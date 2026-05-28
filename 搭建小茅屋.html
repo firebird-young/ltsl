@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>搭建小茅屋</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        background: #f5f5f5;
+        overflow: hidden;
+        font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+        display: flex;
+        justify-content: center;
+        min-height: 100vh;
+    }
+    .app-container {
+        width: 100%;
+        max-width: 430px;
+        min-height: 100vh;
+        position: relative;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        overflow: hidden;
+    }
+    .game-scene {
+        width: 100%;
+        height: 100vh;
+        position: relative;
+        background: linear-gradient(to bottom, #bfe6ff, #e9f7ff);
+    }
+    .game-top {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 20;
+        display: flex;
+        align-items: center;
+        padding: 12px 16px 0;
+    }
+    .game-back {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        border: none;
+        background: rgba(255,255,255,0.7);
+        font-size: 20px;
+        color: #5c3b18;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        backdrop-filter: blur(4px);
+    }
+    .game-back:active { background: rgba(255,255,255,0.9); }
+    .title-area {
+        position: absolute;
+        top: 14px;
+        width: 100%;
+        text-align: center;
+        z-index: 10;
+        pointer-events: none;
+    }
+    .title-area .t-main {
+        font-size: 22px;
+        color: #5c3b18;
+        font-weight: bold;
+    }
+    .title-area .t-hint {
+        color: #6b4c2f;
+        font-size: 13px;
+        margin-top: 2px;
+    }
+    .build-area {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 340px;
+        height: 280px;
+    }
+    .slot {
+        position: absolute;
+        border: 2px dashed rgba(120, 80, 40, 0.35);
+        border-radius: 8px;
+    }
+    .wood {
+        position: absolute;
+        background: linear-gradient(135deg, #9b673d, #6f4420);
+        border-radius: 8px;
+        cursor: grab;
+        box-shadow: 0 6px 10px rgba(0,0,0,0.18);
+        transition: transform 0.2s;
+        user-select: none;
+        z-index: 50;
+    }
+    .wood:hover { transform: scale(1.03); }
+    .wood.dragging {
+        cursor: grabbing;
+        opacity: 0.9;
+        z-index: 999;
+    }
+    .roof { width: 140px; height: 22px; transform: rotate(-24deg); }
+    .roof.right { transform: rotate(24deg); }
+    .wall { width: 130px; height: 24px; }
+    .door {
+        width: 55px;
+        height: 74px;
+        background: linear-gradient(135deg, #7d4c24, #4d2d12);
+    }
+    .success {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        background: rgba(255,255,255,0.95);
+        padding: 22px 36px;
+        border-radius: 24px;
+        font-size: 26px;
+        color: #5c3b18;
+        font-weight: bold;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        transition: 0.5s;
+        z-index: 1000;
+        text-align: center;
+    }
+    .success.show { transform: translate(-50%, -50%) scale(1); }
+    .success .s-sub {
+        font-size: 13px;
+        font-weight: 400;
+        color: #999;
+        margin-top: 6px;
+    }
+    .grass {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 130px;
+        background: linear-gradient(to top, #72ba56, #8dd56d);
+    }
+</style>
+</head>
+<body>
+<div class="app-container">
+<div class="game-scene" id="gameEl">
+    <div class="game-top">
+        <button class="game-back" onclick="goBack()">‹</button>
+    </div>
+    <div class="title-area">
+        <div class="t-main">🪵 搭建小茅屋</div>
+        <div class="t-hint">拖动木材到正确位置，完成一个小茅屋</div>
+    </div>
+
+    <div class="build-area" id="buildArea">
+        <div class="slot" data-match="roof1" style="width:140px;height:22px;left:55px;top:30px;transform:rotate(-24deg);"></div>
+        <div class="slot" data-match="roof2" style="width:140px;height:22px;left:145px;top:30px;transform:rotate(24deg);"></div>
+        <div class="slot" data-match="wall1" style="width:130px;height:24px;left:98px;top:120px;"></div>
+        <div class="slot" data-match="wall2" style="width:130px;height:24px;left:98px;top:152px;"></div>
+        <div class="slot" data-match="wall3" style="width:130px;height:24px;left:98px;top:184px;"></div>
+        <div class="slot" data-match="door" style="width:55px;height:74px;left:135px;top:146px;"></div>
+    </div>
+
+    <div class="wood roof" data-id="roof1" style="left:20px;bottom:90px;"></div>
+    <div class="wood roof right" data-id="roof2" style="left:230px;bottom:70px;"></div>
+    <div class="wood wall" data-id="wall1" style="right:60px;bottom:200px;"></div>
+    <div class="wood wall" data-id="wall2" style="right:80px;bottom:140px;"></div>
+    <div class="wood wall" data-id="wall3" style="right:50px;bottom:80px;"></div>
+    <div class="wood door" data-id="door" style="left:80px;bottom:180px;"></div>
+
+    <div class="success" id="success">
+        🎉 小茅屋完成！
+        <div class="s-sub">你成功搭建了一座茅屋 🏚️</div>
+    </div>
+
+    <div class="grass"></div>
+</div>
+</div>
+
+<script>
+(function() {
+    const woods = document.querySelectorAll('.wood');
+    const slots = document.querySelectorAll('.slot');
+    const success = document.getElementById('success');
+    const game = document.getElementById('gameEl');
+    let completed = 0;
+
+    woods.forEach(wood => {
+        let isDragging = false;
+        let offsetX = 0, offsetY = 0;
+
+        function getContainerOffset() {
+            const r = game.getBoundingClientRect();
+            return { left: r.left, top: r.top };
+        }
+
+        wood.addEventListener('mousedown', startDrag);
+        wood.addEventListener('touchstart', startDrag, { passive: true });
+
+        function startDrag(e) {
+            if (wood.dataset.fixed === 'true') return;
+            isDragging = true;
+            wood.classList.add('dragging');
+            const rect = wood.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            offsetX = clientX - rect.left;
+            offsetY = clientY - rect.top;
+        }
+
+        document.addEventListener('mousemove', moveDrag);
+        document.addEventListener('touchmove', moveDrag, { passive: false });
+
+        function moveDrag(e) {
+            if (!isDragging) return;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            const off = getContainerOffset();
+            wood.style.left = (clientX - offsetX - off.left) + 'px';
+            wood.style.top = (clientY - offsetY - off.top) + 'px';
+            wood.style.bottom = 'auto';
+            wood.style.right = 'auto';
+        }
+
+        document.addEventListener('mouseup', endDrag);
+        document.addEventListener('touchend', endDrag);
+
+        function endDrag() {
+            if (!isDragging) return;
+            isDragging = false;
+            wood.classList.remove('dragging');
+
+            const woodRect = wood.getBoundingClientRect();
+            const buildArea = document.getElementById('buildArea');
+            const baRect = buildArea.getBoundingClientRect();
+
+            slots.forEach(slot => {
+                const slotRect = slot.getBoundingClientRect();
+                const overlap = !(
+                    woodRect.right < slotRect.left ||
+                    woodRect.left > slotRect.right ||
+                    woodRect.bottom < slotRect.top ||
+                    woodRect.top > slotRect.bottom
+                );
+                if (overlap && slot.dataset.match === wood.dataset.id) {
+                    const off = getContainerOffset();
+                    wood.style.left = (slotRect.left - off.left) + 'px';
+                    wood.style.top = (slotRect.top - off.top) + 'px';
+                    wood.dataset.fixed = 'true';
+                    wood.style.cursor = 'default';
+                    slot.style.border = 'none';
+                    completed++;
+                    if (completed === woods.length) {
+                        setTimeout(() => { success.classList.add('show'); }, 300);
+                    }
+                }
+            });
+        }
+    });
+})();
+
+function goBack() {
+    window.location.href = '查看作品.html';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>研学报告 - 我为杜甫建茅屋</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f7fa;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 430px;
+            background: #fff;
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
+
+        /* ===== 顶部导航 ===== */
+        .top-nav {
+            height: 50px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            border-bottom: 1px solid #f0f0f0;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .back-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: #f5f5f5;
+            font-size: 18px;
+            color: #666;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .back-btn:active { background: #e8e8e8; }
+        .top-nav-title {
+            flex: 1;
+            text-align: center;
+            font-size: 17px;
+            font-weight: 600;
+            color: #333;
+            padding-right: 32px;
+        }
+
+        /* ===== 学生信息头部 ===== */
+        .student-header {
+            background: linear-gradient(135deg, #0669FF, #004FE0);
+            padding: 20px 16px 50px;
+            position: relative;
+            overflow: hidden;
+        }
+        .student-header::before {
+            content: '';
+            position: absolute;
+            top: -40px;
+            right: -30px;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+        }
+        .student-header::after {
+            content: '';
+            position: absolute;
+            bottom: -30px;
+            left: -20px;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+        }
+        .student-top-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            position: relative;
+            z-index: 1;
+        }
+        .student-avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            color: #fff;
+            flex-shrink: 0;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        .student-info-text {
+            flex: 1;
+        }
+        .student-info-text .s-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+        }
+        .student-info-text .s-name span {
+            font-size: 13px;
+            font-weight: 400;
+            color: rgba(255,255,255,0.8);
+            margin-left: 6px;
+        }
+        .student-info-text .s-course {
+            font-size: 13px;
+            color: rgba(255,255,255,0.85);
+            margin-top: 4px;
+        }
+        .student-info-text .s-time {
+            font-size: 12px;
+            color: rgba(255,255,255,0.65);
+            margin-top: 2px;
+        }
+
+        /* ===== 统计卡片 ===== */
+        .stats-card {
+            background: #fff;
+            border-radius: 14px;
+            margin: -30px 16px 0;
+            padding: 16px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            display: flex;
+            justify-content: space-around;
+            position: relative;
+            z-index: 10;
+        }
+        .stat-item {
+            text-align: center;
+            flex: 1;
+            position: relative;
+        }
+        .stat-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 10%;
+            height: 80%;
+            width: 1px;
+            background: #f0f0f0;
+        }
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0669FF;
+        }
+        .stat-label {
+            font-size: 11px;
+            color: #999;
+            margin-top: 2px;
+        }
+
+        /* ===== 模块卡片 ===== */
+        .module-card {
+            margin: 16px 16px 0;
+            background: #fff;
+            border-radius: 14px;
+            padding: 18px 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+        }
+        .module-card:last-of-type {
+            margin-bottom: 0;
+        }
+        .module-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .module-header .mh-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            color: #fff;
+            flex-shrink: 0;
+        }
+        .module-header .mh-icon.blue { background: #0669FF; }
+        .module-header .mh-icon.purple { background: #8B5CF6; }
+        .module-header .mh-icon.orange { background: #F59E0B; }
+        .module-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+        .module-header .mh-tag {
+            margin-left: auto;
+            font-size: 11px;
+            color: #0669FF;
+            background: #E8F1FF;
+            padding: 2px 10px;
+            border-radius: 10px;
+        }
+
+
+
+        .ai-works-section {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .aw-row-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 6px;
+        }
+        .aw-row-label .aw-badge {
+            font-size: 11px;
+            font-weight: 400;
+            color: #999;
+            margin-left: 6px;
+        }
+        .aw-scroll-row {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 4px;
+        }
+        .aw-scroll-row::-webkit-scrollbar {
+            height: 3px;
+        }
+        .aw-scroll-row::-webkit-scrollbar-track {
+            background: #f0f0f0;
+            border-radius: 2px;
+        }
+        .aw-scroll-row::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 2px;
+        }
+        .aw-scroll-item {
+            flex: 0 0 calc((100% - 20px) / 3);
+            min-width: calc((100% - 20px) / 3);
+            scroll-snap-align: start;
+            text-align: center;
+        }
+        .aw-img-wrap {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #f0f0f0;
+            margin-bottom: 6px;
+        }
+        .aw-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .aw-play-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.55);
+            border: 2px solid rgba(255,255,255,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #fff;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .aw-play-btn:active {
+            transform: translate(-50%, -50%) scale(0.9);
+        }
+        .aw-scroll-item .aw-label {
+            font-size: 12px;
+            color: #333;
+            font-weight: 500;
+            line-height: 1.3;
+        }
+
+
+        /* ===== 底部留白 ===== */
+        .bottom-spacer {
+            height: 30px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- 顶部导航 -->
+    <div class="top-nav">
+        <button class="back-btn" onclick="goBack()">‹</button>
+        <div class="top-nav-title">研学报告</div>
+    </div>
+
+    <!-- 学生信息头部 -->
+    <div class="student-header">
+        <div class="student-top-row">
+            <div class="student-avatar">📄</div>
+            <div class="student-info-text">
+                <div class="s-name">张晓宇 <span>研学报告</span></div>
+                <div class="s-course">🏚️ 我为杜甫建茅屋</div>
+                <div class="s-time">📅 2026.5.28 14:00 - 17:00</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 统计卡片 -->
+    <div class="stats-card">
+        <div class="stat-item">
+            <div class="stat-value">3</div>
+            <div class="stat-label">AI作品数</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value">5h</div>
+            <div class="stat-label">研学时长</div>
+        </div>
+    </div>
+
+    <!-- ===== 研学内容 ===== -->
+    <div class="module-card">
+        <div class="module-header">
+            <div class="mh-icon blue">📖</div>
+            <h3>研学内容</h3>
+        </div>
+        <div style="font-size:13px;color:#555;line-height:1.9;">
+            本次课程首先探访了杜甫草堂，了解诗圣在成都的生活与创作背景；随后学习了传统茅屋的搭建结构、材料选择和力学原理；在动手实践环节，分组协作搭建茅屋模型，体验古代工匠的智慧；最后整理笔记，记录搭建过程中的感悟与发现。
+        </div>
+    </div>
+
+    <!-- ===== AI作品 ===== -->
+    <div class="module-card">
+        <div class="module-header">
+            <div class="mh-icon purple">🎨</div>
+            <h3>AI作品</h3>
+        </div>
+        <div class="ai-works-section">
+            <div>
+                <div class="aw-row-label">🎬 AI创作视频 <span class="aw-badge">共2个</span></div>
+                <div class="aw-scroll-row">
+                    <div class="aw-scroll-item">
+                        <div class="aw-img-wrap">
+                            <img src="杜甫的家" alt="杜甫的家">
+                            <div class="aw-play-btn">▶</div>
+                        </div>
+                        <div class="aw-label">杜甫的家</div>
+                    </div>
+                    <div class="aw-scroll-item">
+                        <div class="aw-img-wrap">
+                            <img src="杜甫和李白.png" alt="杜甫和李白">
+                            <div class="aw-play-btn">▶</div>
+                        </div>
+                        <div class="aw-label">杜甫和李白</div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="aw-row-label">🎮 AI创作游戏 <span class="aw-badge">共1个</span></div>
+                <div class="aw-scroll-row">
+                    <div class="aw-scroll-item">
+                        <div class="aw-img-wrap">
+                            <img src="快速搭建茅屋" alt="快速搭建茅屋">
+                            <div class="aw-play-btn">▶</div>
+                        </div>
+                        <div class="aw-label">快速搭建茅屋</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 评价 ===== -->
+    <div class="module-card">
+        <div class="module-header">
+            <div class="mh-icon orange">⭐</div>
+            <h3>研学评价</h3>
+        </div>
+        <div style="font-size:13px;color:#555;line-height:1.9;">
+            晓宇在搭建茅屋时非常专注，主动帮助其他组员调整结构，展现了很好的团队协作精神。对茅屋的力学原理理解也很到位，在模型搭建中反复尝试优化，体现了优秀的动手能力和探索精神。
+        </div>
+    </div>
+
+    <div class="bottom-spacer"></div>
+</div>
+
+<script>
+    function goBack() {
+        window.location.href = '研学手记.html';
+    }
+</script>
+
+</body>
+</html>

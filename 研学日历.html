@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>研学日历 - 离泰数链</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        /* 手机模拟容器 */
+        .app-container {
+            width: 100%;
+            max-width: 430px;
+            background-color: #ffffff;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 70px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+        }
+
+        /* ===== 顶部标题栏 ===== */
+        .top-bar {
+            height: 50px;
+            background: #C0D8FF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        /* ===== 页面主体头部 ===== */
+        .page-header {
+            background: #C0D8FF;
+            padding: 6px 20px 36px;
+            position: relative;
+        }
+        .page-header .sub-title {
+            color: #888;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        /* ===== 日历卡片 ===== */
+        .calendar-card {
+            background: #fff;
+            border-radius: 16px;
+            margin: -20px 16px 0;
+            padding: 16px 16px 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            position: relative;
+            z-index: 10;
+        }
+
+        /* 日历头部 */
+        .calendar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .calendar-header .month-year {
+            font-size: 17px;
+            font-weight: 600;
+            color: #333;
+        }
+        .calendar-nav-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: #f5f5f5;
+            font-size: 18px;
+            color: #666;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .calendar-nav-btn:active {
+            background: #e8e8e8;
+        }
+
+        /* 星期行 */
+        .weekday-row {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            padding: 10px 0 6px;
+        }
+        .weekday-row span {
+            font-size: 13px;
+            color: #999;
+            font-weight: 500;
+        }
+
+        /* 日期网格 */
+        .date-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+        }
+        .date-cell {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            color: #333;
+            border-radius: 50%;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+            font-weight: 400;
+        }
+        .date-cell.empty {
+            cursor: default;
+        }
+        .date-cell:not(.empty):hover {
+            background: #e8f0ff;
+        }
+        /* 当天 */
+        .date-cell.today {
+            color: #0669FF;
+            font-weight: 600;
+        }
+        .date-cell.today::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: #0669FF;
+        }
+        /* 选中 */
+        .date-cell.selected {
+            background: #0669FF;
+            color: #fff;
+            font-weight: 600;
+        }
+        .date-cell.selected::after {
+            background: #fff;
+        }
+        .date-cell.selected .dot-indicator {
+            background: #fff;
+        }
+        /* 有课程的标记点 */
+        .date-cell .dot-indicator {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: #0669FF;
+            position: absolute;
+            bottom: 4px;
+        }
+        .date-cell.selected .dot-indicator {
+            background: #fff;
+        }
+        .date-cell.other-month {
+            color: #ccc;
+        }
+
+        /* ===== 游学提示条 ===== */
+        .study-tip {
+            margin: 14px 16px 0;
+            background: linear-gradient(135deg, #E8F1FF, #D6E8FF);
+            border-radius: 10px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #0669FF;
+        }
+        .study-tip .tip-icon {
+            width: 22px;
+            height: 22px;
+            background: #0669FF;
+            border-radius: 50%;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        /* ===== 课程列表标题 ===== */
+        .section-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 16px 10px;
+        }
+        .section-title h2 {
+            font-size: 17px;
+            font-weight: 600;
+            color: #333;
+        }
+        .section-title span {
+            font-size: 13px;
+            color: #999;
+        }
+
+        /* ===== 课程卡片 ===== */
+        .course-list {
+            padding: 0 16px;
+        }
+        .course-card {
+            background: #fff;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            margin-bottom: 14px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .course-card:active {
+            transform: scale(0.98);
+        }
+        .course-card-inner {
+            display: flex;
+            padding: 14px;
+            gap: 12px;
+        }
+        /* 课程缩略图占位 */
+        .course-thumb {
+            width: 100px;
+            min-width: 100px;
+            height: 80px;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .course-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .course-thumb .thumb-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+        .thumb-bonsai {
+            background: linear-gradient(135deg, #86BB71, #5C9E52);
+        }
+        .thumb-hut {
+            background: linear-gradient(135deg, #E8C87A, #D4A84B);
+        }
+        .course-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .course-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .course-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 4px;
+        }
+        .course-tag {
+            background: #e8f0ff;
+            color: #0669FF;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+        .course-time {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* ===== 空状态 ===== */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #bbb;
+        }
+        .empty-state .empty-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        /* ===== 弹窗浮层 ===== */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: 999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.25s;
+            padding: 20px;
+        }
+        .overlay.show {
+            display: flex;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(60px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .popup {
+            background: #fff;
+            width: 100%;
+            max-width: 340px;
+            border-radius: 18px;
+            padding: 30px 24px 24px;
+            text-align: center;
+            animation: slideUp 0.3s ease-out;
+            position: relative;
+        }
+        .popup-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #0669FF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 14px;
+            font-size: 30px;
+            color: #fff;
+        }
+        .popup h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .popup p {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .popup .popup-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: #0669FF;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .popup .popup-btn:active {
+            opacity: 0.85;
+        }
+        .popup-close {
+            position: absolute;
+            top: 12px;
+            right: 14px;
+            background: #f0f0f0;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-size: 16px;
+            color: #999;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .popup-close:active {
+            background: #e0e0e0;
+        }
+
+        /* ===== 底部导航 ===== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 430px;
+            background: #fff;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-around;
+            padding: 6px 0 env(safe-area-inset-bottom, 6px);
+            z-index: 100;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.04);
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            padding: 4px 10px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            transition: color 0.2s;
+        }
+        .nav-item .nav-icon {
+            font-size: 22px;
+            line-height: 1;
+        }
+        .nav-item .nav-label {
+            font-size: 11px;
+            color: #999;
+            font-weight: 500;
+        }
+        .nav-item.active .nav-label {
+            color: #0669FF;
+            font-weight: 600;
+        }
+        .nav-item.active .nav-icon {
+            color: #0669FF;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (min-width: 431px) {
+            .app-container {
+                border-radius: 0;
+            }
+            .bottom-nav {
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- 顶部标题 -->
+    <div class="top-bar">研学日历</div>
+
+    <!-- 页面头部 -->
+    <div class="page-header">
+        <div class="sub-title">查看每日研学课程安排</div>
+    </div>
+
+    <!-- 日历卡片 -->
+    <div class="calendar-card">
+        <div class="calendar-header">
+            <button class="calendar-nav-btn" onclick="prevMonth()">‹</button>
+            <span class="month-year" id="monthYear">2026年5月</span>
+            <button class="calendar-nav-btn" onclick="nextMonth()">›</button>
+        </div>
+        <div class="weekday-row">
+            <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+        </div>
+        <div class="date-grid" id="dateGrid"></div>
+    </div>
+
+    <!-- 游学提示 -->
+    <div class="study-tip">
+        <div class="tip-icon">!</div>
+        <span>标记 <span style="color:#0669FF;font-weight:600;">蓝点</span> 的日期表示有研学课程，点击可查看详情</span>
+    </div>
+
+    <!-- 课程标题 -->
+    <div class="section-title">
+        <h2 id="selectedDateTitle">5月28日 课程</h2>
+        <span id="courseCount">共 2 个研学课程</span>
+    </div>
+
+    <!-- 课程列表 -->
+    <div class="course-list" id="courseList">
+        <!-- 由 JS 动态渲染 -->
+    </div>
+
+    <!-- 弹窗浮层 -->
+    <div class="overlay" id="popupOverlay">
+        <div class="popup">
+            <button class="popup-close" onclick="closePopup()">✕</button>
+            <div class="popup-icon">🔒</div>
+            <h3>温馨提示</h3>
+            <p>需要核销后才能进入课程的<br>"研学手记"</p>
+            <button class="popup-btn" onclick="closePopup()">我知道了</button>
+        </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <div class="bottom-nav">
+        <button class="nav-item">
+            <span class="nav-icon">🏠</span>
+            <span class="nav-label">首页</span>
+        </button>
+        <button class="nav-item active">
+            <span class="nav-icon">📅</span>
+            <span class="nav-label">研学日历</span>
+        </button>
+        <button class="nav-item">
+            <span class="nav-icon">🎁</span>
+            <span class="nav-label">离泰甄选</span>
+        </button>
+        <button class="nav-item">
+            <span class="nav-icon">👤</span>
+            <span class="nav-label">我的</span>
+        </button>
+    </div>
+</div>
+
+
+<script>
+    // ===== 数据 =====
+    // 有研学课程的日期（2026年）
+    const courseDates = [
+        '2026-05-10', '2026-05-15', '2026-05-20',
+        '2026-05-22', '2026-05-28', '2026-05-30',
+        '2026-06-05', '2026-06-12', '2026-06-18',
+        '2026-06-25', '2026-06-28',
+    ];
+
+    // 课程详情数据
+    const courseData = {
+        '2026-05-10': [
+            { name: '盆景美学·指尖上山水', tags: ['自然美育', '动手实践'], time: '09:00 - 11:30', thumb: 'bonsai' },
+            { name: '我为杜甫建茅屋', tags: ['人文历史', '建筑搭建'], time: '14:00 - 17:00', thumb: 'hut' },
+        ],
+        '2026-05-15': [
+            { name: '盆景美学·指尖上山水', tags: ['自然美育', '动手实践'], time: '09:00 - 11:30', thumb: 'bonsai' },
+        ],
+        '2026-05-20': [
+            { name: '我为杜甫建茅屋', tags: ['人文历史', '建筑搭建'], time: '14:00 - 17:00', thumb: 'hut' },
+        ],
+        '2026-05-22': [
+            { name: '盆景美学·指尖上山水', tags: ['自然美育', '动手实践'], time: '09:00 - 11:30', thumb: 'bonsai' },
+            { name: '我为杜甫建茅屋', tags: ['人文历史', '建筑搭建'], time: '14:00 - 17:00', thumb: 'hut' },
+        ],
+        '2026-05-28': [
+            { name: '盆景美学·指尖上山水', tags: ['自然美育', '动手实践'], time: '09:00 - 11:30', thumb: 'bonsai' },
+            { name: '我为杜甫建茅屋', tags: ['人文历史', '建筑搭建'], time: '14:00 - 17:00', thumb: 'hut' },
+        ],
+        '2026-05-30': [
+            { name: '盆景美学·指尖上山水', tags: ['自然美育', '动手实践'], time: '09:00 - 11:30', thumb: 'bonsai' },
+        ],
+        '2026-06-05': [
+            { name: '我为杜甫建茅屋', tags: ['人文历史', '建筑搭建'], time: '14:00 - 17:00', thumb: 'hut' },
+        ],
+        '2026-06-12': [
+            { name: '盆景美学·指尖上山水', tags: ['自然美育', '动手实践'], time: '09:00 - 11:30', thumb: 'bonsai' },
+            { name: '我为杜甫建茅屋', tags: ['人文历史', '建筑搭建'], time: '14:00 - 17:00', thumb: 'hut' },
+        ],
+        '2026-06-18': [
+            { name: '盆景美学·指尖上山水', tags: ['自然美育', '动手实践'], time: '09:00 - 11:30', thumb: 'bonsai' },
+        ],
+        '2026-06-25': [
+            { name: '我为杜甫建茅屋', tags: ['人文历史', '建筑搭建'], time: '14:00 - 17:00', thumb: 'hut' },
+        ],
+        '2026-06-28': [
+            { name: '盆景美学·指尖上山水', tags: ['自然美育', '动手实践'], time: '09:00 - 11:30', thumb: 'bonsai' },
+            { name: '我为杜甫建茅屋', tags: ['人文历史', '建筑搭建'], time: '14:00 - 17:00', thumb: 'hut' },
+        ],
+    };
+
+    let currentYear = 2026;
+    let currentMonth = 5; // 5 = June
+    let selectedDate = '2026-05-28';
+
+    const today = new Date();
+    const todayStr = formatDateStr(today);
+
+    function formatDateStr(date) {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    }
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+
+    // ===== 渲染日历 =====
+    function renderCalendar(year, month) {
+        const grid = document.getElementById('dateGrid');
+        grid.innerHTML = '';
+        document.getElementById('monthYear').textContent = `${year}年${month}月`;
+
+        const firstDay = new Date(year, month - 1, 1).getDay();
+        const daysInMonth = new Date(year, month, 0).getDate();
+
+        // 上月补位
+        const prevMonthDays = new Date(year, month - 1, 0).getDate();
+        for (let i = firstDay - 1; i >= 0; i--) {
+            const cell = document.createElement('div');
+            cell.className = 'date-cell empty other-month';
+            cell.textContent = prevMonthDays - i;
+            grid.appendChild(cell);
+        }
+
+        // 本月日期
+        for (let d = 1; d <= daysInMonth; d++) {
+            const cell = document.createElement('div');
+            cell.className = 'date-cell';
+            const dateStr = `${year}-${pad(month)}-${pad(d)}`;
+            cell.textContent = d;
+            cell.dataset.date = dateStr;
+
+            // 标记今天
+            if (dateStr === todayStr) {
+                cell.classList.add('today');
+            }
+
+            // 标记选中
+            if (dateStr === selectedDate) {
+                cell.classList.add('selected');
+            }
+
+            // 标记有课程的红点
+            if (courseDates.includes(dateStr)) {
+                const dot = document.createElement('span');
+                dot.className = 'dot-indicator';
+                cell.appendChild(dot);
+            }
+
+            cell.addEventListener('click', function () {
+                const ds = this.dataset.date;
+                if (!ds) return;
+                selectedDate = ds;
+                // 移除其他选中
+                document.querySelectorAll('.date-cell.selected').forEach(el => el.classList.remove('selected'));
+                this.classList.add('selected');
+                renderCourses(ds);
+                updateSelectedTitle(ds);
+            });
+
+            grid.appendChild(cell);
+        }
+
+        // 下月补齐 6 行
+        const totalCells = grid.children.length;
+        const remaining = 7 - (totalCells % 7);
+        if (remaining < 7) {
+            for (let i = 1; i <= remaining; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'date-cell empty other-month';
+                cell.textContent = i;
+                grid.appendChild(cell);
+            }
+        }
+
+        // 渲染默认选中日期的课程
+        renderCourses(selectedDate);
+        updateSelectedTitle(selectedDate);
+    }
+
+    // ===== 渲染课程列表 =====
+    function renderCourses(dateStr) {
+        const list = document.getElementById('courseList');
+        const courses = courseData[dateStr];
+
+        if (!courses || courses.length === 0) {
+            list.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">📖</div>
+                    <p>该日暂无研学课程安排</p>
+                </div>
+            `;
+            document.getElementById('courseCount').textContent = '共 0 个研学课程';
+            return;
+        }
+
+        let html = '';
+        courses.forEach((course, index) => {
+            const emojiMap = { bonsai: '🌿', hut: '🏚️' };
+            const bgMap = { bonsai: 'thumb-bonsai', hut: 'thumb-hut' };
+            const imgMap = { bonsai: '', hut: '我为杜甫建茅屋.jpg' };
+            let thumbHtml = '';
+            if (imgMap[course.thumb]) {
+                thumbHtml = `<img src="${imgMap[course.thumb]}" alt="${course.name}">`;
+            } else {
+                thumbHtml = `<div class="thumb-placeholder ${bgMap[course.thumb] || ''}">${emojiMap[course.thumb] || '📚'}</div>`;
+            }
+            html += `
+                <div class="course-card" data-index="${index}">
+                    <div class="course-card-inner">
+                        <div class="course-thumb">
+                            ${thumbHtml}
+                        </div>
+                        <div class="course-info">
+                            <div class="course-name">${course.name}</div>
+                            <div class="course-tags">
+                                ${course.tags.map(t => `<span class="course-tag">${t}</span>`).join('')}
+                            </div>
+                            <div class="course-time">🕐 ${course.time}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        list.innerHTML = html;
+        document.getElementById('courseCount').textContent = `共 ${courses.length} 个研学课程`;
+
+        // 绑定点击事件
+        const cards = list.querySelectorAll('.course-card');
+        cards.forEach((card, idx) => {
+            card.addEventListener('click', function () {
+                const course = courses[idx];
+                if (course.name === '盆景美学·指尖上山水') {
+                    showPopup();
+                } else if (course.name === '我为杜甫建茅屋') {
+                    window.location.href = '研学手记.html';
+                }
+            });
+        });
+    }
+
+    // ===== 更新标题日期 =====
+    function updateSelectedTitle(dateStr) {
+        const parts = dateStr.split('-');
+        const m = parseInt(parts[1], 10);
+        const d = parseInt(parts[2], 10);
+        document.getElementById('selectedDateTitle').textContent = `${m}月${d}日 课程`;
+    }
+
+    // ===== 月份切换 =====
+    function prevMonth() {
+        currentMonth--;
+        if (currentMonth < 1) {
+            currentMonth = 12;
+            currentYear--;
+        }
+        renderCalendar(currentYear, currentMonth);
+    }
+
+    function nextMonth() {
+        currentMonth++;
+        if (currentMonth > 12) {
+            currentMonth = 1;
+            currentYear++;
+        }
+        renderCalendar(currentYear, currentMonth);
+    }
+
+    // ===== 弹窗控制 =====
+    function showPopup() {
+        document.getElementById('popupOverlay').classList.add('show');
+    }
+
+    function closePopup() {
+        document.getElementById('popupOverlay').classList.remove('show');
+    }
+
+    // 点击遮罩关闭
+    document.getElementById('popupOverlay').addEventListener('click', function (e) {
+        if (e.target === this) closePopup();
+    });
+
+    // ===== 初始化 =====
+    renderCalendar(currentYear, currentMonth);
+</script>
+
+</body>
+</html>

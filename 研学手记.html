@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>研学手记 - 我为杜甫建茅屋</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f7fa;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 430px;
+            background: #fff;
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
+
+        /* ===== 顶部导航 ===== */
+        .top-nav {
+            height: 50px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            border-bottom: 1px solid #f0f0f0;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .back-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: #f5f5f5;
+            font-size: 18px;
+            color: #666;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .back-btn:active { background: #e8e8e8; }
+        .top-nav-title {
+            flex: 1;
+            text-align: center;
+            font-size: 17px;
+            font-weight: 600;
+            color: #333;
+            padding-right: 32px;
+        }
+
+        /* ===== 课程横幅 ===== */
+        .course-banner {
+            padding: 20px 16px 24px;
+            background: linear-gradient(135deg, #E8C87A, #D4A84B);
+            position: relative;
+            overflow: hidden;
+        }
+        .course-banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* ===== 模块标题 ===== */
+        .module-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 22px 16px 12px;
+        }
+        .module-title .mt-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background: #0669FF;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+        .module-title h2 {
+            font-size: 17px;
+            font-weight: 600;
+            color: #333;
+        }
+        .module-title .mt-tag {
+            font-size: 11px;
+            color: #0669FF;
+            background: #E8F1FF;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: auto;
+        }
+
+        /* ===== AI 创造卡片 ===== */
+        .ai-card {
+            margin: 0 16px;
+            background: linear-gradient(135deg, #F0F7FF, #E3EEFF);
+            border-radius: 16px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .ai-card::before {
+            content: '✨';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 60px;
+            opacity: 0.2;
+        }
+        .ai-card .ai-desc {
+            font-size: 13px;
+            color: #555;
+            line-height: 1.7;
+            margin-bottom: 14px;
+        }
+        .ai-card .ai-desc strong {
+            color: #0669FF;
+        }
+        .ai-action-bar {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        .ai-action-bar button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .ai-action-bar button:active { opacity: 0.8; }
+        .btn-primary {
+            background: #0669FF;
+            color: #fff;
+        }
+        .btn-secondary {
+            background: #fff;
+            color: #0669FF;
+            border: 1px solid #0669FF !important;
+        }
+
+        /* ===== 研学报告卡片 ===== */
+        .report-card {
+            margin: 4px 16px 0;
+            background: linear-gradient(135deg, #FFF9F0, #FFF3E6);
+            border-radius: 16px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .report-card::before {
+            content: '📊';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 60px;
+            opacity: 0.2;
+        }
+        .report-card .report-desc {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.7;
+            margin-bottom: 14px;
+        }
+        .btn-gold {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            background: #D4A84B;
+            color: #fff;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn-gold:active { opacity: 0.8; }
+
+        /* ===== 研学课程推荐 ===== */
+        .recommend-list {
+            padding: 0 16px;
+        }
+        .recommend-card {
+            background: #fff;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .recommend-card:active {
+            transform: scale(0.98);
+        }
+        .rec-cover {
+            height: 120px;
+            overflow: hidden;
+        }
+        .rec-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .rec-info {
+            padding: 12px 14px;
+        }
+        .rec-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 6px;
+        }
+        .rec-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .rec-time {
+            font-size: 12px;
+            color: #999;
+        }
+        .rec-price {
+            font-size: 16px;
+            font-weight: 700;
+            color: #D43828;
+        }
+
+        /* ===== 底部留白 ===== */
+        .bottom-spacer {
+            height: 30px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- 顶部导航 -->
+    <div class="top-nav">
+        <button class="back-btn" onclick="goBack()">‹</button>
+        <div class="top-nav-title">研学手记</div>
+    </div>
+
+    <!-- 课程横幅 -->
+    <div class="course-banner" style="padding:0;background:linear-gradient(135deg,#E8C87A,#D4A84B);height:160px;position:relative;">
+        <img src="我为杜甫建茅屋.jpg" alt="我为杜甫建茅屋" style="width:100%;height:100%;object-fit:cover;display:block;">
+        <div style="position:absolute;bottom:0;left:0;right:0;padding:10px 16px;background:linear-gradient(transparent,rgba(0,0,0,0.5));z-index:2;">
+            <div style="font-size:18px;font-weight:700;color:#fff;">我为杜甫建茅屋</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.85);">人文历史 · 建筑搭建 · 沉浸体验</div>
+        </div>
+    </div>
+
+    <!-- ===== AI 研学创作工坊 ===== -->
+    <div class="module-title">
+        <div class="mt-icon">🤖</div>
+        <h2>AI 研学创作工坊</h2>
+    </div>
+
+    <div class="ai-card">
+        <div class="ai-desc" style="margin-bottom:0;">
+            <strong>今天学到的知识，创造你的作品</strong>
+        </div>
+        <div class="ai-action-bar" style="margin-top:14px;">
+            <button class="btn-primary" onclick="goAICreate()">🤖 AI创作</button>
+            <button class="btn-secondary" onclick="goViewWorks()">📂 查看作品</button>
+        </div>
+    </div>
+
+    <!-- ===== 研学报告 ===== -->
+    <div class="module-title">
+        <div class="mt-icon">📊</div>
+        <h2>研学报告</h2>
+    </div>
+
+    <div class="report-card" style="padding-top:20px;">
+        <div class="report-desc" style="text-align:center;font-weight:500;color:#5C3D1A;font-size:14px;">
+            回顾你的研学之旅，生成专属报告
+        </div>
+        <button class="btn-gold" onclick="goReport()">📄 查看完整报告</button>
+    </div>
+
+    <!-- ===== 研学课程推荐 ===== -->
+    <div class="module-title" style="padding-bottom:6px;">
+        <div class="mt-icon" style="background:#D4A84B;">🌟</div>
+        <h2>研学课程推荐</h2>
+    </div>
+
+    <div class="recommend-list">
+        <div class="recommend-card">
+            <div class="rec-cover">
+                <img src="诗界无心·草堂寻心.jpg" alt="诗界无心·草堂寻心" style="width:100%;height:100%;object-fit:cover;display:block;">
+            </div>
+            <div class="rec-info">
+                <div class="rec-name">诗界无心·草堂寻心</div>
+                <div class="rec-meta">
+                    <span class="rec-time">📅 2025.1.10-2025.1.25</span>
+                    <span class="rec-price">¥168</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-spacer"></div>
+</div>
+
+<script>
+    function goBack() {
+        window.location.href = '研学日历.html';
+    }
+    function goReport() {
+        window.location.href = '研学报告.html';
+    }
+    function goViewWorks() {
+        window.location.href = '查看作品.html';
+    }
+    function goAICreate() {
+        window.location.href = 'AI创作.html';
+    }
+</script>
+
+</body>
+</html>
