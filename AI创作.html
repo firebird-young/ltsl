@@ -166,6 +166,28 @@
             color: #0669FF;
         }
 
+        /* ===== 名称输入 ===== */
+        .name-input-wrap {
+            margin: 10px 16px 0;
+        }
+        .name-input-wrap input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #333;
+            outline: none;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        .name-input-wrap input:focus {
+            border-color: #0669FF;
+        }
+        .name-input-wrap input::placeholder {
+            color: #bbb;
+        }
+
         /* ===== 生成按钮 ===== */
         .gen-btn-wrap {
             display: flex;
@@ -186,26 +208,6 @@
         }
         .gen-btn:active { opacity: 0.8; }
         .gen-btn:disabled { opacity: 0.5; cursor: default; }
-
-        /* ===== 生成状态 ===== */
-        .gen-status {
-            display: none;
-            margin: 16px 16px 0;
-            padding: 14px;
-            border-radius: 12px;
-            text-align: center;
-            font-size: 14px;
-            color: #666;
-        }
-        .gen-status.generating {
-            display: block;
-            background: #E8F1FF;
-        }
-        .gen-status.done {
-            display: block;
-            background: #E8FFE8;
-            color: #2E7D32;
-        }
 
         /* ===== 生成结果 ===== */
         .result-area {
@@ -261,6 +263,163 @@
             text-align: center;
         }
 
+        /* ===== 弹窗浮层 ===== */
+        .gen-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.45);
+            z-index: 999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.25s;
+            padding: 20px;
+        }
+        .gen-overlay.show { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .gen-popup {
+            background: #fff;
+            width: 100%;
+            max-width: 310px;
+            border-radius: 18px;
+            padding: 32px 24px 24px;
+            text-align: center;
+            animation: slideUp 0.3s ease-out;
+        }
+        .gen-popup .gp-icon {
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            background: #E8F1FF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 14px;
+            font-size: 30px;
+        }
+        .gen-popup h3 {
+            font-size: 17px; font-weight: 600; color: #333;
+            margin-bottom: 6px;
+        }
+        .gen-popup p {
+            font-size: 14px; color: #666; line-height: 1.6;
+            margin-bottom: 22px;
+        }
+        .gen-popup .gp-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .gen-popup .gp-btns button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .gen-popup .gp-btns button:active { opacity: 0.85; }
+        .gp-btn-primary {
+            background: #0669FF; color: #fff;
+        }
+        .gp-btn-secondary {
+            background: #f5f5f5; color: #666;
+        }
+
+        /* ===== 进度条 ===== */
+        .progress-bar-wrap {
+            display: none;
+            margin: 16px 16px 0;
+            padding: 14px 16px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .progress-bar-wrap.show { display: block; }
+        .progress-bar-wrap .pb-text {
+            font-size: 13px; color: #888;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        .progress-track {
+            width: 100%; height: 6px;
+            background: #f0f0f0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #0669FF, #4A9EFF);
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        /* ===== 生成中列表 ===== */
+        .generating-wrap {
+            display: none;
+            margin: 16px 16px 0;
+        }
+        .generating-wrap.show { display: block; }
+        .gen-list-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .gen-list {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+        .gen-list::-webkit-scrollbar { height: 3px; }
+        .gen-list::-webkit-scrollbar-track { background: #f0f0f0; border-radius: 2px; }
+        .gen-list::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
+        .gen-list-item {
+            flex: 0 0 calc((100% - 20px) / 3);
+            min-width: calc((100% - 20px) / 3);
+            scroll-snap-align: start;
+            text-align: center;
+        }
+        .gen-list-item .gli-img {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #e0e0e0;
+            filter: grayscale(1);
+            opacity: 0.7;
+        }
+        .gen-list-item .gli-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .gen-list-item .gli-img .gli-badge {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.55);
+            color: #fff;
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            white-space: nowrap;
+        }
+        .gen-list-item .gli-label {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+            line-height: 1.3;
+        }
+
         /* ===== 底部留白 ===== */
         .bottom-spacer { height: 30px; }
     </style>
@@ -304,20 +463,30 @@
         <span class="template-chip" onclick="useTemplate(this)">杜甫与李白的诗歌对谈</span>
     </div>
 
+    <!-- 名称输入 -->
+    <div class="name-input-wrap">
+        <input type="text" id="nameInput" placeholder="给作品起个名字吧" maxlength="20">
+    </div>
+
     <!-- 生成按钮 -->
     <div class="gen-btn-wrap">
         <button class="gen-btn" id="genBtn" onclick="startGenerate()">✨ 立即生成</button>
     </div>
 
-    <!-- 生成状态 -->
-    <div class="gen-status" id="genStatus"></div>
+    <!-- 进度条 -->
+    <div class="progress-bar-wrap" id="progressBarWrap">
+        <div class="pb-text" id="progressText">🤖 AI正在创作中，请稍候...</div>
+        <div class="progress-track">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
 
     <!-- 生成结果 -->
     <div class="result-area" id="resultArea">
         <div class="result-card" id="resultCard">
             <div class="rc-img">
                 <img id="resultImg" src="" alt="生成结果">
-                <div class="play-overlay" id="playOverlay">▶</div>
+                <div class="play-overlay">▶</div>
             </div>
             <div class="rc-body">
                 <div class="rc-title" id="resultTitle">杜甫和李白</div>
@@ -325,7 +494,26 @@
         </div>
     </div>
 
+    <!-- 生成中列表 -->
+    <div class="generating-wrap" id="generatingWrap">
+        <div class="gen-list-title">⏳ 正在生成中</div>
+        <div class="gen-list" id="genList"></div>
+    </div>
+
     <div class="bottom-spacer"></div>
+
+    <!-- 弹窗浮层 -->
+    <div class="gen-overlay" id="genOverlay">
+        <div class="gen-popup">
+            <div class="gp-icon">⏳</div>
+            <h3>正在生成中</h3>
+            <p>稍后可以在我的作品中查看</p>
+            <div class="gp-btns">
+                <button class="gp-btn-primary" onclick="laterView()">稍后查看</button>
+                <button class="gp-btn-secondary" onclick="continueWait()">继续等待</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -372,41 +560,116 @@
             }
         }
         document.getElementById('promptInput').value = '';
-        document.getElementById('genStatus').className = 'gen-status';
+        document.getElementById('progressBarWrap').classList.remove('show');
+        document.getElementById('resultArea').classList.remove('show');
+        if (genTimer) { clearTimeout(genTimer); genTimer = null; }
+        var btn = document.getElementById('genBtn');
+        btn.disabled = false;
+        btn.textContent = '✨ 立即生成';
     }
 
     function useTemplate(el) {
         document.getElementById('promptInput').value = el.textContent;
     }
 
+    var genTimer = null;
+
     function startGenerate() {
         var btn = document.getElementById('genBtn');
         btn.disabled = true;
         btn.textContent = '⏳ 生成中...';
 
-        var status = document.getElementById('genStatus');
-        status.className = 'gen-status generating';
-        status.textContent = '🤖 AI正在创作中，请稍候...';
+        document.getElementById('resultArea').classList.remove('show');
+        document.getElementById('progressBarWrap').classList.remove('show');
 
+        // 显示弹窗
+        document.getElementById('genOverlay').classList.add('show');
+    }
+
+    var genIdCounter = 0;
+
+    function laterView() {
+        document.getElementById('genOverlay').classList.remove('show');
+        document.getElementById('progressBarWrap').classList.remove('show');
         document.getElementById('resultArea').classList.remove('show');
 
-        setTimeout(function() {
-            if (currentTab === 'video') {
-                videoGenerated = true;
-                status.className = 'gen-status done';
-                status.textContent = '✅ 视频生成完成！';
-                document.getElementById('resultImg').src = '杜甫和李白.png';
-                document.getElementById('resultTitle').textContent = '杜甫和李白';
-            } else {
-                gameGenerated = true;
-                status.className = 'gen-status done';
-                status.textContent = '✅ 游戏生成完成！';
-                document.getElementById('resultImg').src = '快速搭建茅屋';
-                document.getElementById('resultTitle').textContent = '快速搭建茅屋';
-            }
-            document.getElementById('resultArea').classList.add('show');
-            btn.disabled = false;
-            btn.textContent = '✨ 立即生成';
+        // 添加到生成中列表
+        var name = document.getElementById('nameInput').value.trim() || (currentTab === 'video' ? '杜甫和李白' : '快速搭建茅屋');
+        var imgSrc = currentTab === 'video' ? '杜甫和李白.png' : '快速搭建茅屋';
+        var icon = currentTab === 'video' ? '🎬' : '🎮';
+
+        var list = document.getElementById('genList');
+        var item = document.createElement('div');
+        item.className = 'gen-list-item';
+        item.dataset.genId = ++genIdCounter;
+        item.innerHTML = `
+            <div class="gli-img">
+                <img src="${imgSrc}" alt="${name}">
+                <span class="gli-badge">⏳ 生成中</span>
+            </div>
+            <div class="gli-label">${icon} ${name}</div>
+        `;
+        list.appendChild(item);
+        document.getElementById('generatingWrap').classList.add('show');
+
+        var btn = document.getElementById('genBtn');
+        btn.disabled = false;
+        btn.textContent = '✨ 立即生成';
+        if (genTimer) { clearTimeout(genTimer); genTimer = null; }
+    }
+
+    function continueWait() {
+        // 关闭弹窗，展示进度条
+        document.getElementById('genOverlay').classList.remove('show');
+        document.getElementById('progressBarWrap').classList.add('show');
+        document.getElementById('resultArea').classList.remove('show');
+
+        var fill = document.getElementById('progressFill');
+        var text = document.getElementById('progressText');
+        fill.style.width = '0%';
+        text.textContent = '🤖 AI正在创作中，请稍候...';
+
+        // 模拟进度
+        var progress = 0;
+        var interval = setInterval(function() {
+            progress += Math.random() * 15 + 5;
+            if (progress > 95) progress = 95;
+            fill.style.width = progress + '%';
+        }, 400);
+
+        genTimer = setTimeout(function() {
+            clearInterval(interval);
+            fill.style.width = '100%';
+            setTimeout(function() {
+                document.getElementById('progressBarWrap').classList.remove('show');
+                text.textContent = '🤖 AI正在创作中，请稍候...';
+
+                // 移除生成中列表的最后一项
+                var list = document.getElementById('genList');
+                var lastItem = list.lastElementChild;
+                if (lastItem) {
+                    lastItem.style.transition = 'opacity 0.3s, transform 0.3s';
+                    lastItem.style.opacity = '0';
+                    lastItem.style.transform = 'scale(0.8)';
+                    setTimeout(function() { lastItem.remove(); if (list.children.length === 0) document.getElementById('generatingWrap').classList.remove('show'); }, 300);
+                }
+
+                if (currentTab === 'video') {
+                    videoGenerated = true;
+                    document.getElementById('resultImg').src = '杜甫和李白.png';
+                    document.getElementById('resultTitle').textContent = '杜甫和李白';
+                } else {
+                    gameGenerated = true;
+                    document.getElementById('resultImg').src = '快速搭建茅屋';
+                    document.getElementById('resultTitle').textContent = '快速搭建茅屋';
+                }
+                document.getElementById('resultArea').classList.add('show');
+
+                var btn = document.getElementById('genBtn');
+                btn.disabled = false;
+                btn.textContent = '✨ 立即生成';
+                genTimer = null;
+            }, 300);
         }, 2000);
     }
 
