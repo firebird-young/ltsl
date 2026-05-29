@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统参数配置 - 管理后台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header .logo {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0669FF;
+            margin-right: 32px;
+        }
+        .header .nav-list {
+            display: flex;
+            gap: 24px;
+            list-style: none;
+        }
+        .header .nav-list li {
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+            padding: 4px 0;
+            position: relative;
+        }
+        .header .nav-list li:hover { color: #0669FF; }
+        .header .nav-list li.active {
+            color: #0669FF;
+            font-weight: 600;
+        }
+        .header .nav-list li.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #0669FF;
+            border-radius: 1px;
+        }
+        .header .user-area {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .header .user-area .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #E8F0FE;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #0669FF;
+        }
+        .header .user-area .name { font-size: 14px; color: #333; }
+
+        .breadcrumb {
+            padding: 16px 24px 0;
+            font-size: 13px;
+            color: #999;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .breadcrumb a {
+            color: #999;
+            text-decoration: none;
+        }
+        .breadcrumb a:hover { color: #0669FF; }
+        .breadcrumb .sep { color: #ccc; }
+        .breadcrumb .current { color: #333; font-weight: 500; }
+
+        .main {
+            padding: 16px 24px 40px;
+            max-width: 960px;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        .page-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .config-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 28px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            padding-bottom: 14px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #0669FF;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-title .icon { font-size: 18px; }
+
+        .config-row {
+            margin-bottom: 20px;
+        }
+        .config-row:last-child { margin-bottom: 0; }
+        .config-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .config-desc {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        .text-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d9d9d9;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #333;
+            outline: none;
+            transition: border-color 0.2s;
+            font-family: inherit;
+            resize: vertical;
+            line-height: 1.7;
+        }
+        .text-input:focus {
+            border-color: #0669FF;
+            box-shadow: 0 0 0 2px rgba(6,105,255,0.08);
+        }
+        textarea.text-input {
+            min-height: 200px;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .radio-group label {
+            padding: 6px 18px;
+            border-radius: 6px;
+            border: 1px solid #d9d9d9;
+            background: #fff;
+            font-size: 13px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .radio-group input[type="radio"] { display: none; }
+        .radio-group input[type="radio"]:checked + label {
+            border-color: #0669FF;
+            background: #E8F0FE;
+            color: #0669FF;
+            font-weight: 500;
+        }
+        .radio-group label:hover { border-color: #0669FF; }
+
+        .bottom-actions {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+        .btn {
+            padding: 10px 32px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .btn-cancel {
+            background: #f5f5f5;
+            color: #666;
+            border: 1px solid #d9d9d9;
+        }
+        .btn-cancel:hover { background: #eee; }
+        .btn-save {
+            background: #0669FF;
+            color: #fff;
+        }
+        .btn-save:hover { background: #0052CC; }
+        .btn-save:active { background: #0040A0; }
+
+        /* ===== 风格配置 ===== */
+        .style-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 4px;
+        }
+        .style-card {
+            width: 120px;
+            background: #f8f9fc;
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            position: relative;
+            border: 1px solid #eef0f5;
+        }
+        .style-card .sc-thumb {
+            width: 96px;
+            height: 64px;
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 0 auto 6px;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+        .style-card .sc-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .style-card .sc-thumb-empty { background: #f0f0f0; font-size: 24px; }
+        .style-card .sc-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+        }
+        .style-card .sc-del {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: none;
+            background: #E65100;
+            color: #fff;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .style-card .sc-del:hover { background: #BF360C; }
+
+        .add-style-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .upload-thumb-box {
+            width: 120px;
+            height: 60px;
+            border: 2px dashed #d0d5e0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #bbb;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+            transition: border-color 0.2s;
+        }
+        .upload-thumb-box:hover { border-color: #0669FF; }
+        .upload-thumb-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">离泰数链</div>
+        <ul class="nav-list">
+            <li>概览</li>
+            <li class="active">系统设置</li>
+            <li>用户管理</li>
+            <li>日志管理</li>
+        </ul>
+        <div class="user-area">
+            <span class="avatar">👤</span>
+            <span class="name">管理员</span>
+        </div>
+    </div>
+
+    <div class="breadcrumb">
+        <a href="index.html">首页</a>
+        <span class="sep">&gt;</span>
+        <a href="#">系统设置</a>
+        <span class="sep">&gt;</span>
+        <span class="current">系统参数配置</span>
+    </div>
+
+    <div class="main">
+        <div class="page-header">
+            <h2>系统参数配置</h2>
+        </div>
+
+        <!-- ===== AI视频生成配置 ===== -->
+        <div class="config-card">
+            <div class="section-title">
+                <span class="icon">🎬</span>
+                AI视频生成配置
+            </div>
+
+            <div class="config-row">
+                <span class="config-label">AI视频模型</span>
+                <div class="radio-group">
+                    <input type="radio" name="videoModel" id="model0" value="seedance-2.0" checked>
+                    <label for="model0">seedance-2.0</label>
+                    <input type="radio" name="videoModel" id="model1" value="seedance-2.0-fast">
+                    <label for="model1">seedance-2.0-fast</label>
+                    <input type="radio" name="videoModel" id="model2" value="seedance-1.5-pro">
+                    <label for="model2">seedance-1.5-pro</label>
+                </div>
+            </div>
+
+            <div class="config-row">
+                <span class="config-label">AI视频系统 Prompt</span>
+                <textarea class="text-input" id="aiVideoPrompt" placeholder="请输入AI视频系统的全局提示词（System Prompt）&#10;&#10;例如：&#10;- 你是一个专业的AI视频创作助手，擅长制作研学相关的教育视频。&#10;- 视频需要包含清晰的知识点和引人入胜的叙事结构。&#10;- 输出格式需包含分镜描述、旁白文案和画面说明。&#10;- 所有内容需符合中小学生认知水平。"></textarea>
+                <div class="config-desc">该提示词将作为AI视频创作的系统级前置指令，影响所有视频生成的结果</div>
+            </div>
+
+            <!-- 风格配置 -->
+            <div class="config-row">
+                <span class="config-label">风格配置</span>
+                <div id="styleList" class="style-grid"></div>
+                <div class="add-style-row" style="margin-top:12px;">
+                    <input type="text" id="newStyleName" placeholder="输入风格名称" class="text-input" style="width:220px;">
+                    <div class="upload-thumb-box" onclick="document.getElementById('styleThumbInput').click()">
+                        <span id="thumbPlaceholder">+ 上传示意图</span>
+                        <img id="thumbPreview" style="display:none;" alt="">
+                        <input type="file" id="styleThumbInput" accept="image/*" onchange="handleThumbUpload(event)" style="display:none;">
+                    </div>
+                    <button class="btn btn-save" onclick="addStyle()" style="padding:8px 20px;font-size:13px;height:36px;">添加</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== AI游戏生成配置 ===== -->
+        <div class="config-card" style="margin-top:20px;">
+            <div class="section-title">
+                <span class="icon">🎮</span>
+                AI游戏生成配置
+            </div>
+
+            <div class="config-row">
+                <span class="config-label">AI游戏系统 Prompt</span>
+                <textarea class="text-input" id="aiGamePrompt" placeholder="请输入AI游戏系统的全局提示词（System Prompt）&#10;&#10;例如：&#10;- 你是一个专业的AI游戏创作助手，擅长设计研学相关的互动游戏。&#10;- 游戏需要包含明确的教育目标和趣味性。&#10;- 输出格式需结构化，包含游戏规则、关卡设计和评分机制。&#10;- 所有内容需符合中小学生认知水平。"></textarea>
+                <div class="config-desc">该提示词将作为AI游戏创作的系统级前置指令，影响所有游戏生成的结果</div>
+            </div>
+        </div>
+
+        <!-- ===== 保存按钮 ===== -->
+        <div style="margin-top:20px;display:flex;justify-content:flex-end;gap:12px;">
+            <button class="btn btn-cancel" onclick="window.location.href='课程管理.html'">取消</button>
+            <button class="btn btn-save" onclick="saveConfig()">💾 保存配置</button>
+        </div>
+    </div>
+
+    <script>
+        var styles = [];
+
+        function loadStyles() {
+            var saved = localStorage.getItem('systemConfig');
+            if (saved) {
+                try {
+                    var cfg = JSON.parse(saved);
+                    if (cfg.styles) { styles = cfg.styles; }
+                } catch(e) {}
+            }
+            if (styles.length === 0) {
+                styles = [
+                    { name: '水墨', thumb: '' },
+                    { name: '写实', thumb: '' },
+                    { name: '手绘', thumb: '' },
+                    { name: '赛博朋克', thumb: '' }
+                ];
+            }
+            renderStyles();
+        }
+
+        function renderStyles() {
+            var el = document.getElementById('styleList');
+            if (styles.length === 0) {
+                el.innerHTML = '<div style="padding:20px 0;color:#bbb;font-size:13px;text-align:center;">暂无风格，请添加</div>';
+                return;
+            }
+            var html = '';
+            for (var i = 0; i < styles.length; i++) {
+                var s = styles[i];
+                html += '<div class="style-card">';
+                if (s.thumb) {
+                    html += '<div class="sc-thumb"><img src="' + s.thumb + '" alt="' + s.name + '"></div>';
+                } else {
+                    html += '<div class="sc-thumb sc-thumb-empty">🎨</div>';
+                }
+                html += '<div class="sc-name">' + s.name + '</div>';
+                html += '<button class="sc-del" onclick="deleteStyle(' + i + ')">✕</button>';
+                html += '</div>';
+            }
+            el.innerHTML = html;
+        }
+
+        function handleThumbUpload(e) {
+            var file = e.target.files[0];
+            if (!file) return;
+            var reader = new FileReader();
+            reader.onload = function(ev) {
+                document.getElementById('thumbPlaceholder').style.display = 'none';
+                var preview = document.getElementById('thumbPreview');
+                preview.style.display = 'block';
+                preview.src = ev.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function addStyle() {
+            var name = document.getElementById('newStyleName').value.trim();
+            if (!name) { alert('请输入风格名称'); return; }
+            var thumbSrc = document.getElementById('thumbPreview').src;
+            var thumbData = (thumbSrc && thumbSrc.startsWith('data:')) ? thumbSrc : '';
+            styles.push({ name: name, thumb: thumbData });
+            renderStyles();
+            // 清空输入
+            document.getElementById('newStyleName').value = '';
+            document.getElementById('thumbPlaceholder').style.display = 'inline';
+            document.getElementById('thumbPreview').style.display = 'none';
+            document.getElementById('thumbPreview').src = '';
+            document.getElementById('styleThumbInput').value = '';
+        }
+
+        function deleteStyle(index) {
+            if (!confirm('确定要删除风格「' + styles[index].name + '」吗？')) return;
+            styles.splice(index, 1);
+            renderStyles();
+        }
+
+        function loadSaved() {
+            var saved = localStorage.getItem('systemConfig');
+            if (!saved) return;
+            try {
+                var cfg = JSON.parse(saved);
+                if (cfg.aiVideoPrompt) {
+                    document.getElementById('aiVideoPrompt').value = cfg.aiVideoPrompt;
+                }
+                if (cfg.aiGamePrompt) {
+                    document.getElementById('aiGamePrompt').value = cfg.aiGamePrompt;
+                }
+                if (cfg.videoModel) {
+                    var m = document.querySelector('input[name="videoModel"][value="' + cfg.videoModel + '"]');
+                    if (m) m.checked = true;
+                }
+            } catch(e) {}
+        }
+
+        function saveConfig() {
+            var videoPrompt = document.getElementById('aiVideoPrompt').value.trim();
+            var gamePrompt = document.getElementById('aiGamePrompt').value.trim();
+            if (!videoPrompt) {
+                alert('⚠️ 请输入AI视频系统 Prompt');
+                return;
+            }
+            if (!gamePrompt) {
+                alert('⚠️ 请输入AI游戏系统 Prompt');
+                return;
+            }
+            var modelEl = document.querySelector('input[name="videoModel"]:checked');
+            // 合并现有配置，保留 styles
+            var existing = localStorage.getItem('systemConfig');
+            var config = existing ? JSON.parse(existing) : {};
+            config.aiVideoPrompt = videoPrompt;
+            config.aiGamePrompt = gamePrompt;
+            config.videoModel = modelEl ? modelEl.value : 'seedance-2.0';
+            config.styles = styles;
+            localStorage.setItem('systemConfig', JSON.stringify(config));
+            alert('✅ 系统参数配置已保存');
+        }
+
+        loadStyles();
+        loadSaved();
+    </script>
+</body>
+</html>

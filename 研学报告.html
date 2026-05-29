@@ -63,7 +63,7 @@
             background: linear-gradient(135deg, #0669FF, #004FE0);
             padding: 20px 16px 50px;
             position: relative;
-            overflow: hidden;
+            overflow: visible;
         }
         .student-header::before {
             content: '';
@@ -87,7 +87,7 @@
         }
         .student-top-row {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 14px;
             position: relative;
             z-index: 1;
@@ -107,6 +107,7 @@
         }
         .student-info-text {
             flex: 1;
+            position: relative;
         }
         .student-info-text .s-name {
             font-size: 18px;
@@ -128,6 +129,98 @@
             font-size: 12px;
             color: rgba(255,255,255,0.65);
             margin-top: 2px;
+        }
+        .student-info-text .s-course {
+            font-size: 13px;
+            color: rgba(255,255,255,0.85);
+            margin-top: 4px;
+        }
+        .student-info-text .s-time {
+            font-size: 12px;
+            color: rgba(255,255,255,0.65);
+            margin-top: 2px;
+        }
+        .switch-btn-wrap {
+            flex-shrink: 0;
+            padding-top: 6px;
+        }
+        .switch-btn {
+            font-size: 12px;
+            color: #fff;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+            transition: background 0.2s;
+        }
+        .switch-btn:active {
+            background: rgba(255,255,255,0.25);
+        }
+
+        /* ===== 切换用户弹窗 ===== */
+        .switch-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s;
+            padding: 20px;
+        }
+        .switch-overlay.show { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes popIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .switch-popup {
+            background: #fff;
+            width: 100%;
+            max-width: 280px;
+            border-radius: 18px;
+            padding: 24px 0;
+            animation: popIn 0.25s ease-out;
+        }
+        .switch-popup .sp-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+            padding: 0 20px 14px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .switch-popup .sp-item {
+            padding: 14px 20px;
+            font-size: 15px;
+            color: #333;
+            cursor: pointer;
+            border-bottom: 1px solid #f5f5f5;
+            transition: background 0.2s;
+        }
+        .switch-popup .sp-item:last-child { border-bottom: none; }
+        .switch-popup .sp-item:active { background: #E8F1FF; }
+        .switch-popup .sp-item.active { color: #0669FF; font-weight: 600; background: #E8F1FF; }
+        .switch-popup .sp-item .sp-sub {
+            font-size: 11px;
+            color: #999;
+            font-weight: 400;
+            margin-left: 4px;
+        }
+        .switch-popup .sp-close {
+            display: block;
+            width: 100%;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 0 0 18px 18px;
+            background: #f5f5f5;
+            color: #999;
+            font-size: 14px;
+            cursor: pointer;
         }
 
         /* ===== 统计卡片 ===== */
@@ -320,9 +413,15 @@
         <div class="student-top-row">
             <div class="student-avatar">📄</div>
             <div class="student-info-text">
-                <div class="s-name">张晓宇 <span>研学报告</span></div>
-                <div class="s-course">🏚️ 我为杜甫建茅屋</div>
-                <div class="s-time">📅 2026.5.28 14:00 - 17:00</div>
+                <div class="s-name" id="sName">张晓宇 <span>研学报告</span></div>
+                <div class="s-course" id="sCourse">🏚️ 我为杜甫建茅屋</div>
+                <div class="s-time" id="sTime">📅 2026.5.28 14:00 - 17:00</div>
+            </div>
+            <div class="switch-btn-wrap">
+                <div class="switch-btn" onclick="showSwitchPopup()">
+                    切换报告人
+                    <span>▼</span>
+                </div>
             </div>
         </div>
     </div>
@@ -403,12 +502,49 @@
     </div>
 
     <div class="bottom-spacer"></div>
+
+    <!-- 切换用户弹窗 -->
+    <div class="switch-overlay" id="switchOverlay">
+        <div class="switch-popup">
+            <div class="sp-title">👤 切换报告人</div>
+            <div class="sp-item active" onclick="switchUser('张晓宇', '🏚️ 我为杜甫建茅屋', '📅 2026.5.28 14:00 - 17:00')">张晓宇</div>
+            <div class="sp-item" onclick="switchUser('杨梅', '🏚️ 我为杜甫建茅屋', '📅 2026.5.10 09:00 - 12:00')">杨梅</div>
+            <div class="sp-item" onclick="switchUser('刘飞', '🌿 盆景美学·指尖上山水', '📅 2026.5.15 09:00 - 11:30')">刘飞</div>
+            <div class="sp-item" onclick="switchUser('王浩宇', '🏯 诗境无界·草堂寻心', '📅 2026.1.15 14:00 - 17:00')">王浩宇</div>
+            <button class="sp-close" onclick="closeSwitchPopup()">取消</button>
+        </div>
+    </div>
 </div>
 
 <script>
     function goBack() {
         window.location.href = '研学手记.html';
     }
+
+    function showSwitchPopup() {
+        document.getElementById('switchOverlay').classList.add('show');
+    }
+
+    function closeSwitchPopup() {
+        document.getElementById('switchOverlay').classList.remove('show');
+    }
+
+    function switchUser(name, course, time) {
+        document.getElementById('sName').innerHTML = name + ' <span>研学报告</span>';
+        document.getElementById('sCourse').textContent = course;
+        document.getElementById('sTime').textContent = time;
+        closeSwitchPopup();
+        // 高亮当前选中
+        var items = document.querySelectorAll('.sp-item');
+        items.forEach(function(item) { item.classList.remove('active'); });
+        var found = Array.from(items).find(function(item) { return item.textContent.trim() === name; });
+        if (found) found.classList.add('active');
+    }
+
+    // 点击遮罩关闭
+    document.getElementById('switchOverlay').addEventListener('click', function(e) {
+        if (e.target === this) closeSwitchPopup();
+    });
 </script>
 
 </body>

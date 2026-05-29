@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>研学手记配置</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+            background: rgba(0,0,0,0.45);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 20px;
+        }
+        .modal {
+            width: 100%;
+            max-width: 800px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 28px;
+            border-bottom: 1px solid #f0f0f0;
+            background: #fafbff;
+        }
+        .modal-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .modal-header .close-btn {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: #f0f0f0;
+            font-size: 20px;
+            color: #999;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .modal-header .close-btn:hover { background: #e0e0e0; color: #333; }
+        .modal-body {
+            padding: 28px;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+        }
+
+        /* ===== 板块 ===== */
+        .section {
+            margin-bottom: 32px;
+        }
+        .section:last-child { margin-bottom: 0; }
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+            border-bottom: 2px solid #0669FF;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-title .icon { font-size: 18px; }
+
+        /* ===== 分类卡片 ===== */
+        .category-card {
+            background: #f8f9fc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid #eef0f5;
+        }
+        .category-card:last-child { margin-bottom: 0; }
+        .category-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .category-title .badge {
+            font-size: 11px;
+            background: #0669FF;
+            color: #fff;
+            padding: 1px 8px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+
+        /* ===== 配置行 ===== */
+        .config-row {
+            margin-bottom: 14px;
+        }
+        .config-row:last-child { margin-bottom: 0; }
+        .config-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        /* ===== 比例选项 ===== */
+        .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .radio-group label {
+            padding: 5px 14px;
+            border-radius: 6px;
+            border: 1px solid #d9d9d9;
+            background: #fff;
+            font-size: 13px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .radio-group input[type="radio"] { display: none; }
+        .radio-group input[type="radio"]:checked + label {
+            border-color: #0669FF;
+            background: #E8F0FE;
+            color: #0669FF;
+            font-weight: 500;
+        }
+        .radio-group label:hover { border-color: #0669FF; }
+
+        /* ===== 输入框 ===== */
+        .text-input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #d9d9d9;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #333;
+            outline: none;
+            transition: border-color 0.2s;
+            font-family: inherit;
+            resize: vertical;
+        }
+        .text-input:focus {
+            border-color: #0669FF;
+            box-shadow: 0 0 0 2px rgba(6,105,255,0.08);
+        }
+        textarea.text-input {
+            min-height: 80px;
+            line-height: 1.6;
+        }
+
+        /* ===== 非必填标识 ===== */
+        .optional { font-size: 11px; color: #bbb; font-weight: 400; margin-left: 4px; }
+
+        /* ===== 滑动条 ===== */
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .slider-row input[type="range"] {
+            flex: 1;
+            height: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #d9d9d9;
+            border-radius: 2px;
+            outline: none;
+        }
+        .slider-row input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #0669FF;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+        }
+        .slider-row input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #0669FF;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+        }
+        .slider-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: #0669FF;
+            min-width: 36px;
+            text-align: center;
+        }
+        
+        /* ===== 数字输入 ===== */
+        .number-input {
+            width: 100px;
+            height: 34px;
+            padding: 0 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #333;
+            outline: none;
+            text-align: center;
+            transition: border-color 0.2s;
+        }
+        .number-input:focus { border-color: #0669FF; }
+        .number-input::-webkit-inner-spin-button { opacity: 1; }
+
+        /* ===== 风格卡片选择 ===== */
+        .style-card-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 4px;
+        }
+        .style-card-option {
+            width: 100px;
+            background: #fff;
+            border-radius: 10px;
+            padding: 10px 8px 8px;
+            text-align: center;
+            border: 2px solid #eef0f5;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .style-card-option:hover { border-color: #0669FF; }
+        .style-card-option.active {
+            border-color: #0669FF;
+            background: #F0F6FF;
+        }
+        .style-card-option .sco-thumb {
+            width: 80px;
+            height: 52px;
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 0 auto 4px;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+        .style-card-option .sco-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .style-card-option .sco-name {
+            font-size: 12px;
+            font-weight: 500;
+            color: #555;
+        }
+        .style-card-option.active .sco-name { color: #0669FF; }
+
+        /* ===== 快捷提示词标签 ===== */
+        .tag-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .tag-container .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 12px;
+            background: #E8F0FE;
+            color: #0669FF;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: default;
+        }
+        .tag-container .tag .del {
+            cursor: pointer;
+            font-size: 14px;
+            color: #0669FF;
+            opacity: 0.6;
+            margin-left: 2px;
+            line-height: 1;
+        }
+        .tag-container .tag .del:hover { opacity: 1; }
+
+        .tag-input-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .tag-input-row input {
+            flex: 1;
+            height: 34px;
+            padding: 0 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .tag-input-row input:focus { border-color: #0669FF; }
+        .tag-input-row .add-tag-btn {
+            height: 34px;
+            padding: 0 16px;
+            border: none;
+            border-radius: 6px;
+            background: #0669FF;
+            color: #fff;
+            font-size: 13px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background 0.2s;
+        }
+        .tag-input-row .add-tag-btn:hover { background: #0052CC; }
+        .tag-input-row .add-tag-btn:active { background: #0040A0; }
+
+        /* ===== 预设快捷标签 ===== */
+        .preset-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+        .preset-tags .ptag {
+            padding: 3px 10px;
+            border-radius: 4px;
+            border: 1px dashed #d0d5e0;
+            background: #fff;
+            font-size: 12px;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .preset-tags .ptag:hover {
+            border-color: #0669FF;
+            color: #0669FF;
+            background: #F5F8FF;
+        }
+
+        /* ===== 底部按钮 ===== */
+        .modal-footer {
+            padding: 16px 28px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            background: #fafbff;
+        }
+        .modal-footer .btn {
+            padding: 10px 28px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .modal-footer .btn-cancel {
+            background: #f5f5f5;
+            color: #666;
+            border: 1px solid #d9d9d9;
+        }
+        .modal-footer .btn-cancel:hover { background: #eee; }
+        .modal-footer .btn-save {
+            background: #0669FF;
+            color: #fff;
+        }
+        .modal-footer .btn-save:hover { background: #0052CC; }
+        .modal-footer .btn-save:active { background: #0040A0; }
+
+        /* ===== 滚动条 ===== */
+        .modal-body::-webkit-scrollbar { width: 6px; }
+        .modal-body::-webkit-scrollbar-track { background: transparent; }
+        .modal-body::-webkit-scrollbar-thumb { background: #d0d5e0; border-radius: 3px; }
+        .modal-body::-webkit-scrollbar-thumb:hover { background: #b0b8c8; }
+
+        @media (max-width: 640px) {
+            body { padding: 16px; align-items: stretch; }
+            .modal { border-radius: 12px; }
+            .modal-header { padding: 16px 20px; }
+            .modal-body { padding: 20px; }
+            .modal-footer { padding: 14px 20px; }
+            .radio-group label { padding: 4px 10px; font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="modal">
+        <!-- 头部 -->
+        <div class="modal-header">
+            <h2>📝 研学手记配置</h2>
+            <button class="close-btn" onclick="closeModal()">✕</button>
+        </div>
+
+        <!-- 主体 -->
+        <div class="modal-body">
+            <!-- ====== 第一板块：AI研学创作工坊 ====== -->
+            <div class="section">
+                <div class="section-title">
+                    <span class="icon">🤖</span>
+                    AI研学创作工坊
+                </div>
+
+                <!-- 分类一：AI视频创作 -->
+                <div class="category-card">
+                    <div class="category-title">
+                        🎬 AI视频创作
+                        <span class="badge">视频</span>
+                    </div>
+
+                    <!-- 比例 -->
+                    <div class="config-row">
+                        <span class="config-label">比例</span>
+                        <div class="radio-group" id="ratioGroup">
+                            <input type="radio" name="ratio" id="ratio0" value="不限" checked>
+                            <label for="ratio0">不限</label>
+                            <input type="radio" name="ratio" id="ratio1" value="1:1">
+                            <label for="ratio1">1:1</label>
+                            <input type="radio" name="ratio" id="ratio2" value="3:4">
+                            <label for="ratio2">3:4</label>
+                            <input type="radio" name="ratio" id="ratio3" value="4:3">
+                            <label for="ratio3">4:3</label>
+                            <input type="radio" name="ratio" id="ratio4" value="9:16">
+                            <label for="ratio4">9:16</label>
+                            <input type="radio" name="ratio" id="ratio5" value="16:9">
+                            <label for="ratio5">16:9</label>
+                            <input type="radio" name="ratio" id="ratio6" value="21:9">
+                            <label for="ratio6">21:9</label>
+                        </div>
+                    </div>
+
+                    <!-- prompt -->
+                    <div class="config-row">
+                        <span class="config-label">主题 Prompt <span class="optional">（选填）</span></span>
+                        <textarea class="text-input" id="videoPrompt" placeholder="请输入视频创作品描述，例如：&#10;用国风水墨画风格展现诗人杜甫在草堂前吟诗的场景，背景有远山和飘落的桃花..."></textarea>
+                    </div>
+
+                    <!-- 风格 -->
+                    <div class="config-row">
+                        <span class="config-label">风格 <span class="optional">（选填）</span></span>
+                        <div class="style-card-grid" id="styleCardGrid"></div>
+                    </div>
+
+                    <!-- 分辨率 -->
+                    <div class="config-row">
+                        <span class="config-label">分辨率</span>
+                        <div class="radio-group" id="resolutionGroup">
+                            <input type="radio" name="resolution" id="res0" value="480p" checked>
+                            <label for="res0">480p</label>
+                            <input type="radio" name="resolution" id="res1" value="720p">
+                            <label for="res1">720p</label>
+                            <input type="radio" name="resolution" id="res2" value="1080p">
+                            <label for="res2">1080p</label>
+                        </div>
+                    </div>
+
+                    <!-- 视频时长 -->
+                    <div class="config-row">
+                        <span class="config-label">视频时长</span>
+                        <div class="slider-row">
+                            <input type="range" id="videoDuration" min="2" max="15" value="5" step="1" oninput="document.getElementById('durationDisplay').textContent=this.value+'s'">
+                            <span class="slider-value" id="durationDisplay">5s</span>
+                        </div>
+                    </div>
+
+                    <!-- 免费次数 -->
+                    <div class="config-row">
+                        <span class="config-label">免费次数</span>
+                        <input type="number" class="number-input" id="videoFreeCount" value="3" min="0" placeholder="0">
+                    </div>
+
+                    <!-- 快捷提示词 -->
+                    <div class="config-row">
+                        <span class="config-label">快捷提示词 <span class="optional">（选填）</span></span>
+                        <div class="tag-container" id="videoQuickTags"></div>
+                        <div class="tag-input-row">
+                            <input type="text" id="videoQuickInput" placeholder="输入快捷提示词，回车添加" onkeydown="if(event.key==='Enter')addVideoQuick()">
+                            <button class="add-tag-btn" onclick="addVideoQuick()">添加</button>
+                        </div>
+                        <div class="preset-tags">
+                            <span class="ptag" onclick="addPresetVideo('国风水墨')">国风水墨</span>
+                            <span class="ptag" onclick="addPresetVideo('3D动画')">3D动画</span>
+                            <span class="ptag" onclick="addPresetVideo('逐帧动画')">逐帧动画</span>
+                            <span class="ptag" onclick="addPresetVideo('实景融合')">实景融合</span>
+                            <span class="ptag" onclick="addPresetVideo('手绘风格')">手绘风格</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 分类二：AI游戏创作 -->
+                <div class="category-card">
+                    <div class="category-title">
+                        🎮 AI游戏创作
+                        <span class="badge">游戏</span>
+                    </div>
+
+                    <!-- 免费次数 -->
+                    <div class="config-row">
+                        <span class="config-label">免费次数</span>
+                        <input type="number" class="number-input" id="gameFreeCount" value="3" min="0" placeholder="0">
+                    </div>
+
+                    <!-- prompt -->
+                    <div class="config-row">
+                        <span class="config-label">主题 Prompt <span class="optional">（选填）</span></span>
+                        <textarea class="text-input" id="gamePrompt" placeholder="请输入游戏创作主题描述，例如：&#10;设计一款关于杜甫草堂的搭建游戏，玩家通过拖拽木材、茅草等材料完成茅屋搭建，学习唐代建筑知识..."></textarea>
+                    </div>
+
+                    <!-- 快捷提示词 -->
+                    <div class="config-row">
+                        <span class="config-label">快捷提示词 <span class="optional">（选填）</span></span>
+                        <div class="tag-container" id="gameQuickTags"></div>
+                        <div class="tag-input-row">
+                            <input type="text" id="gameQuickInput" placeholder="输入快捷提示词，回车添加" onkeydown="if(event.key==='Enter')addGameQuick()">
+                            <button class="add-tag-btn" onclick="addGameQuick()">添加</button>
+                        </div>
+                        <div class="preset-tags">
+                            <span class="ptag" onclick="addPresetGame('搭建游戏')">搭建游戏</span>
+                            <span class="ptag" onclick="addPresetGame('拼图游戏')">拼图游戏</span>
+                            <span class="ptag" onclick="addPresetGame('问答闯关')">问答闯关</span>
+                            <span class="ptag" onclick="addPresetGame('角色扮演')">角色扮演</span>
+                            <span class="ptag" onclick="addPresetGame('寻宝探险')">寻宝探险</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ====== 第二板块：研学报告 ====== -->
+            <div class="section">
+                <div class="section-title">
+                    <span class="icon">📄</span>
+                    研学报告
+                </div>
+
+                <!-- 分类一：研学内容 -->
+                <div class="category-card">
+                    <div class="category-title">
+                        📖 研学内容
+                        <span class="badge">内容</span>
+                    </div>
+
+                    <div class="config-row">
+                        <span class="config-label">快捷提示词 <span class="optional">（选填）</span></span>
+                        <div class="tag-container" id="contentTags"></div>
+                        <div class="tag-input-row">
+                            <input type="text" id="contentInput" placeholder="输入快捷提示词，回车添加" onkeydown="if(event.key==='Enter')addContentTag()">
+                            <button class="add-tag-btn" onclick="addContentTag()">添加</button>
+                        </div>
+                        <div class="preset-tags">
+                            <span class="ptag" onclick="addPresetContent('课程总结')">课程总结</span>
+                            <span class="ptag" onclick="addPresetContent('知识点梳理')">知识点梳理</span>
+                            <span class="ptag" onclick="addPresetContent('学员表现')">学员表现</span>
+                            <span class="ptag" onclick="addPresetContent('互动情况')">互动情况</span>
+                            <span class="ptag" onclick="addPresetContent('教学目标达成')">教学目标达成</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 分类二：研学评价 -->
+                <div class="category-card">
+                    <div class="category-title">
+                        ⭐ 研学评价
+                        <span class="badge">评价</span>
+                    </div>
+
+                    <div class="config-row">
+                        <span class="config-label">快捷提示词 <span class="optional">（选填）</span></span>
+                        <div class="tag-container" id="evalTags"></div>
+                        <div class="tag-input-row">
+                            <input type="text" id="evalInput" placeholder="输入快捷提示词，回车添加" onkeydown="if(event.key==='Enter')addEvalTag()">
+                            <button class="add-tag-btn" onclick="addEvalTag()">添加</button>
+                        </div>
+                        <div class="preset-tags">
+                            <span class="ptag" onclick="addPresetEval('学习态度')">学习态度</span>
+                            <span class="ptag" onclick="addPresetEval('动手能力')">动手能力</span>
+                            <span class="ptag" onclick="addPresetEval('团队协作')">团队协作</span>
+                            <span class="ptag" onclick="addPresetEval('创意表现')">创意表现</span>
+                            <span class="ptag" onclick="addPresetEval('综合评分')">综合评分</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部 -->
+        <div class="modal-footer">
+            <button class="btn btn-cancel" onclick="closeModal()">取消</button>
+            <button class="btn btn-save" onclick="saveConfig()">💾 保存配置</button>
+        </div>
+    </div>
+
+    <script>
+        // ===== 视频快捷提示词 =====
+        var videoQuickTags = [];
+
+        function renderVideoQuick() {
+            var el = document.getElementById('videoQuickTags');
+            if (videoQuickTags.length === 0) {
+                el.innerHTML = '<span style="font-size:12px;color:#bbb;">暂无快捷提示词</span>';
+                return;
+            }
+            el.innerHTML = videoQuickTags.map(function(t, i) {
+                return '<span class="tag">' + t + '<span class="del" onclick="removeVideoQuick(' + i + ')">×</span></span>';
+            }).join('');
+        }
+
+        function addVideoQuick() {
+            var input = document.getElementById('videoQuickInput');
+            var val = input.value.trim();
+            if (!val) return;
+            videoQuickTags.push(val);
+            input.value = '';
+            renderVideoQuick();
+        }
+
+        function addPresetVideo(val) {
+            videoQuickTags.push(val);
+            renderVideoQuick();
+        }
+
+        function removeVideoQuick(i) {
+            videoQuickTags.splice(i, 1);
+            renderVideoQuick();
+        }
+
+        // ===== 游戏快捷提示词 =====
+        var gameQuickTags = [];
+
+        function renderGameQuick() {
+            var el = document.getElementById('gameQuickTags');
+            if (gameQuickTags.length === 0) {
+                el.innerHTML = '<span style="font-size:12px;color:#bbb;">暂无快捷提示词</span>';
+                return;
+            }
+            el.innerHTML = gameQuickTags.map(function(t, i) {
+                return '<span class="tag">' + t + '<span class="del" onclick="removeGameQuick(' + i + ')">×</span></span>';
+            }).join('');
+        }
+
+        function addGameQuick() {
+            var input = document.getElementById('gameQuickInput');
+            var val = input.value.trim();
+            if (!val) return;
+            gameQuickTags.push(val);
+            input.value = '';
+            renderGameQuick();
+        }
+
+        function addPresetGame(val) {
+            gameQuickTags.push(val);
+            renderGameQuick();
+        }
+
+        function removeGameQuick(i) {
+            gameQuickTags.splice(i, 1);
+            renderGameQuick();
+        }
+
+        // ===== 研学内容 =====
+        var contentTags = [];
+
+        function renderContent() {
+            var el = document.getElementById('contentTags');
+            if (contentTags.length === 0) {
+                el.innerHTML = '<span style="font-size:12px;color:#bbb;">暂无快捷提示词</span>';
+                return;
+            }
+            el.innerHTML = contentTags.map(function(t, i) {
+                return '<span class="tag">' + t + '<span class="del" onclick="removeContentTag(' + i + ')">×</span></span>';
+            }).join('');
+        }
+
+        function addContentTag() {
+            var input = document.getElementById('contentInput');
+            var val = input.value.trim();
+            if (!val) return;
+            contentTags.push(val);
+            input.value = '';
+            renderContent();
+        }
+
+        function addPresetContent(val) {
+            contentTags.push(val);
+            renderContent();
+        }
+
+        function removeContentTag(i) {
+            contentTags.splice(i, 1);
+            renderContent();
+        }
+
+        // ===== 研学评价 =====
+        var evalTags = [];
+
+        function renderEval() {
+            var el = document.getElementById('evalTags');
+            if (evalTags.length === 0) {
+                el.innerHTML = '<span style="font-size:12px;color:#bbb;">暂无快捷提示词</span>';
+                return;
+            }
+            el.innerHTML = evalTags.map(function(t, i) {
+                return '<span class="tag">' + t + '<span class="del" onclick="removeEvalTag(' + i + ')">×</span></span>';
+            }).join('');
+        }
+
+        function addEvalTag() {
+            var input = document.getElementById('evalInput');
+            var val = input.value.trim();
+            if (!val) return;
+            evalTags.push(val);
+            input.value = '';
+            renderEval();
+        }
+
+        function addPresetEval(val) {
+            evalTags.push(val);
+            renderEval();
+        }
+
+        function removeEvalTag(i) {
+            evalTags.splice(i, 1);
+            renderEval();
+        }
+
+        // ===== 风格卡片选择 =====
+        var selectedStyle = '';
+
+        function selectStyleCard(el, name) {
+            document.querySelectorAll('.style-card-option').forEach(function(s) { s.classList.remove('active'); });
+            el.classList.add('active');
+            selectedStyle = name;
+        }
+
+        function renderStyleCards() {
+            var grid = document.getElementById('styleCardGrid');
+            var systemSaved = localStorage.getItem('systemConfig');
+            var styles = [];
+            if (systemSaved) {
+                try {
+                    var cfg = JSON.parse(systemSaved);
+                    if (cfg.styles && cfg.styles.length > 0) { styles = cfg.styles; }
+                } catch(e) {}
+            }
+            if (styles.length === 0) {
+                grid.innerHTML = '<span style="font-size:12px;color:#bbb;">请先在系统参数配置中添加风格</span>';
+                return;
+            }
+            var html = '';
+            for (var i = 0; i < styles.length; i++) {
+                var s = styles[i];
+                var thumbHtml = s.thumb
+                    ? '<img src="' + s.thumb + '" alt="' + s.name + '">'
+                    : '<span style="font-size:20px;">🎨</span>';
+                html += '<div class="style-card-option" onclick="selectStyleCard(this,\'' + s.name + '\')">';
+                html += '  <div class="sco-thumb">' + thumbHtml + '</div>';
+                html += '  <div class="sco-name">' + s.name + '</div>';
+                html += '</div>';
+            }
+            grid.innerHTML = html;
+
+            if (selectedStyle) {
+                var cards = grid.querySelectorAll('.style-card-option');
+                for (var j = 0; j < cards.length; j++) {
+                    if (cards[j].querySelector('.sco-name').textContent === selectedStyle) {
+                        cards[j].classList.add('active');
+                        break;
+                    }
+                }
+            }
+        }
+
+        // ===== 初始化预设 =====
+        // 视频预置快捷提示词
+        var defaultVideoPresets = ['国风水墨', '3D动画'];
+        defaultVideoPresets.forEach(function(v) { videoQuickTags.push(v); });
+        renderVideoQuick();
+
+        // 游戏预置快捷提示词
+        var defaultGamePresets = ['搭建游戏', '拼图游戏'];
+        defaultGamePresets.forEach(function(v) { gameQuickTags.push(v); });
+        renderGameQuick();
+
+        // 内容预置
+        var defaultContent = ['课程总结', '知识点梳理'];
+        defaultContent.forEach(function(v) { contentTags.push(v); });
+        renderContent();
+
+        // 评价预置
+        var defaultEval = ['学习态度', '动手能力'];
+        defaultEval.forEach(function(v) { evalTags.push(v); });
+        renderEval();
+        renderStyleCards();
+
+        // ===== 读取localStorage保存的配置 =====
+        function loadSavedConfig() {
+            var saved = localStorage.getItem('studyNoteConfig');
+            if (!saved) return;
+            try {
+                var cfg = JSON.parse(saved);
+                if (cfg.videoQuick) { videoQuickTags = cfg.videoQuick; renderVideoQuick(); }
+                if (cfg.gameQuick) { gameQuickTags = cfg.gameQuick; renderGameQuick(); }
+                if (cfg.contentTags) { contentTags = cfg.contentTags; renderContent(); }
+                if (cfg.evalTags) { evalTags = cfg.evalTags; renderEval(); }
+                if (cfg.ratio) {
+                    var r = document.querySelector('input[name="ratio"][value="' + cfg.ratio + '"]');
+                    if (r) r.checked = true;
+                }
+                if (cfg.resolution) {
+                    var res = document.querySelector('input[name="resolution"][value="' + cfg.resolution + '"]');
+                    if (res) res.checked = true;
+                }
+                if (cfg.videoPrompt !== undefined) { document.getElementById('videoPrompt').value = cfg.videoPrompt; }
+                if (cfg.videoDuration) { document.getElementById('videoDuration').value = cfg.videoDuration; document.getElementById('durationDisplay').textContent = cfg.videoDuration + 's'; }
+                if (cfg.videoFreeCount !== undefined) { document.getElementById('videoFreeCount').value = cfg.videoFreeCount; }
+                if (cfg.gameFreeCount !== undefined) { document.getElementById('gameFreeCount').value = cfg.gameFreeCount; }
+                if (cfg.gamePrompt !== undefined) { document.getElementById('gamePrompt').value = cfg.gamePrompt; }
+                if (cfg.style) { selectedStyle = cfg.style; renderStyleCards(); }
+            } catch(e) {}
+        }
+
+        loadSavedConfig();
+
+        // ===== 保存 =====
+        function saveConfig() {
+            var ratio = document.querySelector('input[name="ratio"]:checked');
+            var resolution = document.querySelector('input[name="resolution"]:checked');
+            var config = {
+                ratio: ratio ? ratio.value : '不限',
+                resolution: resolution ? resolution.value : '480p',
+                videoPrompt: document.getElementById('videoPrompt').value.trim(),
+                style: selectedStyle,
+                videoDuration: parseInt(document.getElementById('videoDuration').value) || 5,
+                videoFreeCount: parseInt(document.getElementById('videoFreeCount').value) || 0,
+                gameFreeCount: parseInt(document.getElementById('gameFreeCount').value) || 0,
+                gamePrompt: document.getElementById('gamePrompt').value.trim(),
+                videoQuick: videoQuickTags,
+                gameQuick: gameQuickTags,
+                contentTags: contentTags,
+                evalTags: evalTags
+            };
+            localStorage.setItem('studyNoteConfig', JSON.stringify(config));
+            alert('✅ 研学手记配置已保存');
+            closeModal();
+        }
+
+        function closeModal() {
+            window.location.href = '课程管理.html';
+        }
+    </script>
+</body>
+</html>

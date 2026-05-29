@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>课程管理 - 管理后台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', 'Microsoft YaHei', Arial, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* ===== 顶部导航 ===== */
+        .header {
+            background: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header .logo {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0669FF;
+            margin-right: 32px;
+        }
+        .header .nav-list {
+            display: flex;
+            gap: 24px;
+            list-style: none;
+        }
+        .header .nav-list li {
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+            padding: 4px 0;
+            position: relative;
+        }
+        .header .nav-list li:hover { color: #0669FF; }
+        .header .nav-list li.active {
+            color: #0669FF;
+            font-weight: 600;
+        }
+        .header .nav-list li.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #0669FF;
+            border-radius: 1px;
+        }
+        .header .user-area {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .header .user-area .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #E8F0FE;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #0669FF;
+        }
+        .header .user-area .name {
+            font-size: 14px;
+            color: #333;
+        }
+
+        /* ===== 面包屑 ===== */
+        .breadcrumb {
+            padding: 16px 24px 0;
+            font-size: 13px;
+            color: #999;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .breadcrumb a {
+            color: #999;
+            text-decoration: none;
+        }
+        .breadcrumb a:hover { color: #0669FF; }
+        .breadcrumb .sep { color: #ccc; }
+        .breadcrumb .current { color: #333; font-weight: 500; }
+
+        /* ===== 主容器 ===== */
+        .main {
+            padding: 16px 24px 40px;
+        }
+
+        /* ===== 页面标题行 ===== */
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        .page-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        .page-header .btn-new {
+            background: #0669FF;
+            color: #fff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+        .page-header .btn-new:hover { background: #0052CC; }
+        .page-header .btn-new:active { background: #0040A0; }
+
+        /* ===== 搜索区域 ===== */
+        .search-area {
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .search-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: flex-end;
+        }
+        .search-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 160px;
+            flex: 0 0 auto;
+        }
+        .search-item label {
+            font-size: 13px;
+            color: #666;
+            font-weight: 500;
+        }
+        .search-item input,
+        .search-item select {
+            height: 34px;
+            padding: 0 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #333;
+            background: #fff;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-item input:focus,
+        .search-item select:focus {
+            border-color: #0669FF;
+            box-shadow: 0 0 0 2px rgba(6,105,255,0.08);
+        }
+        .search-item select {
+            appearance: auto;
+        }
+        .search-actions {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            padding-bottom: 1px;
+            flex: 0 0 auto;
+        }
+        .search-actions .btn {
+            height: 34px;
+            padding: 0 18px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        .search-actions .btn-search {
+            background: #0669FF;
+            color: #fff;
+        }
+        .search-actions .btn-search:hover { background: #0052CC; }
+        .search-actions .btn-reset {
+            background: #f5f5f5;
+            color: #666;
+            border: 1px solid #d9d9d9;
+        }
+        .search-actions .btn-reset:hover { background: #eee; }
+        .search-actions .btn-new-inline {
+            background: #0669FF;
+            color: #fff;
+            display: none;
+        }
+
+        /* ===== 表格区域 ===== */
+        .table-wrapper {
+            background: #fff;
+            border-radius: 8px;
+            padding: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            min-width: 1100px;
+        }
+        table thead th {
+            background: #fafafa;
+            padding: 12px 14px;
+            text-align: left;
+            font-weight: 600;
+            color: #555;
+            border-bottom: 1px solid #e8e8e8;
+            white-space: nowrap;
+            font-size: 13px;
+        }
+        table tbody td {
+            padding: 14px 14px;
+            border-bottom: 1px solid #f0f0f0;
+            color: #333;
+            vertical-align: middle;
+        }
+        table tbody tr:last-child td { border-bottom: none; }
+        table tbody tr:hover { background: #FAFBFF; }
+
+        /* 状态标签 */
+        .status-tag {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-tag.online { background: #E8F5E9; color: #389E0D; }
+        .status-tag.offline { background: #FFF2E8; color: #D46B08; }
+        .status-tag.draft { background: #F0F0F0; color: #999; }
+
+        /* 课程分类标签 */
+        .category-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            background: #F0F5FF;
+            color: #0669FF;
+        }
+
+        /* 操作按钮 */
+        .action-btn {
+            padding: 5px 14px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            margin-right: 6px;
+            white-space: nowrap;
+        }
+        .action-btn:last-child { margin-right: 0; }
+        .action-btn.btn-offline { background: #FFF2E8; color: #D46B08; }
+        .action-btn.btn-offline:hover { background: #FFE0CC; }
+        .action-btn.btn-view { background: #E8F0FE; color: #0669FF; }
+        .action-btn.btn-view:hover { background: #D6E4FF; }
+        .action-btn.btn-eval { background: #E8F5E9; color: #389E0D; }
+        .action-btn.btn-eval:hover { background: #D6F0D8; }
+        .action-btn.btn-config { background: #FFF7E6; color: #D48806; }
+        .action-btn.btn-config:hover { background: #FFEECC; }
+
+        /* ===== 分页 ===== */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 16px 24px;
+            gap: 8px;
+            border-top: 1px solid #f0f0f0;
+        }
+        .pagination .page-info {
+            font-size: 13px;
+            color: #666;
+            margin-right: 12px;
+        }
+        .pagination .page-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: 1px solid #d9d9d9;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .pagination .page-btn:hover { border-color: #0669FF; color: #0669FF; }
+        .pagination .page-btn.active {
+            background: #0669FF;
+            border-color: #0669FF;
+            color: #fff;
+        }
+        .pagination .page-btn.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* ===== Table total ===== */
+        .table-total {
+            padding: 12px 24px;
+            font-size: 13px;
+            color: #888;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 768px) {
+            .header { padding: 0 16px; }
+            .header .nav-list { display: none; }
+            .breadcrumb { padding: 12px 16px 0; }
+            .main { padding: 12px 16px 24px; }
+            .search-area { padding: 16px; }
+            .search-row { flex-direction: column; gap: 12px; }
+            .search-item { min-width: 100%; }
+            .search-actions { width: 100%; justify-content: flex-start; }
+            .page-header .btn-new { display: none; }
+            .search-actions .btn-new-inline { display: inline-flex; }
+            .table-wrapper { overflow-x: auto; }
+            table { min-width: 900px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <div class="header">
+        <div class="logo">离泰数链</div>
+        <ul class="nav-list">
+            <li>概览</li>
+            <li class="active">研学课程</li>
+            <li>订单管理</li>
+            <li>用户管理</li>
+            <li>内容管理</li>
+            <li onclick="window.location.href='系统参数配置.html'" style="cursor:pointer;">系统设置</li>
+        </ul>
+        <div class="user-area">
+            <span class="avatar">👤</span>
+            <span class="name">管理员</span>
+        </div>
+    </div>
+
+    <!-- 面包屑 -->
+    <div class="breadcrumb">
+        <a href="index.html">首页</a>
+        <span class="sep">&gt;</span>
+        <a href="#">研学课程</a>
+        <span class="sep">&gt;</span>
+        <span class="current">课程管理</span>
+    </div>
+
+    <!-- 主内容 -->
+    <div class="main">
+        <!-- 页面标题 -->
+        <div class="page-header">
+            <h2>课程管理</h2>
+            <button class="btn-new" onclick="handleNew()">➕ 新建产品</button>
+        </div>
+
+        <!-- 搜索区域 -->
+        <div class="search-area">
+            <div class="search-row">
+                <div class="search-item">
+                    <label>产品编号</label>
+                    <input type="text" id="searchId" placeholder="请输入产品编号">
+                </div>
+                <div class="search-item">
+                    <label>产品名称</label>
+                    <input type="text" id="searchName" placeholder="请输入产品名称">
+                </div>
+                <div class="search-item">
+                    <label>执行机构</label>
+                    <input type="text" id="searchAgency" placeholder="请输入执行机构">
+                </div>
+                <div class="search-item">
+                    <label>核验机构</label>
+                    <input type="text" id="searchHost" placeholder="请输入核验机构">
+                </div>
+                <div class="search-item">
+                    <label>课程分类</label>
+                    <select id="searchCategory">
+                        <option value="">全部</option>
+                        <option value="非遗文化">非遗文化</option>
+                        <option value="博物馆研学">博物馆研学</option>
+                        <option value="自然疗愈">自然疗愈</option>
+                        <option value="名师大咖">名师大咖</option>
+                    </select>
+                </div>
+                <div class="search-item">
+                    <label>状态</label>
+                    <select id="searchStatus">
+                        <option value="">全部</option>
+                        <option value="online">已上架</option>
+                        <option value="offline">已下架</option>
+                        <option value="draft">草稿</option>
+                    </select>
+                </div>
+                <div class="search-actions">
+                    <button class="btn btn-search" onclick="handleSearch()">🔍 搜索</button>
+                    <button class="btn btn-reset" onclick="handleReset()">↻ 重置</button>
+                    <button class="btn btn-new btn-new-inline" onclick="handleNew()">➕ 新建产品</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 表格 -->
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:14%">产品编号</th>
+                        <th style="width:17%">产品名称</th>
+                        <th style="width:12%">执行机构</th>
+                        <th style="width:12%">核验机构</th>
+                        <th style="width:10%">课程分类</th>
+                        <th style="width:13%">创建时间</th>
+                        <th style="width:13%">修改时间</th>
+                        <th style="width:7%">状态</th>
+                        <th style="width:18%">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+            <div class="table-total">共 <span id="totalCount">0</span> 条记录</div>
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </div>
+
+    <script>
+        // ===== 模拟数据 =====
+        var mockData = [
+            { id: 'CP20250001', name: '盆景美学·指尖山水', agency: '离泰文化', host: '离泰研学基地', category: '非遗文化', price: '¥298', createTime: '2025-05-20 10:30', updateTime: '2025-05-28 14:20', status: 'online' },
+            { id: 'CP20250002', name: '春假托管班', agency: '离泰文化', host: '离泰研学基地', category: '自然疗愈', price: '¥168', createTime: '2025-05-18 09:00', updateTime: '2025-05-27 16:30', status: 'online' },
+            { id: 'CP20250003', name: '诗界无心·草堂寻心', agency: '诗界教育', host: '杜甫草堂', category: '名师大咖', price: '¥358', createTime: '2025-05-15 08:20', updateTime: '2025-05-25 11:10', status: 'online' },
+            { id: 'CP20250004', name: '杜甫和李白的故事', agency: '诗界教育', host: '杜甫草堂', category: '名师大咖', price: '¥258', createTime: '2025-05-12 14:00', updateTime: '2025-05-22 09:45', status: 'offline' },
+            { id: 'CP20250005', name: '搭建小茅屋', agency: '离泰文化', host: '户外营地', category: '自然疗愈', price: '¥198', createTime: '2025-05-10 10:00', updateTime: '2025-05-20 15:30', status: 'online' },
+            { id: 'CP20250006', name: '快速搭建茅屋', agency: '离泰文化', host: '户外营地', category: '自然疗愈', price: '¥198', createTime: '2025-05-08 11:30', updateTime: '2025-05-18 08:00', status: 'offline' },
+            { id: 'CP20250007', name: '唐代诗歌赏析', agency: '诗界教育', host: '杜甫草堂', category: '名师大咖', price: '¥228', createTime: '2025-05-05 09:20', updateTime: '2025-05-15 12:40', status: 'online' },
+            { id: 'CP20250008', name: '盆景制作入门', agency: '离泰文化', host: '离泰研学基地', category: '非遗文化', price: '¥168', createTime: '2025-04-28 14:30', updateTime: '2025-05-10 10:00', status: 'draft' },
+            { id: 'CP20250009', name: '自然探索营', agency: '离泰文化', host: '森林公园', category: '自然疗愈', price: '¥298', createTime: '2025-04-20 08:00', updateTime: '2025-05-08 16:20', status: 'online' },
+            { id: 'CP20250010', name: '春假艺术工坊', agency: '离泰文化', host: '离泰研学基地', category: '非遗文化', price: '¥128', createTime: '2025-04-15 10:00', updateTime: '2025-05-05 14:00', status: 'offline' },
+            { id: 'CP20250011', name: '户外生存技能', agency: '野趣教育', host: '野趣营地', category: '自然疗愈', price: '¥268', createTime: '2025-04-10 09:30', updateTime: '2025-04-28 11:00', status: 'online' },
+            { id: 'CP20250012', name: '国画水墨体验', agency: '离泰文化', host: '博物馆', category: '博物馆研学', price: '¥188', createTime: '2025-04-05 13:00', updateTime: '2025-04-25 09:30', status: 'draft' }
+        ];
+
+        var currentPage = 1;
+        var pageSize = 8;
+        var filteredData = [];
+
+        function getStatusText(status) {
+            var map = { online: '已上架', offline: '已下架', draft: '草稿' };
+            return map[status] || status;
+        }
+
+        function getStatusClass(status) {
+            var map = { online: 'online', offline: 'offline', draft: 'draft' };
+            return 'status-tag ' + (map[status] || '');
+        }
+
+        function formatDate(d) {
+            return d;
+        }
+
+        function renderTable(data) {
+            var tbody = document.getElementById('tableBody');
+            var totalEl = document.getElementById('totalCount');
+            totalEl.textContent = data.length;
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>';
+                return;
+            }
+            var start = (currentPage - 1) * pageSize;
+            var end = Math.min(start + pageSize, data.length);
+            var pageData = data.slice(start, end);
+            var html = '';
+            for (var i = 0; i < pageData.length; i++) {
+                var item = pageData[i];
+                var idx = start + i + 1;
+                var statusName = getStatusText(item.status);
+                var statusCls = getStatusClass(item.status);
+                html += '<tr>';
+                html += '<td><span style="color:#0669FF;cursor:pointer;" onclick="handleView(\'' + item.id + '\')">' + item.id + '</span></td>';
+                html += '<td>' + item.name + '</td>';
+                html += '<td>' + item.agency + '</td>';
+                html += '<td>' + item.host + '</td>';
+                html += '<td><span class="category-tag">' + item.category + '</span></td>';
+                html += '<td>' + item.createTime + '</td>';
+                html += '<td>' + item.updateTime + '</td>';
+                html += '<td><span class="' + statusCls + '">' + statusName + '</span></td>';
+                html += '<td>';
+                if (item.status === 'online') {
+                    html += '<button class="action-btn btn-offline" onclick="handleOffline(\'' + item.id + '\')">下线</button>';
+                } else if (item.status === 'offline') {
+                    html += '<button class="action-btn btn-view" onclick="handleOnline(\'' + item.id + '\')">上线</button>';
+                } else {
+                    html += '<button class="action-btn btn-view" onclick="handleOnline(\'' + item.id + '\')">发布</button>';
+                }
+                html += '<button class="action-btn btn-view" onclick="handleView(\'' + item.id + '\')">查看</button>';
+                html += '<button class="action-btn btn-eval" onclick="handleEval(\'' + item.id + '\')">评价管理</button>';
+                html += '<button class="action-btn btn-config" onclick="handleConfig(\'' + item.id + '\')">研学手记配置</button>';
+                html += '</td>';
+                html += '</tr>';
+            }
+            tbody.innerHTML = html;
+        }
+
+        function renderPagination(data) {
+            var el = document.getElementById('pagination');
+            var total = data.length;
+            var totalPages = Math.ceil(total / pageSize);
+            if (totalPages <= 1) { el.innerHTML = ''; return; }
+            var html = '<span class="page-info">共 ' + totalPages + ' 页</span>';
+            // 上一页
+            html += '<button class="page-btn' + (currentPage <= 1 ? ' disabled' : '') + '" onclick="goPage(' + (currentPage - 1) + ')">‹</button>';
+            for (var p = 1; p <= totalPages; p++) {
+                if (p === currentPage) {
+                    html += '<button class="page-btn active">' + p + '</button>';
+                } else if (p <= 3 || p > totalPages - 2 || Math.abs(p - currentPage) <= 1) {
+                    html += '<button class="page-btn" onclick="goPage(' + p + ')">' + p + '</button>';
+                } else if (p === 4 && currentPage > 4) {
+                    html += '<button class="page-btn disabled" style="border:none;">…</button>';
+                }
+            }
+            // 下一页
+            html += '<button class="page-btn' + (currentPage >= totalPages ? ' disabled' : '') + '" onclick="goPage(' + (currentPage + 1) + ')">›</button>';
+            el.innerHTML = html;
+        }
+
+        function goPage(page) {
+            var total = filteredData.length;
+            var totalPages = Math.ceil(total / pageSize);
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            renderTable(filteredData);
+            renderPagination(filteredData);
+        }
+
+        function doFilter() {
+            var id = document.getElementById('searchId').value.trim().toLowerCase();
+            var name = document.getElementById('searchName').value.trim().toLowerCase();
+            var agency = document.getElementById('searchAgency').value.trim().toLowerCase();
+            var host = document.getElementById('searchHost').value.trim().toLowerCase();
+            var category = document.getElementById('searchCategory').value;
+            var status = document.getElementById('searchStatus').value;
+
+            filteredData = mockData.filter(function(item) {
+                if (id && !item.id.toLowerCase().includes(id)) return false;
+                if (name && !item.name.toLowerCase().includes(name)) return false;
+                if (agency && !item.agency.toLowerCase().includes(agency)) return false;
+                if (host && !item.host.toLowerCase().includes(host)) return false;
+                if (category && item.category !== category) return false;
+                if (status && item.status !== status) return false;
+                return true;
+            });
+
+            currentPage = 1;
+            renderTable(filteredData);
+            renderPagination(filteredData);
+        }
+
+        function handleSearch() {
+            doFilter();
+        }
+
+        function handleReset() {
+            document.getElementById('searchId').value = '';
+            document.getElementById('searchName').value = '';
+            document.getElementById('searchAgency').value = '';
+            document.getElementById('searchHost').value = '';
+            document.getElementById('searchCategory').value = '';
+            document.getElementById('searchStatus').value = '';
+            doFilter();
+        }
+
+        function handleNew() {
+            alert('📝 新建产品：即将打开新建产品页面');
+        }
+
+        function handleOffline(id) {
+            if (confirm('确定要下线产品 ' + id + ' 吗？')) {
+                for (var i = 0; i < mockData.length; i++) {
+                    if (mockData[i].id === id) {
+                        mockData[i].status = 'offline';
+                        break;
+                    }
+                }
+                doFilter();
+            }
+        }
+
+        function handleOnline(id) {
+            for (var i = 0; i < mockData.length; i++) {
+                if (mockData[i].id === id) {
+                    mockData[i].status = 'online';
+                    break;
+                }
+            }
+            doFilter();
+        }
+
+        function handleView(id) {
+            alert('📄 查看产品详情：' + id);
+        }
+
+        function handleEval(id) {
+            alert('⭐ 评价管理：' + id);
+        }
+
+        function handleConfig(id) {
+            window.location.href = '研学手记配置.html?id=' + id;
+        }
+
+        // 初始化
+        doFilter();
+    </script>
+</body>
+</html>

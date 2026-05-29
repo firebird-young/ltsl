@@ -239,6 +239,7 @@
             display: flex;
             padding: 14px;
             gap: 12px;
+            position: relative;
         }
         /* 课程缩略图占位 */
         .course-thumb {
@@ -269,6 +270,9 @@
         }
         .thumb-hut {
             background: linear-gradient(135deg, #E8C87A, #D4A84B);
+        }
+        .thumb-spring {
+            background: linear-gradient(135deg, #FFB74D, #F57C00);
         }
         .course-info {
             flex: 1;
@@ -303,10 +307,55 @@
         .course-time {
             font-size: 12px;
             color: #999;
-            margin-top: 4px;
             display: flex;
             align-items: center;
             gap: 4px;
+        }
+        .course-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 6px;
+        }
+        .course-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-size: 11px;
+            padding: 3px 10px;
+            border-radius: 8px;
+            font-weight: 500;
+            z-index: 5;
+        }
+        .course-badge.pending {
+            background: #E65100;
+            color: #fff;
+        }
+        .course-badge.done {
+            background: #4CAF50;
+            color: #fff;
+        }
+        .course-badge.expired {
+            background: #999;
+            color: #fff;
+        }
+        .course-handbook-btn {
+            font-size: 13px;
+            color: #fff;
+            background: linear-gradient(135deg, #0669FF, #004FE0);
+            padding: 7px 0;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            width: 100%;
+            display: block;
+            text-align: center;
+            transition: opacity 0.2s;
+            box-shadow: 0 2px 6px rgba(6,105,255,0.25);
+        }
+        .course-handbook-btn:active {
+            opacity: 0.85;
         }
 
         /* ===== 空状态 ===== */
@@ -323,100 +372,7 @@
             font-size: 14px;
         }
 
-        /* ===== 弹窗浮层 ===== */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.45);
-            z-index: 999;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.25s;
-            padding: 20px;
-        }
-        .overlay.show {
-            display: flex;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        @keyframes slideUp {
-            from { transform: translateY(60px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        .popup {
-            background: #fff;
-            width: 100%;
-            max-width: 340px;
-            border-radius: 18px;
-            padding: 30px 24px 24px;
-            text-align: center;
-            animation: slideUp 0.3s ease-out;
-            position: relative;
-        }
-        .popup-icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: #0669FF;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 14px;
-            font-size: 30px;
-            color: #fff;
-        }
-        .popup h3 {
-            font-size: 18px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 8px;
-        }
-        .popup p {
-            font-size: 14px;
-            color: #666;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-        .popup .popup-btn {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 10px;
-            background: #0669FF;
-            color: #fff;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: opacity 0.2s;
-        }
-        .popup .popup-btn:active {
-            opacity: 0.85;
-        }
-        .popup-close {
-            position: absolute;
-            top: 12px;
-            right: 14px;
-            background: #f0f0f0;
-            border: none;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            font-size: 16px;
-            color: #999;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .popup-close:active {
-            background: #e0e0e0;
-        }
+
 
         /* ===== 底部导航 ===== */
         .bottom-nav {
@@ -514,17 +470,6 @@
         <!-- 由 JS 动态渲染 -->
     </div>
 
-    <!-- 弹窗浮层 -->
-    <div class="overlay" id="popupOverlay">
-        <div class="popup">
-            <button class="popup-close" onclick="closePopup()">✕</button>
-            <div class="popup-icon">🔒</div>
-            <h3>温馨提示</h3>
-            <p>需要核销后才能进入课程的<br>"研学手记"</p>
-            <button class="popup-btn" onclick="closePopup()">我知道了</button>
-        </div>
-    </div>
-
     <!-- 底部导航 -->
     <div class="bottom-nav">
         <button class="nav-item">
@@ -576,6 +521,7 @@
         '2026-05-28': [
             { name: '盆景美学·指尖上山水', tags: ['自然美育', '动手实践'], time: '09:00 - 11:30', thumb: 'bonsai' },
             { name: '我为杜甫建茅屋', tags: ['人文历史', '建筑搭建'], time: '14:00 - 17:00', thumb: 'hut' },
+            { name: '春假托管班', tags: ['托管服务', '全天陪伴'], time: '08:00 - 18:00', thumb: 'spring' },
         ],
         '2026-05-30': [
             { name: '盆景美学·指尖上山水', tags: ['自然美育', '动手实践'], time: '09:00 - 11:30', thumb: 'bonsai' },
@@ -707,9 +653,11 @@
 
         let html = '';
         courses.forEach((course, index) => {
-            const emojiMap = { bonsai: '🌿', hut: '🏚️' };
-            const bgMap = { bonsai: 'thumb-bonsai', hut: 'thumb-hut' };
-            const imgMap = { bonsai: '', hut: '我为杜甫建茅屋.jpg' };
+            const emojiMap = { bonsai: '🌿', hut: '🏚️', spring: '🏫' };
+            const bgMap = { bonsai: 'thumb-bonsai', hut: 'thumb-hut', spring: 'thumb-spring' };
+            const imgMap = { bonsai: '盆景美学·指尖上的山水.jpg', hut: '我为杜甫建茅屋.jpg', spring: '春假托管班' };
+            const badgeMap = { bonsai: '<span class="course-badge pending">待出行</span>', hut: '<span class="course-badge done">已核销</span>', spring: '<span class="course-badge expired">已过期</span>' };
+            const btnMap = { bonsai: '', hut: '<button class="course-handbook-btn" onclick="event.stopPropagation();window.location.href=\'研学手记.html\'">📖 进入研学手记</button>', spring: '<button class="course-handbook-btn" onclick="event.stopPropagation();window.location.href=\'研学手记.html\'">📖 进入研学手记</button>' };
             let thumbHtml = '';
             if (imgMap[course.thumb]) {
                 thumbHtml = `<img src="${imgMap[course.thumb]}" alt="${course.name}">`;
@@ -719,6 +667,7 @@
             html += `
                 <div class="course-card" data-index="${index}">
                     <div class="course-card-inner">
+                        ${badgeMap[course.thumb] || ''}
                         <div class="course-thumb">
                             ${thumbHtml}
                         </div>
@@ -727,7 +676,10 @@
                             <div class="course-tags">
                                 ${course.tags.map(t => `<span class="course-tag">${t}</span>`).join('')}
                             </div>
-                            <div class="course-time">🕐 ${course.time}</div>
+                            <div class="course-bottom">
+                                <div class="course-time">🕐 ${course.time}</div>
+                            </div>
+                            ${btnMap[course.thumb] ? '<div style="margin-top:6px;">' + btnMap[course.thumb] + '</div>' : ''}
                         </div>
                     </div>
                 </div>
@@ -736,19 +688,6 @@
 
         list.innerHTML = html;
         document.getElementById('courseCount').textContent = `共 ${courses.length} 个研学课程`;
-
-        // 绑定点击事件
-        const cards = list.querySelectorAll('.course-card');
-        cards.forEach((card, idx) => {
-            card.addEventListener('click', function () {
-                const course = courses[idx];
-                if (course.name === '盆景美学·指尖上山水') {
-                    showPopup();
-                } else if (course.name === '我为杜甫建茅屋') {
-                    window.location.href = '研学手记.html';
-                }
-            });
-        });
     }
 
     // ===== 更新标题日期 =====
@@ -777,20 +716,6 @@
         }
         renderCalendar(currentYear, currentMonth);
     }
-
-    // ===== 弹窗控制 =====
-    function showPopup() {
-        document.getElementById('popupOverlay').classList.add('show');
-    }
-
-    function closePopup() {
-        document.getElementById('popupOverlay').classList.remove('show');
-    }
-
-    // 点击遮罩关闭
-    document.getElementById('popupOverlay').addEventListener('click', function (e) {
-        if (e.target === this) closePopup();
-    });
 
     // ===== 初始化 =====
     renderCalendar(currentYear, currentMonth);

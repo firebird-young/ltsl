@@ -241,6 +241,25 @@
             font-size: 13px;
             color: #999;
         }
+        .contact-item .eval-btn {
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 6px;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: opacity 0.2s;
+        }
+        .contact-item .eval-btn:active { opacity: 0.8; }
+        .eval-btn-add {
+            background: #0669FF;
+            color: #fff;
+        }
+        .eval-btn-view {
+            background: #4CAF50;
+            color: #fff;
+        }
 
         /* ===== 底部按钮区域 ===== */
         .bottom-actions {
@@ -354,23 +373,26 @@
                 <div class="group-header">
                     <div class="phone-wrap">
                         <span class="label">联系电话</span>
-                        <span class="phone">13412344323</span>
+                        <span class="phone">13800138001</span>
                         <span class="phone-icon">📞</span>
                     </div>
                     <span class="status-badge pending">待出行</span>
                 </div>
                 <div class="contact-list">
                     <div class="contact-item">
-                        <span class="name">张菲菲</span>
+                        <span class="name">赵小明</span>
                         <span class="id-card">511602************38</span>
+                        <button class="eval-btn eval-btn-add" onclick="goEval('赵小明')">评价</button>
                     </div>
                     <div class="contact-item">
-                        <span class="name">张丽</span>
-                        <span class="id-card">511602************38</span>
+                        <span class="name">李小红</span>
+                        <span class="id-card">510108************25</span>
+                        <button class="eval-btn eval-btn-add" onclick="goEval('李小红')">评价</button>
                     </div>
                     <div class="contact-item">
-                        <span class="name">王小丽</span>
-                        <span class="id-card">511602************38</span>
+                        <span class="name">王大力</span>
+                        <span class="id-card">440305************12</span>
+                        <button class="eval-btn eval-btn-add" onclick="goEval('王大力')">评价</button>
                     </div>
                 </div>
             </div>
@@ -380,23 +402,26 @@
                 <div class="group-header">
                     <div class="phone-wrap">
                         <span class="label">联系电话</span>
-                        <span class="phone">13412344323</span>
+                        <span class="phone">13900139002</span>
                         <span class="phone-icon">📞</span>
                     </div>
                     <span class="status-badge confirmed">已核销</span>
                 </div>
                 <div class="contact-list">
                     <div class="contact-item">
-                        <span class="name">张菲菲</span>
-                        <span class="id-card">511602************38</span>
+                        <span class="name">陈小华</span>
+                        <span class="id-card">330102************45</span>
+                        <button class="eval-btn eval-btn-add" onclick="goEval('陈小华')">评价</button>
                     </div>
                     <div class="contact-item">
-                        <span class="name">张丽</span>
-                        <span class="id-card">511602************38</span>
+                        <span class="name">林小芳</span>
+                        <span class="id-card">350103************67</span>
+                        <button class="eval-btn eval-btn-add" onclick="goEval('林小芳')">评价</button>
                     </div>
                     <div class="contact-item">
-                        <span class="name">王小丽</span>
-                        <span class="id-card">511602************38</span>
+                        <span class="name">黄小军</span>
+                        <span class="id-card">420106************89</span>
+                        <button class="eval-btn eval-btn-add" onclick="goEval('黄小军')">评价</button>
                     </div>
                 </div>
             </div>
@@ -408,40 +433,60 @@
                 <span class="arrow-icon">››</span>
                 <span>确认完成</span>
             </button>
-            <button class="btn-primary" id="reportBtn" onclick="handleReport()">
-                📊 生成研学报告
+            <button class="btn-primary" id="infoBtn" onclick="handleInfo()">
+                📋 生成研学信息
             </button>
         </div>
     </div>
 
     <script>
-        // 检查是否已生成报告
-        function checkReportStatus() {
-            var saved = localStorage.getItem('studyReport');
-            var btn = document.getElementById('reportBtn');
+        function checkStatus() {
+            var saved = localStorage.getItem('studyInfo');
+            var btn = document.getElementById('infoBtn');
             if (saved) {
-                btn.innerHTML = '📄 查看报告';
+                btn.innerHTML = '📄 查看研学信息';
                 btn.classList.add('btn-view');
             } else {
-                btn.innerHTML = '📊 生成研学报告';
+                btn.innerHTML = '📋 生成研学信息';
                 btn.classList.remove('btn-view');
             }
+            // 初始化评价按钮状态
+            document.querySelectorAll('.contact-item').forEach(function(item) {
+                var btn = item.querySelector('.eval-btn');
+                var name = item.querySelector('.name').textContent.trim();
+                var key = 'eval_' + name;
+                if (localStorage.getItem(key)) {
+                    btn.textContent = '查看评价';
+                    btn.className = 'eval-btn eval-btn-view';
+                }
+            });
         }
 
         function confirmComplete() {
             alert('✅ 已确认完成订单');
         }
 
-        function handleReport() {
-            var saved = localStorage.getItem('studyReport');
+        function handleInfo() {
+            var saved = localStorage.getItem('studyInfo');
             if (saved) {
-                window.location.href = '生成研学报告.html?view=1';
+                window.location.href = '生成研学信息.html?view=1';
             } else {
-                window.location.href = '生成研学报告.html';
+                window.location.href = '生成研学信息.html';
             }
         }
 
-        checkReportStatus();
+        function goEval(name) {
+            var key = 'eval_' + name;
+            var saved = localStorage.getItem(key);
+            var params = '?name=' + encodeURIComponent(name) + '&course=' + encodeURIComponent('杜甫和李白的故事') + '&time=13:00-15:00';
+            if (saved) {
+                window.location.href = '研学评价.html' + params + '&view=1';
+            } else {
+                window.location.href = '研学评价.html' + params;
+            }
+        }
+
+        checkStatus();
     </script>
 </body>
 </html>

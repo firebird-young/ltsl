@@ -3,13 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>我的游客</title>
+    <title>我的成员</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
             background: #f5f5f5;
@@ -51,7 +47,7 @@
             padding-right: 32px;
         }
 
-        /* ===== 游客列表 ===== */
+        /* ===== 成员列表 ===== */
         .visitor-list {
             padding: 12px 16px;
         }
@@ -62,20 +58,56 @@
             margin-bottom: 12px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
         }
-        .visitor-item:last-child {
-            margin-bottom: 0;
+        .visitor-item:last-child { margin-bottom: 0; }
+        .visitor-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0669FF, #004FE0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #fff;
+            font-weight: 600;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .visitor-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         .visitor-info {
             flex: 1;
+            min-width: 0;
+        }
+        .visitor-name-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
         }
         .visitor-name {
             font-size: 16px;
             font-weight: 600;
             color: #333;
-            margin-bottom: 6px;
         }
+        .manage-link {
+            font-size: 12px;
+            color: #999;
+            cursor: pointer;
+            border: none;
+            background: none;
+            padding: 0;
+            line-height: 1;
+            text-decoration: underline;
+            text-decoration-style: dotted;
+            text-underline-offset: 2px;
+        }
+        .manage-link:hover { color: #0669FF; }
         .visitor-id {
             font-size: 13px;
             color: #666;
@@ -83,24 +115,185 @@
             align-items: center;
             gap: 8px;
         }
-        .visitor-id .label {
-            color: #999;
-        }
+        .visitor-id .label { color: #999; }
         .track-btn {
             padding: 8px 14px;
             border: none;
             border-radius: 8px;
             background: #E65100;
             color: #fff;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 500;
             cursor: pointer;
+            white-space: nowrap;
             flex-shrink: 0;
             transition: opacity 0.2s;
         }
-        .track-btn:active {
-            opacity: 0.85;
+        .track-btn:active { opacity: 0.85; }
+
+        /* ===== 新增按钮 ===== */
+        .add-btn-wrap {
+            padding: 16px 16px 80px;
         }
+        .add-btn {
+            width: 100%;
+            padding: 14px;
+            border: 2px dashed #0669FF;
+            border-radius: 12px;
+            background: #fff;
+            color: #0669FF;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .add-btn:active { background: #F0F6FF; }
+
+        /* ===== 蒙层 ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.45);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-box {
+            width: 100%;
+            max-width: 380px;
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+            animation: modalIn 0.2s ease-out;
+        }
+        @keyframes modalIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .modal-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #1a1a1a;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* ===== 头像上传 ===== */
+        .avatar-upload-wrap {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .avatar-upload-box {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: #bbb;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+            border: 2px dashed #d0d5e0;
+            transition: border-color 0.2s;
+        }
+        .avatar-upload-box:hover { border-color: #0669FF; }
+        .avatar-upload-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .avatar-upload-box input { display: none; }
+        .avatar-upload-box .camera-icon {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 24px;
+            height: 24px;
+            background: #0669FF;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #fff;
+            border: 2px solid #fff;
+        }
+
+        /* ===== 表单 ===== */
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #555;
+            display: block;
+            margin-bottom: 6px;
+        }
+        .form-group label .required {
+            color: #E65100;
+            margin-left: 2px;
+        }
+        .form-group input {
+            width: 100%;
+            height: 42px;
+            padding: 0 14px;
+            border: 1px solid #d9d9d9;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #333;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus { border-color: #0669FF; box-shadow: 0 0 0 2px rgba(6,105,255,0.08); }
+        .form-group .error-msg {
+            font-size: 12px;
+            color: #E65100;
+            margin-top: 4px;
+            display: none;
+        }
+        .form-group.error input { border-color: #E65100; }
+        .form-group.error .error-msg { display: block; }
+
+        /* ===== 弹窗按钮 ===== */
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 4px;
+        }
+        .modal-actions .mbtn {
+            flex: 1;
+            height: 44px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .modal-actions .mbtn:active { opacity: 0.85; }
+        .mbtn-delete {
+            background: #FFF2E8;
+            color: #D46B08;
+        }
+        .mbtn-delete:hover { background: #FFE0CC; }
+        .mbtn-confirm {
+            background: #0669FF;
+            color: #fff;
+        }
+        .mbtn-confirm:hover { background: #0052CC; }
     </style>
 </head>
 <body>
@@ -108,52 +301,248 @@
         <!-- 顶部导航 -->
         <div class="top-nav">
             <button class="back-btn" onclick="goBack()">‹</button>
-            <div class="top-nav-title">我的游客</div>
+            <div class="top-nav-title">我的成员</div>
         </div>
 
         <!-- 游客列表 -->
-        <div class="visitor-list">
-            <div class="visitor-item">
-                <div class="visitor-info">
-                    <div class="visitor-name">杨梅</div>
-                    <div class="visitor-id">
-                        <span class="label">身份证</span>
-                        <span>511602198505080038</span>
-                    </div>
+        <div class="visitor-list" id="visitorList"></div>
+
+        <!-- 新增成员按钮 -->
+        <div class="add-btn-wrap">
+            <button class="add-btn" onclick="openAddModal()">＋ 新增成员</button>
+        </div>
+    </div>
+
+    <!-- 弹窗 -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box">
+            <div class="modal-title" id="modalTitle">编辑成员</div>
+
+            <!-- 头像上传 -->
+            <div class="avatar-upload-wrap">
+                <div class="avatar-upload-box" onclick="document.getElementById('avatarInput').click()">
+                    <span id="avatarPlaceholder">📷</span>
+                    <img id="avatarPreview" style="display:none;" alt="">
+                    <div class="camera-icon">📷</div>
+                    <input type="file" id="avatarInput" accept="image/*" onchange="handleAvatarUpload(event)">
                 </div>
-                <button class="track-btn" onclick="viewTrack('杨梅')">查看研学足迹</button>
             </div>
-            <div class="visitor-item">
-                <div class="visitor-info">
-                    <div class="visitor-name">刘飞</div>
-                    <div class="visitor-id">
-                        <span class="label">身份证</span>
-                        <span>51162119891027672X</span>
-                    </div>
-                </div>
-                <button class="track-btn" onclick="viewTrack('刘飞')">查看研学足迹</button>
+
+            <!-- 姓名 -->
+            <div class="form-group" id="nameGroup">
+                <label>姓名 <span class="required">*</span></label>
+                <input type="text" id="editName" placeholder="请输入姓名" maxlength="20">
+                <div class="error-msg">请输入姓名</div>
             </div>
-            <div class="visitor-item">
-                <div class="visitor-info">
-                    <div class="visitor-name">小朋友</div>
-                    <div class="visitor-id">
-                        <span class="label">身份证</span>
-                        <span>32010220160827491X</span>
-                    </div>
-                </div>
-                <button class="track-btn" onclick="viewTrack('小朋友')">查看研学足迹</button>
+
+            <!-- 身份证 -->
+            <div class="form-group" id="idGroup">
+                <label>身份证号 <span class="required">*</span></label>
+                <input type="text" id="editId" placeholder="请输入身份证号" maxlength="18">
+                <div class="error-msg">请输入身份证号</div>
+            </div>
+
+            <!-- 按钮 -->
+            <div class="modal-actions">
+                <button class="mbtn mbtn-delete" id="deleteBtn" onclick="deleteVisitor()">🗑 删除</button>
+                <button class="mbtn mbtn-confirm" id="confirmBtn" onclick="confirmVisitor()">确定</button>
             </div>
         </div>
     </div>
 
     <script>
+        // ===== 成员数据 =====
+        var visitors = [];
+        var editIndex = -1; // -1 = 新增, >=0 = 编辑
+
+        function loadVisitors() {
+            var saved = localStorage.getItem('visitors');
+            if (saved) {
+                try { visitors = JSON.parse(saved); } catch(e) { visitors = []; }
+            }
+            if (visitors.length === 0) {
+                visitors = [
+                    { name: '杨梅', id: '511602198505080038', avatar: '' },
+                    { name: '刘飞', id: '51162119891027672X', avatar: '' },
+                    { name: '王浩宇', id: '32010220160827491X', avatar: '' }
+                ];
+            }
+            renderVisitors();
+        }
+
+        function saveVisitors() {
+            localStorage.setItem('visitors', JSON.stringify(visitors));
+        }
+
+        function renderVisitors() {
+            var el = document.getElementById('visitorList');
+            if (visitors.length === 0) {
+                el.innerHTML = '<div style="text-align:center;padding:40px 0;color:#bbb;font-size:14px;">暂无成员，点击下方新增</div>';
+                return;
+            }
+            var html = '';
+            for (var i = 0; i < visitors.length; i++) {
+                var v = visitors[i];
+                var initial = v.name ? v.name.charAt(0) : '?';
+                var avatarHtml = v.avatar
+                    ? '<img src="' + v.avatar + '" alt="">'
+                    : initial;
+                html += '<div class="visitor-item">';
+                html += '  <div class="visitor-avatar">' + avatarHtml + '</div>';
+                html += '  <div class="visitor-info">';
+                html += '    <div class="visitor-name-row">';
+                html += '      <span class="visitor-name">' + escapeHtml(v.name) + '</span>';
+                html += '      <button class="manage-link" onclick="openEditModal(' + i + ')">管理</button>';
+                html += '    </div>';
+                html += '    <div class="visitor-id"><span class="label">身份证</span><span>' + escapeHtml(v.id) + '</span></div>';
+                html += '  </div>';
+                html += '  <button class="track-btn" onclick="viewTrack(\'' + encodeURIComponent(v.name) + '\')">查看研学足迹</button>';
+                html += '</div>';
+            }
+            el.innerHTML = html;
+        }
+
+        function escapeHtml(str) {
+            var d = document.createElement('div');
+            d.appendChild(document.createTextNode(str));
+            return d.innerHTML;
+        }
+
+        // ===== 弹窗 =====
+        function openModal() {
+            document.getElementById('modalOverlay').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('show');
+            // 清除错误状态
+            document.getElementById('nameGroup').classList.remove('error');
+            document.getElementById('idGroup').classList.remove('error');
+        }
+
+        function openEditModal(index) {
+            editIndex = index;
+            var v = visitors[index];
+            document.getElementById('modalTitle').textContent = '编辑成员';
+            document.getElementById('editName').value = v.name || '';
+            document.getElementById('editId').value = v.id || '';
+            document.getElementById('deleteBtn').style.display = 'block';
+            document.getElementById('confirmBtn').textContent = '确定';
+
+            // 头像回显
+            var placeholder = document.getElementById('avatarPlaceholder');
+            var preview = document.getElementById('avatarPreview');
+            if (v.avatar) {
+                placeholder.style.display = 'none';
+                preview.style.display = 'block';
+                preview.src = v.avatar;
+            } else {
+                placeholder.style.display = 'inline';
+                preview.style.display = 'none';
+                preview.src = '';
+            }
+
+            openModal();
+        }
+
+        function openAddModal() {
+            editIndex = -1;
+            document.getElementById('modalTitle').textContent = '新增成员';
+            document.getElementById('editName').value = '';
+            document.getElementById('editId').value = '';
+            document.getElementById('deleteBtn').style.display = 'none';
+            document.getElementById('confirmBtn').textContent = '新增';
+
+            var placeholder = document.getElementById('avatarPlaceholder');
+            var preview = document.getElementById('avatarPreview');
+            placeholder.style.display = 'inline';
+            preview.style.display = 'none';
+            preview.src = '';
+
+            openModal();
+        }
+
+        // ===== 头像上传 =====
+        function handleAvatarUpload(e) {
+            var file = e.target.files[0];
+            if (!file) return;
+            var reader = new FileReader();
+            reader.onload = function(ev) {
+                var placeholder = document.getElementById('avatarPlaceholder');
+                var preview = document.getElementById('avatarPreview');
+                placeholder.style.display = 'none';
+                preview.style.display = 'block';
+                preview.src = ev.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // ===== 确认 =====
+        function confirmVisitor() {
+            var name = document.getElementById('editName').value.trim();
+            var id = document.getElementById('editId').value.trim();
+            var hasError = false;
+
+            if (!name) {
+                document.getElementById('nameGroup').classList.add('error');
+                hasError = true;
+            } else {
+                document.getElementById('nameGroup').classList.remove('error');
+            }
+
+            if (!id) {
+                document.getElementById('idGroup').classList.add('error');
+                hasError = true;
+            } else {
+                document.getElementById('idGroup').classList.remove('error');
+            }
+
+            if (hasError) return;
+
+            var avatarSrc = document.getElementById('avatarPreview').src;
+            var avatarData = (avatarSrc && avatarSrc.startsWith('data:')) ? avatarSrc : '';
+
+            if (editIndex >= 0) {
+                // 编辑
+                visitors[editIndex].name = name;
+                visitors[editIndex].id = id;
+                if (avatarData) visitors[editIndex].avatar = avatarData;
+            } else {
+                // 新增
+                visitors.push({ name: name, id: id, avatar: avatarData });
+            }
+
+            saveVisitors();
+            renderVisitors();
+            closeModal();
+        }
+
+        // ===== 删除 =====
+        function deleteVisitor() {
+            if (editIndex < 0) return;
+            if (!confirm('确定要删除成员「' + visitors[editIndex].name + '」吗？')) return;
+            visitors.splice(editIndex, 1);
+            saveVisitors();
+            renderVisitors();
+            closeModal();
+        }
+
+        // ===== 导航 =====
         function goBack() {
             window.location.href = '我的.html';
         }
 
         function viewTrack(name) {
-            window.location.href = '研学足迹.html?name=' + encodeURIComponent(name);
+            window.location.href = '研学足迹.html?name=' + name;
         }
+
+        // 点击蒙层关闭
+        document.getElementById('modalOverlay').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        // 初始化
+        loadVisitors();
     </script>
 </body>
 </html>
