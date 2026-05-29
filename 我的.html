@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>我的 - 离泰数链</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 430px;
+            background: #f5f5f5;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 70px;
+        }
+
+        /* ===== 顶部状态栏 ===== */
+        .status-bar {
+            height: 44px;
+            background: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+        }
+        .status-bar .icons {
+            display: flex;
+            gap: 4px;
+            font-size: 14px;
+        }
+
+        /* ===== 顶部导航 ===== */
+        .top-nav {
+            height: 44px;
+            background: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 16px;
+            gap: 12px;
+        }
+        .top-nav .nav-btn {
+            font-size: 20px;
+            color: #333;
+            cursor: pointer;
+        }
+
+        /* ===== 用户信息区 ===== */
+        .user-section {
+            background: #fff;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .user-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #F5C842;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            overflow: hidden;
+        }
+        .user-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .user-name::after {
+            content: '›';
+            color: #999;
+            font-size: 18px;
+        }
+        .check-in-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 16px;
+            font-size: 13px;
+            color: #666;
+            background: #fff;
+            cursor: pointer;
+        }
+        .check-in-btn .icon {
+            font-size: 14px;
+        }
+
+        /* ===== 我的游客按钮（新增） ===== */
+        .visitor-btn-wrap {
+            background: #fff;
+            padding: 0 20px 16px;
+        }
+        .visitor-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #0669FF, #004FE0);
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            box-shadow: 0 4px 12px rgba(6,105,255,0.25);
+        }
+        .visitor-btn:active {
+            opacity: 0.9;
+        }
+
+        /* ===== 积分优惠券卡片 ===== */
+        .stats-card {
+            background: #fff;
+            margin: 0 16px 12px;
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+        }
+        .stat-item {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .stat-item:first-child {
+            border-right: 1px solid #f0f0f0;
+        }
+        .stat-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        .stat-icon.points { background: #FFF3E0; }
+        .stat-icon.coupon { background: #E3F2FD; }
+        .stat-info .label {
+            font-size: 13px;
+            color: #666;
+        }
+        .stat-info .value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            margin-top: 2px;
+        }
+
+        /* ===== 订单区域 ===== */
+        .order-section {
+            background: #fff;
+            margin: 0 16px 12px;
+            border-radius: 12px;
+            padding: 16px 0;
+        }
+        .order-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px 12px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .order-header .title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+        }
+        .order-header .arrow {
+            font-size: 18px;
+            color: #999;
+        }
+        .order-grid {
+            display: flex;
+            padding-top: 16px;
+        }
+        .order-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+        .order-item .icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        .order-item .label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* ===== 联系我们 ===== */
+        .contact-section {
+            background: #fff;
+            margin: 0 16px;
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+        .contact-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .contact-left .icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #E8F5E9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        .contact-left .text {
+            font-size: 15px;
+            color: #333;
+        }
+        .contact-section .arrow {
+            font-size: 18px;
+            color: #999;
+        }
+
+        /* ===== 底部导航 ===== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 430px;
+            background: #fff;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-around;
+            padding: 6px 0 env(safe-area-inset-bottom, 6px);
+            z-index: 100;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.04);
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            padding: 4px 10px;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+        .nav-item .nav-icon {
+            font-size: 22px;
+            line-height: 1;
+        }
+        .nav-item .nav-label {
+            font-size: 11px;
+            color: #999;
+            font-weight: 500;
+        }
+        .nav-item.active .nav-label {
+            color: #D43828;
+            font-weight: 600;
+        }
+        .nav-item.active .nav-icon {
+            color: #D43828;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 顶部状态栏 -->
+        <div class="status-bar">
+            <span>9:41</span>
+            <div class="icons">
+                <span>📶</span>
+                <span>📡</span>
+                <span>🔋</span>
+            </div>
+        </div>
+
+        <!-- 顶部导航 -->
+        <div class="top-nav">
+            <span class="nav-btn">•••</span>
+            <span class="nav-btn">◎</span>
+        </div>
+
+        <!-- 用户信息 -->
+        <div class="user-section">
+            <div class="user-left">
+                <div class="user-avatar">🐻</div>
+                <div class="user-name">爱吃猫的鱼</div>
+            </div>
+            <button class="check-in-btn">
+                <span class="icon">📅</span>
+                <span>签到</span>
+            </button>
+        </div>
+
+        <!-- 我的游客按钮（新增） -->
+        <div class="visitor-btn-wrap">
+            <button class="visitor-btn" onclick="goVisitors()">
+                <span>👥</span>
+                <span>我的游客</span>
+            </button>
+        </div>
+
+        <!-- 积分优惠券 -->
+        <div class="stats-card">
+            <div class="stat-item">
+                <div class="stat-icon points">👑</div>
+                <div class="stat-info">
+                    <div class="label">我的积分</div>
+                    <div class="value">5421</div>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon coupon">🎫</div>
+                <div class="stat-info">
+                    <div class="label">我的优惠券</div>
+                    <div class="value">12</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 研学订单 -->
+        <div class="order-section">
+            <div class="order-header">
+                <span class="title">研学订单</span>
+                <span class="arrow">›</span>
+            </div>
+            <div class="order-grid">
+                <div class="order-item">
+                    <div class="icon">⏱️</div>
+                    <span class="label">待成团</span>
+                </div>
+                <div class="order-item">
+                    <div class="icon">📅</div>
+                    <span class="label">待出行</span>
+                </div>
+                <div class="order-item">
+                    <div class="icon">💰</div>
+                    <span class="label">退款/售后</span>
+                </div>
+                <div class="order-item">
+                    <div class="icon">✅</div>
+                    <span class="label">已完成</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 商城订单 -->
+        <div class="order-section">
+            <div class="order-header">
+                <span class="title">商城订单</span>
+                <span class="arrow">›</span>
+            </div>
+            <div class="order-grid">
+                <div class="order-item">
+                    <div class="icon">💳</div>
+                    <span class="label">待付款</span>
+                </div>
+                <div class="order-item">
+                    <div class="icon">📦</div>
+                    <span class="label">待发货</span>
+                </div>
+                <div class="order-item">
+                    <div class="icon">🚚</div>
+                    <span class="label">待收货</span>
+                </div>
+                <div class="order-item">
+                    <div class="icon">↩️</div>
+                    <span class="label">退款/售后</span>
+                </div>
+                <div class="order-item">
+                    <div class="icon">✔️</div>
+                    <span class="label">已完成</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 联系我们 -->
+        <div class="contact-section">
+            <div class="contact-left">
+                <div class="icon">🎧</div>
+                <span class="text">联系我们</span>
+            </div>
+            <span class="arrow">›</span>
+        </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <div class="bottom-nav">
+        <button class="nav-item" onclick="goNav('首页')">
+            <span class="nav-icon">🏠</span>
+            <span class="nav-label">首页</span>
+        </button>
+        <button class="nav-item" onclick="goNav('研学日历')">
+            <span class="nav-icon">📅</span>
+            <span class="nav-label">研学日历</span>
+        </button>
+        <button class="nav-item" onclick="goNav('甄选')">
+            <span class="nav-icon">🎁</span>
+            <span class="nav-label">甄选</span>
+        </button>
+        <button class="nav-item active" onclick="goNav('我的')">
+            <span class="nav-icon">👤</span>
+            <span class="nav-label">我的</span>
+        </button>
+    </div>
+
+    <script>
+        function goVisitors() {
+            window.location.href = '我的游客.html';
+        }
+        function goNav(name) {
+            if (name === '我的') return;
+            if (name === '研学日历') {
+                window.location.href = '研学日历.html';
+            } else {
+                alert('📍 前往：' + name);
+            }
+        }
+    </script>
+</body>
+</html>
