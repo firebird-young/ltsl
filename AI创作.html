@@ -166,63 +166,6 @@
             color: #0669FF;
         }
 
-        /* ===== 风格选择卡片 ===== */
-        .style-select-wrap {
-            display: none;
-            padding: 8px 16px 6px;
-        }
-        .style-select-wrap.show { display: block; }
-        .style-label {
-            font-size: 13px;
-            font-weight: 500;
-            color: #888;
-            margin-bottom: 8px;
-        }
-        .style-card-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .style-card-opt {
-            width: 90px;
-            background: #fff;
-            border-radius: 10px;
-            padding: 8px 6px 6px;
-            text-align: center;
-            border: 2px solid #eef0f5;
-            cursor: pointer;
-            transition: all 0.2s;
-            user-select: none;
-        }
-        .style-card-opt:hover { border-color: #0669FF; }
-        .style-card-opt.active {
-            border-color: #0669FF;
-            background: #F0F6FF;
-        }
-        .style-card-opt .sco-thumb {
-            width: 74px;
-            height: 48px;
-            border-radius: 6px;
-            overflow: hidden;
-            margin: 0 auto 4px;
-            background: #e0e0e0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-        }
-        .style-card-opt .sco-thumb img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .style-card-opt .sco-name {
-            font-size: 11px;
-            font-weight: 500;
-            color: #555;
-        }
-        .style-card-opt.active .sco-name { color: #0669FF; }
-
         /* ===== 名称输入 ===== */
         .name-input-wrap {
             margin: 10px 16px 0;
@@ -520,12 +463,6 @@
         <span class="template-chip" onclick="useTemplate(this)">杜甫与李白的诗歌对谈</span>
     </div>
 
-    <!-- 风格选择 -->
-    <div class="style-select-wrap" id="styleWrap">
-        <div class="style-label">🎨 选择风格</div>
-        <div class="style-card-grid" id="styleCardGrid"></div>
-    </div>
-
     <!-- 名称输入 -->
     <div class="name-input-wrap">
         <input type="text" id="nameInput" placeholder="给作品起个名字吧" maxlength="20">
@@ -546,10 +483,10 @@
 
     <!-- 生成结果 -->
     <div class="result-area" id="resultArea">
-        <div class="result-card" id="resultCard">
+        <div class="result-card" id="resultCard" style="cursor:pointer;">
             <div class="rc-img">
                 <img id="resultImg" src="" alt="生成结果">
-                <div class="play-overlay">▶</div>
+                <div class="play-overlay" id="playOverlay">▶</div>
             </div>
             <div class="rc-body">
                 <div class="rc-title" id="resultTitle">杜甫和李白</div>
@@ -602,7 +539,6 @@
                 <span class="template-chip" onclick="useTemplate(this)">茅屋搭建的完整过程</span>
                 <span class="template-chip" onclick="useTemplate(this)">杜甫与李白的诗歌对谈</span>
             `;
-            document.getElementById('styleWrap').classList.add('show');
             if (videoGenerated) {
                 document.getElementById('resultArea').classList.add('show');
             } else {
@@ -617,7 +553,6 @@
                 <span class="template-chip" onclick="useTemplate(this)">茅屋结构拼图</span>
                 <span class="template-chip" onclick="useTemplate(this)">杜甫草堂探宝</span>
             `;
-            document.getElementById('styleWrap').classList.remove('show');
             if (gameGenerated) {
                 document.getElementById('resultArea').classList.add('show');
             } else {
@@ -635,43 +570,6 @@
 
     function useTemplate(el) {
         document.getElementById('promptInput').value = el.textContent;
-    }
-
-    var selectedStyle = '不限';
-
-    function selectStyleCard(el, name) {
-        document.querySelectorAll('.style-card-opt').forEach(function(s) { s.classList.remove('active'); });
-        el.classList.add('active');
-        selectedStyle = name;
-    }
-
-    function renderStyleCards() {
-        var grid = document.getElementById('styleCardGrid');
-        var systemSaved = localStorage.getItem('systemConfig');
-        var styles = [];
-        if (systemSaved) {
-            try {
-                var cfg = JSON.parse(systemSaved);
-                if (cfg.styles && cfg.styles.length > 0) { styles = cfg.styles; }
-            } catch(e) {}
-        }
-        if (styles.length === 0) {
-            // 默认兜底
-            styles = [{ name: '不限', thumb: '' }, { name: '写实', thumb: '' }, { name: '卡通', thumb: '' }, { name: '水墨', thumb: '' }, { name: '手绘', thumb: '' }, { name: '3D', thumb: '' }, { name: '赛博朋克', thumb: '' }, { name: '复古胶片', thumb: '' }];
-        }
-        var html = '';
-        for (var i = 0; i < styles.length; i++) {
-            var s = styles[i];
-            var thumbHtml = s.thumb
-                ? '<img src="' + s.thumb + '" alt="' + s.name + '">'
-                : '<span style="font-size:18px;">🎨</span>';
-            var activeCls = (s.name === selectedStyle) ? ' active' : '';
-            html += '<div class="style-card-opt' + activeCls + '" onclick="selectStyleCard(this,\'' + s.name + '\')">';
-            html += '  <div class="sco-thumb">' + thumbHtml + '</div>';
-            html += '  <div class="sco-name">' + s.name + '</div>';
-            html += '</div>';
-        }
-        grid.innerHTML = html;
     }
 
     var genTimer = null;
@@ -760,10 +658,14 @@
                     videoGenerated = true;
                     document.getElementById('resultImg').src = '杜甫和李白.png';
                     document.getElementById('resultTitle').textContent = '杜甫和李白';
+                    document.getElementById('playOverlay').textContent = '▶';
+                    document.getElementById('resultCard').onclick = null;
                 } else {
                     gameGenerated = true;
                     document.getElementById('resultImg').src = '快速搭建茅屋';
                     document.getElementById('resultTitle').textContent = '快速搭建茅屋';
+                    document.getElementById('playOverlay').textContent = '▶ 运行游戏';
+                    document.getElementById('resultCard').onclick = function() { window.location.href = '搭建小茅屋.html?from=AI创作'; };
                 }
                 document.getElementById('resultArea').classList.add('show');
 
@@ -776,7 +678,6 @@
     }
 
     // 初始化
-    renderStyleCards();
     switchTab('video');
 </script>
 

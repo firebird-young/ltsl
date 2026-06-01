@@ -220,91 +220,6 @@
         .btn-save:hover { background: #0052CC; }
         .btn-save:active { background: #0040A0; }
 
-        /* ===== 风格配置 ===== */
-        .style-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-top: 4px;
-        }
-        .style-card {
-            width: 120px;
-            background: #f8f9fc;
-            border-radius: 10px;
-            padding: 12px;
-            text-align: center;
-            position: relative;
-            border: 1px solid #eef0f5;
-        }
-        .style-card .sc-thumb {
-            width: 96px;
-            height: 64px;
-            border-radius: 6px;
-            overflow: hidden;
-            margin: 0 auto 6px;
-            background: #e0e0e0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-        }
-        .style-card .sc-thumb img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .style-card .sc-thumb-empty { background: #f0f0f0; font-size: 24px; }
-        .style-card .sc-name {
-            font-size: 13px;
-            font-weight: 500;
-            color: #333;
-        }
-        .style-card .sc-del {
-            position: absolute;
-            top: -6px;
-            right: -6px;
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            border: none;
-            background: #E65100;
-            color: #fff;
-            font-size: 12px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-        }
-        .style-card .sc-del:hover { background: #BF360C; }
-
-        .add-style-row {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        .upload-thumb-box {
-            width: 120px;
-            height: 60px;
-            border: 2px dashed #d0d5e0;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            color: #bbb;
-            cursor: pointer;
-            overflow: hidden;
-            position: relative;
-            transition: border-color 0.2s;
-        }
-        .upload-thumb-box:hover { border-color: #0669FF; }
-        .upload-thumb-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
     </style>
 </head>
 <body>
@@ -360,20 +275,6 @@
                 <div class="config-desc">该提示词将作为AI视频创作的系统级前置指令，影响所有视频生成的结果</div>
             </div>
 
-            <!-- 风格配置 -->
-            <div class="config-row">
-                <span class="config-label">风格配置</span>
-                <div id="styleList" class="style-grid"></div>
-                <div class="add-style-row" style="margin-top:12px;">
-                    <input type="text" id="newStyleName" placeholder="输入风格名称" class="text-input" style="width:220px;">
-                    <div class="upload-thumb-box" onclick="document.getElementById('styleThumbInput').click()">
-                        <span id="thumbPlaceholder">+ 上传示意图</span>
-                        <img id="thumbPreview" style="display:none;" alt="">
-                        <input type="file" id="styleThumbInput" accept="image/*" onchange="handleThumbUpload(event)" style="display:none;">
-                    </div>
-                    <button class="btn btn-save" onclick="addStyle()" style="padding:8px 20px;font-size:13px;height:36px;">添加</button>
-                </div>
-            </div>
         </div>
 
         <!-- ===== AI游戏生成配置 ===== -->
@@ -398,83 +299,6 @@
     </div>
 
     <script>
-        var styles = [];
-
-        function loadStyles() {
-            var saved = localStorage.getItem('systemConfig');
-            if (saved) {
-                try {
-                    var cfg = JSON.parse(saved);
-                    if (cfg.styles) { styles = cfg.styles; }
-                } catch(e) {}
-            }
-            if (styles.length === 0) {
-                styles = [
-                    { name: '水墨', thumb: '' },
-                    { name: '写实', thumb: '' },
-                    { name: '手绘', thumb: '' },
-                    { name: '赛博朋克', thumb: '' }
-                ];
-            }
-            renderStyles();
-        }
-
-        function renderStyles() {
-            var el = document.getElementById('styleList');
-            if (styles.length === 0) {
-                el.innerHTML = '<div style="padding:20px 0;color:#bbb;font-size:13px;text-align:center;">暂无风格，请添加</div>';
-                return;
-            }
-            var html = '';
-            for (var i = 0; i < styles.length; i++) {
-                var s = styles[i];
-                html += '<div class="style-card">';
-                if (s.thumb) {
-                    html += '<div class="sc-thumb"><img src="' + s.thumb + '" alt="' + s.name + '"></div>';
-                } else {
-                    html += '<div class="sc-thumb sc-thumb-empty">🎨</div>';
-                }
-                html += '<div class="sc-name">' + s.name + '</div>';
-                html += '<button class="sc-del" onclick="deleteStyle(' + i + ')">✕</button>';
-                html += '</div>';
-            }
-            el.innerHTML = html;
-        }
-
-        function handleThumbUpload(e) {
-            var file = e.target.files[0];
-            if (!file) return;
-            var reader = new FileReader();
-            reader.onload = function(ev) {
-                document.getElementById('thumbPlaceholder').style.display = 'none';
-                var preview = document.getElementById('thumbPreview');
-                preview.style.display = 'block';
-                preview.src = ev.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function addStyle() {
-            var name = document.getElementById('newStyleName').value.trim();
-            if (!name) { alert('请输入风格名称'); return; }
-            var thumbSrc = document.getElementById('thumbPreview').src;
-            var thumbData = (thumbSrc && thumbSrc.startsWith('data:')) ? thumbSrc : '';
-            styles.push({ name: name, thumb: thumbData });
-            renderStyles();
-            // 清空输入
-            document.getElementById('newStyleName').value = '';
-            document.getElementById('thumbPlaceholder').style.display = 'inline';
-            document.getElementById('thumbPreview').style.display = 'none';
-            document.getElementById('thumbPreview').src = '';
-            document.getElementById('styleThumbInput').value = '';
-        }
-
-        function deleteStyle(index) {
-            if (!confirm('确定要删除风格「' + styles[index].name + '」吗？')) return;
-            styles.splice(index, 1);
-            renderStyles();
-        }
-
         function loadSaved() {
             var saved = localStorage.getItem('systemConfig');
             if (!saved) return;
@@ -505,18 +329,15 @@
                 return;
             }
             var modelEl = document.querySelector('input[name="videoModel"]:checked');
-            // 合并现有配置，保留 styles
-            var existing = localStorage.getItem('systemConfig');
-            var config = existing ? JSON.parse(existing) : {};
-            config.aiVideoPrompt = videoPrompt;
-            config.aiGamePrompt = gamePrompt;
-            config.videoModel = modelEl ? modelEl.value : 'seedance-2.0';
-            config.styles = styles;
+            var config = {
+                aiVideoPrompt: videoPrompt,
+                aiGamePrompt: gamePrompt,
+                videoModel: modelEl ? modelEl.value : 'seedance-2.0'
+            };
             localStorage.setItem('systemConfig', JSON.stringify(config));
             alert('✅ 系统参数配置已保存');
         }
 
-        loadStyles();
         loadSaved();
     </script>
 </body>

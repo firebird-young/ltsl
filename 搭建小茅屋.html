@@ -260,7 +260,13 @@
 })();
 
 function goBack() {
-    window.location.href = '查看作品.html';
+    var params = new URLSearchParams(window.location.search);
+    var from = params.get('from');
+    if (from === 'AI创作') {
+        window.location.href = 'AI创作.html';
+    } else {
+        window.location.href = '查看作品.html';
+    }
 }
 </script>
 </body>

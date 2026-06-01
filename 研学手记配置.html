@@ -227,52 +227,90 @@
         .number-input:focus { border-color: #0669FF; }
         .number-input::-webkit-inner-spin-button { opacity: 1; }
 
-        /* ===== 风格卡片选择 ===== */
-        .style-card-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 4px;
+        /* ===== 多选下拉 ===== */
+        .multi-select-wrap {
+            position: relative;
+            width: 100%;
         }
-        .style-card-option {
-            width: 100px;
+        .ms-trigger {
+            width: 100%;
+            height: 42px;
+            padding: 0 38px 0 14px;
+            border: 1px solid #d9d9d9;
+            border-radius: 8px;
             background: #fff;
-            border-radius: 10px;
-            padding: 10px 8px 8px;
-            text-align: center;
-            border: 2px solid #eef0f5;
+            font-size: 13px;
+            color: #333;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .ms-trigger:focus { border-color: #0669FF; box-shadow: 0 0 0 2px rgba(6,105,255,0.08); }
+        .ms-trigger::placeholder { color: #bbb; }
+        .multi-select-wrap { position: relative; }
+        .ms-arrow-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 10px;
+            color: #bbb;
+            pointer-events: none;
+        }
+        .ms-dropdown {
+            display: none;
+            position: absolute;
+            top: 44px;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border: 1px solid #d9d9d9;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            z-index: 100;
+            max-height: 220px;
+            overflow-y: auto;
+        }
+        .ms-dropdown.show { display: block; }
+        .ms-option {
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
             cursor: pointer;
-            transition: all 0.2s;
-            user-select: none;
+            font-size: 13px;
+            color: #333;
+            transition: background 0.15s;
         }
-        .style-card-option:hover { border-color: #0669FF; }
-        .style-card-option.active {
-            border-color: #0669FF;
-            background: #F0F6FF;
-        }
-        .style-card-option .sco-thumb {
-            width: 80px;
-            height: 52px;
-            border-radius: 6px;
-            overflow: hidden;
-            margin: 0 auto 4px;
-            background: #e0e0e0;
+        .ms-option:hover { background: #F5F8FF; }
+        .ms-option .ms-check {
+            width: 18px; height: 18px;
+            border-radius: 4px;
+            border: 1px solid #d0d5e0;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
-        }
-        .style-card-option .sco-thumb img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .style-card-option .sco-name {
+            flex-shrink: 0;
+            transition: all 0.15s;
             font-size: 12px;
-            font-weight: 500;
-            color: #555;
+            color: #fff;
         }
-        .style-card-option.active .sco-name { color: #0669FF; }
+        .ms-option.checked .ms-check {
+            background: #0669FF;
+            border-color: #0669FF;
+        }
+        .ms-option .ms-cname { flex: 1; }
+        .ms-search {
+            width: 100%;
+            padding: 8px 12px;
+            border: none;
+            border-bottom: 1px solid #eef0f5;
+            font-size: 13px;
+            outline: none;
+            color: #333;
+            background: #fafafa;
+        }
+        .ms-search:focus { background: #fff; }
+        .ms-search::placeholder { color: #bbb; }
 
         /* ===== 快捷提示词标签 ===== */
         .tag-container {
@@ -456,12 +494,6 @@
                         <textarea class="text-input" id="videoPrompt" placeholder="请输入视频创作品描述，例如：&#10;用国风水墨画风格展现诗人杜甫在草堂前吟诗的场景，背景有远山和飘落的桃花..."></textarea>
                     </div>
 
-                    <!-- 风格 -->
-                    <div class="config-row">
-                        <span class="config-label">风格 <span class="optional">（选填）</span></span>
-                        <div class="style-card-grid" id="styleCardGrid"></div>
-                    </div>
-
                     <!-- 分辨率 -->
                     <div class="config-row">
                         <span class="config-label">分辨率</span>
@@ -498,13 +530,6 @@
                             <input type="text" id="videoQuickInput" placeholder="输入快捷提示词，回车添加" onkeydown="if(event.key==='Enter')addVideoQuick()">
                             <button class="add-tag-btn" onclick="addVideoQuick()">添加</button>
                         </div>
-                        <div class="preset-tags">
-                            <span class="ptag" onclick="addPresetVideo('国风水墨')">国风水墨</span>
-                            <span class="ptag" onclick="addPresetVideo('3D动画')">3D动画</span>
-                            <span class="ptag" onclick="addPresetVideo('逐帧动画')">逐帧动画</span>
-                            <span class="ptag" onclick="addPresetVideo('实景融合')">实景融合</span>
-                            <span class="ptag" onclick="addPresetVideo('手绘风格')">手绘风格</span>
-                        </div>
                     </div>
                 </div>
 
@@ -535,13 +560,6 @@
                             <input type="text" id="gameQuickInput" placeholder="输入快捷提示词，回车添加" onkeydown="if(event.key==='Enter')addGameQuick()">
                             <button class="add-tag-btn" onclick="addGameQuick()">添加</button>
                         </div>
-                        <div class="preset-tags">
-                            <span class="ptag" onclick="addPresetGame('搭建游戏')">搭建游戏</span>
-                            <span class="ptag" onclick="addPresetGame('拼图游戏')">拼图游戏</span>
-                            <span class="ptag" onclick="addPresetGame('问答闯关')">问答闯关</span>
-                            <span class="ptag" onclick="addPresetGame('角色扮演')">角色扮演</span>
-                            <span class="ptag" onclick="addPresetGame('寻宝探险')">寻宝探险</span>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -561,18 +579,16 @@
                     </div>
 
                     <div class="config-row">
+                        <span class="config-label">主要 Prompt <span class="optional">（选填）</span></span>
+                        <textarea class="text-input" id="contentPrompt" placeholder="输入研学内容生成的主要提示词"></textarea>
+                    </div>
+
+                    <div class="config-row">
                         <span class="config-label">快捷提示词 <span class="optional">（选填）</span></span>
                         <div class="tag-container" id="contentTags"></div>
                         <div class="tag-input-row">
                             <input type="text" id="contentInput" placeholder="输入快捷提示词，回车添加" onkeydown="if(event.key==='Enter')addContentTag()">
                             <button class="add-tag-btn" onclick="addContentTag()">添加</button>
-                        </div>
-                        <div class="preset-tags">
-                            <span class="ptag" onclick="addPresetContent('课程总结')">课程总结</span>
-                            <span class="ptag" onclick="addPresetContent('知识点梳理')">知识点梳理</span>
-                            <span class="ptag" onclick="addPresetContent('学员表现')">学员表现</span>
-                            <span class="ptag" onclick="addPresetContent('互动情况')">互动情况</span>
-                            <span class="ptag" onclick="addPresetContent('教学目标达成')">教学目标达成</span>
                         </div>
                     </div>
                 </div>
@@ -585,19 +601,38 @@
                     </div>
 
                     <div class="config-row">
+                        <span class="config-label">主要 Prompt <span class="optional">（选填）</span></span>
+                        <textarea class="text-input" id="evalPrompt" placeholder="输入研学评价生成的主要提示词"></textarea>
+                    </div>
+
+                    <div class="config-row">
                         <span class="config-label">快捷提示词 <span class="optional">（选填）</span></span>
                         <div class="tag-container" id="evalTags"></div>
                         <div class="tag-input-row">
                             <input type="text" id="evalInput" placeholder="输入快捷提示词，回车添加" onkeydown="if(event.key==='Enter')addEvalTag()">
                             <button class="add-tag-btn" onclick="addEvalTag()">添加</button>
                         </div>
-                        <div class="preset-tags">
-                            <span class="ptag" onclick="addPresetEval('学习态度')">学习态度</span>
-                            <span class="ptag" onclick="addPresetEval('动手能力')">动手能力</span>
-                            <span class="ptag" onclick="addPresetEval('团队协作')">团队协作</span>
-                            <span class="ptag" onclick="addPresetEval('创意表现')">创意表现</span>
-                            <span class="ptag" onclick="addPresetEval('综合评分')">综合评分</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ====== 第三板块：研学课程推荐 ====== -->
+            <div class="section">
+                <div class="section-title">
+                    <span class="icon">📚</span>
+                    研学课程推荐
+                </div>
+                <div class="category-card">
+                    <div class="config-row" style="margin-bottom:0;">
+                        <span class="config-label">推荐课程 <span class="optional">（可多选）</span></span>
+                        <div class="multi-select-wrap">
+                            <input type="text" class="ms-trigger" id="msSearch" placeholder="搜索或选择推荐课程..." onfocus="openDropdown()" oninput="onSearchInput()" onkeydown="onSearchKeydown(event)">
+                            <span class="ms-arrow-icon">▼</span>
+                            <div class="ms-dropdown" id="msDropdown">
+                                <div id="msOptionList"></div>
+                            </div>
                         </div>
+                        <div class="tag-container" id="selectedCourses" style="margin-top:8px;"></div>
                     </div>
                 </div>
             </div>
@@ -743,52 +778,112 @@
             renderEval();
         }
 
-        // ===== 风格卡片选择 =====
-        var selectedStyle = '';
+        // ===== 多选下拉 - 研学课程推荐 =====
+        var allCourses = [
+            '盆景美学·指尖山水', '春假托管班', '诗界无心·草堂寻心',
+            '杜甫和李白的故事', '搭建小茅屋', '快速搭建茅屋',
+            '唐代诗歌赏析', '盆景制作入门', '自然探索营',
+            '春假艺术工坊', '户外生存技能', '国画水墨体验'
+        ];
+        var selectedCourses = [];
 
-        function selectStyleCard(el, name) {
-            document.querySelectorAll('.style-card-option').forEach(function(s) { s.classList.remove('active'); });
-            el.classList.add('active');
-            selectedStyle = name;
+        function openDropdown() {
+            document.getElementById('msDropdown').classList.add('show');
+            renderOptions();
         }
 
-        function renderStyleCards() {
-            var grid = document.getElementById('styleCardGrid');
-            var systemSaved = localStorage.getItem('systemConfig');
-            var styles = [];
-            if (systemSaved) {
-                try {
-                    var cfg = JSON.parse(systemSaved);
-                    if (cfg.styles && cfg.styles.length > 0) { styles = cfg.styles; }
-                } catch(e) {}
-            }
-            if (styles.length === 0) {
-                grid.innerHTML = '<span style="font-size:12px;color:#bbb;">请先在系统参数配置中添加风格</span>';
-                return;
-            }
-            var html = '';
-            for (var i = 0; i < styles.length; i++) {
-                var s = styles[i];
-                var thumbHtml = s.thumb
-                    ? '<img src="' + s.thumb + '" alt="' + s.name + '">'
-                    : '<span style="font-size:20px;">🎨</span>';
-                html += '<div class="style-card-option" onclick="selectStyleCard(this,\'' + s.name + '\')">';
-                html += '  <div class="sco-thumb">' + thumbHtml + '</div>';
-                html += '  <div class="sco-name">' + s.name + '</div>';
-                html += '</div>';
-            }
-            grid.innerHTML = html;
+        function onSearchInput() {
+            renderOptions();
+        }
 
-            if (selectedStyle) {
-                var cards = grid.querySelectorAll('.style-card-option');
-                for (var j = 0; j < cards.length; j++) {
-                    if (cards[j].querySelector('.sco-name').textContent === selectedStyle) {
-                        cards[j].classList.add('active');
-                        break;
-                    }
+        function onSearchKeydown(e) {
+            e.stopPropagation();
+            if (e.key === 'Enter') {
+                var val = e.target.value.trim();
+                if (val && allCourses.indexOf(val) === -1 && selectedCourses.indexOf(val) === -1) {
+                    selectedCourses.push(val);
+                    renderOptions();
+                    renderSelectedTags();
+                    updatePlaceholder();
                 }
             }
         }
+
+        function renderOptions() {
+            var el = document.getElementById('msOptionList');
+            var searchInput = document.getElementById('msSearch');
+            var keyword = searchInput.value.trim().toLowerCase();
+            var html = '';
+            var filtered = [];
+            for (var i = 0; i < allCourses.length; i++) {
+                if (!keyword || allCourses[i].toLowerCase().includes(keyword)) {
+                    filtered.push({ index: i, name: allCourses[i] });
+                }
+            }
+            if (filtered.length === 0) {
+                el.innerHTML = '<div style="padding:16px;text-align:center;color:#bbb;font-size:13px;">未找到匹配课程</div>';
+                return;
+            }
+            for (var j = 0; j < filtered.length; j++) {
+                var item = filtered[j];
+                var checked = selectedCourses.indexOf(item.name) !== -1;
+                html += '<div class="ms-option' + (checked ? ' checked' : '') + '" onclick="toggleCourse(' + item.index + ')">';
+                html += '  <div class="ms-check">' + (checked ? '✓' : '') + '</div>';
+                html += '  <span class="ms-cname">' + item.name + '</span>';
+                html += '</div>';
+            }
+            el.innerHTML = html;
+        }
+
+        function toggleCourse(index) {
+            var c = allCourses[index];
+            var idx = selectedCourses.indexOf(c);
+            if (idx !== -1) {
+                selectedCourses.splice(idx, 1);
+            } else {
+                selectedCourses.push(c);
+            }
+            renderOptions();
+            renderSelectedTags();
+            updatePlaceholder();
+        }
+
+        function removeSelectedCourse(name) {
+            var idx = selectedCourses.indexOf(name);
+            if (idx !== -1) {
+                selectedCourses.splice(idx, 1);
+                renderOptions();
+                renderSelectedTags();
+                updatePlaceholder();
+            }
+        }
+
+        function renderSelectedTags() {
+            var el = document.getElementById('selectedCourses');
+            if (selectedCourses.length === 0) {
+                el.innerHTML = '';
+                return;
+            }
+            el.innerHTML = selectedCourses.map(function(n, i) {
+                return '<span class="tag">' + n + '<span class="del" onclick="removeSelectedCourse(\'' + n + '\')">×</span></span>';
+            }).join('');
+        }
+
+        function updatePlaceholder() {
+            var input = document.getElementById('msSearch');
+            if (selectedCourses.length > 0) {
+                input.placeholder = '已选 ' + selectedCourses.length + ' 门课程';
+            } else {
+                input.placeholder = '搜索或选择推荐课程...';
+            }
+        }
+
+        // 点击外部关闭下拉
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.multi-select-wrap')) {
+                document.getElementById('msDropdown').classList.remove('show');
+            }
+        });
 
         // ===== 初始化预设 =====
         // 视频预置快捷提示词
@@ -810,7 +905,6 @@
         var defaultEval = ['学习态度', '动手能力'];
         defaultEval.forEach(function(v) { evalTags.push(v); });
         renderEval();
-        renderStyleCards();
 
         // ===== 读取localStorage保存的配置 =====
         function loadSavedConfig() {
@@ -835,7 +929,9 @@
                 if (cfg.videoFreeCount !== undefined) { document.getElementById('videoFreeCount').value = cfg.videoFreeCount; }
                 if (cfg.gameFreeCount !== undefined) { document.getElementById('gameFreeCount').value = cfg.gameFreeCount; }
                 if (cfg.gamePrompt !== undefined) { document.getElementById('gamePrompt').value = cfg.gamePrompt; }
-                if (cfg.style) { selectedStyle = cfg.style; renderStyleCards(); }
+                if (cfg.contentPrompt !== undefined) { document.getElementById('contentPrompt').value = cfg.contentPrompt; }
+                if (cfg.evalPrompt !== undefined) { document.getElementById('evalPrompt').value = cfg.evalPrompt; }
+                if (cfg.recommendedCourses) { selectedCourses = cfg.recommendedCourses; renderSelectedTags(); updatePlaceholder(); }
             } catch(e) {}
         }
 
@@ -849,15 +945,17 @@
                 ratio: ratio ? ratio.value : '不限',
                 resolution: resolution ? resolution.value : '480p',
                 videoPrompt: document.getElementById('videoPrompt').value.trim(),
-                style: selectedStyle,
                 videoDuration: parseInt(document.getElementById('videoDuration').value) || 5,
                 videoFreeCount: parseInt(document.getElementById('videoFreeCount').value) || 0,
                 gameFreeCount: parseInt(document.getElementById('gameFreeCount').value) || 0,
                 gamePrompt: document.getElementById('gamePrompt').value.trim(),
                 videoQuick: videoQuickTags,
                 gameQuick: gameQuickTags,
+                contentPrompt: document.getElementById('contentPrompt').value.trim(),
+                evalPrompt: document.getElementById('evalPrompt').value.trim(),
                 contentTags: contentTags,
-                evalTags: evalTags
+                evalTags: evalTags,
+                recommendedCourses: selectedCourses
             };
             localStorage.setItem('studyNoteConfig', JSON.stringify(config));
             alert('✅ 研学手记配置已保存');
