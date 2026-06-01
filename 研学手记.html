@@ -277,10 +277,9 @@
         <div class="ai-desc" style="margin-bottom:0;">
             <strong>今天学到的知识，创造你的作品</strong>
         </div>
-        <div class="ai-action-bar" style="margin-top:14px;">
-            <button class="btn-primary" onclick="goAICreate()">🤖 AI创作</button>
-            <button class="btn-secondary" onclick="goViewWorks()">📂 查看作品</button>
-        </div>
+<div class="ai-action-bar" style="margin-top:14px;">
+    <button class="btn-primary" onclick="goAICreate()" style="width:100%;">🤖 AI创作</button>
+</div>
     </div>
 
     <!-- ===== 研学报告 ===== -->
@@ -293,7 +292,7 @@
         <div class="report-desc" style="text-align:center;font-weight:500;color:#5C3D1A;font-size:14px;">
             回顾你的研学之旅，生成专属报告
         </div>
-        <button class="btn-gold" onclick="goReport()">📄 查看完整报告</button>
+        <button class="btn-gold" onclick="goReport()">📄 查看报告</button>
     </div>
 
     <!-- ===== 研学课程推荐 ===== -->
@@ -326,9 +325,6 @@
     }
     function goReport() {
         window.location.href = '研学报告.html';
-    }
-    function goViewWorks() {
-        window.location.href = '查看作品.html';
     }
     function goAICreate() {
         window.location.href = 'AI创作.html';
