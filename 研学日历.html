@@ -5,27 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>研学日历 - 离泰数链</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
-            background-color: #f5f5f5;
+            background: #f5f5f5;
             display: flex;
             justify-content: center;
             min-height: 100vh;
         }
-        /* 手机模拟容器 */
         .app-container {
             width: 100%;
             max-width: 430px;
-            background-color: #ffffff;
+            background: #ffffff;
             min-height: 100vh;
             position: relative;
             padding-bottom: 70px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
         }
 
         /* ===== 顶部标题栏 ===== */
@@ -39,178 +34,102 @@
             font-size: 18px;
             font-weight: 600;
             letter-spacing: 1px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
         }
 
-        /* ===== 页面主体头部 ===== */
-        .page-header {
+        /* ===== 选中的日期展示 ===== */
+        .selected-date-display {
             background: #C0D8FF;
-            padding: 6px 20px 36px;
-            position: relative;
-        }
-        .page-header .sub-title {
-            color: #888;
-            font-size: 13px;
+            padding: 4px 20px 16px;
             text-align: center;
         }
-
-        /* ===== 日历卡片 ===== */
-        .calendar-card {
-            background: #fff;
-            border-radius: 16px;
-            margin: -20px 16px 0;
-            padding: 16px 16px 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            position: relative;
-            z-index: 10;
-        }
-
-        /* 日历头部 */
-        .calendar-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding-bottom: 12px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        .calendar-header .month-year {
-            font-size: 17px;
-            font-weight: 600;
-            color: #333;
-        }
-        .calendar-nav-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            border: none;
-            background: #f5f5f5;
-            font-size: 18px;
+        .selected-date-display .sdd-weekday {
+            font-size: 13px;
             color: #666;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
         }
-        .calendar-nav-btn:active {
-            background: #e8e8e8;
+        .selected-date-display .sdd-date {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-top: 2px;
         }
-
-        /* 星期行 */
-        .weekday-row {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            text-align: center;
-            padding: 10px 0 6px;
-        }
-        .weekday-row span {
+        .selected-date-display .sdd-count {
             font-size: 13px;
-            color: #999;
-            font-weight: 500;
+            color: #888;
+            margin-top: 2px;
         }
 
-        /* 日期网格 */
-        .date-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 2px;
+        /* ===== 日期滚动条 ===== */
+        .date-strip-wrap {
+            background: #fff;
+            padding: 12px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            position: sticky;
+            top: 50px;
+            z-index: 40;
         }
-        .date-cell {
-            aspect-ratio: 1;
+        .date-strip {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 0 16px;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+        .date-strip::-webkit-scrollbar { height: 0; }
+        .date-chip {
+            flex: 0 0 auto;
+            scroll-snap-align: start;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            font-size: 15px;
-            color: #333;
-            border-radius: 50%;
+            gap: 4px;
+            padding: 8px 16px;
+            border-radius: 12px;
+            background: #f5f5f5;
             cursor: pointer;
-            position: relative;
             transition: all 0.2s;
-            font-weight: 400;
+            min-width: 60px;
+            border: none;
         }
-        .date-cell.empty {
-            cursor: default;
-        }
-        .date-cell:not(.empty):hover {
-            background: #e8f0ff;
-        }
-        /* 当天 */
-        .date-cell.today {
-            color: #0669FF;
-            font-weight: 600;
-        }
-        .date-cell.today::after {
-            content: '';
-            position: absolute;
-            bottom: 4px;
-            width: 4px;
-            height: 4px;
-            border-radius: 50%;
-            background: #0669FF;
-        }
-        /* 选中 */
-        .date-cell.selected {
+        .date-chip:active { transform: scale(0.95); }
+        .date-chip.active {
             background: #0669FF;
             color: #fff;
+            box-shadow: 0 2px 8px rgba(6,105,255,0.3);
+        }
+        .date-chip.past {
+            opacity: 0.55;
+        }
+        .date-chip.past.active { opacity: 1; }
+        .date-chip .dc-weekday {
+            font-size: 11px;
+            color: #999;
+        }
+        .date-chip.active .dc-weekday { color: rgba(255,255,255,0.8); }
+        .date-chip .dc-day {
+            font-size: 16px;
             font-weight: 600;
+            color: #333;
         }
-        .date-cell.selected::after {
-            background: #fff;
+        .date-chip.active .dc-day { color: #fff; }
+        .date-chip .dc-month {
+            font-size: 10px;
+            color: #bbb;
         }
-        .date-cell.selected .dot-indicator {
-            background: #fff;
-        }
-        /* 有课程的标记点 */
-        .date-cell .dot-indicator {
-            width: 4px;
-            height: 4px;
-            border-radius: 50%;
-            background: #0669FF;
-            position: absolute;
-            bottom: 4px;
-        }
-        .date-cell.selected .dot-indicator {
-            background: #fff;
-        }
-        .date-cell.other-month {
-            color: #ccc;
-        }
+        .date-chip.active .dc-month { color: rgba(255,255,255,0.7); }
 
-        /* ===== 游学提示条 ===== */
-        .study-tip {
-            margin: 14px 16px 0;
-            background: linear-gradient(135deg, #E8F1FF, #D6E8FF);
-            border-radius: 10px;
-            padding: 10px 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            color: #0669FF;
-        }
-        .study-tip .tip-icon {
-            width: 22px;
-            height: 22px;
-            background: #0669FF;
-            border-radius: 50%;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: bold;
-            flex-shrink: 0;
-        }
-
-        /* ===== 课程列表标题 ===== */
+        /* ===== 课程区标题 ===== */
         .section-title {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 18px 16px 10px;
+            padding: 16px 16px 10px;
         }
         .section-title h2 {
-            font-size: 17px;
+            font-size: 15px;
             font-weight: 600;
             color: #333;
         }
@@ -220,20 +139,13 @@
         }
 
         /* ===== 课程卡片 ===== */
-        .course-list {
-            padding: 0 16px;
-        }
+        .course-list { padding: 0 16px; }
         .course-card {
             background: #fff;
             border-radius: 14px;
             overflow: hidden;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
             margin-bottom: 14px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .course-card:active {
-            transform: scale(0.98);
         }
         .course-card-inner {
             display: flex;
@@ -241,232 +153,90 @@
             gap: 12px;
             position: relative;
         }
-        /* 课程缩略图占位 */
         .course-thumb {
-            width: 100px;
-            min-width: 100px;
+            width: 100px; min-width: 100px;
             height: 80px;
             border-radius: 10px;
             overflow: hidden;
-            position: relative;
             flex-shrink: 0;
         }
-        .course-thumb img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
+        .course-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .course-thumb .thumb-placeholder {
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 28px;
         }
-        .thumb-bonsai {
-            background: linear-gradient(135deg, #86BB71, #5C9E52);
-        }
-        .thumb-hut {
-            background: linear-gradient(135deg, #E8C87A, #D4A84B);
-        }
-        .thumb-spring {
-            background: linear-gradient(135deg, #FFB74D, #F57C00);
-        }
-        .course-info {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
+        .thumb-bonsai { background: linear-gradient(135deg,#86BB71,#5C9E52); }
+        .thumb-hut { background: linear-gradient(135deg,#E8C87A,#D4A84B); }
+        .thumb-spring { background: linear-gradient(135deg,#FFB74D,#F57C00); }
+        .course-info { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
         .course-name {
-            font-size: 15px;
-            font-weight: 600;
-            color: #333;
-            line-height: 1.4;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+            font-size: 15px; font-weight: 600; color: #333;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
         }
-        .course-time {
-            font-size: 12px;
-            color: #999;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .course-bottom {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-top: 6px;
-        }
+        .course-time { font-size: 12px; color: #999; display: flex; align-items: center; gap: 4px; }
+        .course-bottom { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; }
         .course-badge {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            font-size: 11px;
-            padding: 3px 10px;
-            border-radius: 8px;
-            font-weight: 500;
-            z-index: 5;
+            position: absolute; top: 8px; right: 8px;
+            font-size: 11px; padding: 3px 10px; border-radius: 8px; font-weight: 500; z-index: 5;
         }
-        .course-badge.pending {
-            background: #E65100;
-            color: #fff;
-        }
-        .course-badge.done {
-            background: #4CAF50;
-            color: #fff;
-        }
-        .course-badge.expired {
-            background: #999;
-            color: #fff;
-        }
+        .course-badge.travel { background: #389E0D; color: #fff; }
+        .course-badge.done { background: #4CAF50; color: #fff; }
+        .course-badge.expired { background: #999; color: #fff; }
         .course-handbook-btn {
-            font-size: 13px;
-            color: #fff;
-            background: linear-gradient(135deg, #0669FF, #004FE0);
-            padding: 7px 0;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            width: 100%;
-            display: block;
-            text-align: center;
-            transition: opacity 0.2s;
+            font-size: 13px; color: #fff;
+            background: linear-gradient(135deg,#0669FF,#004FE0);
+            padding: 7px 0; border-radius: 8px; font-weight: 600; cursor: pointer;
+            border: none; width: 100%; display: block; text-align: center;
             box-shadow: 0 2px 6px rgba(6,105,255,0.25);
         }
-        .course-handbook-btn:active {
-            opacity: 0.85;
-        }
+        .course-handbook-btn:active { opacity: 0.85; }
 
         /* ===== 空状态 ===== */
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #bbb;
-        }
-        .empty-state .empty-icon {
-            font-size: 48px;
-            margin-bottom: 12px;
-        }
-        .empty-state p {
-            font-size: 14px;
-        }
-
-
+        .empty-state { text-align: center; padding: 40px 20px; color: #bbb; }
+        .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
+        .empty-state p { font-size: 14px; }
 
         /* ===== 底部导航 ===== */
         .bottom-nav {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            width: 100%;
-            background: #fff;
-            border-top: 1px solid #f0f0f0;
-            display: flex;
-            justify-content: space-around;
-            padding: 6px 0 env(safe-area-inset-bottom, 6px);
-            z-index: 100;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.04);
+            position: absolute; bottom: 0; left: 0; right: 0;
+            background: #fff; border-top: 1px solid #f0f0f0;
+            display: flex; justify-content: space-around;
+            padding: 6px 0 env(safe-area-inset-bottom,6px);
+            z-index: 100; box-shadow: 0 -2px 10px rgba(0,0,0,0.04);
         }
         .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 2px;
-            padding: 4px 10px;
-            cursor: pointer;
-            border: none;
-            background: none;
-            transition: color 0.2s;
+            display: flex; flex-direction: column; align-items: center;
+            gap: 2px; padding: 4px 10px; cursor: pointer; border: none; background: none;
         }
-        .nav-item .nav-icon {
-            font-size: 22px;
-            line-height: 1;
-        }
-        .nav-item .nav-label {
-            font-size: 11px;
-            color: #999;
-            font-weight: 500;
-        }
-        .nav-item.active .nav-label {
-            color: #0669FF;
-            font-weight: 600;
-        }
-        .nav-item.active .nav-icon {
-            color: #0669FF;
-        }
+        .nav-item .nav-icon { font-size: 22px; line-height: 1; }
+        .nav-item .nav-label { font-size: 11px; color: #999; font-weight: 500; }
+        .nav-item.active .nav-label { color: #0669FF; font-weight: 600; }
+        .nav-item.active .nav-icon { color: #0669FF; }
 
-        /* ===== 响应式 ===== */
-        @media (min-width: 431px) {
-            .app-container {
-                border-radius: 0;
-            }
-            .bottom-nav {
-                border-radius: 0;
-            }
-        }
-
-        /* ===== 文档面板布局 ===== */
+        /* ===== 文档面板 ===== */
         .page-wrap {
-            display: flex;
-            gap: 20px;
-            padding: 20px;
-            min-height: 100vh;
-            align-items: flex-start;
-            justify-content: center;
+            display: flex; gap: 20px; padding: 20px;
+            min-height: 100vh; align-items: flex-start; justify-content: center;
         }
         .doc-panel {
-            width: 560px;
-            background: #fff;
-            border-radius: 16px;
+            width: 560px; background: #fff; border-radius: 16px;
             box-shadow: 0 2px 20px rgba(0,0,0,0.08);
-            padding: 24px 28px;
-            max-height: calc(100vh - 40px);
-            overflow-y: auto;
+            padding: 24px 28px; max-height: calc(100vh - 40px); overflow-y: auto;
             font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', Arial, sans-serif;
-            line-height: 1.7;
-            font-size: 14px;
-            color: #333;
+            line-height: 1.7; font-size: 14px; color: #333;
         }
         .doc-panel::-webkit-scrollbar { width: 5px; }
         .doc-panel::-webkit-scrollbar-thumb { background: #d0d5e0; border-radius: 3px; }
-        .doc-panel .doc-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: #1F3864;
-            border-bottom: 2px solid #2E75B6;
-            padding-bottom: 10px;
-            margin-bottom: 16px;
-        }
-        .doc-panel h3 {
-            font-size: 16px;
-            font-weight: 600;
-            color: #2E75B6;
-            margin: 16px 0 8px;
-        }
-        .doc-panel h4 {
-            font-size: 14px;
-            font-weight: 600;
-            color: #333;
-            margin: 12px 0 6px;
-        }
+        .doc-panel .doc-title { font-size: 20px; font-weight: 700; color: #1F3864; border-bottom: 2px solid #2E75B6; padding-bottom: 10px; margin-bottom: 16px; }
+        .doc-panel h3 { font-size: 16px; font-weight: 600; color: #2E75B6; margin: 16px 0 8px; }
+        .doc-panel h4 { font-size: 14px; font-weight: 600; color: #333; margin: 12px 0 6px; }
+        .doc-panel p { font-size: 13px; color: #555; margin-bottom: 6px; }
         .doc-panel ul { padding-left: 20px; margin: 4px 0 8px; }
         .doc-panel li { margin-bottom: 3px; font-size: 13px; color: #555; }
-        .doc-panel ol { padding-left: 20px; margin: 4px 0 8px; }
-        .doc-panel ol li { margin-bottom: 4px; font-size: 13px; color: #555; }
-        .doc-panel .doc-section {
-            margin-bottom: 6px;
-        }
-        .doc-panel .badge-orange { background:#E65100; color:#fff; padding:1px 6px; border-radius:4px; font-size:11px; }
-        .doc-panel .badge-green { background:#4CAF50; color:#fff; padding:1px 6px; border-radius:4px; font-size:11px; }
-        .doc-panel .badge-gray { background:#999; color:#fff; padding:1px 6px; border-radius:4px; font-size:11px; }
+        .doc-panel .doc-section { margin-bottom: 6px; }
 
         @media (max-width: 1100px) {
             .page-wrap { flex-direction: column; align-items: center; }
@@ -475,332 +245,239 @@
     </style>
 </head>
 <body>
-
 <div class="page-wrap">
-    <!-- 手机原型 -->
     <div class="app-container">
-        <!-- 顶部标题 -->
         <div class="top-bar">研学日历</div>
 
-        <!-- 页面头部 -->
-        <div class="page-header">
-            <div class="sub-title">查看每日研学课程安排</div>
+        <div class="selected-date-display">
+            <div class="sdd-weekday" id="sdWeekday">星期四</div>
+            <div class="sdd-date" id="sdDate">5月28日</div>
+            <div class="sdd-count" id="sdCount">共 3 个课程</div>
         </div>
 
-        <!-- 日历卡片 -->
-        <div class="calendar-card">
-            <div class="calendar-header">
-                <button class="calendar-nav-btn" onclick="prevMonth()">‹</button>
-                <span class="month-year" id="monthYear">2026年5月</span>
-                <button class="calendar-nav-btn" onclick="nextMonth()">›</button>
-            </div>
-            <div class="weekday-row">
-                <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
-            </div>
-            <div class="date-grid" id="dateGrid"></div>
+        <div class="date-strip-wrap">
+            <div class="date-strip" id="dateStrip"></div>
         </div>
-        <!-- 课程标题 -->
+
         <div class="section-title">
-            <h2 id="selectedDateTitle">5月28日 课程</h2>
-            <span id="courseCount">共 2 个研学课程</span>
+            <h2 id="sectionLabel">📅 即将到来的研学课程</h2>
+            <span id="courseCount">共 0 个</span>
         </div>
 
-        <!-- 课程列表 -->
-        <div class="course-list" id="courseList">
-            <!-- 由 JS 动态渲染 -->
-        </div>
+        <div class="course-list" id="courseList"></div>
 
-        <!-- 底部导航 -->
         <div class="bottom-nav">
-            <button class="nav-item">
-                <span class="nav-icon">🏠</span>
-                <span class="nav-label">首页</span>
-            </button>
-            <button class="nav-item active">
-                <span class="nav-icon">📅</span>
-                <span class="nav-label">研学日历</span>
-            </button>
-            <button class="nav-item">
-                <span class="nav-icon">🎁</span>
-                <span class="nav-label">甄选</span>
-            </button>
-            <button class="nav-item" onclick="window.location.href='我的.html'">
-                <span class="nav-icon">👤</span>
-                <span class="nav-label">我的</span>
-            </button>
+            <button class="nav-item"><span class="nav-icon">🏠</span><span class="nav-label">首页</span></button>
+            <button class="nav-item active"><span class="nav-icon">📅</span><span class="nav-label">研学日历</span></button>
+            <button class="nav-item"><span class="nav-icon">🎁</span><span class="nav-label">甄选</span></button>
+            <button class="nav-item" onclick="window.location.href='我的.html'"><span class="nav-icon">👤</span><span class="nav-label">我的</span></button>
         </div>
     </div>
 
-    <!-- 功能说明文档 -->
     <div class="doc-panel">
         <div class="doc-title">研学日历模块 - 功能说明</div>
-
         <div class="doc-section">
             <h3>1 页面概述</h3>
-            <p>研学日历是用户查看已经成团的课程日程的核心页面，以日历形式展示课程日期，点击日期可查看该日的已经成团的课程列表，包含了待出行、已核销、已过期三种状态</p>
+            <p>研学日历展示有课程安排的日期列表，默认选中最近的有课日期（当天有课则展示当天，否则展示接下来最近的有课日期）。</p>
         </div>
-
         <div class="doc-section">
             <h3>2 页面布局</h3>
-            <p>页面从上到下分为以下区域：</p>
             <ol>
-                <li>月份切换区：显示当前月份（如"2025年5月"），左右箭头切换月份</li>
-                <li>日历面板：7列布局显示日期，课程日期标记蓝色圆点，选中的日期高亮</li>
-                <li>课程列表区：显示选中日期下的课程卡片，每门课程包含封面图、名称、场次、角标状态</li>
-                <li>底部导航栏：首页 / 研学日历 / 甄选 / 我的</li>
+                <li>顶部：选中日期的星期、月日、课程数量</li>
+                <li>日期滚动条：横向滑动标签，只显示有课程的日期</li>
+                <li>课程列表：课程卡片，含封面图、名称、场次、状态角标</li>
+                <li>底部导航栏</li>
             </ol>
         </div>
-
         <div class="doc-section">
             <h3>3 功能说明</h3>
-
-            <h4>3.1 日历交互</h4>
+            <h4>3.1 日期选择</h4>
             <ul>
-                <li>支持左右滑动/点击箭头切换月份</li>
-                <li>有课程的日期右侧显示蓝色小圆点标识</li>
-                <li>点击日期，下方课程列表刷新显示该日课程</li>
-                <li>当天日期自动选中并高亮显示</li>
-                <li>左、右最多各6个月</li>
+                <li>只显示有课程数据的日期</li>
+                <li>默认选中最近的有课日期（当天优先，其次未来最近，再次历史最近）</li>
+                <li>过去日期半透明灰色区分</li>
+                <li>选择当天或之后日期显示"即将到来的研学课程"，之前显示"过往的研学课程"</li>
             </ul>
-
             <h4>3.2 课程列表</h4>
             <ul>
-                <li>每门课程以卡片形式展示：封面图 + 课程名称 + 场次时间</li>
-                <li>卡片右上角显示状态角标：待出行、已核销、已过期</li>
-                <li>列表底部显示"进入研学手记"按钮，点击跳转到研学手记页面，只有已核销和已过期的才能点进去</li>
-                <li>课程示例：盆景美学·指尖山水、杜甫和李白的故事、春假托管班等</li>
+                <li>每门课程卡片：封面图 + 名称 + 场次时间</li>
+                <li>右上角角标：待出行（绿）、已核销（绿）、已过期（灰）</li>
+                <li>已核销/已过期显示"进入研学手记"按钮</li>
             </ul>
         </div>
     </div>
 </div>
 
-
 <script>
-    // ===== 数据 =====
-    // 有研学课程的日期（2026年）
-    const courseDates = [
+    var courseDates = [
         '2026-05-10', '2026-05-15', '2026-05-20',
         '2026-05-22', '2026-05-28', '2026-05-30',
         '2026-06-05', '2026-06-12', '2026-06-18',
         '2026-06-25', '2026-06-28',
     ];
 
-    // 课程详情数据
-    const courseData = {
+    var courseData = {
         '2026-05-10': [
-            { name: '盆景美学·指尖上山水', tags: ['自然美育', '动手实践'], time: '09:00 - 11:30', thumb: 'bonsai' },
-            { name: '我为杜甫建茅屋', tags: ['人文历史', '建筑搭建'], time: '14:00 - 17:00', thumb: 'hut' },
+            { name: '盆景美学·指尖上的山水', time: '09:00 - 11:30', thumb: 'bonsai', status: 'done' },
+            { name: '我为杜甫建茅屋', time: '14:00 - 17:00', thumb: 'hut', status: 'done' },
         ],
         '2026-05-15': [
-            { name: '盆景美学·指尖上山水', tags: ['自然美育', '动手实践'], time: '09:00 - 11:30', thumb: 'bonsai' },
+            { name: '盆景美学·指尖上的山水', time: '09:00 - 11:30', thumb: 'bonsai', status: 'done' },
         ],
         '2026-05-20': [
-            { name: '我为杜甫建茅屋', tags: ['人文历史', '建筑搭建'], time: '14:00 - 17:00', thumb: 'hut' },
+            { name: '我为杜甫建茅屋', time: '14:00 - 17:00', thumb: 'hut', status: 'done' },
         ],
         '2026-05-22': [
-            { name: '盆景美学·指尖上山水', tags: ['自然美育', '动手实践'], time: '09:00 - 11:30', thumb: 'bonsai' },
-            { name: '我为杜甫建茅屋', tags: ['人文历史', '建筑搭建'], time: '14:00 - 17:00', thumb: 'hut' },
+            { name: '盆景美学·指尖上的山水', time: '09:00 - 11:30', thumb: 'bonsai', status: 'done' },
+            { name: '我为杜甫建茅屋', time: '14:00 - 17:00', thumb: 'hut', status: 'done' },
         ],
         '2026-05-28': [
-            { name: '盆景美学·指尖上山水', tags: ['自然美育', '动手实践'], time: '09:00 - 11:30', thumb: 'bonsai' },
-            { name: '我为杜甫建茅屋', tags: ['人文历史', '建筑搭建'], time: '14:00 - 17:00', thumb: 'hut' },
-            { name: '春假托管班', tags: ['托管服务', '全天陪伴'], time: '08:00 - 18:00', thumb: 'spring' },
+            { name: '盆景美学·指尖上的山水', time: '09:00 - 11:30', thumb: 'bonsai', status: 'travel' },
+            { name: '我为杜甫建茅屋', time: '14:00 - 17:00', thumb: 'hut', status: 'done' },
+            { name: '春假托管班', time: '08:00 - 18:00', thumb: 'spring', status: 'expired' },
         ],
         '2026-05-30': [
-            { name: '盆景美学·指尖上山水', tags: ['自然美育', '动手实践'], time: '09:00 - 11:30', thumb: 'bonsai' },
+            { name: '盆景美学·指尖上的山水', time: '09:00 - 11:30', thumb: 'bonsai', status: 'done' },
         ],
         '2026-06-05': [
-            { name: '我为杜甫建茅屋', tags: ['人文历史', '建筑搭建'], time: '14:00 - 17:00', thumb: 'hut' },
+            { name: '我为杜甫建茅屋', time: '14:00 - 17:00', thumb: 'hut', status: 'done' },
         ],
         '2026-06-12': [
-            { name: '盆景美学·指尖上山水', tags: ['自然美育', '动手实践'], time: '09:00 - 11:30', thumb: 'bonsai' },
-            { name: '我为杜甫建茅屋', tags: ['人文历史', '建筑搭建'], time: '14:00 - 17:00', thumb: 'hut' },
+            { name: '盆景美学·指尖上的山水', time: '09:00 - 11:30', thumb: 'bonsai', status: 'travel' },
+            { name: '我为杜甫建茅屋', time: '14:00 - 17:00', thumb: 'hut', status: 'travel' },
         ],
         '2026-06-18': [
-            { name: '盆景美学·指尖上山水', tags: ['自然美育', '动手实践'], time: '09:00 - 11:30', thumb: 'bonsai' },
+            { name: '盆景美学·指尖上的山水', time: '09:00 - 11:30', thumb: 'bonsai', status: 'travel' },
         ],
         '2026-06-25': [
-            { name: '我为杜甫建茅屋', tags: ['人文历史', '建筑搭建'], time: '14:00 - 17:00', thumb: 'hut' },
+            { name: '我为杜甫建茅屋', time: '14:00 - 17:00', thumb: 'hut', status: 'travel' },
         ],
         '2026-06-28': [
-            { name: '盆景美学·指尖上山水', tags: ['自然美育', '动手实践'], time: '09:00 - 11:30', thumb: 'bonsai' },
-            { name: '我为杜甫建茅屋', tags: ['人文历史', '建筑搭建'], time: '14:00 - 17:00', thumb: 'hut' },
+            { name: '盆景美学·指尖上的山水', time: '09:00 - 11:30', thumb: 'bonsai', status: 'travel' },
+            { name: '我为杜甫建茅屋', time: '14:00 - 17:00', thumb: 'hut', status: 'travel' },
         ],
     };
 
-    let currentYear = 2026;
-    let currentMonth = 5; // 5 = June
-    let selectedDate = '2026-05-28';
+    var weekdayNames = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+    var statusTextMap = { travel:'待出行', done:'已核销', expired:'已过期' };
+    var statusClsMap = { travel:'travel', done:'done', expired:'expired' };
+    var thumbImgMap = { bonsai:'盆景美学·指尖上的山水.jpg', hut:'我为杜甫建茅屋.jpg' };
+    var thumbEmojiMap = { bonsai:'🌿', hut:'🏚️', spring:'🏫' };
+    var thumbBgMap = { bonsai:'thumb-bonsai', hut:'thumb-hut', spring:'thumb-spring' };
 
-    const today = new Date();
-    const todayStr = formatDateStr(today);
+    courseDates.sort();
 
-    function formatDateStr(date) {
-        const y = date.getFullYear();
-        const m = String(date.getMonth() + 1).padStart(2, '0');
-        const d = String(date.getDate()).padStart(2, '0');
-        return `${y}-${m}-${d}`;
+    function getTodayStr() {
+        var d = new Date();
+        return d.getFullYear() + '-' +
+            String(d.getMonth()+1).padStart(2,'0') + '-' +
+            String(d.getDate()).padStart(2,'0');
     }
 
-    function pad(n) { return String(n).padStart(2, '0'); }
-
-    // ===== 渲染日历 =====
-    function renderCalendar(year, month) {
-        const grid = document.getElementById('dateGrid');
-        grid.innerHTML = '';
-        document.getElementById('monthYear').textContent = `${year}年${month}月`;
-
-        const firstDay = new Date(year, month - 1, 1).getDay();
-        const daysInMonth = new Date(year, month, 0).getDate();
-
-        // 上月补位
-        const prevMonthDays = new Date(year, month - 1, 0).getDate();
-        for (let i = firstDay - 1; i >= 0; i--) {
-            const cell = document.createElement('div');
-            cell.className = 'date-cell empty other-month';
-            cell.textContent = prevMonthDays - i;
-            grid.appendChild(cell);
+    function findDefaultDate() {
+        var t = getTodayStr();
+        if (courseDates.indexOf(t) !== -1) return t;
+        for (var i = 0; i < courseDates.length; i++) {
+            if (courseDates[i] > t) return courseDates[i];
         }
-
-        // 本月日期
-        for (let d = 1; d <= daysInMonth; d++) {
-            const cell = document.createElement('div');
-            cell.className = 'date-cell';
-            const dateStr = `${year}-${pad(month)}-${pad(d)}`;
-            cell.textContent = d;
-            cell.dataset.date = dateStr;
-
-            // 标记今天
-            if (dateStr === todayStr) {
-                cell.classList.add('today');
-            }
-
-            // 标记选中
-            if (dateStr === selectedDate) {
-                cell.classList.add('selected');
-            }
-
-            // 标记有课程的红点
-            if (courseDates.includes(dateStr)) {
-                const dot = document.createElement('span');
-                dot.className = 'dot-indicator';
-                cell.appendChild(dot);
-            }
-
-            cell.addEventListener('click', function () {
-                const ds = this.dataset.date;
-                if (!ds) return;
-                selectedDate = ds;
-                // 移除其他选中
-                document.querySelectorAll('.date-cell.selected').forEach(el => el.classList.remove('selected'));
-                this.classList.add('selected');
-                renderCourses(ds);
-                updateSelectedTitle(ds);
-            });
-
-            grid.appendChild(cell);
-        }
-
-        // 下月补齐 6 行
-        const totalCells = grid.children.length;
-        const remaining = 7 - (totalCells % 7);
-        if (remaining < 7) {
-            for (let i = 1; i <= remaining; i++) {
-                const cell = document.createElement('div');
-                cell.className = 'date-cell empty other-month';
-                cell.textContent = i;
-                grid.appendChild(cell);
-            }
-        }
-
-        // 渲染默认选中日期的课程
-        renderCourses(selectedDate);
-        updateSelectedTitle(selectedDate);
+        return courseDates[courseDates.length - 1] || courseDates[0];
     }
 
-    // ===== 渲染课程列表 =====
-    function renderCourses(dateStr) {
-        const list = document.getElementById('courseList');
-        const courses = courseData[dateStr];
+    var selectedDate = findDefaultDate();
 
+    function renderDateStrip() {
+        var strip = document.getElementById('dateStrip');
+        var todayStr = getTodayStr();
+        var html = '';
+        for (var i = 0; i < courseDates.length; i++) {
+            var ds = courseDates[i];
+            var parts = ds.split('-');
+            var m = parseInt(parts[1],10);
+            var d = parseInt(parts[2],10);
+            var dateObj = new Date(parseInt(parts[0]), m-1, d);
+            var weekday = weekdayNames[dateObj.getDay()].slice(-1);
+            var isActive = ds === selectedDate;
+            var isPast = ds < todayStr;
+            html += '<button class="date-chip' + (isActive ? ' active' : '') + (isPast && !isActive ? ' past' : '') + '" onclick="selectDate(\'' + ds + '\', this)">' +
+                '<span class="dc-weekday">' + weekday + '</span>' +
+                '<span class="dc-day">' + m + '/' + d + '</span>' +
+                '<span class="dc-month">' + m + '月</span>' +
+                '</button>';
+        }
+        strip.innerHTML = html;
+        var chips = strip.querySelectorAll('.date-chip');
+        for (var j = 0; j < chips.length; j++) {
+            if (chips[j].classList.contains('active')) {
+                chips[j].scrollIntoView({ behavior:'smooth', inline:'center', block:'nearest' });
+                break;
+            }
+        }
+        updateDisplay();
+    }
+
+    function selectDate(ds, el) {
+        selectedDate = ds;
+        var chips = document.querySelectorAll('.date-chip');
+        for (var i = 0; i < chips.length; i++) chips[i].classList.remove('active');
+        if (el) el.classList.add('active');
+        updateDisplay();
+    }
+
+    function updateDisplay() {
+        var parts = selectedDate.split('-');
+        var m = parseInt(parts[1],10);
+        var d = parseInt(parts[2],10);
+        var dateObj = new Date(parseInt(parts[0]), m-1, d);
+        var weekday = weekdayNames[dateObj.getDay()];
+        var courses = courseData[selectedDate] || [];
+        var todayStr = getTodayStr();
+
+        document.getElementById('sdWeekday').textContent = weekday;
+        document.getElementById('sdDate').textContent = m + '月' + d + '日';
+        document.getElementById('sdCount').textContent = '共 ' + courses.length + ' 个课程';
+        document.getElementById('courseCount').textContent = '共 ' + courses.length + ' 个';
+
+        var label = selectedDate >= todayStr ? '📅 即将到来的研学课程' : '📅 过往的研学课程';
+        document.getElementById('sectionLabel').textContent = label;
+
+        renderCourses(courses);
+    }
+
+    function renderCourses(courses) {
+        var list = document.getElementById('courseList');
         if (!courses || courses.length === 0) {
-            list.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-icon">📖</div>
-                    <p>该日暂无研学课程安排</p>
-                </div>
-            `;
-            document.getElementById('courseCount').textContent = '共 0 个研学课程';
+            list.innerHTML = '<div class="empty-state"><div class="empty-icon">📖</div><p>该日暂无研学课程安排</p></div>';
             return;
         }
-
-        let html = '';
-        courses.forEach((course, index) => {
-            const emojiMap = { bonsai: '🌿', hut: '🏚️', spring: '🏫' };
-            const bgMap = { bonsai: 'thumb-bonsai', hut: 'thumb-hut', spring: 'thumb-spring' };
-            const imgMap = { bonsai: '盆景美学·指尖上的山水.jpg', hut: '我为杜甫建茅屋.jpg', spring: '春假托管班' };
-            const badgeMap = { bonsai: '<span class="course-badge pending">待出行</span>', hut: '<span class="course-badge done">已核销</span>', spring: '<span class="course-badge expired">已过期</span>' };
-            const btnMap = { bonsai: '', hut: '<button class="course-handbook-btn" onclick="event.stopPropagation();window.location.href=\'研学手记.html\'">📖 进入研学手记</button>', spring: '<button class="course-handbook-btn" onclick="event.stopPropagation();window.location.href=\'研学手记.html\'">📖 进入研学手记</button>' };
-            let thumbHtml = '';
-            if (imgMap[course.thumb]) {
-                thumbHtml = `<img src="${imgMap[course.thumb]}" alt="${course.name}">`;
+        var html = '';
+        for (var i = 0; i < courses.length; i++) {
+            var c = courses[i];
+            var statusText = statusTextMap[c.status] || c.status;
+            var statusCls = statusClsMap[c.status] || '';
+            var showBtn = c.status === 'done' || c.status === 'expired';
+            var imgSrc = thumbImgMap[c.thumb];
+            var thumbHtml = '';
+            if (imgSrc) {
+                thumbHtml = '<img src="' + imgSrc + '" alt="' + c.name + '">';
             } else {
-                thumbHtml = `<div class="thumb-placeholder ${bgMap[course.thumb] || ''}">${emojiMap[course.thumb] || '📚'}</div>`;
+                var emoji = thumbEmojiMap[c.thumb] || '📚';
+                var bg = thumbBgMap[c.thumb] || '';
+                thumbHtml = '<div class="thumb-placeholder ' + bg + '">' + emoji + '</div>';
             }
-            html += `
-                <div class="course-card" data-index="${index}">
-                    <div class="course-card-inner">
-                        ${badgeMap[course.thumb] || ''}
-                        <div class="course-thumb">
-                            ${thumbHtml}
-                        </div>
-                        <div class="course-info">
-                            <div class="course-name">${course.name}</div>
-                            <div class="course-bottom">
-                                <div class="course-time">🕐 ${course.time}</div>
-                            </div>
-                            ${btnMap[course.thumb] ? '<div style="margin-top:6px;">' + btnMap[course.thumb] + '</div>' : ''}
-                        </div>
-                    </div>
-                </div>
-            `;
-        });
-
+            html += '<div class="course-card"><div class="course-card-inner">' +
+                '<span class="course-badge ' + statusCls + '">' + statusText + '</span>' +
+                '<div class="course-thumb">' + thumbHtml + '</div>' +
+                '<div class="course-info">' +
+                '<div class="course-name">' + c.name + '</div>' +
+                '<div class="course-bottom"><div class="course-time">🕐 ' + c.time + '</div></div>' +
+                (showBtn ? '<div style="margin-top:6px;"><button class="course-handbook-btn" onclick="event.stopPropagation();window.location.href=\'研学手记.html\'">📖 进入研学手记</button></div>' : '') +
+                '</div></div></div>';
+        }
         list.innerHTML = html;
-        document.getElementById('courseCount').textContent = `共 ${courses.length} 个研学课程`;
     }
 
-    // ===== 更新标题日期 =====
-    function updateSelectedTitle(dateStr) {
-        const parts = dateStr.split('-');
-        const m = parseInt(parts[1], 10);
-        const d = parseInt(parts[2], 10);
-        document.getElementById('selectedDateTitle').textContent = `${m}月${d}日 课程`;
-    }
-
-    // ===== 月份切换 =====
-    function prevMonth() {
-        currentMonth--;
-        if (currentMonth < 1) {
-            currentMonth = 12;
-            currentYear--;
-        }
-        renderCalendar(currentYear, currentMonth);
-    }
-
-    function nextMonth() {
-        currentMonth++;
-        if (currentMonth > 12) {
-            currentMonth = 1;
-            currentYear++;
-        }
-        renderCalendar(currentYear, currentMonth);
-    }
-
-    // ===== 初始化 =====
-    renderCalendar(currentYear, currentMonth);
+    renderDateStrip();
 </script>
-
 <a href="index.html" style="position:fixed;top:12px;right:16px;z-index:99999;background:#E53935;color:#fff;padding:7px 16px;border-radius:20px;text-decoration:none;font-size:13px;font-weight:600;box-shadow:0 2px 10px rgba(229,57,53,0.4);display:inline-flex;align-items:center;gap:5px;">🏠 首页</a>
 </body>
 </html>

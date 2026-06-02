@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>申请提现 - 离泰数链</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 430px;
+            background: #f5f5f5;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* ===== 顶部导航 ===== */
+        .top-nav {
+            height: 50px;
+            background: linear-gradient(135deg, #D43828, #B71C1C);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .back-btn {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255,255,255,0.2);
+            font-size: 18px;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .back-btn:active { background: rgba(255,255,255,0.3); }
+        .top-nav-title {
+            flex: 1;
+            text-align: center;
+            font-size: 17px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        /* ===== 提现卡片 ===== */
+        .withdraw-card {
+            background: #fff;
+            border-radius: 14px;
+            margin: 16px 16px 0;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .wc-balance {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #f0f0f0;
+            margin-bottom: 20px;
+        }
+        .wc-balance .wb-label {
+            font-size: 13px;
+            color: #999;
+        }
+        .wc-balance .wb-amount {
+            font-size: 36px;
+            font-weight: 700;
+            color: #D43828;
+            margin: 6px 0;
+        }
+        .wc-balance .wb-amount .unit { font-size: 18px; font-weight: 400; }
+        .wc-balance .wb-hint {
+            font-size: 11px;
+            color: #bbb;
+        }
+        .wc-balance .wb-hint strong { color: #D43828; }
+
+        /* ===== 提现金额输入 ===== */
+        .wc-input-row {
+            margin-bottom: 16px;
+        }
+        .wc-input-row .wci-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .wc-input-row .wci-box {
+            display: flex;
+            align-items: center;
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 0 16px;
+            border: 1px solid #e8e8e8;
+            transition: border-color 0.2s;
+        }
+        .wc-input-row .wci-box:focus-within {
+            border-color: #D43828;
+            box-shadow: 0 0 0 2px rgba(212,56,40,0.06);
+        }
+        .wc-input-row .wci-box .wci-prefix {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin-right: 8px;
+        }
+        .wc-input-row .wci-box input {
+            flex: 1;
+            height: 50px;
+            border: none;
+            background: transparent;
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            outline: none;
+            font-family: inherit;
+        }
+        .wc-input-row .wci-box input::placeholder { color: #d0d0d0; }
+
+        /* ===== 快速金额 ===== */
+        .quick-amounts {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .quick-amounts .qa-item {
+            flex: 1;
+            padding: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            background: #fff;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .quick-amounts .qa-item:active {
+            border-color: #D43828;
+            color: #D43828;
+            background: #FFF0F0;
+        }
+
+        /* ===== 到账账户 ===== */
+        .wc-account {
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .wc-account .wa-icon {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: #07C160;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+        .wc-account .wa-info { flex: 1; }
+        .wc-account .wa-info .wa-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+        .wc-account .wa-info .wa-desc {
+            font-size: 12px;
+            color: #999;
+            margin-top: 2px;
+        }
+
+        /* ===== 提交按钮 ===== */
+        .wc-submit {
+            width: 100%;
+            padding: 16px 0;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #D43828, #B71C1C);
+            color: #fff;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            box-shadow: 0 4px 12px rgba(212,56,40,0.3);
+        }
+        .wc-submit:active { opacity: 0.85; }
+        .wc-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ===== 提现说明 ===== */
+        .wc-tips {
+            margin: 16px 16px 90px;
+            padding: 14px 16px;
+            background: #FFFBF5;
+            border-radius: 10px;
+            border: 1px solid #FFE0B2;
+        }
+        .wc-tips .wt-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #E65100;
+            margin-bottom: 6px;
+        }
+        .wc-tips .wt-item {
+            font-size: 12px;
+            color: #888;
+            line-height: 1.8;
+            padding-left: 12px;
+            position: relative;
+        }
+        .wc-tips .wt-item::before {
+            content: '•';
+            position: absolute;
+            left: 2px;
+            color: #E65100;
+        }
+
+        .page-wrap {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            min-height: 100vh;
+            align-items: flex-start;
+            justify-content: center;
+        }
+        .doc-panel {
+            width: 560px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            padding: 24px 28px;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', Arial, sans-serif;
+            line-height: 1.7;
+            font-size: 14px;
+            color: #333;
+        }
+        .doc-panel::-webkit-scrollbar { width: 5px; }
+        .doc-panel::-webkit-scrollbar-thumb { background: #d0d5e0; border-radius: 3px; }
+        .doc-panel .doc-title { font-size: 20px; font-weight: 700; color: #1F3864; border-bottom: 2px solid #2E75B6; padding-bottom: 10px; margin-bottom: 16px; }
+        .doc-panel h3 { font-size: 16px; font-weight: 600; color: #2E75B6; margin: 16px 0 8px; }
+        .doc-panel h4 { font-size: 14px; font-weight: 600; color: #333; margin: 12px 0 6px; }
+        .doc-panel p { font-size: 13px; color: #555; margin-bottom: 6px; }
+        .doc-panel ul { padding-left: 20px; margin: 4px 0 8px; }
+        .doc-panel li { margin-bottom: 3px; font-size: 13px; color: #555; }
+        .doc-panel .doc-section { margin-bottom: 6px; }
+
+        @media (max-width: 1100px) {
+            .page-wrap { flex-direction: column; align-items: center; }
+            .doc-panel { width: 100%; max-width: 430px; max-height: none; }
+        }
+    </style>
+</head>
+<body>
+<div class="page-wrap">
+    <div class="app-container">
+        <div class="top-nav">
+            <button class="back-btn" onclick="goBack()">‹</button>
+            <div class="top-nav-title">申请提现</div>
+        </div>
+
+        <!-- 提现卡片 -->
+        <div class="withdraw-card">
+            <div class="wc-balance">
+                <div class="wb-label">可提现金额</div>
+                <div class="wb-amount">¥<span class="unit">1,</span>560<span class="unit">.00</span></div>
+                <div class="wb-hint">最低提现 <strong>¥10.00</strong>，每日限提现 <strong>3</strong> 次</div>
+            </div>
+
+            <div class="wc-input-row">
+                <div class="wci-label">提现金额</div>
+                <div class="wci-box">
+                    <span class="wci-prefix">¥</span>
+                    <input type="text" id="amountInput" placeholder="0.00" oninput="onAmountInput()" onfocus="this.value='';onAmountInput()">
+                </div>
+            </div>
+
+            <div class="quick-amounts">
+                <div class="qa-item" onclick="setAmount(100)">¥100</div>
+                <div class="qa-item" onclick="setAmount(500)">¥500</div>
+                <div class="qa-item" onclick="setAmount(1000)">¥1,000</div>
+                <div class="qa-item" onclick="setAmount(1560)">全部提现</div>
+            </div>
+
+            <div class="wc-account">
+                <div class="wa-icon">💬</div>
+                <div class="wa-info">
+                    <div class="wa-name">微信零钱</div>
+                    <div class="wa-desc">提现到当前微信账户，实时到账</div>
+                </div>
+            </div>
+
+            <button class="wc-submit" id="submitBtn" onclick="submitWithdraw()">提现</button>
+        </div>
+
+        <!-- 提现说明 -->
+        <div class="wc-tips">
+            <div class="wt-title">📋 提现说明</div>
+            <div class="wt-item">单笔提现最低 ¥10.00，最高 ¥5,000.00</div>
+            <div class="wt-item">每日可提现 3 次，提现后实时到账微信零钱</div>
+            <div class="wt-item">对接微信支付商家转账接口，佣金报酬场景</div>
+            <div class="wt-item">大额提现（≥2,000元）需校验实名信息</div>
+            <div class="wt-item">如遇问题请联系客服：400-888-8888</div>
+        </div>
+    </div>
+
+    <div class="doc-panel">
+        <div class="doc-title">申请提现 - 功能说明</div>
+        <div class="doc-section">
+            <h3>1 页面概述</h3>
+            <p>提现页面允许分销员将可提现余额提取到微信零钱，实时到账。</p>
+        </div>
+        <div class="doc-section">
+            <h3>2 功能说明</h3>
+            <h4>2.1 可提现余额</h4>
+            <ul>
+                <li>顶部展示当前可提现总金额</li>
+                <li>显示最低提现门槛和每日提现次数限制</li>
+            </ul>
+            <h4>2.2 提现金额输入</h4>
+            <ul>
+                <li>支持手动输入提现金额</li>
+                <li>提供快速金额选择：¥100 / ¥500 / ¥1,000 / 全部提现</li>
+            </ul>
+            <h4>2.3 到账账户</h4>
+            <ul>
+                <li>默认提现到当前微信账户的微信零钱</li>
+                <li>展示微信图标和账户说明</li>
+            </ul>
+            <h4>2.4 接口说明</h4>
+            <ul>
+                <li>对接微信支付"商家转账"接口</li>
+                <li>使用"佣金报酬"场景ID</li>
+                <li>支持"用户确认收款模式"（用户主动点击提现）</li>
+                <li>大额（≥2,000元）传入用户姓名进行实名校验</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    var maxWithdraw = 1560.00;
+    function goBack() {
+        window.location.href = '分销.html';
+    }
+    function setAmount(val) {
+        document.getElementById('amountInput').value = val.toFixed(2);
+        onAmountInput();
+    }
+    function onAmountInput() {
+        var input = document.getElementById('amountInput');
+        var val = parseFloat(input.value) || 0;
+        var btn = document.getElementById('submitBtn');
+        if (val > 0 && val <= maxWithdraw && val >= 10) {
+            btn.disabled = false;
+            btn.textContent = '提现 ¥' + val.toFixed(2);
+        } else {
+            btn.disabled = true;
+            btn.textContent = val <= 0 ? '提现' : (val < 10 ? '最低提现 ¥10.00' : '超出可提现金额');
+        }
+    }
+    function submitWithdraw() {
+        var val = parseFloat(document.getElementById('amountInput').value) || 0;
+        alert('✅ 提现申请已提交！\n\n提现金额：¥' + val.toFixed(2) + '\n到账账户：微信零钱\n预计到账：实时到账');
+        goBack();
+    }
+</script>
+<a href="index.html" style="position:fixed;top:12px;right:16px;z-index:99999;background:#E53935;color:#fff;padding:7px 16px;border-radius:20px;text-decoration:none;font-size:13px;font-weight:600;box-shadow:0 2px 10px rgba(229,57,53,0.4);display:inline-flex;align-items:center;gap:5px;">🏠 首页</a>
+</body>
+</html>
