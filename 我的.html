@@ -18,16 +18,20 @@
         .app-container {
             width: 100%;
             max-width: 430px;
-            background: #f5f5f5;
+            background: #ffffff;
             min-height: 100vh;
-            position: relative;
-            padding-bottom: 70px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
+        .content-area {
+            flex: 1;
         }
 
         /* ===== 顶部状态栏 ===== */
         .status-bar {
             height: 44px;
-            background: #f5f5f5;
+            background: #fff;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -45,7 +49,7 @@
         /* ===== 顶部导航 ===== */
         .top-nav {
             height: 44px;
-            background: #f5f5f5;
+            background: #fff;
             display: flex;
             align-items: center;
             justify-content: flex-end;
@@ -260,15 +264,12 @@
 
         /* ===== 底部导航 ===== */
         .bottom-nav {
-            position: sticky;
-            bottom: 0;
             width: 100%;
             background: #fff;
             border-top: 1px solid #f0f0f0;
             display: flex;
             justify-content: space-around;
             padding: 6px 0 env(safe-area-inset-bottom, 6px);
-            z-index: 100;
             box-shadow: 0 -2px 10px rgba(0,0,0,0.04);
         }
         .nav-item {
@@ -307,14 +308,6 @@
             align-items: flex-start;
             justify-content: center;
         }
-        .app-container {
-            width: 100%;
-            max-width: 430px;
-            background: #f5f5f5;
-            min-height: 100vh;
-            position: relative;
-            padding-bottom: 70px;
-        }
         .doc-panel {
             width: 560px;
             background: #fff;
@@ -347,6 +340,7 @@
 <body>
 <div class="page-wrap">
     <div class="app-container">
+        <div class="content-area">
         <!-- 顶部状态栏 -->
         <div class="status-bar">
             <span>9:41</span>
@@ -464,6 +458,7 @@
                 <span class="text">联系我们</span>
             </div>
             <span class="arrow">›</span>
+        </div>
         </div>
 
         <!-- 底部导航 -->
