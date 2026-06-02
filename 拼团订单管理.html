@@ -1,0 +1,1807 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>拼团订单管理 - 管理后台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', 'Microsoft YaHei', Arial, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* ===== 顶部导航 ===== */
+        .header {
+            background: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header .logo {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0669FF;
+            margin-right: 32px;
+        }
+        .header .nav-list {
+            display: flex;
+            gap: 24px;
+            list-style: none;
+        }
+        .header .nav-list li {
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+            padding: 4px 0;
+            position: relative;
+        }
+        .header .nav-list li:hover { color: #0669FF; }
+        .header .nav-list li.active {
+            color: #0669FF;
+            font-weight: 600;
+        }
+        .header .nav-list li.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #0669FF;
+            border-radius: 1px;
+        }
+        .header .user-area {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .header .user-area .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #E8F0FE;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #0669FF;
+        }
+        .header .user-area .name {
+            font-size: 14px;
+            color: #333;
+        }
+
+        /* ===== 面包屑 ===== */
+        .breadcrumb {
+            padding: 16px 24px 0;
+            font-size: 13px;
+            color: #999;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .breadcrumb a {
+            color: #999;
+            text-decoration: none;
+        }
+        .breadcrumb a:hover { color: #0669FF; }
+        .breadcrumb .sep { color: #ccc; }
+        .breadcrumb .current { color: #333; font-weight: 500; }
+
+        /* ===== 主容器 ===== */
+        .main {
+            padding: 16px 24px 40px;
+        }
+
+        /* ===== 页面标题行 ===== */
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        .page-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        .page-header .btn-export {
+            background: #fff;
+            color: #0669FF;
+            border: 1px solid #0669FF;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        .page-header .btn-export:hover {
+            background: #E8F0FE;
+        }
+
+        /* ===== 搜索区域 ===== */
+        .search-area {
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .search-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: flex-end;
+        }
+        .search-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 160px;
+            flex: 0 0 auto;
+        }
+        .search-item label {
+            font-size: 13px;
+            color: #666;
+            font-weight: 500;
+        }
+        .search-item input,
+        .search-item select {
+            height: 34px;
+            padding: 0 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #333;
+            background: #fff;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-item input:focus,
+        .search-item select:focus {
+            border-color: #0669FF;
+            box-shadow: 0 0 0 2px rgba(6,105,255,0.08);
+        }
+        .search-item select {
+            appearance: auto;
+        }
+        .search-actions {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            padding-bottom: 1px;
+            flex: 0 0 auto;
+        }
+        .search-actions .btn {
+            height: 34px;
+            padding: 0 18px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        .search-actions .btn-search {
+            background: #0669FF;
+            color: #fff;
+        }
+        .search-actions .btn-search:hover { background: #0052CC; }
+        .search-actions .btn-reset {
+            background: #f5f5f5;
+            color: #666;
+            border: 1px solid #d9d9d9;
+        }
+        .search-actions .btn-reset:hover { background: #eee; }
+
+        /* ===== 标签页 ===== */
+        .tabs {
+            display: flex;
+            gap: 0;
+            background: #fff;
+            border-radius: 8px 8px 0 0;
+            padding: 0 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            border-bottom: 1px solid #e8e8e8;
+            margin-bottom: 0;
+        }
+        .tab-item {
+            padding: 14px 20px;
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .tab-item:hover { color: #0669FF; }
+        .tab-item.active {
+            color: #0669FF;
+            font-weight: 600;
+            border-bottom-color: #0669FF;
+        }
+        .tab-item .count {
+            display: inline-block;
+            background: #f0f0f0;
+            color: #999;
+            font-size: 11px;
+            padding: 0 8px;
+            border-radius: 10px;
+            margin-left: 4px;
+            font-weight: 400;
+        }
+        .tab-item.active .count {
+            background: #E8F0FE;
+            color: #0669FF;
+        }
+
+        /* ===== 表格区域 ===== */
+        .table-wrapper {
+            background: #fff;
+            border-radius: 0 0 8px 8px;
+            padding: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            min-width: 1400px;
+        }
+        table thead th {
+            background: #fafafa;
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: 600;
+            color: #555;
+            border-bottom: 1px solid #e8e8e8;
+            white-space: nowrap;
+            font-size: 13px;
+        }
+        table tbody td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #f0f0f0;
+            color: #333;
+            vertical-align: middle;
+        }
+        table tbody tr:last-child td { border-bottom: none; }
+        table tbody tr:hover { background: #FAFBFF; }
+
+        /* 状态标签 */
+        .status-tag {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-tag.waiting { background: #FFF7E6; color: #D48806; }
+        .status-tag.travel { background: #E8F5E9; color: #389E0D; }
+        .status-tag.done { background: #E8F0FE; color: #0669FF; }
+        .status-tag.fail { background: #FFF2E8; color: #D46B08; }
+        .status-tag.pending { background: #F0F0F0; color: #999; }
+
+        /* 进度条 */
+        .progress-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .progress-bar .bar {
+            width: 60px;
+            height: 6px;
+            background: #f0f0f0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .progress-bar .bar .fill {
+            height: 100%;
+            border-radius: 3px;
+            background: #0669FF;
+            transition: width 0.3s;
+        }
+        .progress-bar .bar .fill.full { background: #389E0D; }
+        .progress-bar .bar .fill.half { background: #D48806; }
+        .progress-bar .text {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* 操作按钮 */
+        .action-btn {
+            padding: 5px 14px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            margin-right: 6px;
+            white-space: nowrap;
+        }
+        .action-btn:last-child { margin-right: 0; }
+        .action-btn.btn-view { background: #E8F0FE; color: #0669FF; }
+        .action-btn.btn-view:hover { background: #D6E4FF; }
+        .action-btn.btn-report { background: #FFF7E6; color: #D48806; }
+        .action-btn.btn-report:hover { background: #FFEECC; }
+
+        /* ===== 分页 ===== */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 16px 24px;
+            gap: 8px;
+            border-top: 1px solid #f0f0f0;
+        }
+        .pagination .page-info {
+            font-size: 13px;
+            color: #666;
+            margin-right: 12px;
+        }
+        .pagination .page-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: 1px solid #d9d9d9;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .pagination .page-btn:hover { border-color: #0669FF; color: #0669FF; }
+        .pagination .page-btn.active {
+            background: #0669FF;
+            border-color: #0669FF;
+            color: #fff;
+        }
+        .pagination .page-btn.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* ===== Table total ===== */
+        .table-total {
+            padding: 12px 24px;
+            font-size: 13px;
+            color: #888;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 768px) {
+            .header { padding: 0 16px; }
+            .header .nav-list { display: none; }
+            .breadcrumb { padding: 12px 16px 0; }
+            .main { padding: 12px 16px 24px; }
+            .search-area { padding: 16px; }
+            .search-row { flex-direction: column; gap: 12px; }
+            .search-item { min-width: 100%; }
+            .search-actions { width: 100%; justify-content: flex-start; }
+            .table-wrapper { overflow-x: auto; }
+            table { min-width: 1200px; }
+            .tabs { overflow-x: auto; white-space: nowrap; }
+        }
+
+        /* ===== 浮层样式 ===== */
+        .report-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.45);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeInOverlay 0.2s;
+        }
+        .report-overlay.show { display: flex; }
+        @keyframes fadeInOverlay { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .report-modal {
+            background: #fff;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 960px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+            animation: slideDown 0.25s ease-out;
+            max-height: calc(100vh - 40px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .report-modal .rm-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            flex-shrink: 0;
+        }
+        .report-modal .rm-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        .report-modal .rm-header .rm-close {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: none;
+            background: #f5f5f5;
+            font-size: 14px;
+            color: #999;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .report-modal .rm-header .rm-close:hover { background: #eee; color: #333; }
+
+        .report-modal .rm-body {
+            padding: 12px 16px 14px;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* 课程信息卡片 - 紧凑 */
+        .rm-course-card {
+            display: flex;
+            gap: 14px;
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-bottom: 10px;
+            position: relative;
+            border: 1px solid #e8e8e8;
+        }
+        .rm-course-card .rm-cover {
+            width: 90px;
+            height: 60px;
+            border-radius: 6px;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: #e8e8e8;
+        }
+        .rm-course-card .rm-cover img { width: 100%; height: 100%; object-fit: cover; }
+        .rm-course-card .rm-course-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 2px;
+        }
+        .rm-course-card .rm-course-info .rm-cname {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        .rm-course-card .rm-course-info .rm-detail {
+            font-size: 12px;
+            color: #888;
+        }
+        .rm-course-card .rm-course-info .rm-detail span { margin-right: 12px; }
+        .rm-course-card .rm-status-badge {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+        .rm-status-badge.travel { background: #E8F5E9; color: #389E0D; }
+        .rm-status-badge.pending { background: #FFF7E6; color: #D48806; }
+        .rm-status-badge.done { background: #E8F0FE; color: #0669FF; }
+        .rm-status-badge.fail { background: #FFF2E8; color: #D46B08; }
+
+        /* 区块标题 - 紧凑 */
+        .rm-section { margin-bottom: 8px; }
+        .rm-section .rm-section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .rm-section .rm-section-title .rm-section-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            flex-shrink: 0;
+        }
+        .rm-section .rm-section-title .rm-section-icon.blue { background: #E8F0FE; color: #0669FF; }
+        .rm-section .rm-section-title .rm-section-icon.green { background: #E8F5E9; color: #389E0D; }
+
+        /* 按钮 */
+        .rm-btn {
+            padding: 6px 16px;
+            border-radius: 5px;
+            font-size: 12px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 500;
+        }
+        .rm-btn-primary { background: #0669FF; color: #fff; }
+        .rm-btn-primary:hover { background: #0052CC; }
+        .rm-btn-view { background: #E8F5E9; color: #389E0D; }
+        .rm-btn-view:hover { background: #D6F0D8; }
+        .rm-btn-sm { font-size: 11px; padding: 4px 12px; }
+
+        /* 研学信息生成面板 - 重新设计 */
+        .rm-info-panel {
+            display: none;
+            margin-top: 8px;
+            padding: 14px 16px;
+            background: #f8f9fc;
+            border-radius: 8px;
+            border: 1px solid #e8e8e8;
+        }
+        .rm-info-panel.show { display: block; }
+        .rm-info-panel .rip-tip {
+            margin-bottom: 12px;
+        }
+        .rm-info-panel .rip-tip .rip-tip-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+        .rm-info-panel .rip-tip .rip-tip-desc {
+            font-size: 12px;
+            color: #888;
+            margin-top: 2px;
+        }
+        .rm-info-panel .rip-field {
+            margin-bottom: 12px;
+        }
+        .rm-info-panel .rip-field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 5px;
+        }
+        .rm-info-panel .rip-field input,
+        .rm-info-panel .rip-field textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #333;
+            outline: none;
+            font-family: inherit;
+            background: #fff;
+        }
+        .rm-info-panel .rip-field input:focus,
+        .rm-info-panel .rip-field textarea:focus {
+            border-color: #0669FF;
+            box-shadow: 0 0 0 2px rgba(6,105,255,0.06);
+        }
+        .rm-info-panel .rip-field textarea {
+            resize: none;
+            min-height: 54px;
+            line-height: 1.5;
+        }
+        .rm-info-panel .rip-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+        .rm-info-panel .rip-tag {
+            padding: 4px 12px;
+            border-radius: 14px;
+            border: 1px solid #ddd;
+            background: #fff;
+            font-size: 12px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .rm-info-panel .rip-tag:active { background: #E8F1FF; border-color: #0669FF; color: #0669FF; }
+        .rm-info-panel .rip-gen-btn {
+            padding: 7px 20px;
+            border-radius: 6px;
+            border: none;
+            background: #0669FF;
+            color: #fff;
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .rm-info-panel .rip-gen-btn:disabled { opacity: 0.5; cursor: default; }
+        .rm-info-panel .rip-progress {
+            display: none;
+            margin-top: 10px;
+        }
+        .rm-info-panel .rip-progress.show { display: block; }
+        .rm-info-panel .rip-progress .rip-prog-text { font-size: 12px; color: #888; margin-bottom: 4px; }
+        .rm-info-panel .rip-progress .rip-prog-track {
+            width: 100%; height: 4px;
+            background: #eee;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .rm-info-panel .rip-progress .rip-prog-fill {
+            height: 100%; width: 0%;
+            background: linear-gradient(90deg, #0669FF, #4A9EFF);
+            border-radius: 2px;
+            transition: width 0.3s;
+        }
+        .rm-info-panel .rip-result {
+            display: none;
+            margin-top: 10px;
+        }
+        .rm-info-panel .rip-result.show { display: block; }
+        .rm-info-panel .rip-result .rip-result-box {
+            background: #fff;
+            border-radius: 6px;
+            padding: 10px 12px;
+            border: 1px solid #e0e0e0;
+            font-size: 12px;
+            color: #444;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            min-height: 50px;
+            outline: none;
+        }
+        .rm-info-panel .rip-result .rip-result-box:focus { border-color: #0669FF; }
+        .rm-info-panel .rip-actions {
+            display: none;
+            margin-top: 10px;
+            gap: 8px;
+        }
+        .rm-info-panel .rip-actions.show { display: flex; }
+        .rm-info-panel .rip-save-btn {
+            padding: 6px 18px;
+            border-radius: 6px;
+            border: none;
+            background: #D4A84B;
+            color: #fff;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .rm-info-panel .rip-regen-btn {
+            padding: 6px 18px;
+            border-radius: 6px;
+            border: 1px solid #0669FF;
+            background: #fff;
+            color: #0669FF;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        /* 用户表格 - 紧凑 */
+        .rm-user-table {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: collapse;
+            font-size: 12px;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .rm-user-table thead th {
+            background: #fafafa;
+            padding: 6px 8px;
+            text-align: left;
+            font-weight: 600;
+            color: #555;
+            border-bottom: 1px solid #eee;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+        .rm-user-table tbody td {
+            padding: 6px 8px;
+            border-bottom: 1px solid #f5f5f5;
+            color: #333;
+            vertical-align: middle;
+            word-break: break-all;
+        }
+        .rm-user-table tbody tr:last-child td { border-bottom: none; }
+        .rm-user-table tbody tr:hover { background: #FAFBFF; }
+
+        /* 联系人分组行 */
+        .rm-user-group-header td {
+            background: #f5f7fa;
+            font-weight: 600;
+            color: #666;
+            padding: 5px 8px;
+            font-size: 11px;
+            border-bottom: 1px solid #e8e8e8;
+        }
+
+        /* 评价按钮 */
+        .eval-btn {
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 11px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .eval-btn-add { background: #0669FF; color: #fff; }
+        .eval-btn-add:hover { background: #0052CC; }
+        .eval-btn-view { background: #4CAF50; color: #fff; }
+        .eval-btn-view:hover { background: #388E3C; }
+
+        /* 评价内联面板 */
+        .eval-inline-panel {
+            display: none;
+            background: #f8f9fc;
+            padding: 10px 12px;
+            border-top: 1px solid #eee;
+        }
+        .eval-inline-panel.show { display: table-row; }
+        .eval-inline-panel td { padding: 8px 12px !important; }
+        .eval-inline-panel .eip-inner { display: flex; gap: 10px; align-items: flex-start; }
+        .eval-inline-panel .eip-left {
+            font-size: 11px;
+            color: #666;
+            min-width: 50px;
+            padding-top: 4px;
+            flex-shrink: 0;
+        }
+        .eval-inline-panel .eip-right { flex: 1; }
+        .eval-inline-panel textarea {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 12px;
+            color: #333;
+            outline: none;
+            font-family: inherit;
+            resize: none;
+            min-height: 40px;
+        }
+        .eval-inline-panel textarea:focus { border-color: #0669FF; }
+        .eval-inline-panel .eip-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 5px;
+        }
+        .eval-inline-panel .eip-tag {
+            padding: 2px 8px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            background: #fff;
+            font-size: 10px;
+            color: #666;
+            cursor: pointer;
+        }
+        .eval-inline-panel .eip-tag:active { background: #E8F1FF; border-color: #0669FF; color: #0669FF; }
+        .eval-inline-panel .eip-actions { margin-top: 6px; display: flex; gap: 6px; align-items: center; }
+        .eval-inline-panel .eip-gen-btn {
+            padding: 4px 12px;
+            border-radius: 4px;
+            border: none;
+            background: #0669FF;
+            color: #fff;
+            font-size: 11px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .eval-inline-panel .eip-gen-btn:disabled { opacity: 0.5; cursor: default; }
+        .eval-inline-panel .eip-progress {
+            display: none;
+            margin-top: 4px;
+        }
+        .eval-inline-panel .eip-progress.show { display: block; }
+        .eval-inline-panel .eip-progress .eip-prog-text { font-size: 10px; color: #888; margin-bottom: 2px; }
+        .eval-inline-panel .eip-progress .eip-prog-track {
+            width: 100%; height: 3px;
+            background: #eee;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .eval-inline-panel .eip-progress .eip-prog-fill {
+            height: 100%; width: 0%;
+            background: linear-gradient(90deg, #0669FF, #4A9EFF);
+            border-radius: 2px;
+        }
+        .eval-inline-panel .eip-result-box {
+            display: none;
+            background: #fff;
+            border-radius: 4px;
+            padding: 8px 10px;
+            border: 1px solid #e0e0e0;
+            font-size: 12px;
+            color: #444;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            min-height: 30px;
+            outline: none;
+            margin-top: 4px;
+        }
+        .eval-inline-panel .eip-result-box.show { display: block; }
+        .eval-inline-panel .eip-result-box:focus { border-color: #0669FF; }
+        .eval-inline-panel .eip-save-btn {
+            padding: 4px 12px;
+            border-radius: 4px;
+            border: none;
+            background: #D4A84B;
+            color: #fff;
+            font-size: 11px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .eval-inline-panel .eip-done-text {
+            font-size: 11px;
+            color: #389E0D;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <div class="header">
+        <div class="logo">离泰数链</div>
+        <ul class="nav-list">
+            <li>概览</li>
+            <li>研学课程</li>
+            <li class="active">订单管理</li>
+            <li>用户管理</li>
+            <li>内容管理</li>
+            <li onclick="window.location.href='系统参数配置.html'" style="cursor:pointer;">系统设置</li>
+        </ul>
+        <div class="user-area">
+            <span class="avatar">👤</span>
+            <span class="name">管理员</span>
+        </div>
+    </div>
+
+    <!-- 面包屑 -->
+    <div class="breadcrumb">
+        <a href="index.html">首页</a>
+        <span class="sep">&gt;</span>
+        <a href="#">订单管理</a>
+        <span class="sep">&gt;</span>
+        <span class="current">拼团订单管理</span>
+    </div>
+
+    <!-- 主内容 -->
+    <div class="main">
+        <!-- 页面标题 -->
+        <div class="page-header">
+            <h2>拼团订单管理</h2>
+            <button class="btn-export" onclick="handleExport()">📥 导出</button>
+        </div>
+
+        <!-- 搜索区域 -->
+        <div class="search-area">
+            <div class="search-row">
+                <div class="search-item">
+                    <label>拼团订单号</label>
+                    <input type="text" id="searchOrderId" placeholder="请输入订单号">
+                </div>
+                <div class="search-item">
+                    <label>产品编号</label>
+                    <input type="text" id="searchProductId" placeholder="请输入产品编号">
+                </div>
+                <div class="search-item">
+                    <label>场次名称</label>
+                    <input type="text" id="searchSessionName" placeholder="请输入场次名称">
+                </div>
+                <div class="search-item">
+                    <label>创建时间</label>
+                    <input type="date" id="searchCreateTime">
+                </div>
+                <div class="search-item">
+                    <label>最晚拼团确认时间</label>
+                    <input type="date" id="searchConfirmTime">
+                </div>
+                <div class="search-item">
+                    <label>核验机构</label>
+                    <select id="searchVerifyAgency">
+                        <option value="">全部</option>
+                        <option value="离泰研学基地">离泰研学基地</option>
+                        <option value="杜甫草堂">杜甫草堂</option>
+                        <option value="户外营地">户外营地</option>
+                        <option value="森林公园">森林公园</option>
+                        <option value="博物馆">博物馆</option>
+                    </select>
+                </div>
+                <div class="search-item">
+                    <label>执行机构</label>
+                    <select id="searchExecAgency">
+                        <option value="">全部</option>
+                        <option value="离泰文化">离泰文化</option>
+                        <option value="诗界教育">诗界教育</option>
+                        <option value="野趣教育">野趣教育</option>
+                    </select>
+                </div>
+                <div class="search-actions">
+                    <button class="btn btn-search" onclick="handleSearch()">🔍 搜索</button>
+                    <button class="btn btn-reset" onclick="handleReset()">↻ 重置</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 标签页 -->
+        <div class="tabs">
+            <div class="tab-item active" data-tab="all" onclick="switchTab('all')">全部订单 <span class="count">28</span></div>
+            <div class="tab-item" data-tab="pending" onclick="switchTab('pending')">待成团 <span class="count">6</span></div>
+            <div class="tab-item" data-tab="travel" onclick="switchTab('travel')">待出行 <span class="count">12</span></div>
+            <div class="tab-item" data-tab="fail" onclick="switchTab('fail')">拼团失败 <span class="count">3</span></div>
+            <div class="tab-item" data-tab="done" onclick="switchTab('done')">已完成 <span class="count">7</span></div>
+        </div>
+
+        <!-- 表格 -->
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:10%">拼团订单编号</th>
+                        <th style="width:11%">课程名称</th>
+                        <th style="width:7%">课程编号</th>
+                        <th style="width:8%">执行机构</th>
+                        <th style="width:8%">场次名称</th>
+                        <th style="width:8%">场次时间</th>
+                        <th style="width:7%">总金额</th>
+                        <th style="width:7%">创建时间</th>
+                        <th style="width:7%">最晚拼团确认</th>
+                        <th style="width:7%">成团时间</th>
+                        <th style="width:6%">状态</th>
+                        <th style="width:7%">拼团进度</th>
+                        <th style="width:10%">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+            <div class="table-total">共 <span id="totalCount">0</span> 条记录</div>
+            <div class="pagination" id="pagination"></div>
+        </div>
+
+        <!-- ===== 功能说明 ===== -->
+        <div style="background:#fff;border-radius:8px;padding:14px 18px;margin-top:16px;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+            <div style="font-size:13px;font-weight:600;color:#333;margin-bottom:6px;display:flex;align-items:center;gap:6px;">
+                <span style="width:18px;height:18px;border-radius:4px;background:#E8F0FE;color:#0669FF;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;">ℹ</span>
+                功能说明
+            </div>
+            <div style="font-size:12px;color:#888;line-height:1.7;">
+                原拼团订单列表页面，在"待出行""已完成"的订单后加个按钮"研学报告管理"
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 研学报告管理浮层 ===== -->
+    <div class="report-overlay" id="reportOverlay">
+        <div class="report-modal">
+            <div class="rm-header">
+                <h3>📋 研学报告管理</h3>
+                <button class="rm-close" onclick="closeReportModal()">✕</button>
+            </div>
+            <div class="rm-body" id="reportBody">
+                <!-- 课程信息卡片 -->
+                <div class="rm-course-card" id="rmCourseCard">
+                    <div class="rm-cover">
+                        <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=240&h=160&fit=crop" alt="课程封面">
+                    </div>
+                    <div class="rm-course-info">
+                        <div class="rm-cname" id="rmCourseName">盆景美学·指尖山水</div>
+                        <div class="rm-detail" id="rmCourseDetail">
+                            <span id="rmTimeSpan">📅 2025-06-07 09:00-12:00</span>
+                            <span id="rmSessionSpan">🎯 6月7日(周六)上午场</span>
+                        </div>
+                    </div>
+                    <span class="rm-status-badge travel" id="rmStatusBadge">待出行</span>
+                </div>
+
+                <!-- 研学信息区域（含内嵌生成面板） -->
+                <div class="rm-section">
+                    <div class="rm-section-title">
+                        <span class="rm-section-icon blue">📄</span>
+                        研学信息
+                    </div>
+                    <div>
+                        <button class="rm-btn" id="rmInfoBtn" onclick="toggleRmInfoPanel()">📋 生成研学信息</button>
+                    </div>
+                    <!-- 内嵌研学信息生成面板 -->
+                    <div class="rm-info-panel" id="rmInfoPanel">
+                        <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+                            <div class="rip-tip">
+                                <div class="rip-tip-title">📝 填写研学信息</div>
+                                <div class="rip-tip-desc">输入研学时长和关键词，AI自动生成研学信息</div>
+                            </div>
+                            <span style="font-size:12px;color:#0669FF;cursor:pointer;flex-shrink:0;margin-left:10px;font-weight:500;" onclick="closeRmInfoPanel()">▲ 收起</span>
+                        </div>
+                        <div class="rip-field">
+                            <label>⏱️ 研学时长</label>
+                            <input type="text" id="ripDuration" placeholder="如：2小时、半天、全天..." maxlength="20">
+                        </div>
+                        <div class="rip-field">
+                            <label>📌 研学内容关键词</label>
+                            <textarea id="ripKeywords" rows="2" placeholder="请输入关键词..."></textarea>
+                        </div>
+                        <div class="rip-tags">
+                            <span class="rip-tag" onclick="addRmInfoTag(this)">茅屋搭建</span>
+                            <span class="rip-tag" onclick="addRmInfoTag(this)">团队协作</span>
+                            <span class="rip-tag" onclick="addRmInfoTag(this)">历史文化</span>
+                            <span class="rip-tag" onclick="addRmInfoTag(this)">动手实践</span>
+                            <span class="rip-tag" onclick="addRmInfoTag(this)">知识收获</span>
+                            <span class="rip-tag" onclick="addRmInfoTag(this)">创新思维</span>
+                        </div>
+                        <div id="ripGenArea">
+                            <button class="rip-gen-btn" id="ripGenBtn" onclick="startRmInfoGenerate()">✨ 立即生成</button>
+                        </div>
+                        <div class="rip-progress" id="ripProgress">
+                            <div class="rip-prog-text" id="ripProgText">🤖 AI正在生成研学信息...</div>
+                            <div class="rip-prog-track"><div class="rip-prog-fill" id="ripProgFill"></div></div>
+                        </div>
+                        <div class="rip-result" id="ripResult">
+                            <div class="rip-result-box" id="ripResultBox" contenteditable="true"></div>
+                        </div>
+                        <div class="rip-actions" id="ripSaveActions">
+                            <button class="rip-save-btn" onclick="saveRmInfo()">💾 保存信息</button>
+                            <button class="rip-regen-btn" onclick="reGenerateRmInfo()">🔄 重新生成</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 用户订单区域 -->
+                <div class="rm-section">
+                    <div class="rm-section-title">
+                        <span class="rm-section-icon green">👥</span>
+                        订单成员列表
+                    </div>
+                    <table class="rm-user-table">
+                        <thead>
+                            <tr>
+                                <th style="width:15%">姓名</th>
+                                <th style="width:10%">年龄</th>
+                                <th style="width:35%">身份证号</th>
+                                <th style="width:40%">评价</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rmUserBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== 模拟数据 =====
+        var statusMap = {
+            pending: '待成团',
+            travel: '待出行',
+            fail: '拼团失败',
+            done: '已完成'
+        };
+        var statusClsMap = {
+            pending: 'pending',
+            travel: 'travel',
+            fail: 'fail',
+            done: 'done'
+        };
+
+        var mockData = [
+            { orderId: 'PT20250601001', courseName: '盆景美学·指尖山水', courseId: 'CP20250001', execAgency: '离泰文化', sessionName: '6月7日(周六)上午场', sessionTime: '2025-06-07 09:00-12:00', amount: '¥2,980', createTime: '2025-06-01 10:30', confirmDeadline: '2025-06-04', confirmTime: '2025-06-02 14:20', status: 'travel', progress: '6/10' },
+            { orderId: 'PT20250531002', courseName: '春假托管班', courseId: 'CP20250002', execAgency: '离泰文化', sessionName: '6月8日(周日)全天', sessionTime: '2025-06-08 08:00-17:00', amount: '¥1,680', createTime: '2025-05-31 14:00', confirmDeadline: '2025-06-03', confirmTime: '-', status: 'pending', progress: '4/10' },
+            { orderId: 'PT20250530003', courseName: '诗界无心·草堂寻心', courseId: 'CP20250003', execAgency: '诗界教育', sessionName: '6月6日(周五)下午场', sessionTime: '2025-06-06 14:00-17:00', amount: '¥3,580', createTime: '2025-05-30 09:20', confirmDeadline: '2025-06-02', confirmTime: '2025-06-01 11:30', status: 'travel', progress: '10/10' },
+            { orderId: 'PT20250528004', courseName: '搭建小茅屋', courseId: 'CP20250005', execAgency: '离泰文化', sessionName: '6月5日(周四)上午场', sessionTime: '2025-06-05 09:00-12:00', amount: '¥1,980', createTime: '2025-05-28 16:00', confirmDeadline: '2025-05-31', confirmTime: '2025-05-30 10:00', status: 'travel', progress: '8/8' },
+            { orderId: 'PT20250525005', courseName: '杜甫和李白的故事', courseId: 'CP20250004', execAgency: '诗界教育', sessionName: '5月30日(周五)上午场', sessionTime: '2025-05-30 09:00-11:30', amount: '¥1,548', createTime: '2025-05-25 11:00', confirmDeadline: '2025-05-28', confirmTime: '-', status: 'fail', progress: '3/8' },
+            { orderId: 'PT20250520006', courseName: '自然探索营', courseId: 'CP20250009', execAgency: '离泰文化', sessionName: '5月25日(周日)全天', sessionTime: '2025-05-25 08:00-17:00', amount: '¥2,980', createTime: '2025-05-20 08:30', confirmDeadline: '2025-05-23', confirmTime: '2025-05-22 16:40', status: 'done', progress: '6/6' },
+            { orderId: 'PT20250518007', courseName: '唐代诗歌赏析', courseId: 'CP20250007', execAgency: '诗界教育', sessionName: '5月22日(周四)下午场', sessionTime: '2025-05-22 14:00-16:30', amount: '¥2,280', createTime: '2025-05-18 14:00', confirmDeadline: '2025-05-21', confirmTime: '2025-05-20 09:15', status: 'done', progress: '5/5' },
+            { orderId: 'PT20250515008', courseName: '盆景制作入门', courseId: 'CP20250008', execAgency: '离泰文化', sessionName: '5月20日(周二)上午场', sessionTime: '2025-05-20 09:00-11:00', amount: '¥1,344', createTime: '2025-05-15 10:00', confirmDeadline: '2025-05-18', confirmTime: '-', status: 'fail', progress: '2/8' },
+            { orderId: 'PT20250510009', courseName: '快速搭建茅屋', courseId: 'CP20250006', execAgency: '离泰文化', sessionName: '5月15日(周四)上午场', sessionTime: '2025-05-15 09:00-12:00', amount: '¥990', createTime: '2025-05-10 15:30', confirmDeadline: '2025-05-13', confirmTime: '2025-05-12 11:00', status: 'done', progress: '5/5' },
+            { orderId: 'PT20250508010', courseName: '春假艺术工坊', courseId: 'CP20250010', execAgency: '离泰文化', sessionName: '5月12日(周一)下午场', sessionTime: '2025-05-12 14:00-16:00', amount: '¥768', createTime: '2025-05-08 09:00', confirmDeadline: '2025-05-11', confirmTime: '2025-05-10 14:30', status: 'done', progress: '6/6' },
+            { orderId: 'PT20250602011', courseName: '国画水墨体验', courseId: 'CP20250012', execAgency: '离泰文化', sessionName: '6月10日(周二)上午场', sessionTime: '2025-06-10 09:00-11:30', amount: '¥1,504', createTime: '2025-06-02 08:00', confirmDeadline: '2025-06-07', confirmTime: '-', status: 'pending', progress: '4/8' },
+            { orderId: 'PT20250601012', courseName: '户外生存技能', courseId: 'CP20250011', execAgency: '野趣教育', sessionName: '6月8日(周日)全天', sessionTime: '2025-06-08 08:00-17:00', amount: '¥2,144', createTime: '2025-06-01 18:00', confirmDeadline: '2025-06-05', confirmTime: '-', status: 'pending', progress: '5/8' },
+            { orderId: 'PT20250522013', courseName: '盆景美学·指尖山水', courseId: 'CP20250001', execAgency: '离泰文化', sessionName: '5月28日(周三)下午场', sessionTime: '2025-05-28 14:00-17:00', amount: '¥1,788', createTime: '2025-05-22 13:00', confirmDeadline: '2025-05-25', confirmTime: '2025-05-24 09:00', status: 'travel', progress: '6/6' },
+            { orderId: 'PT20250505014', courseName: '春假托管班', courseId: 'CP20250002', execAgency: '离泰文化', sessionName: '5月10日(周六)全天', sessionTime: '2025-05-10 08:00-17:00', amount: '¥1,008', createTime: '2025-05-05 07:30', confirmDeadline: '2025-05-08', confirmTime: '2025-05-07 16:20', status: 'done', progress: '6/6' },
+            { orderId: 'PT20250530015', courseName: '自然探索营', courseId: 'CP20250009', execAgency: '离泰文化', sessionName: '6月5日(周四)全天', sessionTime: '2025-06-05 08:00-17:00', amount: '¥2,384', createTime: '2025-05-30 11:00', confirmDeadline: '2025-06-02', confirmTime: '2025-06-01 10:00', status: 'travel', progress: '8/8' }
+        ];
+
+        // 模拟成员数据（按联系电话分组）
+        var mockMembersByOrder = {
+            'PT20250601001': [
+                { phone: '13800138001', status: 'travel' },
+                { phone: '13900139002', status: 'done' }
+            ]
+        };
+
+        var mockMembers = {
+            '13800138001': {
+                members: [
+                    { name: '赵小明', age: 12, idCard: '511602************38' },
+                    { name: '李小红', age: 11, idCard: '510108************25' },
+                    { name: '王大力', age: 13, idCard: '440305************12' }
+                ]
+            },
+            '13900139002': {
+                members: [
+                    { name: '陈小华', age: 10, idCard: '330102************45' },
+                    { name: '林小芳', age: 12, idCard: '350103************67' },
+                    { name: '黄小军', age: 11, idCard: '420106************89' }
+                ]
+            }
+        };
+
+        var statusBadgeMap = {
+            pending: '待成团',
+            travel: '待出行',
+            fail: '拼团失败',
+            done: '已完成'
+        };
+        var statusBadgeCls = {
+            pending: 'pending',
+            travel: 'travel',
+            fail: 'fail',
+            done: 'done'
+        };
+
+        // ===== 浮层相关函数 =====
+        var currentReportOrderId = '';
+        var currentReportCourse = null;
+
+        function openReportModal(orderId, course) {
+            currentReportOrderId = orderId;
+            currentReportCourse = course;
+            // 设置课程信息
+            document.getElementById('rmCourseName').textContent = course.courseName;
+            document.getElementById('rmTimeSpan').textContent = '📅 ' + course.sessionTime;
+            document.getElementById('rmSessionSpan').textContent = '🎯 ' + course.sessionName;
+
+            var badge = document.getElementById('rmStatusBadge');
+            var statusText = statusBadgeMap[course.status] || course.status;
+            var statusCls = statusBadgeCls[course.status] || '';
+            badge.textContent = statusText;
+            badge.className = 'rm-status-badge ' + statusCls;
+
+            // 重置研学信息面板
+            resetRmInfoPanel();
+            // 检查是否已有保存的研学信息（按订单区分）
+            var saved = localStorage.getItem('studyInfo_' + orderId);
+            var infoBtn = document.getElementById('rmInfoBtn');
+            if (saved) {
+                infoBtn.textContent = '📄 查看研学信息';
+                infoBtn.className = 'rm-btn rm-btn-view';
+            } else {
+                infoBtn.textContent = '📋 生成研学信息';
+                infoBtn.className = 'rm-btn rm-btn-primary';
+            }
+
+            // 渲染用户列表
+            renderRmUsers();
+
+            document.getElementById('reportOverlay').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeReportModal() {
+            document.getElementById('reportOverlay').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        // ===== 研学信息生成（内嵌） =====
+
+        function closeRmInfoPanel() {
+            document.getElementById('rmInfoPanel').classList.remove('show');
+        }
+
+        function resetRmInfoPanel() {
+            var panel = document.getElementById('rmInfoPanel');
+            panel.classList.remove('show');
+            var durInput = document.getElementById('ripDuration');
+            durInput.value = '';
+            durInput.disabled = false;
+            durInput.style.background = '#fff';
+            durInput.style.cursor = '';
+            document.getElementById('ripKeywords').value = '';
+            document.getElementById('ripProgress').classList.remove('show');
+            document.getElementById('ripResult').classList.remove('show');
+            document.getElementById('ripSaveActions').classList.remove('show');
+            document.getElementById('ripGenBtn').disabled = false;
+            document.getElementById('ripGenBtn').textContent = '✨ 立即生成';
+        }
+        function hideRmInfoForm() {
+            // 只隐藏关键词字段、标签和生成按钮，时长字段始终显示
+            var kwField = document.querySelector('#rmInfoPanel .rip-field:last-child');
+            if (kwField) kwField.style.display = 'none';
+            var tags = document.querySelector('#rmInfoPanel .rip-tags');
+            if (tags) tags.style.display = 'none';
+            var genArea = document.getElementById('ripGenArea');
+            if (genArea) genArea.style.display = 'none';
+        }
+        function showRmInfoForm() {
+            var durInput = document.getElementById('ripDuration');
+            durInput.disabled = false;
+            durInput.style.background = '#fff';
+            durInput.style.cursor = '';
+            var kwField = document.querySelector('#rmInfoPanel .rip-field:last-child');
+            if (kwField) kwField.style.display = 'block';
+            var tags = document.querySelector('#rmInfoPanel .rip-tags');
+            if (tags) tags.style.display = 'flex';
+            var genArea = document.getElementById('ripGenArea');
+            if (genArea) genArea.style.display = 'block';
+        }
+
+        function toggleRmInfoPanel() {
+            var saved = localStorage.getItem('studyInfo_' + currentReportOrderId);
+            var panel = document.getElementById('rmInfoPanel');
+            // 如果面板已打开，关闭它
+            if (panel.classList.contains('show')) {
+                panel.classList.remove('show');
+                return;
+            }
+            // 展开面板
+            panel.classList.add('show');
+            if (saved) {
+                // 有保存内容 → 时长只读，关键词框+快捷标签保留可见，展示内容+重新生成
+                // 只隐藏生成按钮区域
+                var genArea = document.getElementById('ripGenArea');
+                if (genArea) genArea.style.display = 'none';
+                try {
+                    var data = JSON.parse(saved);
+                    // 时长字段回显并置为只读
+                    var durInput = document.getElementById('ripDuration');
+                    durInput.value = data.duration || '';
+                    durInput.disabled = true;
+                    durInput.style.background = '#f5f5f5';
+                    durInput.style.cursor = 'default';
+                    // 关键词框保留可见，清空或回显
+                    document.getElementById('ripKeywords').value = '';
+                    // 快捷标签保留可见
+                    var tags = document.querySelector('#rmInfoPanel .rip-tags');
+                    if (tags) tags.style.display = 'flex';
+                    document.getElementById('ripResultBox').textContent = data.content || '';
+                } catch(e) {
+                    document.getElementById('ripResultBox').textContent = saved;
+                }
+                document.getElementById('ripResultBox').setAttribute('contenteditable', 'false');
+                document.getElementById('ripResult').classList.add('show');
+                document.getElementById('ripProgress').classList.remove('show');
+                document.getElementById('ripSaveActions').classList.remove('show');
+                // 显示重新生成按钮（在结果下方）
+                var regenArea = document.getElementById('ripRegenArea');
+                if (!regenArea) {
+                    regenArea = document.createElement('div');
+                    regenArea.id = 'ripRegenArea';
+                    regenArea.style.cssText = 'margin-top:10px;';
+                    regenArea.innerHTML = '<button class="rip-regen-btn" onclick="reGenerateRmInfo()">🔄 重新生成</button>';
+                    document.getElementById('ripResult').after(regenArea);
+                }
+                regenArea.style.display = 'block';
+            } else {
+                // 无保存内容 → 显示输入表单
+                showRmInfoForm();
+                document.getElementById('ripResultBox').setAttribute('contenteditable', 'true');
+                document.getElementById('ripResult').classList.remove('show');
+                document.getElementById('ripSaveActions').classList.remove('show');
+                var regenArea = document.getElementById('ripRegenArea');
+                if (regenArea) regenArea.style.display = 'none';
+            }
+        }
+
+        function addRmInfoTag(el) {
+            var input = document.getElementById('ripKeywords');
+            var text = el.textContent;
+            var cur = input.value.trim();
+            input.value = cur ? cur + '、' + text : text;
+        }
+
+        function startRmInfoGenerate() {
+            var duration = document.getElementById('ripDuration').value.trim();
+            if (!duration) { alert('请输入研学时长'); return; }
+            var keywords = document.getElementById('ripKeywords').value.trim();
+            var genArea = document.getElementById('ripGenArea');
+            if (genArea) genArea.style.display = 'none';
+            doRmInfoGenerate(duration, keywords);
+        }
+
+        function doRmInfoGenerate(duration, keywords) {
+            document.getElementById('ripResult').classList.remove('show');
+            document.getElementById('ripSaveActions').classList.remove('show');
+            document.getElementById('ripProgress').classList.add('show');
+            document.getElementById('ripResultBox').setAttribute('contenteditable', 'false');
+
+            var fill = document.getElementById('ripProgFill');
+            var text = document.getElementById('ripProgText');
+            var p = 0;
+            var timer = setInterval(function() {
+                p += Math.random() * 15 + 5;
+                if (p > 100) { p = 100; }
+                fill.style.width = p + '%';
+                if (p < 50) text.textContent = '🤖 AI正在分析课程信息...';
+                else if (p < 80) text.textContent = '📝 AI正在生成研学内容...';
+                else text.textContent = '✅ 即将完成...';
+                if (p >= 100) {
+                    clearInterval(timer);
+                    var content = generateRmInfoContent(duration, keywords);
+                    document.getElementById('ripResultBox').textContent = content;
+                    document.getElementById('ripResult').classList.add('show');
+                    document.getElementById('ripSaveActions').classList.add('show');
+                    setTimeout(function() {
+                        document.getElementById('ripProgress').classList.remove('show');
+                    }, 500);
+                }
+            }, 300);
+        }
+
+        function generateRmInfoContent(duration, keywords) {
+            var course = currentReportCourse;
+            var courseName = course ? course.courseName : '当前课程';
+            var kws = keywords ? keywords.split(/[、，,]/).filter(function(k) { return k.trim(); }) : [];
+            var content = '【研学内容】\n\n';
+            content += '📋 课程名称：' + courseName + '\n';
+            content += '📅 课程时间：' + (course ? course.sessionTime : '') + '\n\n';
+            content += '━━━━ 研学内容 ━━━━\n\n';
+            content += '本次课程通过实地体验与动手实践相结合的方式，';
+            content += '让学生深入了解相关知识，在实践中学习与成长。\n';
+            kws.forEach(function(k) {
+                var kw = k.trim();
+                if (kw.indexOf('茅屋') !== -1 || kw.indexOf('搭建') !== -1) content += '▸ ' + kw + '：学习了搭建结构、材料选择及力学原理，分组协作亲手搭建模型。\n';
+                else if (kw.indexOf('团队') !== -1) content += '▸ ' + kw + '：分组协作完成任务，成员分工明确，配合默契。\n';
+                else if (kw.indexOf('历史') !== -1 || kw.indexOf('文化') !== -1) content += '▸ ' + kw + '：深入了解相关历史文化背景，丰富人文素养。\n';
+                else if (kw.indexOf('动手') !== -1 || kw.indexOf('实践') !== -1) content += '▸ ' + kw + '：在实践中反复调整优化，锻炼实际操作能力。\n';
+                else if (kw.indexOf('知识') !== -1 || kw.indexOf('收获') !== -1) content += '▸ ' + kw + '：掌握了丰富的知识，收获了宝贵的体验。\n';
+                else if (kw.indexOf('创新') !== -1 || kw.indexOf('思维') !== -1) content += '▸ ' + kw + '：在传统基础上思考优化设计，培养创新意识。\n';
+                else content += '▸ ' + kw + '：作为本次研学的重要环节，深入参与并获得了丰富体验。\n';
+            });
+            return content;
+        }
+
+        function saveRmInfo() {
+            var content = document.getElementById('ripResultBox').textContent.trim();
+            if (!content) { alert('请先生成研学信息'); return; }
+            var duration = document.getElementById('ripDuration').value.trim();
+            var data = { duration: duration, content: content, saveTime: new Date().toLocaleString() };
+            localStorage.setItem('studyInfo_' + currentReportOrderId, JSON.stringify(data));
+            var infoBtn = document.getElementById('rmInfoBtn');
+            infoBtn.textContent = '📄 查看研学信息';
+            infoBtn.className = 'rm-btn rm-btn-view';
+            // 关闭面板
+            document.getElementById('rmInfoPanel').classList.remove('show');
+            alert('✅ 研学信息保存成功！');
+        }
+
+        function reGenerateRmInfo() {
+            // 重新生成：保留关键词输入框和快捷标签
+            var saved = localStorage.getItem('studyInfo_' + currentReportOrderId);
+            var duration = '';
+            if (saved) {
+                try { duration = JSON.parse(saved).duration || ''; } catch(e) {}
+            }
+            if (!duration) {
+                duration = document.getElementById('ripDuration').value.trim();
+            }
+            var keywords = document.getElementById('ripKeywords').value.trim();
+            // 隐藏 reGenArea，保留输入框和标签
+            var regenArea = document.getElementById('ripRegenArea');
+            if (regenArea) regenArea.style.display = 'none';
+            // 确保关键词输入框和标签可见
+            var kwField = document.querySelector('#rmInfoPanel .rip-field:last-child');
+            if (kwField) kwField.style.display = 'block';
+            var tags = document.querySelector('#rmInfoPanel .rip-tags');
+            if (tags) tags.style.display = 'flex';
+            doRmInfoGenerate(duration, keywords);
+        }
+
+        // ===== 用户列表渲染 & 评价（内嵌） =====
+
+        function renderRmUsers() {
+            var tbody = document.getElementById('rmUserBody');
+            var orderId = currentReportOrderId;
+            var groups = mockMembersByOrder[orderId] || [
+                { phone: '13800138001', status: 'travel' },
+                { phone: '13900139002', status: 'done' }
+            ];
+
+            var html = '';
+            for (var g = 0; g < groups.length; g++) {
+                var group = groups[g];
+                var members = mockMembers[group.phone] || { members: [] };
+                html += '<tr class="rm-user-group-header">';
+                html += '<td colspan="4">📞 ' + group.phone + '</td>';
+                html += '</tr>';
+                for (var m = 0; m < members.members.length; m++) {
+                    var member = members.members[m];
+                    var evalKey = 'eval_' + orderId + '_' + member.name;
+                    var hasEval = !!getEvalData(member.name);
+                    var evalBtnCls = hasEval ? 'eval-btn-view' : 'eval-btn-add';
+                    var evalBtnText = hasEval ? '查看评价' : '评价';
+                    html += '<tr id="rmUserRow_' + member.name + '">';
+                    html += '<td><strong>' + member.name + '</strong></td>';
+                    html += '<td>' + member.age + '岁</td>';
+                    html += '<td style="font-family:monospace;color:#888;font-size:12px;">' + member.idCard + '</td>';
+                    html += '<td><button class="eval-btn ' + evalBtnCls + '" id="evalBtn_' + member.name + '" onclick="toggleEvalPanel(\'' + member.name + '\')">' + evalBtnText + '</button></td>';
+                    html += '</tr>';
+                    // 内联评价面板（隐藏）
+                    html += '<tr class="eval-inline-panel" id="evalPanel_' + member.name + '">';
+                    html += '<td colspan="4">';
+                    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">';
+                    html += '<span style="font-size:12px;font-weight:600;color:#333;">✍️ 评价 - ' + member.name + '</span>';
+                    html += '<span style="font-size:12px;color:#0669FF;cursor:pointer;font-weight:500;" onclick="closeEvalPanel(\'' + member.name + '\')">▲ 收起</span>';
+                    html += '</div>';
+                    html += '<div class="eip-right">';
+                    html += '<textarea id="evalInput_' + member.name + '" rows="2" placeholder="请输入评价关键词..."></textarea>';
+                    html += '<div class="eip-tags">';
+                    html += '<span class="eip-tag" onclick="addEvalTag(\'' + member.name + '\',this)">专注认真</span>';
+                    html += '<span class="eip-tag" onclick="addEvalTag(\'' + member.name + '\',this)">团队协作</span>';
+                    html += '<span class="eip-tag" onclick="addEvalTag(\'' + member.name + '\',this)">动手能力强</span>';
+                    html += '<span class="eip-tag" onclick="addEvalTag(\'' + member.name + '\',this)">积极互动</span>';
+                    html += '<span class="eip-tag" onclick="addEvalTag(\'' + member.name + '\',this)">创新思维</span>';
+                    html += '</div>';
+                    html += '<div class="eip-progress" id="evalProg_' + member.name + '">';
+                    html += '<div class="eip-prog-text">🤖 AI正在生成评价...</div>';
+                    html += '<div class="eip-prog-track"><div class="eip-prog-fill" id="evalProgFill_' + member.name + '"></div></div>';
+                    html += '</div>';
+                    html += '<div class="eip-result-box" id="evalResult_' + member.name + '" contenteditable="true"></div>';
+                    html += '<div style="margin-top:6px;display:flex;gap:6px;" id="evalActions_' + member.name + '">';
+                    html += '<button class="eip-gen-btn" id="evalGenBtn_' + member.name + '" onclick="startEvalGenerate(\'' + member.name + '\')">✨ 生成评价</button>';
+                    html += '</div>';
+                    html += '</div></td></tr>';
+                }
+            }
+            tbody.innerHTML = html;
+        }
+
+        function getEvalData(name) {
+            var raw = localStorage.getItem('eval_' + currentReportOrderId + '_' + name);
+            if (!raw) return null;
+            try {
+                var parsed = JSON.parse(raw);
+                if (parsed && parsed.content) return parsed;
+            } catch(e) {}
+            return { input: '', content: raw };
+        }
+
+        function toggleEvalPanel(name) {
+            var data = getEvalData(name);
+            var panel = document.getElementById('evalPanel_' + name);
+            var isOpen = panel.classList.contains('show');
+
+            var allPanels = document.querySelectorAll('.eval-inline-panel.show');
+            for (var i = 0; i < allPanels.length; i++) {
+                allPanels[i].classList.remove('show');
+            }
+
+            if (!isOpen) {
+                panel.classList.add('show');
+                var input = document.getElementById('evalInput_' + name);
+                var resultBox = document.getElementById('evalResult_' + name);
+                var actions = document.getElementById('evalActions_' + name);
+                var btn = document.getElementById('evalGenBtn_' + name);
+
+                if (data) {
+                    // 查看模式：保留输入框（回显关键词）+ 展示结果 + 重新生成/保存
+                    input.value = data.input || '';
+                    input.style.display = '';
+                    resultBox.textContent = data.content;
+                    resultBox.setAttribute('contenteditable', 'false');
+                    resultBox.classList.add('show');
+                    var tags = panel.querySelector('.eip-tags');
+                    if (tags) tags.style.display = 'flex';
+                    // 替换按钮为 重新生成 + 保存
+                    actions.innerHTML = '';
+                    var regenBtn = document.createElement('button');
+                    regenBtn.className = 'eip-gen-btn';
+                    regenBtn.textContent = '🔄 重新生成';
+                    regenBtn.onclick = function() { reGenerateEval(name); };
+                    actions.appendChild(regenBtn);
+                    var saveBtn = document.createElement('button');
+                    saveBtn.className = 'eip-gen-btn';
+                    saveBtn.style.cssText = 'background:#D4A84B;border:none;color:#fff;padding:4px 12px;border-radius:4px;font-size:11px;cursor:pointer;font-weight:500;';
+                    saveBtn.textContent = '💾 保存';
+                    saveBtn.onclick = function() { saveEval(name); };
+                    actions.appendChild(saveBtn);
+                } else {
+                    // 编辑模式
+                    input.value = '';
+                    input.style.display = '';
+                    resultBox.classList.remove('show');
+                    resultBox.textContent = '';
+                    var tags = panel.querySelector('.eip-tags');
+                    if (tags) tags.style.display = 'flex';
+                    actions.innerHTML = '';
+                    var genBtn = document.createElement('button');
+                    genBtn.className = 'eip-gen-btn';
+                    genBtn.id = 'evalGenBtn_' + name;
+                    genBtn.textContent = '✨ 生成评价';
+                    genBtn.onclick = function() { startEvalGenerate(name); };
+                    actions.appendChild(genBtn);
+                }
+            }
+        }
+
+        function closeEvalPanel(name) {
+            document.getElementById('evalPanel_' + name).classList.remove('show');
+        }
+
+        function addEvalTag(name, el) {
+            var input = document.getElementById('evalInput_' + name);
+            var text = el.textContent;
+            var cur = input.value.trim();
+            input.value = cur ? cur + '、' + text : text;
+        }
+
+        function startEvalGenerate(name) {
+            var input = document.getElementById('evalInput_' + name);
+            var text = input.value.trim();
+            if (!text) { alert('请输入或选择评价关键词'); return; }
+            doEvalGenerate(name, text);
+        }
+
+        function reGenerateEval(name) {
+            var input = document.getElementById('evalInput_' + name);
+            var text = input.value.trim();
+            if (!text) { alert('请输入评价关键词'); return; }
+            doEvalGenerate(name, text);
+        }
+
+        function doEvalGenerate(name, text) {
+            var btn = document.getElementById('evalGenBtn_' + name);
+            if (!btn) {
+                btn = document.querySelector('#evalActions_' + name + ' button:first-child');
+            }
+            if (btn) { btn.disabled = true; btn.textContent = '⏳ 生成中...'; }
+            var prog = document.getElementById('evalProg_' + name);
+            prog.classList.add('show');
+            var fill = document.getElementById('evalProgFill_' + name);
+            var p = 0;
+            var timer = setInterval(function() {
+                p += Math.random() * 20 + 10;
+                if (p > 100) p = 100;
+                fill.style.width = p + '%';
+                if (p >= 100) {
+                    clearInterval(timer);
+                    var courseName = currentReportCourse ? currentReportCourse.courseName : '当前课程';
+                    var result = '【' + name + '】研学评价\n\n';
+                    var kws = text.split(/[、，,]/).filter(function(k) { return k.trim(); });
+                    kws.forEach(function(k) {
+                        var kw = k.trim();
+                        if (kw.indexOf('专注') !== -1) result += '▸ ' + kw + '：' + name + '在课程中非常专注，认真听取讲解并积极参与互动。\n';
+                        else if (kw.indexOf('团队') !== -1) result += '▸ ' + kw + '：' + name + '与同学配合默契，主动帮助他人，展现了良好的团队精神。\n';
+                        else if (kw.indexOf('动手') !== -1) result += '▸ ' + kw + '：' + name + '动手能力出色，在实践环节中表现出色，能独立完成任务。\n';
+                        else if (kw.indexOf('互动') !== -1) result += '▸ ' + kw + '：' + name + '课堂互动积极，勇于提问和表达自己的想法。\n';
+                        else if (kw.indexOf('创新') !== -1 || kw.indexOf('思维') !== -1) result += '▸ ' + kw + '：' + name + '在活动中展现了优秀的创新思维，提出了很多有价值的想法。\n';
+                        else result += '▸ ' + kw + '：' + name + '在本次研学中表现良好，值得肯定。\n';
+                    });
+                    result += '\n总体评价：' + name + '在本次课程中表现优秀，积极参与各个环节，收获丰富。';
+                    var resultBox = document.getElementById('evalResult_' + name);
+                    resultBox.textContent = result;
+                    resultBox.setAttribute('contenteditable', 'false');
+                    resultBox.classList.add('show');
+                    if (btn) { btn.disabled = false; btn.textContent = '🔄 重新生成'; }
+                    // 显示保存按钮
+                    var actions = document.getElementById('evalActions_' + name);
+                    if (actions && !actions.querySelector('.eval-save-btn')) {
+                        var saveBtn = document.createElement('button');
+                        saveBtn.className = 'eval-save-btn';
+                        saveBtn.style.cssText = 'background:#D4A84B;border:none;color:#fff;padding:4px 12px;border-radius:4px;font-size:11px;cursor:pointer;font-weight:500;';
+                        saveBtn.textContent = '💾 保存';
+                        saveBtn.onclick = function() { saveEval(name); };
+                        actions.appendChild(saveBtn);
+                    }
+                    setTimeout(function() { prog.classList.remove('show'); }, 500);
+                }
+            }, 250);
+        }
+
+        function saveEval(name) {
+            var resultBox = document.getElementById('evalResult_' + name);
+            var content = resultBox.textContent.trim();
+            if (!content) { alert('请先生成评价内容'); return; }
+            var input = document.getElementById('evalInput_' + name);
+            var inputText = input.value.trim();
+            var data = { input: inputText, content: content, saveTime: new Date().toLocaleString() };
+            localStorage.setItem('eval_' + currentReportOrderId + '_' + name, JSON.stringify(data));
+            var btn = document.getElementById('evalBtn_' + name);
+            btn.textContent = '查看评价';
+            btn.className = 'eval-btn eval-btn-view';
+            document.getElementById('evalPanel_' + name).classList.remove('show');
+            alert('✅ 评价保存成功！');
+        }
+
+        function handleReport(id) {
+            window.location.href = '研学报告管理.html?orderId=' + id;
+        }
+
+        // 点击遮罩关闭
+        document.getElementById('reportOverlay').addEventListener('click', function(e) {
+            if (e.target === this) closeReportModal();
+        });
+        var currentTab = 'all';
+        var currentPage = 1;
+        var pageSize = 8;
+        var filteredData = [];
+
+        function getStatusText(status) {
+            return statusMap[status] || status;
+        }
+
+        function getStatusClass(status) {
+            return 'status-tag ' + (statusClsMap[status] || '');
+        }
+
+        function getProgressValue(progress) {
+            var parts = progress.split('/');
+            if (parts.length === 2) {
+                var current = parseInt(parts[0]);
+                var total = parseInt(parts[1]);
+                if (total > 0) return Math.round((current / total) * 100);
+            }
+            return 0;
+        }
+
+        function getProgressBarClass(progress) {
+            var val = getProgressValue(progress);
+            if (val >= 100) return 'full';
+            if (val >= 50) return 'half';
+            return '';
+        }
+
+        function renderTable(data) {
+            var tbody = document.getElementById('tableBody');
+            var totalEl = document.getElementById('totalCount');
+            totalEl.textContent = data.length;
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>';
+                return;
+            }
+            var start = (currentPage - 1) * pageSize;
+            var end = Math.min(start + pageSize, data.length);
+            var pageData = data.slice(start, end);
+            var html = '';
+            for (var i = 0; i < pageData.length; i++) {
+                var item = pageData[i];
+                var statusName = getStatusText(item.status);
+                var statusCls = getStatusClass(item.status);
+                var progressVal = getProgressValue(item.progress);
+                var barCls = getProgressBarClass(item.progress);
+                html += '<tr>';
+                html += '<td><span style="color:#0669FF;cursor:pointer;" onclick="handleView(\'' + item.orderId + '\')">' + item.orderId + '</span></td>';
+                html += '<td>' + item.courseName + '</td>';
+                html += '<td>' + item.courseId + '</td>';
+                html += '<td>' + item.execAgency + '</td>';
+                html += '<td>' + item.sessionName + '</td>';
+                html += '<td>' + item.sessionTime + '</td>';
+                html += '<td style="font-weight:600;color:#D46B08;">' + item.amount + '</td>';
+                html += '<td>' + item.createTime + '</td>';
+                html += '<td>' + item.confirmDeadline + '</td>';
+                html += '<td>' + item.confirmTime + '</td>';
+                html += '<td><span class="' + statusCls + '">' + statusName + '</span></td>';
+                html += '<td>';
+                html += '<div class="progress-bar">';
+                html += '<span class="bar"><span class="fill ' + barCls + '" style="width:' + progressVal + '%"></span></span>';
+                html += '<span class="text">' + item.progress + '</span>';
+                html += '</div>';
+                html += '</td>';
+                html += '<td>';
+                html += '<button class="action-btn btn-view" onclick="handleView(\'' + item.orderId + '\')">查看</button>';
+                if (item.status === 'travel' || item.status === 'done') {
+                    html += '<button class="action-btn btn-report" onclick="handleReport(\'' + item.orderId + '\')">研学报告管理</button>';
+                }
+                html += '</td>';
+                html += '</tr>';
+            }
+            tbody.innerHTML = html;
+        }
+
+        function renderPagination(data) {
+            var el = document.getElementById('pagination');
+            var total = data.length;
+            var totalPages = Math.ceil(total / pageSize);
+            if (totalPages <= 1) { el.innerHTML = ''; return; }
+            var html = '<span class="page-info">共 ' + totalPages + ' 页</span>';
+            html += '<button class="page-btn' + (currentPage <= 1 ? ' disabled' : '') + '" onclick="goPage(' + (currentPage - 1) + ')">‹</button>';
+            for (var p = 1; p <= totalPages; p++) {
+                if (p === currentPage) {
+                    html += '<button class="page-btn active">' + p + '</button>';
+                } else if (p <= 3 || p > totalPages - 2 || Math.abs(p - currentPage) <= 1) {
+                    html += '<button class="page-btn" onclick="goPage(' + p + ')">' + p + '</button>';
+                } else if (p === 4 && currentPage > 4) {
+                    html += '<button class="page-btn disabled" style="border:none;">…</button>';
+                }
+            }
+            html += '<button class="page-btn' + (currentPage >= totalPages ? ' disabled' : '') + '" onclick="goPage(' + (currentPage + 1) + ')">›</button>';
+            el.innerHTML = html;
+        }
+
+        function goPage(page) {
+            var total = filteredData.length;
+            var totalPages = Math.ceil(total / pageSize);
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            renderTable(filteredData);
+            renderPagination(filteredData);
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            var tabs = document.querySelectorAll('.tab-item');
+            for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('active');
+            document.querySelector('.tab-item[data-tab="' + tab + '"]').classList.add('active');
+            doFilter();
+        }
+
+        function doFilter() {
+            var orderId = document.getElementById('searchOrderId').value.trim().toLowerCase();
+            var productId = document.getElementById('searchProductId').value.trim().toLowerCase();
+            var sessionName = document.getElementById('searchSessionName').value.trim().toLowerCase();
+            var createTime = document.getElementById('searchCreateTime').value;
+            var confirmTime = document.getElementById('searchConfirmTime').value;
+            var verifyAgency = document.getElementById('searchVerifyAgency').value;
+            var execAgency = document.getElementById('searchExecAgency').value;
+
+            filteredData = mockData.filter(function(item) {
+                if (currentTab !== 'all' && item.status !== currentTab) return false;
+                if (orderId && !item.orderId.toLowerCase().includes(orderId)) return false;
+                if (productId && !item.courseId.toLowerCase().includes(productId)) return false;
+                if (sessionName && !item.sessionName.toLowerCase().includes(sessionName)) return false;
+                if (createTime && item.createTime.indexOf(createTime) !== 0) return false;
+                if (execAgency && item.execAgency !== execAgency) return false;
+                return true;
+            });
+
+            currentPage = 1;
+            renderTable(filteredData);
+            renderPagination(filteredData);
+        }
+
+        function handleSearch() {
+            doFilter();
+        }
+
+        function handleReset() {
+            document.getElementById('searchOrderId').value = '';
+            document.getElementById('searchProductId').value = '';
+            document.getElementById('searchSessionName').value = '';
+            document.getElementById('searchCreateTime').value = '';
+            document.getElementById('searchConfirmTime').value = '';
+            document.getElementById('searchVerifyAgency').value = '';
+            document.getElementById('searchExecAgency').value = '';
+            doFilter();
+        }
+
+        function handleView(id) {
+            alert('📄 查看拼团订单详情：' + id);
+        }
+
+        function handleExport() {
+            alert('📥 导出拼团订单数据');
+        }
+
+        // 初始化
+        doFilter();
+    </script>
+<a href="index.html" style="position:fixed;top:12px;right:16px;z-index:99999;background:#E53935;color:#fff;padding:7px 16px;border-radius:20px;text-decoration:none;font-size:13px;font-weight:600;box-shadow:0 2px 10px rgba(229,57,53,0.4);display:inline-flex;align-items:center;gap:5px;">🏠 首页</a>
+</body>
+</html>

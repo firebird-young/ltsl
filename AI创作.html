@@ -9,17 +9,7 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
             background: #f5f7fa;
-            display: flex;
-            justify-content: center;
             min-height: 100vh;
-        }
-        .app-container {
-            width: 100%;
-            max-width: 430px;
-            background: #f5f7fa;
-            min-height: 100vh;
-            position: relative;
-            box-shadow: 0 0 20px rgba(0,0,0,0.05);
         }
 
         /* ===== 顶部导航 ===== */
@@ -300,96 +290,203 @@
         .gen-popup .gp-btns button:active { opacity: 0.85; }
         .gp-btn-primary { background: #0669FF; color: #fff; }
         .gp-btn-secondary { background: #f5f5f5; color: #666; }
+
+        /* ===== 双栏布局 & 文档面板 ===== */
+        .page-wrap {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            min-height: 100vh;
+            align-items: flex-start;
+            justify-content: center;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 430px;
+            background: #f5f7fa;
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
+        .doc-panel {
+            width: 560px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            padding: 24px 28px;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', Arial, sans-serif;
+            line-height: 1.7;
+            font-size: 14px;
+            color: #333;
+        }
+        .doc-panel::-webkit-scrollbar { width: 5px; }
+        .doc-panel::-webkit-scrollbar-thumb { background: #d0d5e0; border-radius: 3px; }
+        .doc-panel .doc-title { font-size: 20px; font-weight: 700; color: #1F3864; border-bottom: 2px solid #2E75B6; padding-bottom: 10px; margin-bottom: 16px; }
+        .doc-panel h3 { font-size: 16px; font-weight: 600; color: #2E75B6; margin: 16px 0 8px; }
+        .doc-panel h4 { font-size: 14px; font-weight: 600; color: #333; margin: 12px 0 6px; }
+        .doc-panel p { font-size: 13px; color: #555; margin-bottom: 6px; }
+        .doc-panel ul { padding-left: 20px; margin: 4px 0 8px; }
+        .doc-panel li { margin-bottom: 3px; font-size: 13px; color: #555; }
+        .doc-panel ol { padding-left: 20px; margin: 4px 0 8px; }
+        .doc-panel ol li { margin-bottom: 4px; font-size: 13px; color: #555; }
+        .doc-panel .doc-section { margin-bottom: 6px; }
+
+        @media (max-width: 1100px) {
+            .page-wrap { flex-direction: column; align-items: center; }
+            .doc-panel { width: 100%; max-width: 430px; max-height: none; }
+        }
     </style>
 </head>
 <body>
-<div class="app-container">
-    <!-- 顶部导航 -->
-    <div class="top-nav">
-        <button class="back-btn" onclick="goBack()">‹</button>
-        <div class="top-nav-title">AI创作</div>
-    </div>
-
-    <!-- ====== 创作区 ====== -->
-    <div class="creation-area">
-        <div class="course-bar">
-            <span class="cb-icon">🎨</span>
-            <span class="cb-text">我为杜甫建茅屋</span>
+<div class="page-wrap">
+    <div class="app-container">
+        <!-- 顶部导航 -->
+        <div class="top-nav">
+            <button class="back-btn" onclick="goBack()">‹</button>
+            <div class="top-nav-title">AI创作</div>
         </div>
 
-        <div class="tab-bar">
-            <button class="tab-item active" onclick="switchTab('video')" id="tabVideo">🎬 视频创作</button>
-            <button class="tab-item" onclick="switchTab('game')" id="tabGame">🎮 游戏创作</button>
+        <!-- ====== 创作区 ====== -->
+        <div class="creation-area">
+            <div class="course-bar">
+                <span class="cb-icon">🎨</span>
+                <span class="cb-text">我为杜甫建茅屋</span>
+            </div>
+
+            <div class="tab-bar">
+                <button class="tab-item active" onclick="switchTab('video')" id="tabVideo">🎬 视频创作</button>
+                <button class="tab-item" onclick="switchTab('game')" id="tabGame">🎮 游戏创作</button>
+            </div>
+
+            <div class="tip-area">
+                <div class="tip-title" id="tipTitle">AI创作视频</div>
+                <div class="tip-desc" id="tipDesc">输入主题或描述，AI自动为你生成精彩的小视频</div>
+            </div>
+
+            <div class="prompt-box">
+                <textarea id="promptInput" rows="3" placeholder="输入创作描述，如：杜甫在草堂前与李白相遇..."></textarea>
+            </div>
+
+            <div class="templates" id="templateList">
+                <span class="template-chip" onclick="useTemplate(this)">杜甫在草堂前与李白相遇</span>
+                <span class="template-chip" onclick="useTemplate(this)">茅屋搭建的完整过程</span>
+                <span class="template-chip" onclick="useTemplate(this)">杜甫与李白的诗歌对谈</span>
+            </div>
+
+            <div class="name-input-wrap">
+                <input type="text" id="nameInput" placeholder="给作品起个名字吧" maxlength="20">
+            </div>
+
+            <div class="gen-btn-wrap">
+                <button class="gen-btn" id="genBtn" onclick="startGenerate()">✨ 立即生成</button>
+            </div>
+
+            <div class="progress-bar-wrap" id="progressBarWrap">
+                <div class="pb-text" id="progressText">🤖 AI正在创作中，请稍候...</div>
+                <div class="progress-track">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
         </div>
 
-        <div class="tip-area">
-            <div class="tip-title" id="tipTitle">AI创作视频</div>
-            <div class="tip-desc" id="tipDesc">输入主题或描述，AI自动为你生成精彩的研学视频</div>
+        <!-- ====== 作品区 ====== -->
+        <div class="works-area">
+            <div id="videoWorksSection">
+                <div class="works-section">
+                    <div class="ws-title">⏳ 创作中 <span class="ws-count" id="videoGenCount">0</span></div>
+                    <div class="ws-grid" id="videoGeneratingList"></div>
+                </div>
+                <div class="works-section">
+                    <div class="ws-title">✅ 已完成 <span class="ws-count" id="videoDoneCount">0</span></div>
+                    <div class="ws-grid" id="videoDoneList"></div>
+                </div>
+            </div>
+            <div id="gameWorksSection" style="display:none;">
+                <div class="works-section">
+                    <div class="ws-title">⏳ 创作中 <span class="ws-count" id="gameGenCount">0</span></div>
+                    <div class="ws-grid" id="gameGeneratingList"></div>
+                </div>
+                <div class="works-section">
+                    <div class="ws-title">✅ 已完成 <span class="ws-count" id="gameDoneCount">0</span></div>
+                    <div class="ws-grid" id="gameDoneList"></div>
+                </div>
+            </div>
         </div>
 
-        <div class="prompt-box">
-            <textarea id="promptInput" rows="3" placeholder="输入创作描述，如：杜甫在草堂前与李白相遇..."></textarea>
-        </div>
-
-        <div class="templates" id="templateList">
-            <span class="template-chip" onclick="useTemplate(this)">杜甫在草堂前与李白相遇</span>
-            <span class="template-chip" onclick="useTemplate(this)">茅屋搭建的完整过程</span>
-            <span class="template-chip" onclick="useTemplate(this)">杜甫与李白的诗歌对谈</span>
-        </div>
-
-        <div class="name-input-wrap">
-            <input type="text" id="nameInput" placeholder="给作品起个名字吧" maxlength="20">
-        </div>
-
-        <div class="gen-btn-wrap">
-            <button class="gen-btn" id="genBtn" onclick="startGenerate()">✨ 立即生成</button>
-        </div>
-
-        <div class="progress-bar-wrap" id="progressBarWrap">
-            <div class="pb-text" id="progressText">🤖 AI正在创作中，请稍候...</div>
-            <div class="progress-track">
-                <div class="progress-fill" id="progressFill"></div>
+        <!-- 弹窗 -->
+        <div class="gen-overlay" id="genOverlay">
+            <div class="gen-popup">
+                <div class="gp-icon">⏳</div>
+                <h3>正在生成中</h3>
+                <p>稍后可以在作品中查看</p>
+                <div class="gp-btns">
+                    <button class="gp-btn-primary" onclick="laterView()">稍后查看</button>
+                    <button class="gp-btn-secondary" onclick="continueWait()">继续等待</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- ====== 作品区 ====== -->
-    <div class="works-area">
-        <!-- AI视频作品 -->
-        <div id="videoWorksSection">
-            <div class="works-section">
-                <div class="ws-title">⏳ 创作中 <span class="ws-count" id="videoGenCount">0</span></div>
-                <div class="ws-grid" id="videoGeneratingList"></div>
-            </div>
-            <div class="works-section">
-                <div class="ws-title">✅ 已完成 <span class="ws-count" id="videoDoneCount">0</span></div>
-                <div class="ws-grid" id="videoDoneList"></div>
-            </div>
+    <!-- 功能说明文档 -->
+    <div class="doc-panel">
+        <div class="doc-title">AI创作模块 - 功能说明</div>
+
+        <div class="doc-section">
+            <h3>1 页面概述</h3>
+            <p>AI创作页面是用户使用AI生成视频和游戏作品的核心功能页面。页面分为上下两大区域：上部为创作区（输入描述、选择模板、生成作品），下部为作品区（展示创作中和已完成的作品列表）。</p>
         </div>
 
-        <!-- AI游戏作品 -->
-        <div id="gameWorksSection" style="display:none;">
-            <div class="works-section">
-                <div class="ws-title">⏳ 创作中 <span class="ws-count" id="gameGenCount">0</span></div>
-                <div class="ws-grid" id="gameGeneratingList"></div>
-            </div>
-            <div class="works-section">
-                <div class="ws-title">✅ 已完成 <span class="ws-count" id="gameDoneCount">0</span></div>
-                <div class="ws-grid" id="gameDoneList"></div>
-            </div>
-        </div>
-    </div>
+        <div class="doc-section">
+            <h3>2 页面布局</h3>
+            <h4>2.1 创作区（上部）</h4>
+            <p>从上到下排列：</p>
+            <ol>
+                <li>课程横幅：显示当前课程名称</li>
+                <li>Tab切换栏：视频创作 / 游戏创作</li>
+                <li>提示文案区：标题 + 描述文字</li>
+                <li>Prompt输入框：支持多行输入</li>
+                <li>快速提示词标签：点击填充Prompt输入框（后台研学手记配置里设置快速标签）</li>
+                <li>作品名称输入框</li>
+                <li>立即生成按钮</li>
+                <li>进度条：生成过程中显示，完成后自动消失</li>
+            </ol>
 
-    <!-- 弹窗 -->
-    <div class="gen-overlay" id="genOverlay">
-        <div class="gen-popup">
-            <div class="gp-icon">⏳</div>
-            <h3>正在生成中</h3>
-            <p>稍后可以在作品中查看</p>
-            <div class="gp-btns">
-                <button class="gp-btn-primary" onclick="laterView()">稍后查看</button>
-                <button class="gp-btn-secondary" onclick="continueWait()">继续等待</button>
-            </div>
+            <h4>2.2 作品区（下部）</h4>
+            <p>作品区根据当前Tab显示对应类型的作品列表：</p>
+            <ul>
+                <li>AI视频作品板块（视频Tab下显示）/ AI游戏作品板块（游戏Tab下显示）</li>
+                <li>创作中子版块：灰色封面 + 生成中标签，显示作品数量角标</li>
+                <li>已完成子版块：正常封面 + 播放按钮，显示作品数量角标</li>
+                <li>每个作品卡片下方有删除按钮（✕），可删除作品</li>
+                <li>作品为空时显示"暂无作品"提示</li>
+            </ul>
+        </div>
+
+        <div class="doc-section">
+            <h3>3 功能说明</h3>
+
+            <h4>3.1 Tab切换</h4>
+            <ul>
+                <li>视频创作Tab：提示文案为"输入主题或描述，AI自动为你生成精彩的视频"，模板为诗歌/故事类描述</li>
+                <li>游戏创作Tab：提示文案为"描述你想要的游戏玩法，AI为你设计互动游戏"，模板为游戏玩法描述</li>
+                <li>切换Tab时清空输入内容，重置生成状态</li>
+            </ul>
+
+            <h4>3.2 生成流程</h4>
+            <ol>
+                <li>用户输入描述（或点击模板填充），输入作品名称，点击"立即生成"。<strong style="color:#E53935;">这里传给AI模型的最终提示词是（系统提示词+系统规格参数+运营提示词+运营规格参数+用户提示词），如果效果不好可能需要先经过AI文本模型梳理一遍（这个会增长链路，待定，根据实际效果决定要不要加）</strong></li>
+                <li>弹出"正在生成中"弹窗，提供两个选项：<ul>
+                    <li>稍后查看：作品加入创作中列表，灰色封面（ui给个默认图）+生成中标签</li>
+                    <li>继续等待：显示进度条，模拟生成进度（视频10s轮询一次，游戏8s轮询一次，暂定，后续根据实际开发调整），完成后移至已完成列表</li>
+                </ul></li>
+                <li>游戏作品点击封面可跳转运行游戏（比如跳转到搭建小茅屋.html）</li>
+                <li>作品卡片右下角✕按钮可删除该作品</li>
+            </ol>
+
+            <h4>3.3 作品管理</h4>
+            <p>作品按类型（视频/游戏）自动分类展示。每个类型下再分为"创作中"和"已完成"两个列表。生成中的作品显示灰色封面和"生成中"标签，完成后恢复正常显示。用户可以随时删除作品。</p>
         </div>
     </div>
 </div>
@@ -580,5 +677,6 @@
     // 初始化
     switchTab('video');
 </script>
+<a href="index.html" style="position:fixed;top:12px;right:16px;z-index:99999;background:#E53935;color:#fff;padding:7px 16px;border-radius:20px;text-decoration:none;font-size:13px;font-weight:600;box-shadow:0 2px 10px rgba(229,57,53,0.4);display:inline-flex;align-items:center;gap:5px;">🏠 首页</a>
 </body>
 </html>

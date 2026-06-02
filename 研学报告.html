@@ -9,8 +9,6 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
             background: #f5f7fa;
-            display: flex;
-            justify-content: center;
             min-height: 100vh;
         }
         .app-container {
@@ -55,7 +53,6 @@
             font-size: 17px;
             font-weight: 600;
             color: #333;
-            padding-right: 32px;
         }
 
         /* ===== 学生信息头部 ===== */
@@ -397,121 +394,513 @@
         .bottom-spacer {
             height: 30px;
         }
+
+        /* ===== 双栏布局 & 文档面板 ===== */
+        .page-wrap {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            min-height: 100vh;
+            align-items: flex-start;
+            justify-content: center;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 430px;
+            background: #fff;
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
+        .doc-panel {
+            width: 560px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            padding: 24px 28px;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', Arial, sans-serif;
+            line-height: 1.7;
+            font-size: 14px;
+            color: #333;
+        }
+        .doc-panel::-webkit-scrollbar { width: 5px; }
+        .doc-panel::-webkit-scrollbar-thumb { background: #d0d5e0; border-radius: 3px; }
+        .doc-panel .doc-title { font-size: 20px; font-weight: 700; color: #1F3864; border-bottom: 2px solid #2E75B6; padding-bottom: 10px; margin-bottom: 16px; }
+        .doc-panel h3 { font-size: 16px; font-weight: 600; color: #2E75B6; margin: 16px 0 8px; }
+        .doc-panel h4 { font-size: 14px; font-weight: 600; color: #333; margin: 12px 0 6px; }
+        .doc-panel p { font-size: 13px; color: #555; margin-bottom: 6px; }
+        .doc-panel ul { padding-left: 20px; margin: 4px 0 8px; }
+        .doc-panel li { margin-bottom: 3px; font-size: 13px; color: #555; }
+        .doc-panel ol { padding-left: 20px; margin: 4px 0 8px; }
+        .doc-panel ol li { margin-bottom: 4px; font-size: 13px; color: #555; }
+        .doc-panel .doc-section { margin-bottom: 6px; }
+
+        @media (max-width: 1100px) {
+            .page-wrap { flex-direction: column; align-items: center; }
+            .doc-panel { width: 100%; max-width: 430px; max-height: none; }
+        }
+
+        /* ===== 底部分享栏（app容器内吸底） ===== */
+        .bottom-share-bar {
+            position: sticky;
+            bottom: 0;
+            z-index: 1000;
+            background: #fff;
+            border-top: 1px solid #e8e8e8;
+            padding: 10px 16px;
+            display: flex;
+            justify-content: center;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.06);
+        }
+        .bottom-share-bar .bs-btn {
+            width: 100%;
+            max-width: 380px;
+            padding: 12px 0;
+            border-radius: 10px;
+            border: none;
+            background: #07C160;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+        .bottom-share-bar .bs-btn:hover { background: #06AD56; }
+        .bottom-share-bar .bs-btn:active { background: #059A4C; }
+
+        /* ===== 分享弹窗 ===== */
+        .share-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.55);
+            z-index: 99999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .share-overlay.show { display: flex; }
+        .share-modal {
+            background: #fff;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.2);
+            animation: popIn 0.25s ease-out;
+            overflow: hidden;
+        }
+        .share-modal .sm-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .share-modal .sm-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+        .share-modal .sm-header .sm-close {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: none;
+            background: #f5f5f5;
+            font-size: 16px;
+            color: #999;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .share-modal .sm-body {
+            padding: 30px 20px 32px;
+            text-align: center;
+        }
+        .share-modal .sm-body .sm-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 24px;
+        }
+        .share-modal .sm-body .sm-share-row {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+        }
+        .share-modal .sm-body .sm-share-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: transform 0.15s;
+        }
+        .share-modal .sm-body .sm-share-item:active { transform: scale(0.92); }
+        .share-modal .sm-body .sm-share-item .ssi-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .share-modal .sm-body .sm-share-item .ssi-icon.wechat {
+            background: #07C160;
+            color: #fff;
+        }
+        .share-modal .sm-body .sm-share-item .ssi-icon.moments {
+            background: #FFC300;
+            color: #fff;
+        }
+        .share-modal .sm-body .sm-share-item .ssi-icon.download {
+            background: #0669FF;
+            color: #fff;
+        }
+        .share-modal .sm-body .sm-share-item .ssi-label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* ===== 下载报告弹窗 ===== */
+        .dl-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.55);
+            z-index: 99999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .dl-overlay.show { display: flex; }
+        .dl-modal {
+            background: #fff;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 340px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.2);
+            animation: popIn 0.25s ease-out;
+            overflow: hidden;
+        }
+        .dl-modal .dl-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .dl-modal .dl-header h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+        }
+        .dl-modal .dl-header .dl-close {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: none;
+            background: #f5f5f5;
+            font-size: 14px;
+            color: #999;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .dl-modal .dl-body {
+            padding: 20px 18px 24px;
+            text-align: center;
+        }
+        .dl-modal .dl-body .dl-preview {
+            width: 100%;
+            aspect-ratio: 3 / 4;
+            background: #f5f7fa;
+            border-radius: 10px;
+            border: 1px solid #e8e8e8;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 18px;
+            overflow: hidden;
+        }
+        .dl-modal .dl-body .dl-preview .dl-preview-icon {
+            font-size: 40px;
+            color: #0669FF;
+        }
+        .dl-modal .dl-body .dl-preview .dl-preview-text {
+            font-size: 13px;
+            color: #999;
+        }
+        .dl-modal .dl-body .dl-qr-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+        .dl-modal .dl-body .dl-qr-wrap .dl-qr-box {
+            width: 120px;
+            height: 120px;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            color: #333;
+        }
+        .dl-modal .dl-body .dl-qr-wrap .dl-qr-label {
+            font-size: 11px;
+            color: #999;
+        }
+        .dl-modal .dl-body .dl-qr-wrap .dl-qr-label strong {
+            color: #07C160;
+        }
     </style>
 </head>
 <body>
 
-<div class="app-container">
-    <!-- 顶部导航 -->
-    <div class="top-nav">
-        <button class="back-btn" onclick="goBack()">‹</button>
-        <div class="top-nav-title">研学报告</div>
+<div class="page-wrap">
+    <div class="app-container">
+        <!-- 顶部导航 -->
+        <div class="top-nav">
+            <button class="back-btn" onclick="goBack()">‹</button>
+            <div class="top-nav-title">研学报告</div>
+        </div>
+
+        <!-- 学生信息头部 -->
+        <div class="student-header">
+            <div class="student-top-row">
+                <div class="student-avatar">📄</div>
+                <div class="student-info-text">
+                    <div class="s-name" id="sName">张晓宇 <span>研学报告</span></div>
+                    <div class="s-course" id="sCourse">🏚️ 我为杜甫建茅屋</div>
+                    <div class="s-time" id="sTime">📅 2026.5.28 14:00 - 17:00</div>
+                </div>
+                <div class="switch-btn-wrap">
+                    <div class="switch-btn" onclick="showSwitchPopup()">
+                        切换报告人
+                        <span>▼</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 统计卡片 -->
+        <div class="stats-card">
+            <div class="stat-item">
+                <div class="stat-value">3</div>
+                <div class="stat-label">AI作品数</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">5h</div>
+                <div class="stat-label">研学时长</div>
+            </div>
+        </div>
+
+        <!-- ===== 研学内容 ===== -->
+        <div class="module-card">
+            <div class="module-header">
+                <div class="mh-icon blue">📖</div>
+                <h3>研学内容</h3>
+            </div>
+            <div style="font-size:13px;color:#555;line-height:1.9;">
+                本次课程首先探访了杜甫草堂，了解诗圣在成都的生活与创作背景；随后学习了传统茅屋的搭建结构、材料选择和力学原理；在动手实践环节，分组协作搭建茅屋模型，体验古代工匠的智慧；最后整理笔记，记录搭建过程中的感悟与发现。
+            </div>
+        </div>
+
+        <!-- ===== AI作品 ===== -->
+        <div class="module-card">
+            <div class="module-header">
+                <div class="mh-icon purple">🎨</div>
+                <h3>AI作品</h3>
+            </div>
+            <div class="ai-works-section">
+                <div>
+                    <div class="aw-row-label">🎬 AI创作视频 <span class="aw-badge">共2个</span></div>
+                    <div class="aw-scroll-row">
+                        <div class="aw-scroll-item">
+                            <div class="aw-img-wrap">
+                                <img src="杜甫的家" alt="杜甫的家">
+                                <div class="aw-play-btn">▶</div>
+                            </div>
+                            <div class="aw-label">杜甫的家</div>
+                        </div>
+                        <div class="aw-scroll-item">
+                            <div class="aw-img-wrap">
+                                <img src="杜甫和李白.png" alt="杜甫和李白">
+                                <div class="aw-play-btn">▶</div>
+                            </div>
+                            <div class="aw-label">杜甫和李白</div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="aw-row-label">🎮 AI创作游戏 <span class="aw-badge">共1个</span></div>
+                    <div class="aw-scroll-row">
+                        <div class="aw-scroll-item">
+                            <div class="aw-img-wrap">
+                                <img src="快速搭建茅屋" alt="快速搭建茅屋">
+                                <div class="aw-play-btn">▶</div>
+                            </div>
+                            <div class="aw-label">快速搭建茅屋</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 评价 ===== -->
+        <div class="module-card">
+            <div class="module-header">
+                <div class="mh-icon orange">⭐</div>
+                <h3>研学评价</h3>
+            </div>
+            <div style="font-size:13px;color:#555;line-height:1.9;">
+                晓宇在搭建茅屋时非常专注，主动帮助其他组员调整结构，展现了很好的团队协作精神。对茅屋的力学原理理解也很到位，在模型搭建中反复尝试优化，体现了优秀的动手能力和探索精神。
+            </div>
+        </div>
+
+        <div class="bottom-spacer"></div>
+
+        <!-- 底部固定分享 -->
+        <div class="bottom-share-bar">
+            <button class="bs-btn" onclick="openShare()">📤 分享研学报告</button>
+        </div>
+
+        <!-- 切换用户弹窗 -->
+        <div class="switch-overlay" id="switchOverlay">
+            <div class="switch-popup">
+                <div class="sp-title">👤 切换报告人</div>
+                <div class="sp-item active" onclick="switchUser('张晓宇', '🏚️ 我为杜甫建茅屋', '📅 2026.5.28 14:00 - 17:00')">张晓宇</div>
+                <div class="sp-item" onclick="switchUser('杨梅', '🏚️ 我为杜甫建茅屋', '📅 2026.5.10 09:00 - 12:00')">杨梅</div>
+                <div class="sp-item" onclick="switchUser('刘飞', '🌿 盆景美学·指尖上山水', '📅 2026.5.15 09:00 - 11:30')">刘飞</div>
+                <div class="sp-item" onclick="switchUser('王浩宇', '🏯 诗境无界·草堂寻心', '📅 2026.1.15 14:00 - 17:00')">王浩宇</div>
+                <button class="sp-close" onclick="closeSwitchPopup()">取消</button>
+            </div>
+        </div>
     </div>
 
-    <!-- 学生信息头部 -->
-    <div class="student-header">
-        <div class="student-top-row">
-            <div class="student-avatar">📄</div>
-            <div class="student-info-text">
-                <div class="s-name" id="sName">张晓宇 <span>研学报告</span></div>
-                <div class="s-course" id="sCourse">🏚️ 我为杜甫建茅屋</div>
-                <div class="s-time" id="sTime">📅 2026.5.28 14:00 - 17:00</div>
+    <!-- ===== 分享弹窗 ===== -->
+    <div class="share-overlay" id="shareOverlay">
+        <div class="share-modal">
+            <div class="sm-header">
+                <h3>📤 分享研学报告</h3>
+                <button class="sm-close" onclick="closeShare()">✕</button>
             </div>
-            <div class="switch-btn-wrap">
-                <div class="switch-btn" onclick="showSwitchPopup()">
-                    切换报告人
-                    <span>▼</span>
+            <div class="sm-body">
+                <div class="sm-title">分享研学报告</div>
+                <div class="sm-share-row">
+                    <div class="sm-share-item" onclick="shareToWeChatFriend()">
+                        <div class="ssi-icon wechat">💬</div>
+                        <span class="ssi-label">分享给好友</span>
+                    </div>
+                    <div class="sm-share-item" onclick="shareToMoments()">
+                        <div class="ssi-icon moments">🔄</div>
+                        <span class="ssi-label">分享到朋友圈</span>
+                    </div>
+                    <div class="sm-share-item" onclick="downloadShareImage()">
+                        <div class="ssi-icon download">💾</div>
+                        <span class="ssi-label">下载报告</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 统计卡片 -->
-    <div class="stats-card">
-        <div class="stat-item">
-            <div class="stat-value">3</div>
-            <div class="stat-label">AI作品数</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-value">5h</div>
-            <div class="stat-label">研学时长</div>
-        </div>
-    </div>
-
-    <!-- ===== 研学内容 ===== -->
-    <div class="module-card">
-        <div class="module-header">
-            <div class="mh-icon blue">📖</div>
-            <h3>研学内容</h3>
-        </div>
-        <div style="font-size:13px;color:#555;line-height:1.9;">
-            本次课程首先探访了杜甫草堂，了解诗圣在成都的生活与创作背景；随后学习了传统茅屋的搭建结构、材料选择和力学原理；在动手实践环节，分组协作搭建茅屋模型，体验古代工匠的智慧；最后整理笔记，记录搭建过程中的感悟与发现。
-        </div>
-    </div>
-
-    <!-- ===== AI作品 ===== -->
-    <div class="module-card">
-        <div class="module-header">
-            <div class="mh-icon purple">🎨</div>
-            <h3>AI作品</h3>
-        </div>
-        <div class="ai-works-section">
-            <div>
-                <div class="aw-row-label">🎬 AI创作视频 <span class="aw-badge">共2个</span></div>
-                <div class="aw-scroll-row">
-                    <div class="aw-scroll-item">
-                        <div class="aw-img-wrap">
-                            <img src="杜甫的家" alt="杜甫的家">
-                            <div class="aw-play-btn">▶</div>
-                        </div>
-                        <div class="aw-label">杜甫的家</div>
-                    </div>
-                    <div class="aw-scroll-item">
-                        <div class="aw-img-wrap">
-                            <img src="杜甫和李白.png" alt="杜甫和李白">
-                            <div class="aw-play-btn">▶</div>
-                        </div>
-                        <div class="aw-label">杜甫和李白</div>
-                    </div>
-                </div>
+    <!-- ===== 下载报告弹窗 ===== -->
+    <div class="dl-overlay" id="dlOverlay">
+        <div class="dl-modal">
+            <div class="dl-header">
+                <h3>📥 下载研学报告</h3>
+                <button class="dl-close" onclick="closeDl()">✕</button>
             </div>
-            <div>
-                <div class="aw-row-label">🎮 AI创作游戏 <span class="aw-badge">共1个</span></div>
-                <div class="aw-scroll-row">
-                    <div class="aw-scroll-item">
-                        <div class="aw-img-wrap">
-                            <img src="快速搭建茅屋" alt="快速搭建茅屋">
-                            <div class="aw-play-btn">▶</div>
-                        </div>
-                        <div class="aw-label">快速搭建茅屋</div>
-                    </div>
+            <div class="dl-body">
+                <div class="dl-preview">
+                    <div class="dl-preview-icon">📄</div>
+                    <div class="dl-preview-text">研学报告预览</div>
+                </div>
+                <div class="dl-qr-wrap">
+                    <div class="dl-qr-box">⬜</div>
+                    <div class="dl-qr-label">长按识别小程序码，加入 <strong>离泰数链</strong> </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ===== 评价 ===== -->
-    <div class="module-card">
-        <div class="module-header">
-            <div class="mh-icon orange">⭐</div>
-            <h3>研学评价</h3>
-        </div>
-        <div style="font-size:13px;color:#555;line-height:1.9;">
-            晓宇在搭建茅屋时非常专注，主动帮助其他组员调整结构，展现了很好的团队协作精神。对茅屋的力学原理理解也很到位，在模型搭建中反复尝试优化，体现了优秀的动手能力和探索精神。
-        </div>
-    </div>
+    <!-- 功能说明文档 -->
+    <div class="doc-panel">
+        <div class="doc-title">研学报告模块 - 功能说明</div>
 
-    <div class="bottom-spacer"></div>
+        <div class="doc-section">
+            <h3>1 页面概述</h3>
+            <p>研学报告页面是展示单个学生的完整研学报告详情页，包含学生的研学内容记录、AI创作作品展示和研学评价三大模块。页面支持切换报告人，查看不同学生的研学报告（必须是当前登录用户在该订单下面填报的成员）。</p>
+        </div>
 
-    <!-- 切换用户弹窗 -->
-    <div class="switch-overlay" id="switchOverlay">
-        <div class="switch-popup">
-            <div class="sp-title">👤 切换报告人</div>
-            <div class="sp-item active" onclick="switchUser('张晓宇', '🏚️ 我为杜甫建茅屋', '📅 2026.5.28 14:00 - 17:00')">张晓宇</div>
-            <div class="sp-item" onclick="switchUser('杨梅', '🏚️ 我为杜甫建茅屋', '📅 2026.5.10 09:00 - 12:00')">杨梅</div>
-            <div class="sp-item" onclick="switchUser('刘飞', '🌿 盆景美学·指尖上山水', '📅 2026.5.15 09:00 - 11:30')">刘飞</div>
-            <div class="sp-item" onclick="switchUser('王浩宇', '🏯 诗境无界·草堂寻心', '📅 2026.1.15 14:00 - 17:00')">王浩宇</div>
-            <button class="sp-close" onclick="closeSwitchPopup()">取消</button>
+        <div class="doc-section">
+            <h3>2 页面布局</h3>
+            <p>页面从上到下分为以下区域：</p>
+            <ol>
+                <li><strong>学生信息头部</strong>：展示学生头像（需要有个默认头像）、姓名、课程名称、课程时间，右上角有"切换报告人"按钮</li>
+                <li><strong>统计卡片</strong>：浮动在学生信息头部下方，展示AI作品数和研学时长两项统计数据</li>
+                <li><strong>研学内容模块</strong>：展示本次课程的详细研学内容文本</li>
+                <li><strong>AI作品模块</strong>：分视频和游戏两类展示AI创作作品，每类以横向滑动列表展示，每个作品有封面图和播放按钮。<strong style="color:#E53935;">注意这里只展示已完成的AI作品</strong></li>
+                <li><strong>研学评价模块</strong>：展示对该学生的研学评价文本</li>
+            </ol>
+        </div>
+
+        <div class="doc-section">
+            <h3>3 功能说明</h3>
+
+            <h4>3.1 切换报告人</h4>
+            <ul>
+                <li>点击学生信息头部的"切换报告人"按钮，弹出操作浮层</li>
+                <li>浮层中列出可选的学生名单，每个选项显示学生姓名</li>
+                <li>选中后页面数据（课程名称、时间、研学内容、AI作品、评价等）会随之切换显示对应的内容</li>
+                <li>支持点击遮罩层关闭弹窗</li>
+            </ul>
+
+            <h4>3.2 统计卡片</h4>
+            <ul>
+                <li>显示两个核心数据：AI作品总数、研学总时长</li>
+                <li>以左右两栏布局展示，中间有分隔线</li>
+            </ul>
+
+            <h4>3.3 AI作品展示</h4>
+            <ul>
+                <li>作品按类型分为"AI创作视频"和"AI创作游戏"两个板块</li>
+                <li>每个板块上方显示数量角标（如"共2个"）</li>
+                <li>作品以横向滑动卡片形式展示，每行显示约3个，多了自动换行</li>
+                <li>每个作品卡片包含：封面图（缩略图）、播放按钮（▶）、作品名称</li>
+                <li>支持左右滑动查看更多作品</li>
+            </ul>
+
+            <h4>3.4 研学评价</h4>
+            <ul>
+                <li>显示针对该学生的定性评价文本</li>
+            </ul>
+
+            <h4>3.5 分享研学报告</h4>
+            <ul>
+                <li>页面底部有固定分享栏，点击"分享研学报告"按钮弹出分享弹窗</li>
+                <li>弹窗提供三个圆形图标按钮：分享给好友、分享到朋友圈、下载报告</li>
+                <li>点击"下载报告"弹出预览弹窗，上方为报告预览图，下方为小程序码示意</li>
+                <li>支持长按识别小程序码跳转到离泰研学小程序</li>
+            </ul>
         </div>
     </div>
 </div>
@@ -534,18 +923,49 @@
         document.getElementById('sCourse').textContent = course;
         document.getElementById('sTime').textContent = time;
         closeSwitchPopup();
-        // 高亮当前选中
         var items = document.querySelectorAll('.sp-item');
         items.forEach(function(item) { item.classList.remove('active'); });
         var found = Array.from(items).find(function(item) { return item.textContent.trim() === name; });
         if (found) found.classList.add('active');
     }
 
+    // ===== 分享功能 =====
+    function openShare() {
+        document.getElementById('shareOverlay').classList.add('show');
+    }
+
+    function closeShare() {
+        document.getElementById('shareOverlay').classList.remove('show');
+    }
+
+    function downloadShareImage() {
+        closeShare();
+        document.getElementById('dlOverlay').classList.add('show');
+    }
+    function closeDl() {
+        document.getElementById('dlOverlay').classList.remove('show');
+    }
+
+    function shareToWeChatFriend() {
+        alert('📱 请打开微信，从相册中选择图片分享给好友。');
+    }
+
+    function shareToMoments() {
+        alert('📱 请打开微信，从相册中选择图片分享到朋友圈。');
+    }
+
     // 点击遮罩关闭
     document.getElementById('switchOverlay').addEventListener('click', function(e) {
         if (e.target === this) closeSwitchPopup();
     });
+    document.getElementById('shareOverlay').addEventListener('click', function(e) {
+        if (e.target === this) closeShare();
+    });
+    document.getElementById('dlOverlay').addEventListener('click', function(e) {
+        if (e.target === this) closeDl();
+    });
 </script>
 
+<a href="index.html" style="position:fixed;top:12px;right:16px;z-index:99999;background:#E53935;color:#fff;padding:7px 16px;border-radius:20px;text-decoration:none;font-size:13px;font-weight:600;box-shadow:0 2px 10px rgba(229,57,53,0.4);display:inline-flex;align-items:center;gap:5px;">🏠 首页</a>
 </body>
 </html>

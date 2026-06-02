@@ -9,8 +9,6 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
             background: #f5f5f5;
-            display: flex;
-            justify-content: center;
             min-height: 100vh;
         }
         .app-container {
@@ -294,9 +292,55 @@
             color: #fff;
         }
         .mbtn-confirm:hover { background: #0052CC; }
+
+        /* ===== 双栏布局 & 文档面板 ===== */
+        .page-wrap {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            min-height: 100vh;
+            align-items: flex-start;
+            justify-content: center;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 430px;
+            background: #f5f5f5;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 20px;
+        }
+        .doc-panel {
+            width: 560px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            padding: 24px 28px;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', Arial, sans-serif;
+            line-height: 1.7;
+            font-size: 14px;
+            color: #333;
+        }
+        .doc-panel::-webkit-scrollbar { width: 5px; }
+        .doc-panel::-webkit-scrollbar-thumb { background: #d0d5e0; border-radius: 3px; }
+        .doc-panel .doc-title { font-size: 20px; font-weight: 700; color: #1F3864; border-bottom: 2px solid #2E75B6; padding-bottom: 10px; margin-bottom: 16px; }
+        .doc-panel h3 { font-size: 16px; font-weight: 600; color: #2E75B6; margin: 16px 0 8px; }
+        .doc-panel h4 { font-size: 14px; font-weight: 600; color: #333; margin: 12px 0 6px; }
+        .doc-panel p { font-size: 13px; color: #555; margin-bottom: 6px; }
+        .doc-panel ul { padding-left: 20px; margin: 4px 0 8px; }
+        .doc-panel li { margin-bottom: 3px; font-size: 13px; color: #555; }
+        .doc-panel .doc-section { margin-bottom: 6px; }
+
+        @media (max-width: 1100px) {
+            .page-wrap { flex-direction: column; align-items: center; }
+            .doc-panel { width: 100%; max-width: 430px; max-height: none; }
+        }
     </style>
 </head>
 <body>
+<div class="page-wrap">
     <div class="app-container">
         <!-- 顶部导航 -->
         <div class="top-nav">
@@ -304,7 +348,7 @@
             <div class="top-nav-title">我的成员</div>
         </div>
 
-        <!-- 游客列表 -->
+        <!-- 成员列表 -->
         <div class="visitor-list" id="visitorList"></div>
 
         <!-- 新增成员按钮 -->
@@ -541,8 +585,72 @@
             if (e.target === this) closeModal();
         });
 
-        // 初始化
-        loadVisitors();
-    </script>
+    // 初始化
+    loadVisitors();
+</script>
+
+    <!-- 功能说明文档 -->
+    <div class="doc-panel">
+        <div class="doc-title">我的成员模块 - 功能说明</div>
+
+        <div class="doc-section">
+            <h3>1 页面概述</h3>
+            <p>用于管理当前登录用户填报的成员信息。用户可在此添加、编辑、删除成员资料（姓名、身份证号、头像），并查看每个成员的研学足迹。即之前研学课程下单时的联系人信息。</p>
+        </div>
+
+        <div class="doc-section">
+            <h3>2 页面布局</h3>
+            <p>页面从上到下分为以下区域：</p>
+            <ol>
+                <li><strong>顶部导航栏</strong>：返回按钮（←）+ 页面标题"我的成员"</li>
+                <li><strong>成员列表区</strong>：以卡片列表形式展示所有成员，每人一张卡片</li>
+                <li><strong>新增成员按钮</strong>：底部按钮"＋ 新增成员"</li>
+                <li><strong>编辑/新增弹窗</strong>：提交修改或新增成员信息的浮层</li>
+            </ol>
+        </div>
+
+        <div class="doc-section">
+            <h3>3 功能说明</h3>
+
+            <h4>3.1 成员卡片</h4>
+            <p>每个成员卡片包含以下信息：</p>
+            <ul>
+                <li><strong>头像</strong>：圆形背景，显示默认头像或上传的头像图片</li>
+                <li><strong>姓名</strong>：成员姓名，右侧带"管理"链接（点击弹出编辑弹窗）</li>
+                <li><strong>身份证号</strong>：显示成员证件号码，标签为"身份证"</li>
+                <li><strong>查看研学足迹按钮</strong>：按钮，点击跳转到该成员的研学足迹页面</li>
+            </ul>
+
+            <h4>3.2 新增成员</h4>
+            <ul>
+                <li>点击底部"＋ 新增成员"按钮，弹出新增弹窗</li>
+                <li>弹窗中包含：头像上传（非必填，不传就是默认头像）、姓名输入（必填）、身份证号输入（必填）（即之前的添加联系人，保持同样的逻辑）</li>
+                <li>点击"新增"按钮保存，头像需用户手动上传</li>
+            </ul>
+
+            <h4>3.3 编辑成员</h4>
+            <ul>
+                <li>点击成员卡片上的"管理"链接，弹出编辑弹窗</li>
+                <li>弹窗中回显当前成员的姓名、身份证号、头像信息</li>
+                <li>修改后点击"确定"保存</li>
+                <li>编辑模式显示"删除"按钮，点击可删除该成员（确认后删除）</li>
+            </ul>
+
+            <h4>3.4 头像上传</h4>
+            <ul>
+                <li>弹窗中点击相机图标触发文件选择</li>
+                <li>支持选择本地图片作为成员头像</li>
+                <li>上传后头像显示在圆形区域内</li>
+            </ul>
+
+            <h4>3.5 查看研学足迹</h4>
+            <ul>
+                <li>点击成员卡片的"查看研学足迹"按钮</li>
+                <li>跳转到研学足迹页面，携带该成员信息</li>
+            </ul>
+        </div>
+    </div>
+</div>
+<a href="index.html" style="position:fixed;top:12px;right:16px;z-index:99999;background:#E53935;color:#fff;padding:7px 16px;border-radius:20px;text-decoration:none;font-size:13px;font-weight:600;box-shadow:0 2px 10px rgba(229,57,53,0.4);display:inline-flex;align-items:center;gap:5px;">🏠 首页</a>
 </body>
 </html>

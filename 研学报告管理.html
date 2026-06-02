@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>研学报告管理 - 管理后台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', 'Microsoft YaHei', Arial, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            color: #333;
+        }
+        .header {
+            background: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header .logo { font-size: 18px; font-weight: 700; color: #0669FF; margin-right: 32px; }
+        .header .nav-list { display: flex; gap: 24px; list-style: none; }
+        .header .nav-list li { font-size: 14px; color: #666; cursor: pointer; padding: 4px 0; }
+        .header .nav-list li:hover { color: #0669FF; }
+        .header .nav-list li.active { color: #0669FF; font-weight: 600; position: relative; }
+        .header .nav-list li.active::after { content: ''; position: absolute; bottom: -4px; left: 0; right: 0; height: 2px; background: #0669FF; border-radius: 1px; }
+        .header .user-area { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+        .header .user-area .avatar { width: 32px; height: 32px; border-radius: 50%; background: #E8F0FE; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #0669FF; }
+        .header .user-area .name { font-size: 14px; color: #333; }
+        .breadcrumb { padding: 16px 24px 0; font-size: 13px; color: #999; display: flex; align-items: center; gap: 6px; }
+        .breadcrumb a { color: #999; text-decoration: none; }
+        .breadcrumb a:hover { color: #0669FF; }
+        .breadcrumb .sep { color: #ccc; }
+        .breadcrumb .current { color: #333; font-weight: 500; }
+        .main { padding: 16px 24px 40px; max-width: 960px; margin: 0 auto; }
+
+        /* 课程卡片 */
+        .course-card {
+            display: flex; gap: 16px; background: #fff; border-radius: 10px; padding: 16px; margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04); position: relative;
+        }
+        .course-card .cover { width: 120px; height: 75px; border-radius: 8px; overflow: hidden; flex-shrink: 0; background: #e8e8e8; }
+        .course-card .cover img { width: 100%; height: 100%; object-fit: cover; }
+        .course-card .info { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 3px; }
+        .course-card .info .name { font-size: 16px; font-weight: 600; color: #1a1a1a; }
+        .course-card .info .detail { font-size: 13px; color: #888; }
+        .course-card .info .detail span { margin-right: 14px; }
+        .course-card .status-badge { position: absolute; top: 12px; right: 14px; font-size: 11px; padding: 3px 10px; border-radius: 4px; font-weight: 500; }
+        .status-travel { background: #E8F5E9; color: #389E0D; }
+        .status-done { background: #E8F0FE; color: #0669FF; }
+
+        /* 区块 */
+        .section-card {
+            background: #fff; border-radius: 10px; padding: 18px 20px; margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .section-title {
+            font-size: 15px; font-weight: 600; color: #333; margin-bottom: 12px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .section-title .icon { width: 24px; height: 24px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+        .icon-blue { background: #E8F0FE; color: #0669FF; }
+        .icon-green { background: #E8F5E9; color: #389E0D; }
+
+        /* 研学报名字段展示 */
+        .info-display { background: #f9fafb; border-radius: 6px; margin-top: 10px; overflow: hidden; }
+        .info-display .display-header { 
+            display: flex; align-items: center; gap: 6px; 
+            font-size: 13px; font-weight: 500; color: #0669FF;
+            padding: 8px 12px 4px 12px;
+        }
+        .info-display .display-body { 
+            padding: 4px 12px 10px 12px; 
+            font-size: 13px; color: #333; line-height: 1.6;
+            white-space: pre-wrap;
+        }
+        .info-display-duration .display-body { 
+            padding: 2px 12px 8px 12px; 
+            font-size: 14px; font-weight: 500; color: #333;
+        }
+
+        /* 按钮 */
+        .btn { padding: 7px 18px; border-radius: 6px; font-size: 13px; cursor: pointer; border: none; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; gap: 4px; }
+        .btn-primary { background: #0669FF; color: #fff; }
+        .btn-primary:hover { background: #0052CC; }
+        .btn-view { background: #E8F5E9; color: #389E0D; }
+        .btn-view:hover { background: #D6F0D8; }
+
+        /* 成员表格 */
+        .member-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .member-table thead th { background: #fafafa; padding: 10px 12px; text-align: left; font-weight: 600; color: #555; border-bottom: 1px solid #eee; font-size: 12px; }
+        .member-table tbody td { padding: 10px 12px; border-bottom: 1px solid #f5f5f5; color: #333; vertical-align: middle; }
+        .member-table tbody tr:hover { background: #FAFBFF; }
+        .member-table .group-header td { background: #f5f7fa; font-weight: 600; color: #666; padding: 6px 12px; font-size: 12px; border-bottom: 1px solid #e8e8e8; }
+
+        .eval-btn { padding: 4px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; border: none; font-weight: 500; white-space: nowrap; }
+        .eval-btn-add { background: #0669FF; color: #fff; }
+        .eval-btn-add:hover { background: #0052CC; }
+        .eval-btn-view { background: #4CAF50; color: #fff; }
+        .eval-btn-view:hover { background: #388E3C; }
+
+        /* ===== 子订单卡片 ===== */
+        .suborder-card {
+            background: #f9fafb;
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+        .suborder-card:last-child { margin-bottom: 0; }
+        .suborder-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: #f5f7fa;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        .suborder-header .suborder-phone {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+        }
+        .suborder-header .suborder-status {
+            font-size: 11px;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        .suborder-status.sub-travel { background: #E8F5E9; color: #389E0D; }
+        .suborder-status.sub-verified { background: #E8F0FE; color: #0669FF; }
+        .suborder-status.sub-expired { background: #FFF2E8; color: #D46B08; }
+
+        .suborder-body { padding: 0; }
+        .suborder-member {
+            display: flex;
+            align-items: center;
+            padding: 10px 14px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.15s;
+        }
+        .suborder-member:last-child { border-bottom: none; }
+        .suborder-member:hover { background: #FAFBFF; }
+        .suborder-member .member-name {
+            width: 18%; font-size: 13px; font-weight: 600; color: #333;
+        }
+        .suborder-member .member-age {
+            width: 10%; font-size: 12px; color: #888;
+        }
+        .suborder-member .member-idcard {
+            width: 42%; font-size: 12px; color: #999; font-family: monospace;
+        }
+        .suborder-member .member-action {
+            width: 30%; text-align: right;
+        }
+
+        /* ===== 状态标签（表格用，保留兼容） ===== */
+        .status-tag {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-tag.travel { background: #E8F5E9; color: #389E0D; }
+        .status-tag.verified { background: #E8F0FE; color: #0669FF; }
+        .status-tag.expired { background: #FFF2E8; color: #D46B08; }
+
+        /* ===== 浮层样式 ===== */
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.45); z-index: 9999;
+            display: none; align-items: center; justify-content: center; padding: 30px;
+        }
+        .overlay.show { display: flex; }
+        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .overlay-box {
+            background: #fff; border-radius: 12px; width: 100%; max-width: 700px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.12); animation: popIn 0.2s ease-out;
+            max-height: calc(100vh - 60px); display: flex; flex-direction: column;
+        }
+        .overlay-box .ol-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 20px; border-bottom: 1px solid #f0f0f0; flex-shrink: 0;
+        }
+        .overlay-box .ol-header h3 { font-size: 16px; font-weight: 600; color: #1a1a1a; }
+        .overlay-box .ol-header .ol-close { font-size: 12px; color: #0669FF; cursor: pointer; font-weight: 500; }
+        .overlay-box .ol-body { padding: 18px 20px; overflow-y: auto; flex: 1; }
+
+        /* ===== 功能说明文档面板 ===== */
+        .doc-panel {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            padding: 18px 20px;
+            margin: 0 24px 24px;
+        }
+        .doc-panel .doc-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1F3864;
+            border-bottom: 2px solid #2E75B6;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+        .doc-panel p {
+            font-size: 13px;
+            color: #555;
+            line-height: 1.8;
+            margin: 0;
+        }
+        .doc-panel p br { display: block; content: ''; margin: 4px 0; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">离泰数链</div>
+        <ul class="nav-list">
+            <li>概览</li><li>研学课程</li><li class="active">订单管理</li><li>用户管理</li><li>内容管理</li>
+            <li onclick="window.location.href='系统参数配置.html'" style="cursor:pointer;">系统设置</li>
+        </ul>
+        <div class="user-area"><span class="avatar">👤</span><span class="name">管理员</span></div>
+    </div>
+    <div class="breadcrumb">
+        <a href="index.html">首页</a><span class="sep">&gt;</span>
+        <a href="拼团订单管理.html">拼团订单管理</a><span class="sep">&gt;</span>
+        <span class="current">研学报告管理</span>
+    </div>
+
+    <div class="main" id="appMain">
+        <!-- 课程卡片 -->
+        <div class="course-card" id="courseCard">
+            <div class="cover"><img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=240&h=150&fit=crop" alt="课程封面"></div>
+            <div class="info">
+                <div class="name" id="courseName">-</div>
+                <div class="detail" id="courseDetail">-</div>
+            </div>
+            <span class="status-badge" id="statusBadge">-</span>
+        </div>
+
+        <!-- 研学信息 -->
+        <div class="section-card">
+            <div class="section-title"><span class="icon icon-blue">📄</span>研学信息</div>
+            <div><button class="btn btn-primary" id="infoBtn" onclick="openInfoModal()">📋 生成研学信息</button></div>
+            <div id="infoDurationDisplay" class="info-display info-display-duration" style="display:none;">
+                <div class="display-header">⏱️ 研学时长</div>
+                <div class="display-body" id="durationText"></div>
+            </div>
+            <div id="infoContentDisplay" class="info-display" style="display:none;">
+                <div class="display-header">📄 研学内容</div>
+                <div class="display-body" id="contentText"></div>
+            </div>
+        </div>
+
+        <!-- 订单成员列表（子订单卡片） -->
+        <div class="section-card">
+            <div class="section-title"><span class="icon icon-green">👥</span>订单成员列表</div>
+            <div id="memberContainer"></div>
+        </div>
+
+    </div>
+
+    <!-- ===== 功能说明 ===== -->
+    <div class="doc-panel">
+        <div class="doc-title">研学报告管理模块 - 功能说明</div>
+        <p>
+            1. <strong>课程信息卡片</strong>：顶部展示当前订单的课程名称、场次时间、场次名称及订单状态（待出行/已完成等）。<br><br>
+            2. <strong>研学信息生成</strong>：<br>
+            &nbsp;&nbsp;- 首次点击"生成研学信息"按钮，展开浮层，输入研学时长和提示词，点击"立即生成"，调用AI生成研学信息<br>
+            &nbsp;&nbsp;- 提示词输入框支持插入变量 <code>{课程名称}</code>、<code>{课程时间}</code>，生成时自动替换为当前课程的对应信息<br>
+            &nbsp;&nbsp;- 生成后按钮变为"查看研学信息"；支持"重新生成"<br>
+            &nbsp;&nbsp;- 点击"查看研学信息"按钮，面板展开后显示已保存的内容（时长只读、提示词可修改），可重新生成或再次保存<br>
+            &nbsp;&nbsp;- 研学信息是跟订单走的。<br><br>
+            3. <strong>订单成员列表</strong>：按子订单分组（电话+订单状态）显示每个成员的姓名、年龄、身份证号。<br><br>
+            4. <strong>成员评价功能</strong>：<br>
+            &nbsp;&nbsp;- 点击成员对应的"评价"按钮，弹出评价浮层<br>
+            &nbsp;&nbsp;- 提示词输入框首先将研学手记配置中该项的提示词自动填入框内，可以补充输入内容<br>
+            &nbsp;&nbsp;- 提示词输入框支持插入变量 <code>{用户姓名}</code>，生成评价时自动替换为成员实际姓名<br>
+            &nbsp;&nbsp;- 已保存评价的成员显示"查看评价"按钮，点击可查看已有内容并重新生成
+        </p>
+    </div>
+    <div class="overlay" id="infoOverlay">
+        <div class="overlay-box">
+            <div class="ol-header">
+                <h3>📝 研学信息</h3>
+                <span class="ol-close" onclick="closeInfoOverlay()">✕ 关闭</span>
+            </div>
+            <div class="ol-body">
+                <div style="margin-bottom:12px;">
+                    <div style="font-size:13px;font-weight:600;color:#333;margin-bottom:2px;">填写研学信息</div>
+                    <div style="font-size:12px;color:#888;">输入研学时长和提示词，AI自动生成研学信息</div>
+                </div>
+                <div class="rip-field" style="margin-bottom:10px;">
+                    <label style="display:block;font-size:13px;font-weight:500;color:#555;margin-bottom:4px;">⏱️ 研学时长</label>
+                    <input type="text" id="ripDuration" placeholder="如：2小时、半天、全天..." maxlength="20" style="width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;outline:none;">
+                </div>
+                <div class="rip-field" style="margin-bottom:10px;">
+                    <label style="display:block;font-size:13px;font-weight:500;color:#555;margin-bottom:4px;">📌 研学内容提示词</label>
+                    <textarea id="ripKeywords" rows="2" placeholder="请输入提示词..." style="width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;outline:none;resize:none;font-family:inherit;"></textarea>
+                    <div style="display:flex;align-items:center;gap:6px;margin-top:6px;">
+                        <span style="font-size:11px;color:#888;">插入变量：</span>
+                        <span onclick="insertInfoVar('{课程名称}')" style="padding:2px 8px;border-radius:10px;border:1px solid #0669FF;background:#E8F0FE;font-size:11px;color:#0669FF;cursor:pointer;font-weight:500;">{课程名称}</span>
+                        <span onclick="insertInfoVar('{课程时间}')" style="padding:2px 8px;border-radius:10px;border:1px solid #0669FF;background:#E8F0FE;font-size:11px;color:#0669FF;cursor:pointer;font-weight:500;">{课程时间}</span>
+                    </div>
+                </div>
+                <div id="infoGenArea"><button class="btn btn-primary" id="infoGenBtn" onclick="startInfoGenerate()">✨ 立即生成</button></div>
+                <div class="rip-progress" id="ripProgress" style="display:none;margin-top:10px;">
+                    <div id="ripProgText" style="font-size:12px;color:#888;margin-bottom:4px;">🤖 AI正在生成...</div>
+                    <div style="width:100%;height:4px;background:#eee;border-radius:2px;overflow:hidden;"><div id="ripProgFill" style="height:100%;width:0%;background:linear-gradient(90deg,#0669FF,#4A9EFF);border-radius:2px;"></div></div>
+                </div>
+                <div id="ripResult" style="display:none;margin-top:10px;">
+                    <div style="font-size:12px;font-weight:600;color:#0669FF;margin-bottom:4px;">📄 研学信息内容</div>
+                    <div id="ripResultBox" contenteditable="true" style="background:#fff;border-radius:6px;padding:10px 12px;border:1px solid #e0e0e0;font-size:12px;color:#444;line-height:1.7;white-space:pre-wrap;min-height:60px;outline:none;"></div>
+                </div>
+                <div id="ripActions" style="display:none;margin-top:10px;gap:8px;">
+                    <button class="btn" style="background:#D4A84B;color:#fff;border:none;" onclick="saveInfo()">💾 保存信息</button>
+                    <button class="btn" style="border:1px solid #0669FF;background:#fff;color:#0669FF;" onclick="reGenerateInfo()">🔄 重新生成</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 评价浮层 ===== -->
+    <div class="overlay" id="evalOverlay">
+        <div class="overlay-box">
+            <div class="ol-header">
+                <h3 id="evalTitle">✍️ 评价</h3>
+                <span class="ol-close" onclick="closeEvalOverlay()">✕ 关闭</span>
+            </div>
+            <div class="ol-body">
+                <div style="margin-bottom:10px;">
+                    <div style="font-size:13px;font-weight:600;color:#333;margin-bottom:2px;">填写评价提示词</div>
+                    <div style="font-size:12px;color:#888;">输入提示词，AI自动生成评价内容</div>
+                </div>
+                <textarea id="evalInput" rows="2" placeholder="请输入评价提示词..." style="width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;outline:none;resize:none;font-family:inherit;"></textarea>
+                <div style="display:flex;align-items:center;gap:8px;margin:6px 0;">
+                    <span style="font-size:12px;color:#888;flex-shrink:0;">插入变量：</span>
+                    <span onclick="insertEvalVar('{用户姓名}')" style="padding:3px 10px;border-radius:12px;border:1px solid #0669FF;background:#E8F0FE;font-size:11px;color:#0669FF;cursor:pointer;font-weight:500;">{用户姓名}</span>
+                </div>
+
+                <div id="evalGenArea"><button class="btn btn-primary" id="evalGenBtn" onclick="startEvalGenerate()">✨ 生成评价</button></div>
+                <div class="rip-progress" id="evalProg" style="display:none;margin-top:10px;">
+                    <div id="evalProgText" style="font-size:12px;color:#888;margin-bottom:4px;">🤖 AI正在生成评价...</div>
+                    <div style="width:100%;height:4px;background:#eee;border-radius:2px;overflow:hidden;"><div id="evalProgFill" style="height:100%;width:0%;background:linear-gradient(90deg,#0669FF,#4A9EFF);border-radius:2px;"></div></div>
+                </div>
+                <div id="evalResult" style="display:none;margin-top:10px;">
+                    <div style="font-size:12px;font-weight:600;color:#0669FF;margin-bottom:4px;">📄 评价内容</div>
+                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                        <span style="font-size:11px;color:#888;">插入变量：</span>
+                        <span onclick="insertEvalResultVar('{用户姓名}')" style="padding:2px 8px;border-radius:10px;border:1px solid #0669FF;background:#E8F0FE;font-size:11px;color:#0669FF;cursor:pointer;font-weight:500;">{用户姓名}</span>
+                    </div>
+                    <div id="evalResultBox" contenteditable="true" style="background:#fff;border-radius:6px;padding:10px 12px;border:1px solid #e0e0e0;font-size:12px;color:#444;line-height:1.7;white-space:pre-wrap;min-height:50px;outline:none;"></div>
+                </div>
+                <div id="evalActions" style="display:none;margin-top:10px;gap:8px;">
+                    <button class="btn" style="background:#D4A84B;color:#fff;border:none;" onclick="saveEval()">💾 保存</button>
+                    <button class="btn" style="border:1px solid #0669FF;background:#fff;color:#0669FF;" onclick="reGenerateEval()">🔄 重新生成</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== 数据 =====
+        var mockData = [
+            { orderId: 'PT20250601001', courseName: '盆景美学·指尖山水', courseId: 'CP20250001', execAgency: '离泰文化', sessionName: '6月7日(周六)上午场', sessionTime: '2025-06-07 09:00-12:00', amount: '¥2,980', createTime: '2025-06-01 10:30', confirmDeadline: '2025-06-04', confirmTime: '2025-06-02 14:20', status: 'travel', progress: '6/10' },
+            { orderId: 'PT20250530003', courseName: '诗界无心·草堂寻心', courseId: 'CP20250003', execAgency: '诗界教育', sessionName: '6月6日(周五)下午场', sessionTime: '2025-06-06 14:00-17:00', amount: '¥3,580', createTime: '2025-05-30 09:20', confirmDeadline: '2025-06-02', confirmTime: '2025-06-01 11:30', status: 'travel', progress: '10/10' },
+            { orderId: 'PT20250520006', courseName: '自然探索营', courseId: 'CP20250009', execAgency: '离泰文化', sessionName: '5月25日(周日)全天', sessionTime: '2025-05-25 08:00-17:00', amount: '¥2,980', createTime: '2025-05-20 08:30', confirmDeadline: '2025-05-23', confirmTime: '2025-05-22 16:40', status: 'done', progress: '6/6' }
+        ];
+        var mockMembersByOrder = {
+            'PT20250601001': [ { phone: '13800138001', status: 'travel' }, { phone: '13900139002', status: 'verified' } ],
+            'PT20250530003': [ { phone: '13700137003', status: 'travel' }, { phone: '13600136004', status: 'expired' } ],
+            'PT20250520006': [ { phone: '13500135005', status: 'verified' } ]
+        };
+        var mockMembers = {
+            '13800138001': { members: [ { name: '赵小明', age: 12, idCard: '511602************38' }, { name: '李小红', age: 11, idCard: '510108************25' }, { name: '王大力', age: 13, idCard: '440305************12' } ] },
+            '13900139002': { members: [ { name: '陈小华', age: 10, idCard: '330102************45' }, { name: '林小芳', age: 12, idCard: '350103************67' }, { name: '黄小军', age: 11, idCard: '420106************89' } ] },
+            '13700137003': { members: [ { name: '周小天', age: 11, idCard: '510107************56' }, { name: '吴小月', age: 12, idCard: '440301************78' } ] },
+            '13600136004': { members: [ { name: '郑小云', age: 10, idCard: '330101************90' } ] },
+            '13500135005': { members: [ { name: '孙小风', age: 13, idCard: '420105************12' }, { name: '钱小飞', age: 11, idCard: '350102************34' } ] }
+        };
+        var statusClsMap = { travel: 'status-travel', done: 'status-done' };
+        var statusTextMap = { travel: '待出行', done: '已完成' };
+
+        // 子订单状态
+        var subStatusMap = {
+            travel: '待出行',
+            verified: '已核销',
+            expired: '已过期'
+        };
+        var subStatusClsMap = {
+            travel: 'sub-travel',
+            verified: 'sub-verified',
+            expired: 'sub-expired'
+        };
+
+        var currentOrderId = '';
+        var currentEvalName = '';
+
+        // ===== 初始化 =====
+        function init() {
+            var params = new URLSearchParams(window.location.search);
+            currentOrderId = params.get('orderId') || 'PT20250601001';
+            var course = mockData.find(function(o) { return o.orderId === currentOrderId; });
+            if (course) {
+                document.getElementById('courseName').textContent = course.courseName;
+                document.getElementById('courseDetail').innerHTML = '<span>📅 ' + course.sessionTime + '</span><span>🎯 ' + course.sessionName + '</span>';
+                var badge = document.getElementById('statusBadge');
+                badge.textContent = statusTextMap[course.status] || course.status;
+                badge.className = 'status-badge ' + (statusClsMap[course.status] || '');
+            }
+            // 研学信息按钮状态
+            updateInfoBtn();
+            // 渲染成员
+            renderMembers();
+        }
+
+        // ===== 研学信息 =====
+        function updateInfoBtn() {
+            var saved = localStorage.getItem('studyInfo_' + currentOrderId);
+            var btn = document.getElementById('infoBtn');
+            var durDisplay = document.getElementById('infoDurationDisplay');
+            var conDisplay = document.getElementById('infoContentDisplay');
+            if (saved) {
+                btn.textContent = '🔄 重新生成研学信息';
+                btn.className = 'btn btn-view';
+                try {
+                    var data = JSON.parse(saved);
+                    document.getElementById('durationText').textContent = data.duration || '-';
+                    document.getElementById('contentText').textContent = data.content || '';
+                } catch(e) {
+                    document.getElementById('contentText').textContent = saved;
+                    document.getElementById('durationText').textContent = '-';
+                }
+                durDisplay.style.display = 'block';
+                conDisplay.style.display = 'block';
+            } else {
+                btn.textContent = '📋 生成研学信息';
+                btn.className = 'btn btn-primary';
+                durDisplay.style.display = 'none';
+                conDisplay.style.display = 'none';
+            }
+        }
+
+        function openInfoModal() {
+            var overlay = document.getElementById('infoOverlay');
+            overlay.classList.add('show');
+            var saved = localStorage.getItem('studyInfo_' + currentOrderId);
+            if (saved) {
+                try {
+                    var data = JSON.parse(saved);
+                    document.getElementById('ripDuration').value = data.duration || '';
+                    document.getElementById('ripDuration').disabled = true;
+                    document.getElementById('ripDuration').style.background = '#f5f5f5';
+                    document.getElementById('ripKeywords').value = '';
+                    document.getElementById('ripResultBox').textContent = data.content || '';
+                    document.getElementById('ripResult').style.display = 'block';
+                    document.getElementById('ripResultBox').setAttribute('contenteditable', 'false');
+                    document.getElementById('infoGenArea').style.display = 'none';
+                    document.getElementById('ripActions').style.display = 'flex';
+                    document.getElementById('ripProgress').style.display = 'none';
+                } catch(e) {}
+            } else {
+                document.getElementById('ripDuration').disabled = false;
+                document.getElementById('ripDuration').style.background = '#fff';
+                document.getElementById('ripKeywords').value = '';
+                document.getElementById('ripResult').style.display = 'none';
+                document.getElementById('ripResultBox').textContent = '';
+                document.getElementById('infoGenArea').style.display = 'block';
+                document.getElementById('ripActions').style.display = 'none';
+                document.getElementById('ripProgress').style.display = 'none';
+            }
+        }
+        function closeInfoOverlay() { document.getElementById('infoOverlay').classList.remove('show'); }
+        function insertInfoVar(v) {
+            var input = document.getElementById('ripKeywords');
+            var cur = input.value;
+            var start = input.selectionStart;
+            var end = input.selectionEnd;
+            input.value = cur.substring(0, start) + v + cur.substring(end);
+            input.focus();
+            input.selectionStart = input.selectionEnd = start + v.length;
+        }
+        function startInfoGenerate() {
+            var duration = document.getElementById('ripDuration').value.trim();
+            if (!duration) { alert('请输入研学时长'); return; }
+            var keywords = document.getElementById('ripKeywords').value.trim();
+            // 替换变量为实际值
+            var courseName = document.getElementById('courseName').textContent;
+            var courseTime = document.querySelector('#courseDetail span:first-child') ? document.querySelector('#courseDetail span:first-child').textContent.replace('📅','').trim() : '';
+            keywords = keywords.replace(/\{课程名称\}/g, courseName).replace(/\{课程时间\}/g, courseTime);
+            document.getElementById('infoGenArea').style.display = 'none';
+            doInfoGenerate(duration, keywords);
+        }
+        function doInfoGenerate(duration, keywords) {
+            document.getElementById('ripResult').style.display = 'none';
+            document.getElementById('ripActions').style.display = 'none';
+            document.getElementById('ripProgress').style.display = 'block';
+            document.getElementById('ripResultBox').setAttribute('contenteditable', 'false');
+            var fill = document.getElementById('ripProgFill');
+            var text = document.getElementById('ripProgText');
+            var p = 0;
+            var timer = setInterval(function() {
+                p += Math.random() * 15 + 5;
+                if (p > 100) p = 100;
+                fill.style.width = p + '%';
+                if (p < 50) text.textContent = '🤖 AI正在分析课程信息...';
+                else if (p < 80) text.textContent = '📝 AI正在生成研学内容...';
+                else text.textContent = '✅ 即将完成...';
+                if (p >= 100) {
+                    clearInterval(timer);
+                    var courseName = document.getElementById('courseName').textContent;
+                    var kws = keywords ? keywords.split(/[、，,]/).filter(function(k) { return k.trim(); }) : [];
+                    var content = '📋 课程名称：' + courseName + '\n';
+                    content += '📅 课程时间：' + (document.querySelector('#courseDetail span:first-child') ? document.querySelector('#courseDetail span:first-child').textContent.replace('📅','').trim() : '') + '\n\n';
+                    content += '━━━ 研学内容 ━━━\n\n';
+                    content += '本次课程通过实地体验与动手实践相结合的方式，让学生深入了解相关知识，在实践中学习与成长。\n';
+                    kws.forEach(function(k) {
+                        var kw = k.trim();
+                        if (kw.indexOf('茅屋') !== -1 || kw.indexOf('搭建') !== -1) content += '▸ ' + kw + '：学习了搭建结构、材料选择等，分组协作搭建模型。\n';
+                        else if (kw.indexOf('团队') !== -1) content += '▸ ' + kw + '：分组协作完成任务，成员分工明确。\n';
+                        else if (kw.indexOf('历史') !== -1 || kw.indexOf('文化') !== -1) content += '▸ ' + kw + '：深入了解相关历史文化背景，丰富人文素养。\n';
+                        else if (kw.indexOf('动手') !== -1 || kw.indexOf('实践') !== -1) content += '▸ ' + kw + '：在实践中反复调整优化，锻炼实际操作能力。\n';
+                        else content += '▸ ' + kw + '：作为本次研学的重要环节，深入参与并获得了丰富体验。\n';
+                    });
+                    document.getElementById('ripResultBox').textContent = content;
+                    document.getElementById('ripResult').style.display = 'block';
+                    document.getElementById('ripActions').style.display = 'flex';
+                    setTimeout(function() { document.getElementById('ripProgress').style.display = 'none'; }, 500);
+                }
+            }, 300);
+        }
+        function reGenerateInfo() {
+            var duration = document.getElementById('ripDuration').value.trim();
+            var keywords = document.getElementById('ripKeywords').value.trim();
+            var saved = localStorage.getItem('studyInfo_' + currentOrderId);
+            if (!duration && saved) { try { duration = JSON.parse(saved).duration || ''; } catch(e) {} }
+            doInfoGenerate(duration, keywords);
+        }
+        function saveInfo() {
+            var content = document.getElementById('ripResultBox').textContent.trim();
+            if (!content) { alert('请先生成研学信息'); return; }
+            var duration = document.getElementById('ripDuration').value.trim();
+            var data = { duration: duration, content: content, saveTime: new Date().toLocaleString() };
+            localStorage.setItem('studyInfo_' + currentOrderId, JSON.stringify(data));
+            updateInfoBtn();
+            closeInfoOverlay();
+            alert('✅ 研学信息保存成功！');
+        }
+
+        // ===== 评价 =====
+        function renderMembers() {
+            var container = document.getElementById('memberContainer');
+            var groups = mockMembersByOrder[currentOrderId] || [];
+            var html = '';
+            for (var g = 0; g < groups.length; g++) {
+                var group = groups[g];
+                var subStatus = subStatusMap[group.status] || '待出行';
+                var subCls = subStatusClsMap[group.status] || 'sub-travel';
+                var members = mockMembers[group.phone] || { members: [] };
+                html += '<div class="suborder-card">';
+                html += '<div class="suborder-header">';
+                html += '<span class="suborder-phone">📞 ' + group.phone + '</span>';
+                html += '<span class="suborder-status ' + subCls + '">' + subStatus + '</span>';
+                html += '</div>';
+                html += '<div class="suborder-body">';
+                for (var m = 0; m < members.members.length; m++) {
+                    var member = members.members[m];
+                    var key = 'eval_' + currentOrderId + '_' + member.name;
+                    var hasEval = !!localStorage.getItem(key);
+                    var cls = hasEval ? 'eval-btn-view' : 'eval-btn-add';
+                    var txt = hasEval ? '查看评价' : '评价';
+                    html += '<div class="suborder-member">';
+                    html += '<span class="member-name"><strong>' + member.name + '</strong></span>';
+                    html += '<span class="member-age">' + member.age + '岁</span>';
+                    html += '<span class="member-idcard">' + member.idCard + '</span>';
+                    html += '<span class="member-action"><button class="eval-btn ' + cls + '" onclick="openEvalOverlay(\'' + member.name + '\')">' + txt + '</button></span>';
+                    html += '</div>';
+                }
+                html += '</div></div>';
+            }
+            if (groups.length === 0) {
+                html = '<div style="text-align:center;padding:30px;color:#999;font-size:13px;">暂无订单成员数据</div>';
+            }
+            container.innerHTML = html;
+        }
+
+        function openEvalOverlay(name) {
+            currentEvalName = name;
+            document.getElementById('evalTitle').textContent = '✍️ 评价 - ' + name;
+            var overlay = document.getElementById('evalOverlay');
+            overlay.classList.add('show');
+            var key = 'eval_' + currentOrderId + '_' + name;
+            var saved = localStorage.getItem(key);
+            if (saved) {
+                try {
+                    var data = JSON.parse(saved);
+                    document.getElementById('evalInput').value = data.input || '';
+                    document.getElementById('evalResultBox').textContent = data.content || '';
+                } catch(e) {
+                    document.getElementById('evalInput').value = '';
+                    document.getElementById('evalResultBox').textContent = saved;
+                }
+                document.getElementById('evalResult').style.display = 'block';
+                document.getElementById('evalResultBox').setAttribute('contenteditable', 'false');
+                document.getElementById('evalGenArea').style.display = 'none';
+                document.getElementById('evalActions').style.display = 'flex';
+            } else {
+                document.getElementById('evalInput').value = '';
+                document.getElementById('evalResult').style.display = 'none';
+                document.getElementById('evalResultBox').textContent = '';
+                document.getElementById('evalGenArea').style.display = 'block';
+                document.getElementById('evalActions').style.display = 'none';
+            }
+        }
+        function closeEvalOverlay() { document.getElementById('evalOverlay').classList.remove('show'); }
+        function insertEvalVar(v) {
+            var input = document.getElementById('evalInput');
+            var cur = input.value;
+            var start = input.selectionStart;
+            var end = input.selectionEnd;
+            input.value = cur.substring(0, start) + v + cur.substring(end);
+            input.focus();
+            input.selectionStart = input.selectionEnd = start + v.length;
+        }
+        function insertEvalResultVar(v) {
+            var box = document.getElementById('evalResultBox');
+            var cur = box.textContent;
+            var sel = window.getSelection();
+            if (sel.rangeCount > 0 && box.contains(sel.anchorNode)) {
+                var range = sel.getRangeAt(0);
+                range.deleteContents();
+                range.insertNode(document.createTextNode(v));
+                range.collapse(false);
+                sel.removeAllRanges();
+                sel.addRange(range);
+            } else {
+                box.textContent = cur + v;
+            }
+            box.focus();
+        }
+        function startEvalGenerate() {
+            var text = document.getElementById('evalInput').value.trim();
+            if (!text) { alert('请输入或选择评价提示词'); return; }
+            doEvalGenerate(text);
+        }
+        function reGenerateEval() {
+            var text = document.getElementById('evalInput').value.trim();
+            if (!text) { alert('请输入评价提示词'); return; }
+            doEvalGenerate(text);
+        }
+        function doEvalGenerate(text) {
+            document.getElementById('evalResult').style.display = 'none';
+            document.getElementById('evalActions').style.display = 'none';
+            document.getElementById('evalGenArea').style.display = 'none';
+            document.getElementById('evalProg').style.display = 'block';
+            var fill = document.getElementById('evalProgFill');
+            var p = 0;
+            var timer = setInterval(function() {
+                p += Math.random() * 20 + 10;
+                if (p > 100) p = 100;
+                fill.style.width = p + '%';
+                if (p >= 100) {
+                    clearInterval(timer);
+                    var name = currentEvalName;
+                    var result = '【' + name + '】研学评价\n\n';
+                    var kws = text.split(/[、，,]/).filter(function(k) { return k.trim(); });
+                    kws.forEach(function(k) {
+                        var kw = k.trim();
+                        // 自动替换变量
+                        kw = kw.replace(/\{用户姓名\}/g, name);
+                        if (kw.indexOf('专注') !== -1) result += '▸ ' + kw + '：' + name + '在课程中非常专注，认真听取讲解并积极参与互动。\n';
+                        else if (kw.indexOf('团队') !== -1) result += '▸ ' + kw + '：' + name + '与同学配合默契，主动帮助他人，展现了良好的团队精神。\n';
+                        else if (kw.indexOf('动手') !== -1) result += '▸ ' + kw + '：' + name + '动手能力出色，在实践环节中表现出色，能独立完成任务。\n';
+                        else if (kw.indexOf('互动') !== -1) result += '▸ ' + kw + '：' + name + '课堂互动积极，勇于提问和表达自己的想法。\n';
+                        else if (kw.indexOf('创新') !== -1 || kw.indexOf('思维') !== -1) result += '▸ ' + kw + '：' + name + '在活动中展现了优秀的创新思维，提出了很多有价值的想法。\n';
+                        else result += '▸ ' + kw + '：' + name + '在本次研学中表现良好，值得肯定。\n';
+                    });
+                    result += '\n总体评价：' + name + '在本次课程中表现优秀，积极参与各个环节，收获丰富。';
+                    // 对整体结果也做变量替换
+                    result = result.replace(/\{用户姓名\}/g, name);
+                    var box = document.getElementById('evalResultBox');
+                    box.textContent = result;
+                    box.setAttribute('contenteditable', 'true');
+                    document.getElementById('evalResult').style.display = 'block';
+                    document.getElementById('evalActions').style.display = 'flex';
+                    setTimeout(function() { document.getElementById('evalProg').style.display = 'none'; }, 500);
+                }
+            }, 250);
+        }
+        function saveEval() {
+            var content = document.getElementById('evalResultBox').textContent.trim();
+            if (!content) { alert('请先生成评价内容'); return; }
+            var inputText = document.getElementById('evalInput').value.trim();
+            var data = { input: inputText, content: content, saveTime: new Date().toLocaleString() };
+            localStorage.setItem('eval_' + currentOrderId + '_' + currentEvalName, JSON.stringify(data));
+            renderMembers();
+            closeEvalOverlay();
+            alert('✅ 评价保存成功！');
+        }
+
+        // 遮罩点击关闭
+        document.getElementById('infoOverlay').addEventListener('click', function(e) { if (e.target === this) closeInfoOverlay(); });
+        document.getElementById('evalOverlay').addEventListener('click', function(e) { if (e.target === this) closeEvalOverlay(); });
+
+        // 初始化
+        init();
+    </script>
+<a href="index.html" style="position:fixed;top:12px;right:16px;z-index:99999;background:#E53935;color:#fff;padding:7px 16px;border-radius:20px;text-decoration:none;font-size:13px;font-weight:600;box-shadow:0 2px 10px rgba(229,57,53,0.4);display:inline-flex;align-items:center;gap:5px;">🏠 首页</a>
+</body>
+</html>

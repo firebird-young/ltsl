@@ -9,136 +9,189 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
             background: #f5f7fa;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             min-height: 100vh;
             padding: 20px;
         }
-        .app-container {
-            width: 100%;
-            max-width: 430px;
-            background: #fff;
-            border-radius: 20px;
-            padding: 40px 24px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+        .page-wrap {
+            max-width: 520px;
+            margin: 0 auto;
+        }
+        .header-area {
             text-align: center;
+            padding: 30px 0 24px;
         }
-        .logo {
-            font-size: 48px;
-            margin-bottom: 12px;
+        .header-area .logo-icon {
+            font-size: 42px;
+            margin-bottom: 8px;
         }
-        .app-name {
+        .header-area .app-name {
             font-size: 22px;
             font-weight: 700;
-            color: #333;
-            margin-bottom: 4px;
+            color: #1a1a1a;
         }
-        .app-desc {
+        .header-area .app-desc {
             font-size: 14px;
             color: #999;
-            margin-bottom: 32px;
+            margin-top: 2px;
         }
-        .menu-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-        .menu-card {
+
+        /* ===== 板块标题 ===== */
+        .section-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #333;
+            padding: 8px 0 10px;
             display: flex;
             align-items: center;
-            gap: 18px;
-            padding: 20px;
-            border-radius: 16px;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            text-decoration: none;
+            gap: 8px;
+            border-bottom: 2px solid #e8e8e8;
+            margin-bottom: 12px;
         }
-        .menu-card:active {
-            transform: scale(0.97);
-        }
-        .menu-card.blue {
-            background: linear-gradient(135deg, #0669FF, #004FE0);
-            box-shadow: 0 4px 16px rgba(6,105,255,0.3);
-        }
-        .menu-card.orange {
-            background: linear-gradient(135deg, #E65100, #BF360C);
-            box-shadow: 0 4px 16px rgba(230,81,0,0.3);
-        }
-        .menu-icon {
-            width: 52px;
-            height: 52px;
-            border-radius: 14px;
-            background: rgba(255,255,255,0.2);
+        .section-title .st-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
+            font-size: 15px;
             flex-shrink: 0;
         }
-        .menu-text {
-            flex: 1;
-            text-align: left;
-            color: #fff;
+        .section-title .st-icon.blue { background: #E8F0FE; color: #0669FF; }
+        .section-title .st-icon.green { background: #E8F5E9; color: #389E0D; }
+
+        /* ===== 导航卡片 ===== */
+        .nav-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 24px;
         }
-        .menu-text .mt-title {
-            font-size: 17px;
+        .nav-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            background: #fff;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-decoration: none;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .nav-card:active {
+            transform: scale(0.97);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+        }
+        .nav-card .nc-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .nav-card .nc-icon.blue-bg { background: #E8F0FE; }
+        .nav-card .nc-icon.orange-bg { background: #FFF3E0; }
+        .nav-card .nc-icon.green-bg { background: #E8F5E9; }
+        .nav-card .nc-icon.purple-bg { background: #F3E8FF; }
+        .nav-card .nc-icon.red-bg { background: #FFEBEE; }
+        .nav-card .nc-icon.teal-bg { background: #E0F2F1; }
+        .nav-card .nc-text { flex: 1; text-align: left; }
+        .nav-card .nc-text .nc-title {
+            font-size: 14px;
             font-weight: 600;
+            color: #333;
         }
-        .menu-text .mt-desc {
-            font-size: 13px;
-            opacity: 0.8;
-            margin-top: 2px;
+        .nav-card .nc-text .nc-desc {
+            font-size: 12px;
+            color: #999;
+            margin-top: 1px;
         }
-        .menu-arrow {
-            font-size: 22px;
-            color: rgba(255,255,255,0.6);
+        .nav-card .nc-arrow {
+            font-size: 18px;
+            color: #ccc;
+            flex-shrink: 0;
         }
+
+        .section-spacer { height: 8px; }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <div class="logo">🏚️</div>
+<div class="page-wrap">
+    <div class="header-area">
+        <div class="logo-icon">🏚️</div>
         <div class="app-name">离泰数链</div>
         <div class="app-desc">研学实践 · 文化传承</div>
-
-        <div class="menu-grid">
-            <a class="menu-card blue" href="研学日历.html">
-                <div class="menu-icon">📅</div>
-                <div class="menu-text">
-                    <div class="mt-title">小程序用户端</div>
-                    <div class="mt-desc">研学日历 · 课程查看</div>
-                </div>
-                <div class="menu-arrow">›</div>
-            </a>
-
-            <a class="menu-card orange" href="订单详情.html">
-                <div class="menu-icon">📋</div>
-                <div class="menu-text">
-                    <div class="mt-title">小程序机构端</div>
-                    <div class="mt-desc">订单详情与核销管理</div>
-                </div>
-                <div class="menu-arrow">›</div>
-            </a>
-
-            <a class="menu-card" style="background:linear-gradient(135deg,#00897B,#00695C);box-shadow:0 4px 16px rgba(0,137,123,0.3);" href="课程管理.html">
-                <div class="menu-icon">📚</div>
-                <div class="menu-text">
-                    <div class="mt-title">课程管理</div>
-                    <div class="mt-desc">产品管理 · 上下架与评价</div>
-                </div>
-                <div class="menu-arrow">›</div>
-            </a>
-
-            <a class="menu-card" style="background:linear-gradient(135deg,#7B1FA2,#4A148C);box-shadow:0 4px 16px rgba(123,31,162,0.3);" href="系统参数配置.html">
-                <div class="menu-icon">⚙️</div>
-                <div class="menu-text">
-                    <div class="mt-title">系统参数配置</div>
-                    <div class="mt-desc">AI生成配置 · 系统Prompt</div>
-                </div>
-                <div class="menu-arrow">›</div>
-            </a>
-        </div>
     </div>
+
+    <!-- ===== 小程序用户端 ===== -->
+    <div class="section-title">
+        <span class="st-icon blue">📱</span>
+        小程序用户端
+    </div>
+    <div class="nav-grid">
+        <a class="nav-card" href="研学日历.html">
+            <div class="nc-icon blue-bg">📅</div>
+            <div class="nc-text"><div class="nc-title">研学日历</div><div class="nc-desc">课程查看 · 日程安排</div></div>
+            <span class="nc-arrow">›</span>
+        </a>
+        <a class="nav-card" href="研学手记.html">
+            <div class="nc-icon red-bg">📝</div>
+            <div class="nc-text"><div class="nc-title">研学手记</div><div class="nc-desc">研学报告 · 作品回顾</div></div>
+            <span class="nc-arrow">›</span>
+        </a>
+        <a class="nav-card" href="AI创作.html">
+            <div class="nc-icon purple-bg">🎨</div>
+            <div class="nc-text"><div class="nc-title">AI创作</div><div class="nc-desc">AI视频 · AI游戏创作</div></div>
+            <span class="nc-arrow">›</span>
+        </a>
+        <a class="nav-card" href="我的.html">
+            <div class="nc-icon green-bg">👤</div>
+            <div class="nc-text"><div class="nc-title">我的</div><div class="nc-desc">个人中心 · 我的作品</div></div>
+            <span class="nc-arrow">›</span>
+        </a>
+        <a class="nav-card" href="我的成员.html">
+            <div class="nc-icon teal-bg">👥</div>
+            <div class="nc-text"><div class="nc-title">我的成员</div><div class="nc-desc">成员管理 · 资料编辑</div></div>
+            <span class="nc-arrow">›</span>
+        </a>
+        <a class="nav-card" href="研学报告.html">
+            <div class="nc-icon red-bg">📊</div>
+            <div class="nc-text"><div class="nc-title">研学报告</div><div class="nc-desc">研学详情 · AI作品展示</div></div>
+            <span class="nc-arrow">›</span>
+        </a>
+    </div>
+
+    <!-- ===== 管理后台 ===== -->
+    <div class="section-title">
+        <span class="st-icon green">⚙️</span>
+        管理后台
+    </div>
+    <div class="nav-grid">
+        <a class="nav-card" href="课程管理.html">
+            <div class="nc-icon blue-bg">📚</div>
+            <div class="nc-text"><div class="nc-title">课程管理</div><div class="nc-desc">产品管理 · 上下架 · 评价</div></div>
+            <span class="nc-arrow">›</span>
+        </a>
+       <a class="nav-card" href="研学手记配置.html">
+            <div class="nc-icon green-bg">📄</div>
+            <div class="nc-text"><div class="nc-title">研学手记配置</div><div class="nc-desc">AI创作 · 研学报告配置</div></div>
+            <span class="nc-arrow">›</span>
+        <a class="nav-card" href="拼团订单管理.html">
+            <div class="nc-icon orange-bg">📦</div>
+            <div class="nc-text"><div class="nc-title">拼团订单管理</div><div class="nc-desc">订单查询 · 研学报告管理</div></div>
+            <span class="nc-arrow">›</span>
+        </a>
+        <a class="nav-card" href="系统参数配置.html">
+            <div class="nc-icon purple-bg">⚙️</div>
+            <div class="nc-text"><div class="nc-title">系统参数配置</div><div class="nc-desc">AI生成配置 · 系统Prompt</div></div>
+            <span class="nc-arrow">›</span>
+        </a>
+        </a>
+    </div>
+</div>
 </body>
 </html>

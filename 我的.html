@@ -13,8 +13,6 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
             background: #f5f5f5;
-            display: flex;
-            justify-content: center;
             min-height: 100vh;
         }
         .app-container {
@@ -302,9 +300,55 @@
         .nav-item.active .nav-icon {
             color: #D43828;
         }
+
+        /* ===== 双栏布局 & 文档面板 ===== */
+        .page-wrap {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            min-height: 100vh;
+            align-items: flex-start;
+            justify-content: center;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 430px;
+            background: #f5f5f5;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 70px;
+        }
+        .doc-panel {
+            width: 560px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            padding: 24px 28px;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', Arial, sans-serif;
+            line-height: 1.7;
+            font-size: 14px;
+            color: #333;
+        }
+        .doc-panel::-webkit-scrollbar { width: 5px; }
+        .doc-panel::-webkit-scrollbar-thumb { background: #d0d5e0; border-radius: 3px; }
+        .doc-panel .doc-title { font-size: 20px; font-weight: 700; color: #1F3864; border-bottom: 2px solid #2E75B6; padding-bottom: 10px; margin-bottom: 16px; }
+        .doc-panel h3 { font-size: 16px; font-weight: 600; color: #2E75B6; margin: 16px 0 8px; }
+        .doc-panel h4 { font-size: 14px; font-weight: 600; color: #333; margin: 12px 0 6px; }
+        .doc-panel p { font-size: 13px; color: #555; margin-bottom: 6px; }
+        .doc-panel ul { padding-left: 20px; margin: 4px 0 8px; }
+        .doc-panel li { margin-bottom: 3px; font-size: 13px; color: #555; }
+        .doc-panel .doc-section { margin-bottom: 6px; }
+
+        @media (max-width: 1100px) {
+            .page-wrap { flex-direction: column; align-items: center; }
+            .doc-panel { width: 100%; max-width: 430px; max-height: none; }
+        }
     </style>
 </head>
 <body>
+<div class="page-wrap">
     <div class="app-container">
         <!-- 顶部状态栏 -->
         <div class="status-bar">
@@ -334,7 +378,7 @@
             </button>
         </div>
 
-        <!-- 我的游客按钮（新增） -->
+        <!-- 我的成员按钮 -->
         <div class="visitor-btn-wrap">
             <button class="visitor-btn" onclick="goVisitors()">
                 <span>👥</span>
@@ -424,31 +468,50 @@
             </div>
             <span class="arrow">›</span>
         </div>
+
+        <!-- 底部导航 -->
+        <div class="bottom-nav">
+            <button class="nav-item" onclick="goNav('首页')">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">首页</span>
+            </button>
+            <button class="nav-item" onclick="goNav('研学日历')">
+                <span class="nav-icon">📅</span>
+                <span class="nav-label">研学日历</span>
+            </button>
+            <button class="nav-item" onclick="goNav('甄选')">
+                <span class="nav-icon">🎁</span>
+                <span class="nav-label">甄选</span>
+            </button>
+            <button class="nav-item active" onclick="goNav('我的')">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">我的</span>
+            </button>
+        </div>
     </div>
 
-    <!-- 底部导航 -->
-    <div class="bottom-nav">
-        <button class="nav-item" onclick="goNav('首页')">
-            <span class="nav-icon">🏠</span>
-            <span class="nav-label">首页</span>
-        </button>
-        <button class="nav-item" onclick="goNav('研学日历')">
-            <span class="nav-icon">📅</span>
-            <span class="nav-label">研学日历</span>
-        </button>
-        <button class="nav-item" onclick="goNav('甄选')">
-            <span class="nav-icon">🎁</span>
-            <span class="nav-label">甄选</span>
-        </button>
-        <button class="nav-item active" onclick="goNav('我的')">
-            <span class="nav-icon">👤</span>
-            <span class="nav-label">我的</span>
-        </button>
+    <!-- 功能说明文档 -->
+    <div class="doc-panel">
+        <div class="doc-title">我的页面 - 功能说明</div>
+
+        <div class="doc-section">
+            <h3>1 页面概述</h3>
+            <p>"我的"页面是用户个人中心和订单管理的聚合入口，展示用户基本信息、积分/优惠券数据，以及研学订单和商城订单的状态入口。</p>
+        </div>
+
+
+        <div class="doc-section">
+            <h3>2 功能说明</h3>
+            <h4>2.1 我的成员</h4>
+             <ul>
+                <li>页面新增"我的成员"按钮，方便用户管理已填报的成员信息。</li>
+            </ul>
     </div>
+</div>
 
     <script>
         function goVisitors() {
-            window.location.href = '我的游客.html';
+            window.location.href = '我的成员.html';
         }
         function goNav(name) {
             if (name === '我的') return;
@@ -459,5 +522,6 @@
             }
         }
     </script>
+<a href="index.html" style="position:fixed;top:12px;right:16px;z-index:99999;background:#E53935;color:#fff;padding:7px 16px;border-radius:20px;text-decoration:none;font-size:13px;font-weight:600;box-shadow:0 2px 10px rgba(229,57,53,0.4);display:inline-flex;align-items:center;gap:5px;">🏠 首页</a>
 </body>
 </html>

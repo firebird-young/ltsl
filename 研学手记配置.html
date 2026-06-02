@@ -564,59 +564,7 @@
                 </div>
             </div>
 
-            <!-- ====== 第二板块：研学报告 ====== -->
-            <div class="section">
-                <div class="section-title">
-                    <span class="icon">📄</span>
-                    研学报告
-                </div>
-
-                <!-- 分类一：研学内容 -->
-                <div class="category-card">
-                    <div class="category-title">
-                        📖 研学内容
-                        <span class="badge">内容</span>
-                    </div>
-
-                    <div class="config-row">
-                        <span class="config-label">主要 Prompt <span class="optional">（选填）</span></span>
-                        <textarea class="text-input" id="contentPrompt" placeholder="输入研学内容生成的主要提示词"></textarea>
-                    </div>
-
-                    <div class="config-row">
-                        <span class="config-label">快捷提示词 <span class="optional">（选填）</span></span>
-                        <div class="tag-container" id="contentTags"></div>
-                        <div class="tag-input-row">
-                            <input type="text" id="contentInput" placeholder="输入快捷提示词，回车添加" onkeydown="if(event.key==='Enter')addContentTag()">
-                            <button class="add-tag-btn" onclick="addContentTag()">添加</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 分类二：研学评价 -->
-                <div class="category-card">
-                    <div class="category-title">
-                        ⭐ 研学评价
-                        <span class="badge">评价</span>
-                    </div>
-
-                    <div class="config-row">
-                        <span class="config-label">主要 Prompt <span class="optional">（选填）</span></span>
-                        <textarea class="text-input" id="evalPrompt" placeholder="输入研学评价生成的主要提示词"></textarea>
-                    </div>
-
-                    <div class="config-row">
-                        <span class="config-label">快捷提示词 <span class="optional">（选填）</span></span>
-                        <div class="tag-container" id="evalTags"></div>
-                        <div class="tag-input-row">
-                            <input type="text" id="evalInput" placeholder="输入快捷提示词，回车添加" onkeydown="if(event.key==='Enter')addEvalTag()">
-                            <button class="add-tag-btn" onclick="addEvalTag()">添加</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ====== 第三板块：研学课程推荐 ====== -->
+            <!-- ====== 第二板块：研学课程推荐 ====== -->
             <div class="section">
                 <div class="section-title">
                     <span class="icon">📚</span>
@@ -710,72 +658,6 @@
         function removeGameQuick(i) {
             gameQuickTags.splice(i, 1);
             renderGameQuick();
-        }
-
-        // ===== 研学内容 =====
-        var contentTags = [];
-
-        function renderContent() {
-            var el = document.getElementById('contentTags');
-            if (contentTags.length === 0) {
-                el.innerHTML = '<span style="font-size:12px;color:#bbb;">暂无快捷提示词</span>';
-                return;
-            }
-            el.innerHTML = contentTags.map(function(t, i) {
-                return '<span class="tag">' + t + '<span class="del" onclick="removeContentTag(' + i + ')">×</span></span>';
-            }).join('');
-        }
-
-        function addContentTag() {
-            var input = document.getElementById('contentInput');
-            var val = input.value.trim();
-            if (!val) return;
-            contentTags.push(val);
-            input.value = '';
-            renderContent();
-        }
-
-        function addPresetContent(val) {
-            contentTags.push(val);
-            renderContent();
-        }
-
-        function removeContentTag(i) {
-            contentTags.splice(i, 1);
-            renderContent();
-        }
-
-        // ===== 研学评价 =====
-        var evalTags = [];
-
-        function renderEval() {
-            var el = document.getElementById('evalTags');
-            if (evalTags.length === 0) {
-                el.innerHTML = '<span style="font-size:12px;color:#bbb;">暂无快捷提示词</span>';
-                return;
-            }
-            el.innerHTML = evalTags.map(function(t, i) {
-                return '<span class="tag">' + t + '<span class="del" onclick="removeEvalTag(' + i + ')">×</span></span>';
-            }).join('');
-        }
-
-        function addEvalTag() {
-            var input = document.getElementById('evalInput');
-            var val = input.value.trim();
-            if (!val) return;
-            evalTags.push(val);
-            input.value = '';
-            renderEval();
-        }
-
-        function addPresetEval(val) {
-            evalTags.push(val);
-            renderEval();
-        }
-
-        function removeEvalTag(i) {
-            evalTags.splice(i, 1);
-            renderEval();
         }
 
         // ===== 多选下拉 - 研学课程推荐 =====
@@ -891,20 +773,11 @@
         defaultVideoPresets.forEach(function(v) { videoQuickTags.push(v); });
         renderVideoQuick();
 
+
         // 游戏预置快捷提示词
         var defaultGamePresets = ['搭建游戏', '拼图游戏'];
         defaultGamePresets.forEach(function(v) { gameQuickTags.push(v); });
         renderGameQuick();
-
-        // 内容预置
-        var defaultContent = ['课程总结', '知识点梳理'];
-        defaultContent.forEach(function(v) { contentTags.push(v); });
-        renderContent();
-
-        // 评价预置
-        var defaultEval = ['学习态度', '动手能力'];
-        defaultEval.forEach(function(v) { evalTags.push(v); });
-        renderEval();
 
         // ===== 读取localStorage保存的配置 =====
         function loadSavedConfig() {
@@ -914,8 +787,6 @@
                 var cfg = JSON.parse(saved);
                 if (cfg.videoQuick) { videoQuickTags = cfg.videoQuick; renderVideoQuick(); }
                 if (cfg.gameQuick) { gameQuickTags = cfg.gameQuick; renderGameQuick(); }
-                if (cfg.contentTags) { contentTags = cfg.contentTags; renderContent(); }
-                if (cfg.evalTags) { evalTags = cfg.evalTags; renderEval(); }
                 if (cfg.ratio) {
                     var r = document.querySelector('input[name="ratio"][value="' + cfg.ratio + '"]');
                     if (r) r.checked = true;
@@ -929,8 +800,6 @@
                 if (cfg.videoFreeCount !== undefined) { document.getElementById('videoFreeCount').value = cfg.videoFreeCount; }
                 if (cfg.gameFreeCount !== undefined) { document.getElementById('gameFreeCount').value = cfg.gameFreeCount; }
                 if (cfg.gamePrompt !== undefined) { document.getElementById('gamePrompt').value = cfg.gamePrompt; }
-                if (cfg.contentPrompt !== undefined) { document.getElementById('contentPrompt').value = cfg.contentPrompt; }
-                if (cfg.evalPrompt !== undefined) { document.getElementById('evalPrompt').value = cfg.evalPrompt; }
                 if (cfg.recommendedCourses) { selectedCourses = cfg.recommendedCourses; renderSelectedTags(); updatePlaceholder(); }
             } catch(e) {}
         }
@@ -951,10 +820,6 @@
                 gamePrompt: document.getElementById('gamePrompt').value.trim(),
                 videoQuick: videoQuickTags,
                 gameQuick: gameQuickTags,
-                contentPrompt: document.getElementById('contentPrompt').value.trim(),
-                evalPrompt: document.getElementById('evalPrompt').value.trim(),
-                contentTags: contentTags,
-                evalTags: evalTags,
                 recommendedCourses: selectedCourses
             };
             localStorage.setItem('studyNoteConfig', JSON.stringify(config));
@@ -966,5 +831,6 @@
             window.location.href = '课程管理.html';
         }
     </script>
+<a href="index.html" style="position:fixed;top:12px;right:16px;z-index:99999;background:#E53935;color:#fff;padding:7px 16px;border-radius:20px;text-decoration:none;font-size:13px;font-weight:600;box-shadow:0 2px 10px rgba(229,57,53,0.4);display:inline-flex;align-items:center;gap:5px;">🏠 首页</a>
 </body>
 </html>
