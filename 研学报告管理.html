@@ -192,6 +192,94 @@
         .overlay-box .ol-header .ol-close { font-size: 12px; color: #0669FF; cursor: pointer; font-weight: 500; }
         .overlay-box .ol-body { padding: 18px 20px; overflow-y: auto; flex: 1; }
 
+        /* ===== AI作品（评价浮层内） ===== */
+        .eval-ai-section {
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px solid #f0f0f0;
+        }
+        .eval-ai-section .eai-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .eval-ai-section .eai-header .eai-icon {
+            width: 22px; height: 22px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #fff;
+            flex-shrink: 0;
+        }
+        .eval-ai-section .eai-header .eai-icon.purple { background: #8B5CF6; }
+        .eval-ai-section .eai-row-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 6px;
+        }
+        .eval-ai-section .eai-row-label .eai-badge {
+            font-size: 10px;
+            font-weight: 400;
+            color: #999;
+            margin-left: 4px;
+        }
+        .eval-ai-section .eai-scroll-row {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            margin-bottom: 10px;
+        }
+        .eval-ai-section .eai-scroll-row:last-child { margin-bottom: 0; }
+        .eval-ai-section .eai-scroll-row::-webkit-scrollbar { height: 3px; }
+        .eval-ai-section .eai-scroll-row::-webkit-scrollbar-thumb { background: #d0d5e0; border-radius: 2px; }
+        .eval-ai-section .eai-item {
+            flex: 0 0 90px;
+            text-align: center;
+        }
+        .eval-ai-section .eai-img-wrap {
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            border-radius: 6px;
+            overflow: hidden;
+            background: #f0f0f0;
+            margin-bottom: 4px;
+            position: relative;
+        }
+        .eval-ai-section .eai-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .eval-ai-section .eai-play-btn {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.55);
+            border: 2px solid rgba(255,255,255,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: #fff;
+            cursor: pointer;
+        }
+        .eval-ai-section .eai-item .eai-label {
+            font-size: 11px;
+            color: #666;
+            line-height: 1.3;
+        }
+        .eval-ai-section .eai-empty {
+            font-size: 12px;
+            color: #bbb;
+            padding: 10px 0;
+        }
+
         /* ===== 功能说明文档面板 ===== */
         .doc-panel {
             background: #fff;
@@ -281,7 +369,10 @@
             &nbsp;&nbsp;- 点击成员对应的"评价"按钮，弹出评价浮层<br>
             &nbsp;&nbsp;- 提示词输入框首先将研学手记配置中该项的提示词自动填入框内，可以补充输入内容<br>
             &nbsp;&nbsp;- 提示词输入框支持插入变量 <code>{用户姓名}</code>，生成评价时自动替换为成员实际姓名<br>
-            &nbsp;&nbsp;- 已保存评价的成员显示"查看评价"按钮，点击可查看已有内容并重新生成
+            &nbsp;&nbsp;- 已保存评价的成员显示"查看评价"按钮，点击可查看已有内容并重新生成<br><br>
+            5. <strong>AI作品展示</strong>：<br>
+            &nbsp;&nbsp;- 评价浮层底部展示该成员的AI作品（视频和游戏）<br>
+            &nbsp;&nbsp;- <strong style="color:#E53935;">注意：只展示已完成的AI作品</strong>
         </p>
     </div>
     <div class="overlay" id="infoOverlay">
@@ -360,6 +451,15 @@
                     <button class="btn" style="background:#D4A84B;color:#fff;border:none;" onclick="saveEval()">💾 保存</button>
                     <button class="btn" style="border:1px solid #0669FF;background:#fff;color:#0669FF;" onclick="reGenerateEval()">🔄 重新生成</button>
                 </div>
+
+                <!-- ===== AI作品 ===== -->
+                <div class="eval-ai-section" id="evalAiSection">
+                    <div class="eai-header">
+                        <span class="eai-icon purple">🎨</span>
+                        AI作品
+                    </div>
+                    <div id="evalAiContent"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -397,6 +497,22 @@
             verified: 'sub-verified',
             expired: 'sub-expired'
         };
+
+        // ===== AI作品Mock数据（按成员姓名） =====
+        var mockAiWorks = {
+            '赵小明': { videos: ['杜甫的家', '杜甫和李白'], games: ['快速搭建茅屋'] },
+            '李小红': { videos: ['国风水墨'], games: ['拼图游戏'] },
+            '王大力': { videos: ['草堂春景', '花间漫步'], games: ['搭建游戏'] },
+            '陈小华': { videos: ['盆景艺术'], games: [] },
+            '林小芳': { videos: ['诗韵流芳', '墨香书韵'], games: ['书法拼图'] },
+            '黄小军': { videos: ['自然之声'], games: ['森林探险'] },
+            '周小天': { videos: ['星空探秘'], games: [] },
+            '吴小月': { videos: [], games: ['诗词接龙'] },
+            '郑小云': { videos: ['山水之间'], games: ['水墨画板'] },
+            '孙小风': { videos: ['风之谷', '飞鸟集'], games: ['飞行棋'] },
+            '钱小飞': { videos: ['城市之光'], games: [] }
+        };
+        var defaultWorks = { videos: ['默认作品'], games: [] };
 
         var currentOrderId = '';
         var currentEvalName = '';
@@ -616,6 +732,38 @@
                 document.getElementById('evalGenArea').style.display = 'block';
                 document.getElementById('evalActions').style.display = 'none';
             }
+            // 渲染该成员的AI作品
+            renderEvalAiWorks(name);
+        }
+        function renderEvalAiWorks(name) {
+            var container = document.getElementById('evalAiContent');
+            var works = mockAiWorks[name] || defaultWorks;
+            var videos = works.videos || [];
+            var games = works.games || [];
+            if (videos.length === 0 && games.length === 0) {
+                container.innerHTML = '<div class="eai-empty">暂无AI作品</div>';
+                return;
+            }
+            var html = '';
+            // 视频
+            if (videos.length > 0) {
+                html += '<div class="eai-row-label">🎬 AI创作视频 <span class="eai-badge">共' + videos.length + '个</span></div>';
+                html += '<div class="eai-scroll-row">';
+                for (var i = 0; i < videos.length; i++) {
+                    html += '<div class="eai-item"><div class="eai-img-wrap"><div style="width:100%;height:100%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;font-size:22px;">🎬</div><div class="eai-play-btn">▶</div></div><div class="eai-label">' + videos[i] + '</div></div>';
+                }
+                html += '</div>';
+            }
+            // 游戏
+            if (games.length > 0) {
+                html += '<div class="eai-row-label">🎮 AI创作游戏 <span class="eai-badge">共' + games.length + '个</span></div>';
+                html += '<div class="eai-scroll-row">';
+                for (var i = 0; i < games.length; i++) {
+                    html += '<div class="eai-item"><div class="eai-img-wrap"><div style="width:100%;height:100%;background:linear-gradient(135deg,#F59E0B,#EF4444);display:flex;align-items:center;justify-content:center;font-size:22px;">🎮</div><div class="eai-play-btn">▶</div></div><div class="eai-label">' + games[i] + '</div></div>';
+                }
+                html += '</div>';
+            }
+            container.innerHTML = html;
         }
         function closeEvalOverlay() { document.getElementById('evalOverlay').classList.remove('show'); }
         function insertEvalVar(v) {
