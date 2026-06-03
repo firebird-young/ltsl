@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分销员管理 - 管理后台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            color: #333;
+        }
+        .header {
+            background: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header .logo { font-size: 18px; font-weight: 700; color: #0669FF; margin-right: 32px; }
+        .header .nav-list { display: flex; gap: 24px; list-style: none; }
+        .header .nav-list li { font-size: 14px; color: #666; cursor: pointer; padding: 4px 0; position: relative; }
+        .header .nav-list li:hover { color: #0669FF; }
+        .header .nav-list li.active { color: #0669FF; font-weight: 600; }
+        .header .nav-list li.active::after { content: ''; position: absolute; bottom: -4px; left: 0; right: 0; height: 2px; background: #0669FF; border-radius: 1px; }
+        .header .user-area { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+        .header .user-area .avatar { width: 32px; height: 32px; border-radius: 50%; background: #E8F0FE; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #0669FF; }
+
+        .breadcrumb { padding: 16px 24px 0; font-size: 13px; color: #999; }
+        .breadcrumb a { color: #999; text-decoration: none; }
+        .breadcrumb a:hover { color: #0669FF; }
+        .breadcrumb .current { color: #333; font-weight: 500; }
+
+        .main { padding: 16px 24px 40px; max-width: 1200px; margin: 0 auto; }
+
+        /* 统计卡片 */
+        .stat-row { display: flex; gap: 16px; margin-bottom: 20px; }
+        .stat-card {
+            flex: 1; background: #fff; border-radius: 10px; padding: 18px 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .stat-card .sc-label { font-size: 13px; color: #999; }
+        .stat-card .sc-value { font-size: 24px; font-weight: 700; color: #333; margin-top: 4px; }
+        .stat-card .sc-value.blue { color: #0669FF; }
+        .stat-card .sc-value.green { color: #389E0D; }
+        .stat-card .sc-value.orange { color: #D48806; }
+
+        /* 筛选 */
+        .filter-bar {
+            display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;
+        }
+        .filter-bar .search-input {
+            flex: 1; min-width: 200px; height: 36px; border: 1px solid #e0e0e0; border-radius: 8px;
+            padding: 0 12px; font-size: 13px; outline: none; transition: border-color 0.2s;
+        }
+        .filter-bar .search-input:focus { border-color: #0669FF; }
+
+        /* 表格 */
+        .table-wrap {
+            background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        table { width: 100%; border-collapse: collapse; }
+        thead th {
+            font-size: 12px; font-weight: 600; color: #999; text-align: left;
+            padding: 12px 16px; border-bottom: 1px solid #f0f0f0; background: #fafafa;
+        }
+        tbody td {
+            font-size: 13px; color: #333; padding: 14px 16px; border-bottom: 1px solid #f5f5f5;
+        }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: #FAFBFF; }
+
+        .tag {
+            display: inline-block; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 500;
+        }
+        .tag.green { background: #E8F5E9; color: #389E0D; }
+        .tag.orange { background: #FFF7E6; color: #D48806; }
+        .tag.blue { background: #E8F0FE; color: #0669FF; }
+
+        .dist-link {
+            color: #0669FF; text-decoration: none; font-weight: 500; cursor: pointer;
+        }
+        .dist-link:hover { text-decoration: underline; }
+
+        .pagination { display: flex; justify-content: center; gap: 6px; margin-top: 16px; }
+        .pagination .page-btn {
+            width: 32px; height: 32px; border: 1px solid #e0e0e0; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center; font-size: 13px;
+            color: #666; cursor: pointer; background: #fff; transition: all 0.2s;
+        }
+        .pagination .page-btn:hover { border-color: #0669FF; color: #0669FF; }
+        .pagination .page-btn.active { background: #0669FF; color: #fff; border-color: #0669FF; }
+        .pagination .page-btn.disabled { opacity: 0.4; cursor: default; }
+    </style>
+</head>
+<body>
+<div class="header">
+    <div class="logo">离泰研学</div>
+    <ul class="nav-list">
+        <li onclick="location.href='系统参数配置.html'">系统参数</li>
+        <li onclick="location.href='研学报告管理.html'">报告管理</li>
+        <li onclick="location.href='分销管理.html'">订单提现</li>
+        <li class="active">分销员管理</li>
+        <li onclick="location.href='拼团订单管理.html'">拼团订单</li>
+        <li onclick="location.href='课程管理.html'">课程管理</li>
+    </ul>
+    <div class="user-area">
+        <span class="name">管理员</span>
+        <div class="avatar">👤</div>
+    </div>
+</div>
+
+<div class="breadcrumb">离泰研学 / 分销员管理</div>
+
+<div class="main">
+    <div class="stat-row">
+        <div class="stat-card">
+            <div class="sc-label">分销员总数</div>
+            <div class="sc-value blue" id="totalCount">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="sc-label">本月新增</div>
+            <div class="sc-value green" id="newThisMonth">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="sc-label">本月总佣金</div>
+            <div class="sc-value orange" id="monthCommission">¥0</div>
+        </div>
+        <div class="stat-card">
+            <div class="sc-label">活跃分销员</div>
+            <div class="sc-value" id="activeCount">0</div>
+        </div>
+    </div>
+
+    <div class="filter-bar">
+        <input class="search-input" id="searchInput" placeholder="搜索分销员姓名、手机号..." oninput="doSearch()">
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>分销员</th>
+                    <th>手机号</th>
+                    <th>等级</th>
+                    <th>分销订单</th>
+                    <th>订单总额</th>
+                    <th>总佣金</th>
+                    <th>分佣比例</th>
+                    <th>当前余额</th>
+                    <th>状态</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+    <div class="pagination" id="pagination"></div>
+</div>
+
+<script>
+    var distData = [
+        { name: '王小明', phone: '13812345678', level: '金牌分销员', levelTag: 'Lv.3', orders: 9, orderAmount: 1723.33, commission: 258.50, rate: '15%', balance: 86.00, monthNew: true, monthActive: true },
+        { name: '李大力', phone: '18698765432', level: '银牌分销员', levelTag: 'Lv.2', orders: 6, orderAmount: 1130.00, commission: 169.50, rate: '15%', balance: 67.20, monthNew: false, monthActive: true },
+        { name: '张小红', phone: '13655667788', level: '金牌分销员', levelTag: 'Lv.3', orders: 4, orderAmount: 1120.00, commission: 168.00, rate: '15%', balance: 880.00, monthNew: true, monthActive: true },
+        { name: '赵思远', phone: '15099887766', level: '铜牌分销员', levelTag: 'Lv.1', orders: 2, orderAmount: 373.33, commission: 56.00, rate: '15%', balance: 0.00, monthNew: false, monthActive: false },
+        { name: '刘佳', phone: '17712340987', level: '银牌分销员', levelTag: 'Lv.2', orders: 5, orderAmount: 890.00, commission: 133.50, rate: '15%', balance: 0.00, monthNew: false, monthActive: true },
+        { name: '陈伟', phone: '18856781234', level: '铜牌分销员', levelTag: 'Lv.1', orders: 1, orderAmount: 150.00, commission: 22.50, rate: '15%', balance: 22.50, monthNew: true, monthActive: false },
+    ];
+
+    var page = 1, pageSize = 8;
+
+    function fmt(n) { return n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+
+    function doSearch() { page = 1; render(); }
+
+    function render() {
+        var keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+        var filtered = distData.filter(function(d) {
+            return keyword === '' || d.name.indexOf(keyword) !== -1 || d.phone.indexOf(keyword) !== -1;
+        });
+
+        // 统计
+        var total = distData.length;
+        var monthNew = distData.filter(function(d) { return d.monthNew; }).length;
+        var monthComm = distData.reduce(function(s, d) { return s + d.commission; }, 0);
+        var active = distData.filter(function(d) { return d.monthActive; }).length;
+        document.getElementById('totalCount').textContent = total;
+        document.getElementById('newThisMonth').textContent = monthNew;
+        document.getElementById('monthCommission').textContent = '¥' + fmt(monthComm);
+        document.getElementById('activeCount').textContent = active;
+
+        var totalPages = Math.ceil(filtered.length / pageSize) || 1;
+        var start = (page - 1) * pageSize;
+        var pageData = filtered.slice(start, start + pageSize);
+
+        var html = '';
+        pageData.forEach(function(d) {
+            var statusTag = d.monthActive
+                ? '<span class="tag green">活跃</span>'
+                : '<span class="tag orange">沉睡</span>';
+            html += '<tr>'
+                + '<td><a class="dist-link" href="分销员详情.html?name=' + encodeURIComponent(d.name) + '&phone=' + d.phone + '">' + d.name + '</a></td>'
+                + '<td style="font-family:monospace;">' + d.phone + '</td>'
+                + '<td>' + d.level + ' <span style="font-size:11px;color:#999;">' + d.levelTag + '</span></td>'
+                + '<td><b>' + d.orders + '</b></td>'
+                + '<td>¥' + fmt(d.orderAmount) + '</td>'
+                + '<td>¥' + fmt(d.commission) + '</td>'
+                + '<td>' + d.rate + '</td>'
+                + '<td><b>' + (d.balance > 0 ? '¥' + fmt(d.balance) : '<span style="color:#ccc;">¥0.00</span>') + '</b></td>'
+                + '<td>' + statusTag + '</td>'
+                + '</tr>';
+        });
+        if (!html) html = '<tr><td colspan="9" style="text-align:center;color:#999;padding:40px;">暂无数据</td></tr>';
+        document.getElementById('tableBody').innerHTML = html;
+
+        // 分页
+        var ph = '';
+        ph += page > 1 ? '<div class="page-btn" onclick="goPage(' + (page-1) + ')">‹</div>' : '<div class="page-btn disabled">‹</div>';
+        for (var i = 1; i <= totalPages; i++) {
+            ph += '<div class="page-btn' + (i === page ? ' active' : '') + '" onclick="goPage(' + i + ')">' + i + '</div>';
+        }
+        ph += page < totalPages ? '<div class="page-btn" onclick="goPage(' + (page+1) + ')">›</div>' : '<div class="page-btn disabled">›</div>';
+        document.getElementById('pagination').innerHTML = ph;
+    }
+
+    function goPage(p) { page = p; render(); }
+
+    render();
+</script>
+<a href="index.html" style="position:fixed;top:12px;right:16px;z-index:99999;background:#E53935;color:#fff;padding:7px 16px;border-radius:20px;text-decoration:none;font-size:13px;font-weight:600;box-shadow:0 2px 10px rgba(229,57,53,0.4);display:inline-flex;align-items:center;gap:5px;">🏠 首页</a>
+</body>
+</html>

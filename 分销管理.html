@@ -164,6 +164,7 @@
         <li onclick="location.href='系统参数配置.html'">系统参数</li>
         <li onclick="location.href='研学报告管理.html'">报告管理</li>
         <li class="active">分销管理</li>
+        <li onclick="location.href='分销员管理.html'">分销员管理</li>
         <li onclick="location.href='拼团订单管理.html'">拼团订单</li>
         <li onclick="location.href='课程管理.html'">课程管理</li>
     </ul>
@@ -330,7 +331,7 @@
             html += '<tr><td style="font-size:12px;color:#888;">' + o.id + '</td>'
                  + '<td>' + o.name + '</td>'
                  + '<td>¥' + o.amount.toFixed(2) + '</td>'
-                 + '<td>' + o.distributor + '</td>'
+                 + '<td><a href="分销员详情.html?name=' + encodeURIComponent(o.distributor) + '&phone=' + o.phone + '" style="color:#0669FF;text-decoration:none;font-weight:500;">' + o.distributor + '</a></td>'
                  + '<td style="font-family:monospace;">' + o.phone + '</td>'
                  + '<td>' + o.rate + '</td>'
                  + '<td><b>¥' + o.commission.toFixed(2) + '</b></td>'
@@ -405,7 +406,7 @@
             items.forEach(function(w) {
                 html += '<div class="wdg-item">'
                      + '<div class="wdg-info">'
-                     + '<div class="wdg-name">' + w.name + '</div>'
+                     + '<div class="wdg-name"><a href="分销员详情.html?name=' + encodeURIComponent(w.name) + '&phone=' + w.phone + '" style="color:#0669FF;text-decoration:none;">' + w.name + '</a></div>'
                      + '<div class="wdg-phone">' + w.phone + '</div>'
                      + '</div>'
                      + '<div class="wdg-amount">¥' + w.amount.toFixed(2) + '</div>'

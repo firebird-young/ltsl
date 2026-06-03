@@ -321,6 +321,23 @@
                 </div>
 
                 <div class="config-row">
+                    <span class="config-label">AI文本模型</span>
+                    <div class="config-desc" style="margin-bottom:10px;">当前采用阿里千问，推荐以下文本模型</div>
+                    <div class="radio-group">
+                        <input type="radio" name="gameModel" id="gm0" value="qwen3.7-max-preview" checked>
+                        <label for="gm0">Qwen3.7-Max-Preview</label>
+                        <input type="radio" name="gameModel" id="gm1" value="qwen3-max">
+                        <label for="gm1">Qwen3-Max</label>
+                        <input type="radio" name="gameModel" id="gm2" value="qwen3.6-plus">
+                        <label for="gm2">Qwen3.6-Plus</label>
+                        <input type="radio" name="gameModel" id="gm3" value="qwen3-30b">
+                        <label for="gm3">Qwen3-30B</label>
+                        <input type="radio" name="gameModel" id="gm4" value="qwen3-max-thinking">
+                        <label for="gm4">Qwen3-Max-Thinking</label>
+                    </div>
+                </div>
+
+                <div class="config-row">
                     <span class="config-label">AI游戏系统 Prompt</span>
                     <textarea class="text-input" id="aiGamePrompt" placeholder="请输入AI游戏系统的全局提示词（System Prompt）&#10;&#10;例如：&#10;- 你是一个专业的AI游戏创作助手，擅长设计研学相关的互动游戏。&#10;- 游戏需要包含明确的教育目标和趣味性。&#10;- 输出格式需结构化，包含游戏规则、关卡设计和评分机制。&#10;- 所有内容需符合中小学生认知水平。"></textarea>
                     <div class="config-desc">该提示词将作为AI游戏创作的系统级前置指令，影响所有游戏生成的结果</div>
@@ -344,6 +361,7 @@
                     &nbsp;&nbsp;- <strong>AI视频模型</strong>：单选，支持 seedance-2.0、seedance-2.0-fast、seedance-1.5-pro 三个模型版本（可以做成字典，有需要调整）<br>
                     &nbsp;&nbsp;- <strong>AI视频系统 Prompt</strong>：文本输入框，设置AI视频创作的系统级前置指令，作为全局提示词影响所有视频生成的结果<br><br>
                     2. <strong>AI游戏生成配置</strong>：<br>
+                    &nbsp;&nbsp;- <strong>AI文本模型</strong>：单选，支持千问系列最新文本模型（Qwen3.7-Max-Preview / Qwen3-Max / Qwen3.6-Plus / Qwen3-30B / Qwen3-Max-Thinking）<br>
                     &nbsp;&nbsp;- <strong>AI游戏系统 Prompt</strong>：文本输入框，设置AI游戏创作的系统级前置指令，作为全局提示词影响所有游戏生成的结果<br><br>
                     3. <strong>底部操作</strong>：支持"取消"和"保存配置"
                 </p>
@@ -367,6 +385,10 @@
                     var m = document.querySelector('input[name="videoModel"][value="' + cfg.videoModel + '"]');
                     if (m) m.checked = true;
                 }
+                if (cfg.gameModel) {
+                    var gm = document.querySelector('input[name="gameModel"][value="' + cfg.gameModel + '"]');
+                    if (gm) gm.checked = true;
+                }
             } catch(e) {}
         }
 
@@ -382,10 +404,12 @@
                 return;
             }
             var modelEl = document.querySelector('input[name="videoModel"]:checked');
+            var gameModelEl = document.querySelector('input[name="gameModel"]:checked');
             var config = {
                 aiVideoPrompt: videoPrompt,
                 aiGamePrompt: gamePrompt,
-                videoModel: modelEl ? modelEl.value : 'seedance-2.0'
+                videoModel: modelEl ? modelEl.value : 'seedance-2.0',
+                gameModel: gameModelEl ? gameModelEl.value : 'qwen3.7-max-preview'
             };
             localStorage.setItem('systemConfig', JSON.stringify(config));
             alert('✅ 系统参数配置已保存');

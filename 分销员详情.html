@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分销员详情 - 管理后台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            color: #333;
+        }
+        .header {
+            background: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header .logo { font-size: 18px; font-weight: 700; color: #0669FF; margin-right: 32px; }
+        .header .nav-list { display: flex; gap: 24px; list-style: none; }
+        .header .nav-list li { font-size: 14px; color: #666; cursor: pointer; padding: 4px 0; position: relative; }
+        .header .nav-list li:hover { color: #0669FF; }
+        .header .nav-list li.active { color: #0669FF; font-weight: 600; }
+        .header .nav-list li.active::after { content: ''; position: absolute; bottom: -4px; left: 0; right: 0; height: 2px; background: #0669FF; border-radius: 1px; }
+        .header .user-area { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+        .header .user-area .avatar { width: 32px; height: 32px; border-radius: 50%; background: #E8F0FE; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #0669FF; }
+
+        .breadcrumb { padding: 16px 24px 0; font-size: 13px; color: #999; }
+        .breadcrumb a { color: #999; text-decoration: none; }
+        .breadcrumb a:hover { color: #0669FF; }
+        .breadcrumb .current { color: #333; font-weight: 500; }
+
+        .main { padding: 16px 24px 40px; max-width: 1100px; margin: 0 auto; }
+
+        /* 分销员头部 */
+        .dist-header {
+            background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 20px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04); display: flex; align-items: center; gap: 16px;
+        }
+        .dist-header .dh-avatar {
+            width: 56px; height: 56px; border-radius: 50%; background: #E8F0FE;
+            display: flex; align-items: center; justify-content: center; font-size: 24px; color: #0669FF; flex-shrink: 0;
+        }
+        .dist-header .dh-info { flex: 1; }
+        .dist-header .dh-info .dh-name { font-size: 20px; font-weight: 700; color: #1a1a1a; }
+        .dist-header .dh-info .dh-phone { font-size: 14px; color: #999; margin-top: 4px; font-family: monospace; }
+        .dist-header .dh-level {
+            padding: 6px 16px; background: #FFF7E6; border-radius: 20px; font-size: 13px; color: #D48806; font-weight: 500;
+        }
+
+        /* 统计卡片 */
+        .stat-row { display: flex; gap: 16px; margin-bottom: 20px; }
+        .stat-card {
+            flex: 1; background: #fff; border-radius: 10px; padding: 18px 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .stat-card .sc-label { font-size: 13px; color: #999; }
+        .stat-card .sc-value { font-size: 24px; font-weight: 700; color: #333; margin-top: 4px; }
+        .stat-card .sc-value.blue { color: #0669FF; }
+        .stat-card .sc-value.green { color: #389E0D; }
+        .stat-card .sc-value.orange { color: #D48806; }
+
+        /* 余额卡片 */
+        .balance-card {
+            background: #fff; border-radius: 12px; padding: 18px 20px; margin-bottom: 20px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .balance-card .bc-title { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 12px; }
+        .balance-card .bc-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f5f5f5; }
+        .balance-card .bc-row:last-child { border-bottom: none; }
+        .balance-card .bc-row .bc-label { font-size: 13px; color: #999; }
+        .balance-card .bc-row .bc-value { font-size: 15px; font-weight: 600; }
+        .balance-card .bc-row .bc-value.blue { color: #0669FF; }
+        .balance-card .bc-row .bc-value.green { color: #389E0D; }
+        .balance-card .bc-row .bc-value.orange { color: #D48806; }
+
+        /* 订单列表 */
+        .section-title {
+            font-size: 15px; font-weight: 600; color: #333; margin-bottom: 12px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .order-list { background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+        .order-item {
+            display: flex; align-items: center; padding: 14px 18px; border-bottom: 1px solid #f5f5f5;
+        }
+        .order-item:last-child { border-bottom: none; }
+        .order-item .oi-info { flex: 1; }
+        .order-item .oi-info .oi-name { font-size: 14px; font-weight: 500; color: #333; }
+        .order-item .oi-info .oi-meta { font-size: 12px; color: #999; margin-top: 2px; }
+        .order-item .oi-amount { text-align: right; }
+        .order-item .oi-amount .oi-price { font-size: 15px; font-weight: 600; color: #333; }
+        .order-item .oi-amount .oi-commission { font-size: 12px; color: #D48806; margin-top: 2px; }
+        .order-item .oi-status { margin-left: 16px; }
+
+        .tag {
+            display: inline-block; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 500;
+        }
+        .tag.green { background: #E8F5E9; color: #389E0D; }
+        .tag.orange { background: #FFF7E6; color: #D48806; }
+        .tag.red { background: #FFF0F0; color: #D43828; }
+    </style>
+</head>
+<body>
+<div class="header">
+    <div class="logo">离泰研学</div>
+    <ul class="nav-list">
+        <li>系统参数</li>
+        <li>报告管理</li>
+        <li onclick="location.href='分销管理.html'" style="color:#0669FF;font-weight:600;">分销管理</li>
+        <li>拼团订单</li>
+        <li>课程管理</li>
+    </ul>
+    <div class="user-area">
+        <span class="name">管理员</span>
+        <div class="avatar">👤</div>
+    </div>
+</div>
+
+<div class="breadcrumb">
+    <a href="分销管理.html">分销管理</a> / <span class="current" id="bcName">分销员详情</span>
+</div>
+
+<div class="main" id="app">
+    <div class="dist-header">
+        <div class="dh-avatar" id="dhAvatar">👤</div>
+        <div class="dh-info">
+            <div class="dh-name" id="dhName">-</div>
+            <div class="dh-phone" id="dhPhone">-</div>
+        </div>
+        <div class="dh-level">金牌分销员 Lv.3</div>
+    </div>
+
+    <div class="stat-row">
+        <div class="stat-card">
+            <div class="sc-label">分销订单总数</div>
+            <div class="sc-value blue" id="statOrders">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="sc-label">总订单金额</div>
+            <div class="sc-value" id="statAmount">¥0</div>
+        </div>
+        <div class="stat-card">
+            <div class="sc-label">总佣金收入</div>
+            <div class="sc-value green" id="statCommission">¥0</div>
+        </div>
+        <div class="stat-card">
+            <div class="sc-label">分佣比例</div>
+            <div class="sc-value orange" id="statRate">-</div>
+        </div>
+    </div>
+
+    <div class="balance-card">
+        <div class="bc-title">💰 收益概览</div>
+        <div class="bc-row">
+            <span class="bc-label">累计收益</span>
+            <span class="bc-value blue" id="totalEarn">¥0.00</span>
+        </div>
+        <div class="bc-row">
+            <span class="bc-label">已提现总额</span>
+            <span class="bc-value green" id="withdrawn">¥0.00</span>
+        </div>
+        <div class="bc-row">
+            <span class="bc-label">当前余额（已结算）</span>
+            <span class="bc-value" id="settledBal">¥0.00</span>
+        </div>
+        <div class="bc-row">
+            <span class="bc-label">待结算</span>
+            <span class="bc-value orange" id="pendingBal">¥0.00</span>
+        </div>
+    </div>
+
+    <div class="section-title">
+        <span>📋 分销订单</span>
+        <span style="font-size:12px;color:#999;" id="orderCount">共 0 笔</span>
+    </div>
+    <div class="order-list" id="orderList"></div>
+</div>
+
+<script>
+    var allOrders = [
+        { id: 'YX20260602001', name: '盆景美学·指尖山水', amount: 373.33, phone: '13812345678', distributor: '王小明', rate: '15%', commission: 56.00, time: '2026-06-02 10:30', status: 'done' },
+        { id: 'YX20260601002', name: '诗界无心·草堂寻心', amount: 200.00, phone: '13812345678', distributor: '王小明', rate: '15%', commission: 30.00, time: '2026-06-01 14:20', status: 'done' },
+        { id: 'YX20260530003', name: '搭建小茅屋', amount: 150.00, phone: '18698765432', distributor: '李大力', rate: '15%', commission: 22.50, time: '2026-05-30 09:15', status: 'pending' },
+        { id: 'YX20260522004', name: '自然探索营', amount: 298.00, phone: '18698765432', distributor: '李大力', rate: '15%', commission: 44.70, time: '2026-05-22 08:30', status: 'done' },
+        { id: 'YX20260520005', name: '我为杜甫建茅屋', amount: 586.67, phone: '13655667788', distributor: '张小红', rate: '15%', commission: 88.00, time: '2026-05-20 16:00', status: 'done' },
+        { id: 'YX20260518006', name: '盆景美学·指尖山水', amount: 373.33, phone: '15099887766', distributor: '赵思远', rate: '15%', commission: 56.00, time: '2026-05-18 11:20', status: 'refund' },
+        { id: 'YX20260515007', name: '诗界无心·草堂寻心', amount: 200.00, phone: '17712340987', distributor: '刘佳', rate: '15%', commission: 30.00, time: '2026-05-15 09:00', status: 'done' },
+        { id: 'YX20260512008', name: '搭建小茅屋', amount: 150.00, phone: '18856781234', distributor: '陈伟', rate: '15%', commission: 22.50, time: '2026-05-12 14:30', status: 'pending' },
+    ];
+
+    // 提现数据用于计算余额
+    var allWithdraws = [
+        { name: '王小明', amount: 1560.00, time: '2026-06-01', status: 'pending' },
+        { name: '李大力', amount: 2300.00, time: '2026-05-31', status: 'success' },
+        { name: '李大力', amount: 1400.00, time: '2026-04-30', status: 'success' },
+        { name: '张小红', amount: 880.00, time: '2026-05-31', status: 'pending' },
+        { name: '赵思远', amount: 500.00, time: '', status: 'failed' },
+        { name: '刘佳', amount: 1200.00, time: '2026-05-31', status: 'success' },
+        { name: '刘佳', amount: 800.00, time: '', status: 'failed' },
+        { name: '王小明', amount: 1640.00, time: '2026-04-30', status: 'success' },
+    ];
+
+    function fmt(n) { return n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+
+    function statusTag(status) {
+        var map = { done: ['green', '已结算'], pending: ['orange', '待结算'], refund: ['red', '已退款'] };
+        var m = map[status] || ['gray', status];
+        return '<span class="tag ' + m[0] + '">' + m[1] + '</span>';
+    }
+
+    function init() {
+        var params = new URLSearchParams(window.location.search);
+        var name = params.get('name') || '';
+        var phone = params.get('phone') || '';
+
+        if (!name) { document.getElementById('app').innerHTML = '<p style="text-align:center;color:#999;padding:60px;">未指定分销员</p>'; return; }
+
+        document.getElementById('dhName').textContent = name;
+        document.getElementById('dhPhone').textContent = phone;
+        document.getElementById('bcName').textContent = name;
+
+        // 筛选该分销员的订单
+        var orders = allOrders.filter(function(o) { return o.distributor === name; });
+
+        // 统计
+        var totalOrders = orders.length;
+        var totalAmount = orders.reduce(function(s, o) { return s + o.amount; }, 0);
+        var totalCommission = orders.reduce(function(s, o) { return s + o.commission; }, 0);
+        var rate = orders.length > 0 ? orders[0].rate : '-';
+
+        document.getElementById('statOrders').textContent = totalOrders;
+        document.getElementById('statAmount').textContent = '¥' + fmt(totalAmount);
+        document.getElementById('statCommission').textContent = '¥' + fmt(totalCommission);
+        document.getElementById('statRate').textContent = rate;
+
+        // 收益概览
+        var withdrawnTotal = allWithdraws.filter(function(w) { return w.name === name && w.status === 'success'; })
+            .reduce(function(s, w) { return s + w.amount; }, 0);
+        var settled = orders.filter(function(o) { return o.status === 'done'; })
+            .reduce(function(s, o) { return s + o.commission; }, 0);
+        var pending = orders.filter(function(o) { return o.status === 'pending'; })
+            .reduce(function(s, o) { return s + o.commission; }, 0);
+        var totalEarn = totalCommission;
+
+        document.getElementById('totalEarn').textContent = '¥' + fmt(totalEarn);
+        document.getElementById('withdrawn').textContent = '¥' + fmt(withdrawnTotal);
+        document.getElementById('settledBal').textContent = '¥' + fmt(Math.max(0, settled - withdrawnTotal));
+        document.getElementById('pendingBal').textContent = '¥' + fmt(pending);
+
+        // 订单列表
+        document.getElementById('orderCount').textContent = '共 ' + totalOrders + ' 笔';
+        var html = '';
+        orders.forEach(function(o) {
+            html += '<div class="order-item">'
+                 + '<div class="oi-info">'
+                 + '<div class="oi-name">' + o.name + '</div>'
+                 + '<div class="oi-meta">' + o.time + ' · ' + o.id + '</div>'
+                 + '</div>'
+                 + '<div class="oi-amount">'
+                 + '<div class="oi-price">¥' + o.amount.toFixed(2) + '</div>'
+                 + '<div class="oi-commission">佣金 ¥' + o.commission.toFixed(2) + '</div>'
+                 + '</div>'
+                 + '<div class="oi-status">' + statusTag(o.status) + '</div>'
+                 + '</div>';
+        });
+        document.getElementById('orderList').innerHTML = html || '<div style="text-align:center;padding:40px;color:#999;">暂无订单</div>';
+    }
+
+    init();
+</script>
+<a href="index.html" style="position:fixed;top:12px;right:16px;z-index:99999;background:#E53935;color:#fff;padding:7px 16px;border-radius:20px;text-decoration:none;font-size:13px;font-weight:600;box-shadow:0 2px 10px rgba(229,57,53,0.4);display:inline-flex;align-items:center;gap:5px;">🏠 首页</a>
+</body>
+</html>
