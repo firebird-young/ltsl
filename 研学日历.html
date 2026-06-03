@@ -395,7 +395,7 @@
             var m = parseInt(parts[1],10);
             var d = parseInt(parts[2],10);
             var dateObj = new Date(parseInt(parts[0]), m-1, d);
-            var weekday = weekdayNames[dateObj.getDay()].slice(-1);
+            var weekday = '周' + weekdayNames[dateObj.getDay()].slice(-1);
             var isActive = ds === selectedDate;
             var isPast = ds < todayStr;
             html += '<button class="date-chip' + (isActive ? ' active' : '') + (isPast && !isActive ? ' past' : '') + '" onclick="selectDate(\'' + ds + '\', this)">' +

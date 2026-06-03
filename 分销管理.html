@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分销管理 - 管理后台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            color: #333;
+        }
+        .header {
+            background: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header .logo { font-size: 18px; font-weight: 700; color: #0669FF; margin-right: 32px; }
+        .header .nav-list { display: flex; gap: 24px; list-style: none; }
+        .header .nav-list li { font-size: 14px; color: #666; cursor: pointer; padding: 4px 0; position: relative; }
+        .header .nav-list li:hover { color: #0669FF; }
+        .header .nav-list li.active { color: #0669FF; font-weight: 600; }
+        .header .nav-list li.active::after { content: ''; position: absolute; bottom: -4px; left: 0; right: 0; height: 2px; background: #0669FF; border-radius: 1px; }
+        .header .user-area { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+        .header .user-area .avatar { width: 32px; height: 32px; border-radius: 50%; background: #E8F0FE; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #0669FF; }
+        .header .user-area .name { font-size: 14px; color: #333; }
+
+        .breadcrumb { padding: 16px 24px 0; font-size: 13px; color: #999; }
+        .breadcrumb a { color: #999; text-decoration: none; }
+        .breadcrumb a:hover { color: #0669FF; }
+        .breadcrumb .current { color: #333; font-weight: 500; }
+
+        .main { padding: 16px 24px 40px; max-width: 1100px; margin: 0 auto; }
+
+        /* 统计卡片 */
+        .stat-row { display: flex; gap: 16px; margin-bottom: 20px; }
+        .stat-card {
+            flex: 1; background: #fff; border-radius: 10px; padding: 18px 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .stat-card .sc-label { font-size: 13px; color: #999; }
+        .stat-card .sc-value { font-size: 24px; font-weight: 700; color: #333; margin-top: 4px; }
+        .stat-card .sc-value.blue { color: #0669FF; }
+        .stat-card .sc-value.green { color: #389E0D; }
+        .stat-card .sc-value.orange { color: #D48806; }
+
+        /* Tab 切换 */
+        .tab-bar { display: flex; gap: 0; margin-bottom: 16px; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+        .tab-bar .tab-item {
+            flex: 1; padding: 14px 0; text-align: center; font-size: 14px; font-weight: 500;
+            color: #666; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s;
+        }
+        .tab-bar .tab-item:hover { color: #0669FF; }
+        .tab-bar .tab-item.active { color: #0669FF; border-bottom-color: #0669FF; font-weight: 600; }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* 搜索/筛选栏 */
+        .filter-bar {
+            display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;
+        }
+        .filter-bar .search-input {
+            flex: 1; min-width: 200px; height: 36px; border: 1px solid #e0e0e0; border-radius: 8px;
+            padding: 0 12px; font-size: 13px; outline: none; transition: border-color 0.2s;
+        }
+        .filter-bar .search-input:focus { border-color: #0669FF; }
+        .filter-bar select {
+            height: 36px; border: 1px solid #e0e0e0; border-radius: 8px; padding: 0 10px;
+            font-size: 13px; color: #333; outline: none; background: #fff;
+        }
+        .filter-bar .btn {
+            height: 36px; padding: 0 18px; border: none; border-radius: 8px; font-size: 13px;
+            font-weight: 500; cursor: pointer; transition: opacity 0.2s;
+        }
+        .filter-bar .btn:active { opacity: 0.85; }
+        .filter-bar .btn.primary { background: #0669FF; color: #fff; }
+
+        /* 表格 */
+        .table-wrap {
+            background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        table { width: 100%; border-collapse: collapse; }
+        thead th {
+            font-size: 12px; font-weight: 600; color: #999; text-align: left;
+            padding: 12px 16px; border-bottom: 1px solid #f0f0f0; background: #fafafa;
+        }
+        tbody td {
+            font-size: 13px; color: #333; padding: 14px 16px; border-bottom: 1px solid #f5f5f5;
+        }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: #FAFBFF; }
+        .tag {
+            display: inline-block; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 500;
+        }
+        .tag.green { background: #E8F5E9; color: #389E0D; }
+        .tag.orange { background: #FFF7E6; color: #D48806; }
+        .tag.blue { background: #E8F0FE; color: #0669FF; }
+        .tag.red { background: #FFF0F0; color: #D43828; }
+        .tag.gray { background: #f5f5f5; color: #999; }
+
+        /* 操作按钮 */
+        .action-btn {
+            padding: 4px 12px; border: none; border-radius: 6px; font-size: 12px; font-weight: 500;
+            cursor: pointer; transition: opacity 0.2s; margin: 0 3px;
+        }
+        .action-btn:active { opacity: 0.8; }
+        .action-btn.green { background: #E8F5E9; color: #389E0D; }
+        .action-btn.blue { background: #E8F0FE; color: #0669FF; }
+        .action-btn.red { background: #FFF0F0; color: #D43828; }
+        .action-btn.gray { background: #f5f5f5; color: #999; cursor: default; }
+
+        /* 月份分组 */
+        .wd-group { background: #fff; border-radius: 10px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); overflow: hidden; }
+        .wd-group .wdg-header { padding: 12px 18px; background: #fafafa; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: space-between; }
+        .wd-group .wdg-header .wdg-month { font-size: 14px; font-weight: 600; color: #333; }
+        .wd-group .wdg-header .wdg-summary { font-size: 12px; color: #999; }
+        .wd-group .wdg-header .wdg-summary strong { color: #333; }
+        .wd-group .wdg-header .wdg-summary .red { color: #D43828; }
+        .wd-group .wdg-item { display: flex; align-items: center; padding: 12px 18px; border-bottom: 1px solid #f5f5f5; }
+        .wd-group .wdg-item:last-child { border-bottom: none; }
+        .wd-group .wdg-item .wdg-info { flex: 2; min-width: 0; }
+        .wd-group .wdg-item .wdg-info .wdg-name { font-size: 14px; font-weight: 500; color: #333; }
+        .wd-group .wdg-item .wdg-info .wdg-phone { font-size: 11px; color: #999; font-family: monospace; margin-top: 1px; }
+        .wd-group .wdg-item .wdg-amount { flex: 1; font-size: 16px; font-weight: 700; color: #333; text-align: center; }
+        .wd-group .wdg-item .wdg-meta { flex: 1.5; font-size: 12px; color: #999; text-align: center; }
+        .wd-group .wdg-item .wdg-meta .wdg-acct { margin-bottom: 2px; }
+        .wd-group .wdg-item .wdg-status { flex: 0.8; text-align: center; }
+        .wd-group .wdg-item .wdg-action { flex: 1; text-align: center; }
+        .wd-group .wdg-item .wdg-action .btn-retry {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 5px 12px; border-radius: 6px; border: none; cursor: pointer;
+            font-size: 12px; font-weight: 500; transition: all 0.2s;
+            background: #E8F0FE; color: #0669FF;
+        }
+        .wd-group .wdg-item .wdg-action .btn-retry:hover { background: #0669FF; color: #fff; }
+        .wd-group .wdg-item .wdg-action .btn-retry:active { opacity: 0.8; }
+
+        /* 分页 */
+        .pagination { display: flex; justify-content: center; gap: 6px; margin-top: 16px; }
+        .pagination .page-btn {
+            width: 32px; height: 32px; border: 1px solid #e0e0e0; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center; font-size: 13px;
+            color: #666; cursor: pointer; background: #fff; transition: all 0.2s;
+        }
+        .pagination .page-btn:hover { border-color: #0669FF; color: #0669FF; }
+        .pagination .page-btn.active { background: #0669FF; color: #fff; border-color: #0669FF; }
+        .pagination .page-btn.disabled { opacity: 0.4; cursor: default; }
+
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="logo">离泰研学</div>
+    <ul class="nav-list">
+        <li onclick="location.href='系统参数配置.html'">系统参数</li>
+        <li onclick="location.href='研学报告管理.html'">报告管理</li>
+        <li class="active">分销管理</li>
+        <li onclick="location.href='拼团订单管理.html'">拼团订单</li>
+        <li onclick="location.href='课程管理.html'">课程管理</li>
+    </ul>
+    <div class="user-area">
+        <span class="name">管理员</span>
+        <div class="avatar">👤</div>
+    </div>
+</div>
+
+<div class="breadcrumb">离泰研学 / 分销管理</div>
+
+<div class="main">
+
+    <!-- 统计卡片 -->
+    <div class="stat-row">
+        <div class="stat-card">
+            <div class="sc-label">分销员总数</div>
+            <div class="sc-value blue">128</div>
+        </div>
+        <div class="stat-card">
+            <div class="sc-label">本月新增分销员</div>
+            <div class="sc-value green">12</div>
+        </div>
+        <div class="stat-card">
+            <div class="sc-label">本月佣金支出</div>
+            <div class="sc-value orange">¥8,620.50</div>
+        </div>
+        <div class="stat-card">
+            <div class="sc-label">待结算佣金</div>
+            <div class="sc-value">¥1,720.00</div>
+        </div>
+    </div>
+
+    <!-- Tab 切换 -->
+    <div class="tab-bar">
+        <div class="tab-item active" onclick="switchTab(this, 'orders')">📦 分销订单</div>
+        <div class="tab-item" onclick="switchTab(this, 'withdraw')">💳 提现管理</div>
+    </div>
+
+    <!-- ============ TAB 1: 分销订单 ============ -->
+    <div class="tab-panel active" id="panel-orders">
+        <div class="filter-bar">
+            <input class="search-input" id="orderSearch" placeholder="搜索订单名称、分销员姓名、手机号..." oninput="filterOrders()">
+            <select id="orderStatusFilter" onchange="filterOrders()">
+                <option value="all">全部状态</option>
+                <option value="done">已结算</option>
+                <option value="pending">待结算</option>
+                <option value="refund">已退款</option>
+            </select>
+            <button class="btn primary" onclick="alert('导出成功')">📥 导出</button>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>订单编号</th>
+                        <th>订单名称</th>
+                        <th>订单金额</th>
+                        <th>分享员</th>
+                        <th>分享员账号</th>
+                        <th>分佣比例</th>
+                        <th>佣金</th>
+                        <th>下单时间</th>
+                        <th>结算时间</th>
+                        <th>状态</th>
+                    </tr>
+                </thead>
+                <tbody id="orderTableBody">
+                </tbody>
+            </table>
+        </div>
+        <div class="pagination" id="orderPagination"></div>
+    </div>
+
+    <!-- ============ TAB 2: 提现管理 ============ -->
+    <div class="tab-panel" id="panel-withdraw">
+        <div class="filter-bar">
+            <input class="search-input" id="withdrawSearch" placeholder="搜索分销员姓名、手机号..." oninput="filterWithdraws()">
+            <select id="withdrawMonthFilter" onchange="filterWithdraws()">
+                <option value="all">全部月份</option>
+            </select>
+            <select id="withdrawStatusFilter" onchange="filterWithdraws()">
+                <option value="all">全部状态</option>
+                <option value="pending">待提现</option>
+                <option value="success">提现成功</option>
+                <option value="failed">提现失败</option>
+            </select>
+        </div>
+        <div id="withdrawList"></div>
+        <div class="pagination" id="withdrawPagination"></div>
+    </div>
+</div>
+
+<script>
+    /* ===== 模拟数据 ===== */
+    var orderData = [
+        { id: 'YX20260602001', name: '盆景美学·指尖山水', amount: 373.33, phone: '13812345678', distributor: '王小明', rate: '15%', commission: 56.00, time: '2026-06-02 10:30', settleTime: '2026-06-02 23:00', status: 'done' },
+        { id: 'YX20260601002', name: '诗界无心·草堂寻心', amount: 200.00, phone: '13812345678', distributor: '王小明', rate: '15%', commission: 30.00, time: '2026-06-01 14:20', settleTime: '2026-06-01 23:00', status: 'done' },
+        { id: 'YX20260530003', name: '搭建小茅屋', amount: 150.00, phone: '18698765432', distributor: '李大力', rate: '15%', commission: 22.50, time: '2026-05-30 09:15', settleTime: null, status: 'pending' },
+        { id: 'YX20260522004', name: '自然探索营', amount: 298.00, phone: '18698765432', distributor: '李大力', rate: '15%', commission: 44.70, time: '2026-05-22 08:30', settleTime: '2026-05-22 23:00', status: 'done' },
+        { id: 'YX20260520005', name: '我为杜甫建茅屋', amount: 586.67, phone: '13655667788', distributor: '张小红', rate: '15%', commission: 88.00, time: '2026-05-20 16:00', settleTime: '2026-05-20 23:00', status: 'done' },
+        { id: 'YX20260518006', name: '盆景美学·指尖山水', amount: 373.33, phone: '15099887766', distributor: '赵思远', rate: '15%', commission: 56.00, time: '2026-05-18 11:20', settleTime: null, status: 'refund' },
+        { id: 'YX20260515007', name: '诗界无心·草堂寻心', amount: 200.00, phone: '17712340987', distributor: '刘佳', rate: '15%', commission: 30.00, time: '2026-05-15 09:00', settleTime: '2026-05-15 23:00', status: 'done' },
+        { id: 'YX20260512008', name: '搭建小茅屋', amount: 150.00, phone: '18856781234', distributor: '陈伟', rate: '15%', commission: 22.50, time: '2026-05-12 14:30', settleTime: null, status: 'pending' },
+    ];
+
+    var withdrawData = [
+        { month: '2026年6月', name: '王小明', phone: '13812345678', amount: 1560.00, account: '微信零钱', time: '2026-06-01', status: 'pending' },
+        { month: '2026年5月', name: '李大力', phone: '18698765432', amount: 2300.00, account: '微信零钱', time: '2026-05-31', status: 'success' },
+        { month: '2026年5月', name: '张小红', phone: '13655667788', amount: 880.00, account: '微信零钱', time: '2026-05-31', status: 'pending' },
+        { month: '2026年5月', name: '赵思远', phone: '15099887766', amount: 500.00, account: '微信零钱', time: '', status: 'failed' },
+        { month: '2026年5月', name: '刘佳', phone: '17712340987', amount: 1200.00, account: '微信零钱', time: '2026-05-31', status: 'success' },
+        { month: '2026年5月', name: '陈伟', phone: '18856781234', amount: 3200.00, account: '微信零钱', time: '', status: 'failed' },
+        { month: '2026年4月', name: '王小明', phone: '13812345678', amount: 1640.00, account: '微信零钱', time: '2026-04-30', status: 'success' },
+        { month: '2026年4月', name: '李大力', phone: '18698765432', amount: 1400.00, account: '微信零钱', time: '2026-04-30', status: 'success' },
+        { month: '2026年4月', name: '刘佳', phone: '17712340987', amount: 800.00, account: '微信零钱', time: '', status: 'failed' },
+    ];
+    var statusLabels = { pending: '待提现', success: '提现成功', failed: '提现失败' };
+
+    var orderPage = 1, orderPageSize = 6;
+    var withdrawPage = 1, withdrawPageSize = 6;
+
+    /* ===== Tab 切换 ===== */
+    function switchTab(el, name) {
+        document.querySelectorAll('.tab-item').forEach(function(t) { t.classList.remove('active'); });
+        document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+        el.classList.add('active');
+        document.getElementById('panel-' + name).classList.add('active');
+    }
+
+    /* ===== 状态标签 ===== */
+    function statusTag(status) {
+        var map = { done: ['green', '已结算'], pending: ['orange', '待结算'], refund: ['red', '已退款'] };
+        var m = map[status] || ['gray', status];
+        return '<span class="tag ' + m[0] + '">' + m[1] + '</span>';
+    }
+    function wdStatusTag(status) {
+        var map = { pending: ['orange', '待提现'], success: ['green', '提现成功'], failed: ['red', '提现失败'] };
+        var m = map[status] || ['gray', status];
+        return '<span class="tag ' + m[0] + '">' + m[1] + '</span>';
+    }
+
+    /* ===== 分销订单 ===== */
+    function filterOrders() {
+        orderPage = 1;
+        renderOrders();
+    }
+    function renderOrders() {
+        var keyword = document.getElementById('orderSearch').value.trim().toLowerCase();
+        var statusFilter = document.getElementById('orderStatusFilter').value;
+        var filtered = orderData.filter(function(o) {
+            var matchStatus = statusFilter === 'all' || o.status === statusFilter;
+            var matchKw = keyword === '' || o.name.toLowerCase().indexOf(keyword) !== -1
+                        || o.distributor.indexOf(keyword) !== -1
+                        || o.phone.indexOf(keyword) !== -1
+                        || o.id.toLowerCase().indexOf(keyword) !== -1;
+            return matchStatus && matchKw;
+        });
+        var totalPages = Math.ceil(filtered.length / orderPageSize) || 1;
+        var start = (orderPage - 1) * orderPageSize;
+        var pageData = filtered.slice(start, start + orderPageSize);
+        var html = '';
+        pageData.forEach(function(o) {
+            html += '<tr><td style="font-size:12px;color:#888;">' + o.id + '</td>'
+                 + '<td>' + o.name + '</td>'
+                 + '<td>¥' + o.amount.toFixed(2) + '</td>'
+                 + '<td>' + o.distributor + '</td>'
+                 + '<td style="font-family:monospace;">' + o.phone + '</td>'
+                 + '<td>' + o.rate + '</td>'
+                 + '<td><b>¥' + o.commission.toFixed(2) + '</b></td>'
+                 + '<td style="font-size:12px;color:#888;">' + o.time + '</td>'
+                 + '<td style="font-size:12px;color:#888;">' + (o.settleTime || '-') + '</td>'
+                 + '<td>' + statusTag(o.status) + '</td></tr>';
+        });
+        if (!html) html = '<tr><td colspan="10" style="text-align:center;color:#999;padding:40px;">暂无数据</td></tr>';
+        document.getElementById('orderTableBody').innerHTML = html;
+        renderPagination('orderPagination', totalPages, orderPage, goOrderPage);
+    }
+
+    /* ===== 获取所有月份（去重排序） ===== */
+    function getAllMonths() {
+        var map = {};
+        withdrawData.forEach(function(w) { map[w.month] = true; });
+        return Object.keys(map).sort().reverse();
+    }
+    function initMonthFilter() {
+        var sel = document.getElementById('withdrawMonthFilter');
+        getAllMonths().forEach(function(m) {
+            var opt = document.createElement('option');
+            opt.value = m; opt.textContent = m;
+            sel.appendChild(opt);
+        });
+    }
+
+    /* ===== 提现管理 ===== */
+    function filterWithdraws() {
+        renderWithdraws();
+    }
+    function renderWithdraws() {
+        var keyword = document.getElementById('withdrawSearch').value.trim().toLowerCase();
+        var monthFilter = document.getElementById('withdrawMonthFilter').value;
+        var statusFilter = document.getElementById('withdrawStatusFilter').value;
+        var filterFn = function(w) {
+            var matchMonth = monthFilter === 'all' || w.month === monthFilter;
+            var matchStatus = statusFilter === 'all' || w.status === statusFilter;
+            var matchKw = keyword === '' || w.name.indexOf(keyword) !== -1 || w.phone.indexOf(keyword) !== -1;
+            return matchMonth && matchStatus && matchKw;
+        };
+
+        // 按月份分组
+        var groups = {};
+        withdrawData.forEach(function(w) {
+            if (!filterFn(w)) return;
+            if (!groups[w.month]) groups[w.month] = [];
+            groups[w.month].push(w);
+        });
+
+        var months = Object.keys(groups).sort().reverse();
+        var html = '';
+        months.forEach(function(month) {
+            var items = groups[month];
+            var total = items.reduce(function(s, w) { return s + w.amount; }, 0);
+            var successCount = items.filter(function(w) { return w.status === 'success'; }).length;
+            var failCount = items.filter(function(w) { return w.status === 'failed'; }).length;
+            var pendingCount = items.filter(function(w) { return w.status === 'pending'; }).length;
+
+            var summaryParts = [];
+            summaryParts.push('总额 <strong>¥' + total.toFixed(2) + '</strong>');
+            if (successCount) summaryParts.push('成功 <strong>' + successCount + '</strong> 笔');
+            if (pendingCount) summaryParts.push('待提现 <strong class="red">' + pendingCount + '</strong> 笔');
+            if (failCount) summaryParts.push('失败 <strong class="red">' + failCount + '</strong> 笔');
+
+            html += '<div class="wd-group">'
+                 + '<div class="wdg-header">'
+                 + '<span class="wdg-month">' + month + '</span>'
+                 + '<span class="wdg-summary">' + summaryParts.join(' · ') + '</span>'
+                 + '</div>';
+
+            items.forEach(function(w) {
+                html += '<div class="wdg-item">'
+                     + '<div class="wdg-info">'
+                     + '<div class="wdg-name">' + w.name + '</div>'
+                     + '<div class="wdg-phone">' + w.phone + '</div>'
+                     + '</div>'
+                     + '<div class="wdg-amount">¥' + w.amount.toFixed(2) + '</div>'
+                     + '<div class="wdg-meta">'
+                     + '<div class="wdg-acct">' + w.account + '</div>'
+                     + '<div>' + (w.time || '<span style="color:#ccc;">-</span>') + '</div>'
+                     + '</div>'
+                     + '<div class="wdg-status">' + wdStatusTag(w.status) + '</div>'
+                     + '<div class="wdg-action">' + (w.status === 'failed' ? '<button class="btn-retry" onclick="retryWithdraw(' + withdrawData.indexOf(w) + ')">↻ 重新打款</button>' : '') + '</div>'
+                     + '</div>';
+            });
+
+            html += '</div>';
+        });
+
+        if (!html) html = '<div style="text-align:center;color:#999;padding:60px 0;">暂无数据</div>';
+        document.getElementById('withdrawList').innerHTML = html;
+        document.getElementById('withdrawPagination').innerHTML = '';
+    }
+
+    function retryWithdraw(idx) {
+        if (confirm('确认重新打款给该分销员？')) {
+            withdrawData[idx].status = 'pending';
+            withdrawData[idx].time = '';
+            renderWithdraws();
+        }
+    }
+
+    /* ===== 分页 ===== */
+    function goOrderPage(p) { orderPage = p; renderOrders(); }
+    function goWithdrawPage(p) { withdrawPage = p; renderWithdraws(); }
+    function renderPagination(containerId, total, current, pageFn) {
+        var html = '';
+        var fnName = pageFn.name;
+        html += current > 1 ? '<div class="page-btn" onclick="' + fnName + '(' + (current-1) + ')">‹</div>' : '<div class="page-btn disabled">‹</div>';
+        for (var i = 1; i <= total; i++) {
+            html += '<div class="page-btn' + (i === current ? ' active' : '') + '" onclick="' + fnName + '(' + i + ')">' + i + '</div>';
+        }
+        html += current < total ? '<div class="page-btn" onclick="' + fnName + '(' + (current+1) + ')">›</div>' : '<div class="page-btn disabled">›</div>';
+        document.getElementById(containerId).innerHTML = html;
+    }
+
+    /* ===== 初始化 ===== */
+    initMonthFilter();
+    renderOrders();
+    renderWithdraws();
+</script>
+<a href="index.html" style="position:fixed;top:12px;right:16px;z-index:99999;background:#E53935;color:#fff;padding:7px 16px;border-radius:20px;text-decoration:none;font-size:13px;font-weight:600;box-shadow:0 2px 10px rgba(229,57,53,0.4);display:inline-flex;align-items:center;gap:5px;">🏠 首页</a>
+</body>
+</html>

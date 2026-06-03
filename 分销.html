@@ -14,9 +14,10 @@
         .app-container {
             width: 100%;
             max-width: 430px;
-            background: #f5f5f5;
+            background: #ffffff;
             min-height: 100vh;
             position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
         }
 
         /* ===== 顶部导航 ===== */
@@ -117,21 +118,22 @@
             z-index: 10;
         }
         .stats-row {
-            display: flex;
-            text-align: center;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
         }
         .stats-row .stat-item {
-            flex: 1;
+            padding: 12px 0;
             position: relative;
+            text-align: center;
         }
-        .stats-row .stat-item:not(:last-child)::after {
-            content: '';
-            position: absolute;
-            right: 0;
-            top: 10%;
-            height: 80%;
-            width: 1px;
-            background: #f0f0f0;
+        .stats-row .stat-item:nth-child(1),
+        .stats-row .stat-item:nth-child(2) {
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .stats-row .stat-item:nth-child(1),
+        .stats-row .stat-item:nth-child(3) {
+            border-right: 1px solid #f0f0f0;
         }
         .stat-value {
             font-size: 22px;
@@ -147,6 +149,47 @@
             font-size: 12px;
             color: #999;
             margin-top: 4px;
+        }
+
+        /* ===== 已完成推广订单 ===== */
+        .order-count-card {
+            background: #fff;
+            border-radius: 12px;
+            margin: 12px 16px 0;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .order-count-card .oc-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .order-count-card .oc-left .oc-icon {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: #E8F5E9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        .order-count-card .oc-left .oc-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+        .order-count-card .oc-num {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2E7D32;
+        }
+        .order-count-card .oc-num .oc-unit {
+            font-size: 13px;
+            font-weight: 400;
+            color: #999;
         }
 
         /* ===== 佣金率卡片 ===== */
@@ -405,14 +448,27 @@
                     <div class="stat-label">累计收益</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-value">¥3,280<span class="unit">.00</span></div>
-                    <div class="stat-label">当前余额</div>
+                    <div class="stat-value">¥5,340<span class="unit">.50</span></div>
+                    <div class="stat-label">已提现总额</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-value">¥1,560<span class="unit">.00</span></div>
-                    <div class="stat-label">可提现</div>
+                    <div class="stat-label">当前余额（已结算）</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">¥1,720<span class="unit">.00</span></div>
+                    <div class="stat-label">待结算</div>
                 </div>
             </div>
+        </div>
+
+        <!-- 已完成推广订单 -->
+        <div class="order-count-card">
+            <div class="oc-left">
+                <span class="oc-icon">📊</span>
+                <span class="oc-label">已完成推广订单</span>
+            </div>
+            <div class="oc-num">36 <span class="oc-unit">单</span></div>
         </div>
 
         <!-- 佣金率 -->
@@ -430,23 +486,7 @@
         <!-- 快捷操作 -->
         <div class="quick-actions">
             <button class="qa-btn primary" onclick="goLedger()">📋 记账明细</button>
-            <button class="qa-btn secondary" onclick="goWithdraw()">💳 申请提现</button>
-        </div>
-
-        <!-- 今日收益 -->
-        <div class="today-section">
-            <div class="today-header">
-                <div class="th-title">📈 今日收益</div>
-                <div class="th-amount">+¥86.00</div>
-            </div>
-            <div class="today-item">
-                <span class="ti-source">订单返佣 <span class="ti-tag">盆景美学</span></span>
-                <span class="ti-amount plus">+¥56.00</span>
-            </div>
-            <div class="today-item">
-                <span class="ti-source">订单返佣 <span class="ti-tag">诗界无心</span></span>
-                <span class="ti-amount plus">+¥30.00</span>
-            </div>
+            <button class="qa-btn secondary" onclick="goWithdraw()">🏦 提现账户管理</button>
         </div>
 
         <!-- 最近收益 -->
@@ -483,15 +523,6 @@
                     <div class="rl-amount">+¥22.50</div>
                     <div class="rl-status" style="color:#D48806;">待结算</div>
                 </div>
-                <div class="rl-item">
-                    <div class="rl-icon">🎉</div>
-                    <div class="rl-info">
-                        <div class="rl-name">推广奖励 - 新用户注册</div>
-                        <div class="rl-time">2026-05-28 16:00</div>
-                    </div>
-                    <div class="rl-amount">+¥10.00</div>
-                    <div class="rl-status">已到账</div>
-                </div>
             </div>
         </div>
     </div>
@@ -501,32 +532,46 @@
         <div class="doc-title">分销中心 - 功能说明</div>
         <div class="doc-section">
             <h3>1 页面概述</h3>
-            <p>分销中心是推广员/团长的佣金管理核心页面，展示累计收益、余额、可提现金额、佣金比例以及收益明细。</p>
+            <p>分销中心是推广员/团长的佣金管理核心页面，展示累计收益、余额、已结算佣金比例以及收益明细。系统每月末自动将可提现金额批量打款到用户微信零钱（用户授权免确认模式）。</p>
         </div>
         <div class="doc-section">
             <h3>2 功能说明</h3>
             <h4>2.1 收益概览</h4>
+            <p style="color:#888;font-size:12px;margin-bottom:6px;">关系：累计收益 = 已提现总额 + 当前余额（已结算）+ 待结算</p>
             <ul>
                 <li><strong>累计收益</strong>：从加入分销至今获得的所有佣金总和</li>
-                <li><strong>当前余额</strong>：累计收益减去已提现金额后的余额</li>
-                <li><strong>可提现</strong>：当前可申请提现的金额（满足最低提现门槛）</li>
+                <li><strong>已提现总额</strong>：已成功提现到账的总金额</li>
+                <li><strong>当前余额（已结算）</strong>：已完成结算的金额，系统月末批量自动打款</li>
+                <li><strong>待结算</strong>：订单确认中，尚未完成结算的佣金，暂不可提现</li>
             </ul>
-            <h4>2.2 佣金比例</h4>
+            <h4>2.2 已完成推广订单</h4>
+            <ul>
+                <li>统计该分销员所有已完成结算的推广订单总数</li>
+                <li>订单状态更新为"已结算"后计入该总数</li>
+            </ul>
+            <h4>2.3 佣金比例</h4>
             <ul>
                 <li>根据分销员等级（Lv.1~Lv.5）享受不同的佣金比例</li>
                 <li>推广课程订单完成后，按比例自动计算佣金</li>
             </ul>
-            <h4>2.3 快捷操作</h4>
+            <h4>2.4 快捷操作</h4>
             <ul>
                 <li><strong>记账明细</strong>：查看所有佣金收入和提现记录</li>
-                <li><strong>申请提现</strong>：将可提现金额提现到微信零钱</li>
+                <li><strong>提现账户管理</strong>：管理提现账户、查看授权状态和打款记录</li>
             </ul>
-            <h4>2.4 收益列表</h4>
+            <h4>2.5 收益列表</h4>
             <ul>
-                <li>展示今日收益和最近收益</li>
+                <li>展示最近收益记录</li>
                 <li>每条记录包含：来源订单、时间、金额、到账状态</li>
                 <li>状态分为：已到账（微信支付已打款）、待结算（订单确认中）</li>
-                <li>对接微信支付"商家转账"接口，佣金报酬场景</li>
+                <li>已结算金额由系统每月末自动批量打款至微信零钱</li>
+                <li>对接微信支付"商家转账"接口（用户授权免确认模式），佣金报酬场景</li>
+            </ul>
+            <h4>2.6 自动打款说明</h4>
+            <ul>
+                <li>系统每月末自动将"当前余额（已结算）"批量打款至用户微信零钱</li>
+                <li>打款前需用户授权免确认模式（仅需授权一次）</li>
+                <li>用户可在"提现账户管理"查看授权状态、下次打款日期和打款记录</li>
             </ul>
         </div>
     </div>

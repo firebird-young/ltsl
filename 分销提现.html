@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>申请提现 - 离泰数链</title>
+    <title>提现账户管理 - 离泰数链</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -14,9 +14,11 @@
         .app-container {
             width: 100%;
             max-width: 430px;
-            background: #f5f5f5;
+            background: #ffffff;
             min-height: 100vh;
             position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            padding-bottom: 90px;
         }
 
         /* ===== 顶部导航 ===== */
@@ -52,184 +54,194 @@
             color: #fff;
         }
 
-        /* ===== 提现卡片 ===== */
-        .withdraw-card {
+        /* ===== 授权状态卡片 ===== */
+        .auth-card {
             background: #fff;
             border-radius: 14px;
             margin: 16px 16px 0;
-            padding: 20px;
+            padding: 24px 20px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        }
-        .wc-balance {
             text-align: center;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #f0f0f0;
-            margin-bottom: 20px;
         }
-        .wc-balance .wb-label {
-            font-size: 13px;
-            color: #999;
-        }
-        .wc-balance .wb-amount {
-            font-size: 36px;
-            font-weight: 700;
-            color: #D43828;
-            margin: 6px 0;
-        }
-        .wc-balance .wb-amount .unit { font-size: 18px; font-weight: 400; }
-        .wc-balance .wb-hint {
-            font-size: 11px;
-            color: #bbb;
-        }
-        .wc-balance .wb-hint strong { color: #D43828; }
-
-        /* ===== 提现金额输入 ===== */
-        .wc-input-row {
-            margin-bottom: 16px;
-        }
-        .wc-input-row .wci-label {
-            font-size: 14px;
-            font-weight: 500;
-            color: #333;
-            margin-bottom: 8px;
-        }
-        .wc-input-row .wci-box {
-            display: flex;
-            align-items: center;
-            background: #f9f9f9;
-            border-radius: 10px;
-            padding: 0 16px;
-            border: 1px solid #e8e8e8;
-            transition: border-color 0.2s;
-        }
-        .wc-input-row .wci-box:focus-within {
-            border-color: #D43828;
-            box-shadow: 0 0 0 2px rgba(212,56,40,0.06);
-        }
-        .wc-input-row .wci-box .wci-prefix {
-            font-size: 20px;
-            font-weight: 700;
-            color: #333;
-            margin-right: 8px;
-        }
-        .wc-input-row .wci-box input {
-            flex: 1;
-            height: 50px;
-            border: none;
-            background: transparent;
-            font-size: 24px;
-            font-weight: 600;
-            color: #333;
-            outline: none;
-            font-family: inherit;
-        }
-        .wc-input-row .wci-box input::placeholder { color: #d0d0d0; }
-
-        /* ===== 快速金额 ===== */
-        .quick-amounts {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-        .quick-amounts .qa-item {
-            flex: 1;
-            padding: 10px 0;
-            border-radius: 8px;
-            border: 1px solid #e0e0e0;
-            background: #fff;
-            font-size: 14px;
-            font-weight: 500;
-            color: #666;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.2s;
-        }
-        .quick-amounts .qa-item:active {
-            border-color: #D43828;
-            color: #D43828;
-            background: #FFF0F0;
-        }
-
-        /* ===== 到账账户 ===== */
-        .wc-account {
-            background: #f9f9f9;
-            border-radius: 10px;
-            padding: 14px 16px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .wc-account .wa-icon {
-            width: 40px; height: 40px;
+        .auth-card .auth-icon {
+            width: 60px; height: 60px;
             border-radius: 50%;
-            background: #07C160;
+            margin: 0 auto 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
-            flex-shrink: 0;
+            font-size: 30px;
+            transition: background 0.3s;
         }
-        .wc-account .wa-info { flex: 1; }
-        .wc-account .wa-info .wa-name {
-            font-size: 14px;
+        .auth-card .auth-icon.active { background: #E8F5E9; }
+        .auth-card .auth-icon.inactive { background: #FFF3E0; }
+        .auth-card .auth-title {
+            font-size: 16px;
             font-weight: 600;
             color: #333;
         }
-        .wc-account .wa-info .wa-desc {
-            font-size: 12px;
-            color: #999;
-            margin-top: 2px;
-        }
-
-        /* ===== 提交按钮 ===== */
-        .wc-submit {
-            width: 100%;
-            padding: 16px 0;
+        .auth-card .auth-tag {
+            display: inline-block;
+            padding: 3px 16px;
             border-radius: 12px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .auth-card .auth-tag.active { background: #E8F5E9; color: #2E7D32; }
+        .auth-card .auth-tag.inactive { background: #FFF3E0; color: #E65100; }
+        .auth-card .auth-btn {
+            margin-top: 16px;
+            padding: 10px 32px;
+            border-radius: 20px;
             border: none;
-            background: linear-gradient(135deg, #D43828, #B71C1C);
-            color: #fff;
-            font-size: 17px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: opacity 0.2s;
-            box-shadow: 0 4px 12px rgba(212,56,40,0.3);
         }
-        .wc-submit:active { opacity: 0.85; }
-        .wc-submit:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        /* ===== 提现说明 ===== */
-        .wc-tips {
-            margin: 16px 16px 90px;
-            padding: 14px 16px;
-            background: #FFFBF5;
-            border-radius: 10px;
-            border: 1px solid #FFE0B2;
-        }
-        .wc-tips .wt-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: #E65100;
-            margin-bottom: 6px;
-        }
-        .wc-tips .wt-item {
+        .auth-card .auth-btn:active { opacity: 0.85; }
+        .auth-card .auth-btn.primary { background: #07C160; color: #fff; }
+        .auth-card .auth-btn.secondary { background: #f0f0f0; color: #666; }
+        .auth-card .auth-hint {
+            margin-top: 12px;
             font-size: 12px;
-            color: #888;
-            line-height: 1.8;
-            padding-left: 12px;
-            position: relative;
-        }
-        .wc-tips .wt-item::before {
-            content: '•';
-            position: absolute;
-            left: 2px;
-            color: #E65100;
+            color: #bbb;
+            line-height: 1.5;
         }
 
+        /* ===== 下次打款信息 ===== */
+        .payout-card {
+            background: #fff;
+            border-radius: 14px;
+            margin: 12px 16px 0;
+            padding: 18px 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .payout-card .pc-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .payout-card .pc-row:last-child { border-bottom: none; }
+        .payout-card .pc-row .pc-label { font-size: 13px; color: #999; }
+        .payout-card .pc-row .pc-value { font-size: 14px; font-weight: 600; color: #333; }
+        .payout-card .pc-row .pc-value.highlight { color: #D43828; }
+        .payout-card .pc-row .pc-value.green { color: #2E7D32; }
+        .payout-card .pc-row .pc-value.dim { color: #bbb; }
+
+        /* ===== 打款记录 ===== */
+        .record-section {
+            background: #fff;
+            border-radius: 12px;
+            margin: 12px 16px 0;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+            overflow: hidden;
+        }
+        .record-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .record-header .rh-title { font-size: 14px; font-weight: 600; color: #333; }
+        .record-header .rh-more { font-size: 12px; color: #999; cursor: pointer; }
+        .record-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .record-item:last-child { border-bottom: none; }
+        .record-item .ri-icon {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+            margin-right: 12px;
+        }
+        .record-item .ri-icon.payout { background: #E8F5E9; }
+        .record-item .ri-info { flex: 1; min-width: 0; }
+        .record-item .ri-info .ri-name { font-size: 14px; font-weight: 500; color: #333; }
+        .record-item .ri-info .ri-time { font-size: 11px; color: #bbb; margin-top: 2px; }
+        .record-item .ri-right { text-align: right; flex-shrink: 0; }
+        .record-item .ri-right .ri-amount { font-size: 15px; font-weight: 600; color: #333; }
+        .record-item .ri-right .ri-status { font-size: 11px; margin-top: 2px; }
+        .record-item .ri-right .ri-status.done { color: #07C160; }
+
+        /* ===== 授权弹窗 ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-box {
+            background: #fff;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 360px;
+            padding: 28px 24px 24px;
+            text-align: center;
+            animation: modalIn 0.25s ease;
+        }
+        @keyframes modalIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .modal-box .m-icon { font-size: 48px; margin-bottom: 12px; }
+        .modal-box .m-title { font-size: 17px; font-weight: 600; color: #333; margin-bottom: 6px; }
+        .modal-box .m-desc { font-size: 13px; color: #888; margin-bottom: 20px; line-height: 1.6; }
+        .modal-box .m-desc .hl { color: #D43828; font-weight: 600; }
+        .modal-box .m-btns { display: flex; gap: 10px; }
+        .modal-box .m-btns .mbtn {
+            flex: 1;
+            padding: 12px 0;
+            border-radius: 10px;
+            border: none;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .modal-box .m-btns .mbtn:active { opacity: 0.85; }
+        .modal-box .m-btns .mbtn.primary { background: #07C160; color: #fff; }
+        .modal-box .m-btns .mbtn.cancel { background: #f5f5f5; color: #666; }
+        .modal-box .m-btns .mbtn.danger { background: #D43828; color: #fff; }
+        .modal-box .m-input {
+            width: 100%; height: 42px; border: 1px solid #e0e0e0; border-radius: 10px;
+            padding: 0 14px; font-size: 15px; color: #333; outline: none; margin-bottom: 16px;
+            transition: border-color 0.2s; font-family: inherit;
+        }
+        .modal-box .m-input:focus { border-color: #07C160; }
+        .modal-box .m-input::placeholder { color: #ccc; }
+        .modal-box .m-loading {
+            padding: 30px 0;
+            font-size: 14px;
+            color: #999;
+        }
+        .modal-box .m-loading .spinner {
+            display: block;
+            width: 32px; height: 32px;
+            border: 3px solid #f0f0f0;
+            border-top-color: #07C160;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ===== 双栏 & 文档面板 ===== */
         .page-wrap {
             display: flex;
             gap: 20px;
@@ -272,114 +284,338 @@
     <div class="app-container">
         <div class="top-nav">
             <button class="back-btn" onclick="goBack()">‹</button>
-            <div class="top-nav-title">申请提现</div>
+            <div class="top-nav-title">提现账户管理</div>
         </div>
 
-        <!-- 提现卡片 -->
-        <div class="withdraw-card">
-            <div class="wc-balance">
-                <div class="wb-label">可提现金额</div>
-                <div class="wb-amount">¥<span class="unit">1,</span>560<span class="unit">.00</span></div>
-                <div class="wb-hint">最低提现 <strong>¥10.00</strong>，每日限提现 <strong>3</strong> 次</div>
-            </div>
-
-            <div class="wc-input-row">
-                <div class="wci-label">提现金额</div>
-                <div class="wci-box">
-                    <span class="wci-prefix">¥</span>
-                    <input type="text" id="amountInput" placeholder="0.00" oninput="onAmountInput()" onfocus="this.value='';onAmountInput()">
-                </div>
-            </div>
-
-            <div class="quick-amounts">
-                <div class="qa-item" onclick="setAmount(100)">¥100</div>
-                <div class="qa-item" onclick="setAmount(500)">¥500</div>
-                <div class="qa-item" onclick="setAmount(1000)">¥1,000</div>
-                <div class="qa-item" onclick="setAmount(1560)">全部提现</div>
-            </div>
-
-            <div class="wc-account">
-                <div class="wa-icon">💬</div>
-                <div class="wa-info">
-                    <div class="wa-name">微信零钱</div>
-                    <div class="wa-desc">提现到当前微信账户，实时到账</div>
-                </div>
-            </div>
-
-            <button class="wc-submit" id="submitBtn" onclick="submitWithdraw()">提现</button>
+        <!-- 授权状态 -->
+        <div class="auth-card" id="authCard">
+            <div class="auth-icon" id="authIcon">✅</div>
+            <div class="auth-title" id="authTitle"><span class="auth-tag active" id="authTag">已绑定</span></div>
+            <button class="auth-btn secondary" id="authBtn" onclick="handleAuthAction()">解绑账号</button>
+            <div class="auth-hint">绑定微信账号后，系统每月末自动打款到微信零钱</div>
         </div>
 
-        <!-- 提现说明 -->
-        <div class="wc-tips">
-            <div class="wt-title">📋 提现说明</div>
-            <div class="wt-item">单笔提现最低 ¥10.00，最高 ¥5,000.00</div>
-            <div class="wt-item">每日可提现 3 次，提现后实时到账微信零钱</div>
-            <div class="wt-item">对接微信支付商家转账接口，佣金报酬场景</div>
-            <div class="wt-item">大额提现（≥2,000元）需校验实名信息</div>
-            <div class="wt-item">如遇问题请联系客服：400-888-8888</div>
+        <!-- 下次打款信息 -->
+        <div class="payout-card">
+            <div class="pc-row">
+                <span class="pc-label">下次打款日期</span>
+                <span class="pc-value highlight">2026年6月30日</span>
+            </div>
+            <div class="pc-row">
+                <span class="pc-label">本次预计打款</span>
+                <span class="pc-value highlight" id="payoutAmount">¥1,560.00</span>
+            </div>
+            <div class="pc-row">
+                <span class="pc-label">打款账户</span>
+                <span class="pc-value">微信零钱</span>
+            </div>
+            <div class="pc-row">
+                <span class="pc-label">打款模式</span>
+                <span class="pc-value green">自动打款</span>
+            </div>
+        </div>
+
+        <!-- 打款记录 -->
+        <div class="record-section" id="recordSection">
+            <div class="record-header">
+                <span class="rh-title">📄 打款记录</span>
+                <span class="rh-more" onclick="alert('查看全部打款记录 → 分销记账')">查看更多 ›</span>
+            </div>
+            <div id="recordList">
+            <div class="record-item">
+                <div class="ri-icon payout">💰</div>
+                <div class="ri-info">
+                    <div class="ri-name">2026年5月批量打款</div>
+                    <div class="ri-time">2026-05-31 23:59</div>
+                </div>
+                <div class="ri-right">
+                    <div class="ri-amount">+¥2,300.00</div>
+                    <div class="ri-status done">已到账</div>
+                </div>
+            </div>
+            <div class="record-item">
+                <div class="ri-icon payout">💰</div>
+                <div class="ri-info">
+                    <div class="ri-name">2026年4月批量打款</div>
+                    <div class="ri-time">2026-04-30 23:59</div>
+                </div>
+                <div class="ri-right">
+                    <div class="ri-amount">+¥1,640.00</div>
+                    <div class="ri-status done">已到账</div>
+                </div>
+            </div>
+            <div class="record-item">
+                <div class="ri-icon payout">💰</div>
+                <div class="ri-info">
+                    <div class="ri-name">2026年3月批量打款</div>
+                    <div class="ri-time">2026-03-31 23:59</div>
+                </div>
+                <div class="ri-right">
+                    <div class="ri-amount">+¥1,400.00</div>
+                    <div class="ri-status done">已到账</div>
+                </div>
+            </div>
+            </div>
         </div>
     </div>
 
+    <!-- 授权/解除弹窗 -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal-box" id="modalContent">
+            <!-- 由 JS 动态填充 -->
+        </div>
+    </div>
+
+    <!-- 功能说明文档 -->
     <div class="doc-panel">
-        <div class="doc-title">申请提现 - 功能说明</div>
+        <div class="doc-title">提现账户管理 - 功能说明</div>
         <div class="doc-section">
             <h3>1 页面概述</h3>
-            <p>提现页面允许分销员将可提现余额提取到微信零钱，实时到账。</p>
+            <p>提现账户管理页面用于管理微信账号绑定及系统自动打款。绑定账号后，系统每月末自动将可提现余额批量打款到用户微信零钱。</p>
         </div>
         <div class="doc-section">
             <h3>2 功能说明</h3>
-            <h4>2.1 可提现余额</h4>
+            <h4>2.1 账号绑定</h4>
             <ul>
-                <li>顶部展示当前可提现总金额</li>
-                <li>显示最低提现门槛和每日提现次数限制</li>
+                <li>展示绑定状态（已绑定/未绑定）</li>
+                <li>已绑定：系统可每月自动打款，无需手动操作</li>
+                <li>未绑定：用户可点击"绑定账号"在弹窗中完成绑定</li>
+                <li>绑定流程：点击绑定账号 → 确认弹窗 → 绑定成功</li>
+                <li>解绑账号：点击解绑账号 → 确认弹窗 → 解绑成功</li>
             </ul>
-            <h4>2.2 提现金额输入</h4>
+            <h4>2.2 自动打款</h4>
             <ul>
-                <li>支持手动输入提现金额</li>
-                <li>提供快速金额选择：¥100 / ¥500 / ¥1,000 / 全部提现</li>
+                <li>系统每月末（最后一天23:59）自动发起批量打款</li>
+                <li>打款金额 = "当前余额（已结算）"的全部金额</li>
+                <li>打款账户为用户的微信零钱</li>
+                <li>已绑定用户无需每次确认收款</li>
             </ul>
-            <h4>2.3 到账账户</h4>
+            <h4>2.3 打款记录</h4>
             <ul>
-                <li>默认提现到当前微信账户的微信零钱</li>
-                <li>展示微信图标和账户说明</li>
+                <li>展示历次系统自动打款的记录</li>
+                <li>包含打款月份、金额、到账状态</li>
+                <li>解绑后历史打款记录仍可查看</li>
             </ul>
             <h4>2.4 接口说明</h4>
             <ul>
-                <li>对接微信支付"商家转账"接口</li>
-                <li>使用"佣金报酬"场景ID</li>
-                <li>支持"用户确认收款模式"（用户主动点击提现）</li>
-                <li>大额（≥2,000元）传入用户姓名进行实名校验</li>
+                <li>对接微信支付"商家转账"接口，场景：佣金报酬</li>
+                <li>大额打款（≥2,000元）传入用户姓名进行实名校验</li>
             </ul>
         </div>
     </div>
 </div>
 
 <script>
-    var maxWithdraw = 1560.00;
+    var isAuthorized = true;
+
     function goBack() {
         window.location.href = '分销.html';
     }
-    function setAmount(val) {
-        document.getElementById('amountInput').value = val.toFixed(2);
-        onAmountInput();
-    }
-    function onAmountInput() {
-        var input = document.getElementById('amountInput');
-        var val = parseFloat(input.value) || 0;
-        var btn = document.getElementById('submitBtn');
-        if (val > 0 && val <= maxWithdraw && val >= 10) {
-            btn.disabled = false;
-            btn.textContent = '提现 ¥' + val.toFixed(2);
+
+    function handleAuthAction() {
+        if (isAuthorized) {
+            showRevokeConfirm();
         } else {
-            btn.disabled = true;
-            btn.textContent = val <= 0 ? '提现' : (val < 10 ? '最低提现 ¥10.00' : '超出可提现金额');
+            showAuthConfirm();
         }
     }
-    function submitWithdraw() {
-        var val = parseFloat(document.getElementById('amountInput').value) || 0;
-        alert('✅ 提现申请已提交！\n\n提现金额：¥' + val.toFixed(2) + '\n到账账户：微信零钱\n预计到账：实时到账');
-        goBack();
+
+    /* ===== 授权弹窗 ===== */
+    function showAuthConfirm() {
+        var modal = document.getElementById('authModal');
+        var content = document.getElementById('modalContent');
+        content.innerHTML = `
+            <div class="m-icon">🔐</div>
+            <div class="m-title">绑定微信账号</div>
+            <div class="m-desc" style="margin-bottom:12px;">
+                请输入您的真实姓名用于实名校验
+            </div>
+            <input class="m-input" id="realNameInput" placeholder="请输入真实姓名" maxlength="20" autocomplete="off">
+            <div class="m-btns">
+                <button class="mbtn cancel" onclick="closeModal()">取消</button>
+                <button class="mbtn primary" onclick="startAuth()">确认绑定</button>
+            </div>
+        `;
+        modal.classList.add('show');
+        setTimeout(function() { document.getElementById('realNameInput').focus(); }, 100);
     }
+
+    function startAuth() {
+        var name = document.getElementById('realNameInput').value.trim();
+        if (!name) { document.getElementById('realNameInput').style.borderColor = '#D43828'; return; }
+        document.getElementById('realNameInput').style.borderColor = '#07C160';
+        var content = document.getElementById('modalContent');
+        content.innerHTML = `
+            <div class="m-loading">
+                <div class="spinner"></div>
+                <div>正在绑定账号...</div>
+            </div>
+        `;
+        setTimeout(function() {
+            var name = document.getElementById('realNameInput') ? document.getElementById('realNameInput').value.trim() : '';
+            content.innerHTML = `
+                <div class="m-icon">✅</div>
+                <div class="m-title">绑定成功</div>
+                <div class="m-desc" style="margin-bottom:16px;">
+                    姓名 <span style="font-weight:600;color:#333;">${name}</span> 已校验通过<br>
+                    每月末系统自动打款至微信零钱
+                </div>
+                <div class="m-btns">
+                    <button class="mbtn primary" onclick="completeAuth(true)" style="flex:1;">我知道了</button>
+                </div>
+            `;
+        }, 1800);
+    }
+
+    function completeAuth(result) {
+        closeModal();
+        isAuthorized = result;
+        updateAuthUI();
+    }
+
+    /* ===== 解除授权 ===== */
+    function showRevokeConfirm() {
+        var modal = document.getElementById('authModal');
+        var content = document.getElementById('modalContent');
+        content.innerHTML = `
+            <div class="m-icon">⚠️</div>
+            <div class="m-title">确认解绑</div>
+            <div class="m-desc">解绑后系统将<span class="hl">不再</span>自动打款</div>
+            <div class="m-btns">
+                <button class="mbtn cancel" onclick="closeModal()">取消</button>
+                <button class="mbtn danger" onclick="startRevoke()">确认解绑</button>
+            </div>
+        `;
+        modal.classList.add('show');
+    }
+
+    function startRevoke() {
+        var content = document.getElementById('modalContent');
+        content.innerHTML = `
+            <div class="m-loading">
+                <div class="spinner" style="border-top-color:#D43828;"></div>
+                <div>正在解绑账号...</div>
+            </div>
+        `;
+        setTimeout(function() {
+            content.innerHTML = `
+                <div class="m-icon">🔓</div>
+                <div class="m-title">已解绑</div>
+                <div class="m-desc">如需自动打款，请重新绑定账号</div>
+                <div class="m-btns">
+                    <button class="mbtn primary" onclick="completeAuth(false)" style="flex:1;">我知道了</button>
+                </div>
+            `;
+        }, 1500);
+    }
+
+    function closeModal() {
+        document.getElementById('authModal').classList.remove('show');
+    }
+
+    /* ===== UI 更新 ===== */
+    function updateAuthUI() {
+        var icon = document.getElementById('authIcon');
+        var tag = document.getElementById('authTag');
+        var btn = document.getElementById('authBtn');
+        var payoutAmount = document.getElementById('payoutAmount');
+        var recordList = document.getElementById('recordList');
+
+        if (isAuthorized) {
+            icon.textContent = '✅';
+            icon.className = 'auth-icon active';
+            tag.textContent = '已绑定';
+            tag.className = 'auth-tag active';
+            btn.textContent = '解绑账号';
+            btn.className = 'auth-btn secondary';
+            payoutAmount.textContent = '¥1,560.00';
+            payoutAmount.className = 'pc-value highlight';
+            recordList.innerHTML = `
+            <div class="record-item">
+                <div class="ri-icon payout">💰</div>
+                <div class="ri-info">
+                    <div class="ri-name">2026年5月批量打款</div>
+                    <div class="ri-time">2026-05-31 23:59</div>
+                </div>
+                <div class="ri-right">
+                    <div class="ri-amount">+¥2,300.00</div>
+                    <div class="ri-status done">已到账</div>
+                </div>
+            </div>
+            <div class="record-item">
+                <div class="ri-icon payout">💰</div>
+                <div class="ri-info">
+                    <div class="ri-name">2026年4月批量打款</div>
+                    <div class="ri-time">2026-04-30 23:59</div>
+                </div>
+                <div class="ri-right">
+                    <div class="ri-amount">+¥1,640.00</div>
+                    <div class="ri-status done">已到账</div>
+                </div>
+            </div>
+            <div class="record-item">
+                <div class="ri-icon payout">💰</div>
+                <div class="ri-info">
+                    <div class="ri-name">2026年3月批量打款</div>
+                    <div class="ri-time">2026-03-31 23:59</div>
+                </div>
+                <div class="ri-right">
+                    <div class="ri-amount">+¥1,400.00</div>
+                    <div class="ri-status done">已到账</div>
+                </div>
+            </div>
+            `;
+        } else {
+            icon.textContent = '🔒';
+            icon.className = 'auth-icon inactive';
+            tag.textContent = '未绑定';
+            tag.className = 'auth-tag inactive';
+            btn.textContent = '绑定账号';
+            btn.className = 'auth-btn primary';
+            payoutAmount.textContent = '¥0.00';
+            payoutAmount.className = 'pc-value dim';
+            recordList.innerHTML = `
+            <div class="record-item">
+                <div class="ri-icon payout">💰</div>
+                <div class="ri-info">
+                    <div class="ri-name">2026年5月批量打款</div>
+                    <div class="ri-time">2026-05-31 23:59</div>
+                </div>
+                <div class="ri-right">
+                    <div class="ri-amount">+¥2,300.00</div>
+                    <div class="ri-status done">已到账</div>
+                </div>
+            </div>
+            <div class="record-item">
+                <div class="ri-icon payout">💰</div>
+                <div class="ri-info">
+                    <div class="ri-name">2026年4月批量打款</div>
+                    <div class="ri-time">2026-04-30 23:59</div>
+                </div>
+                <div class="ri-right">
+                    <div class="ri-amount">+¥1,640.00</div>
+                    <div class="ri-status done">已到账</div>
+                </div>
+            </div>
+            <div class="record-item">
+                <div class="ri-icon payout">💰</div>
+                <div class="ri-info">
+                    <div class="ri-name">2026年3月批量打款</div>
+                    <div class="ri-time">2026-03-31 23:59</div>
+                </div>
+                <div class="ri-right">
+                    <div class="ri-amount">+¥1,400.00</div>
+                    <div class="ri-status done">已到账</div>
+                </div>
+            </div>
+            `;
+        }
+    }
+
+    // 点击弹窗遮罩关闭
+    document.getElementById('authModal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
 </script>
 <a href="index.html" style="position:fixed;top:12px;right:16px;z-index:99999;background:#E53935;color:#fff;padding:7px 16px;border-radius:20px;text-decoration:none;font-size:13px;font-weight:600;box-shadow:0 2px 10px rgba(229,57,53,0.4);display:inline-flex;align-items:center;gap:5px;">🏠 首页</a>
 </body>
