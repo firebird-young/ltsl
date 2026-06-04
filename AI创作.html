@@ -40,6 +40,108 @@
             padding-right: 32px;
         }
 
+        /* ===== 成员卡片 ===== */
+        .member-header {
+            background: #fff;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .member-header .mh-avatar {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #fff;
+            flex-shrink: 0;
+        }
+        .member-header .mh-info { flex: 1; min-width: 0; }
+        .member-header .mh-info .mh-name { font-size: 15px; font-weight: 600; color: #333; }
+        .member-header .mh-info .mh-hint { font-size: 11px; color: #bbb; margin-top: 1px; }
+        .member-header .mh-switch {
+            padding: 6px 14px;
+            border: 1px solid #e0e0e0;
+            border-radius: 16px;
+            font-size: 12px;
+            color: #666;
+            background: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .member-header .mh-switch:active { background: #f5f5f5; }
+
+        /* ===== 成员切换弹窗 ===== */
+        .switch-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.45);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .switch-overlay.show { display: flex; }
+        .switch-popup {
+            background: #fff;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 300px;
+            padding: 20px 0 0;
+            animation: popIn 0.2s ease;
+        }
+        @keyframes popIn { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .switch-popup .sp-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            padding: 0 20px 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .switch-popup .sp-item {
+            padding: 14px 20px;
+            font-size: 14px;
+            color: #333;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.15s;
+        }
+        .switch-popup .sp-item:hover { background: #F5F8FF; }
+        .switch-popup .sp-item.active { color: #0669FF; font-weight: 600; background: #E8F0FE; }
+        .switch-popup .sp-item .sp-avatar {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: #E8F0FE;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+        .switch-popup .sp-close {
+            width: 100%;
+            padding: 14px 0;
+            border: none;
+            border-top: 1px solid #f0f0f0;
+            background: #fff;
+            font-size: 14px;
+            color: #999;
+            cursor: pointer;
+            border-radius: 0 0 16px 16px;
+        }
+        .switch-popup .sp-close:active { background: #f5f5f5; }
+
         /* ===== 创作区 ===== */
         .creation-area {
             background: #fff;
@@ -348,6 +450,16 @@
             <div class="top-nav-title">AI创作</div>
         </div>
 
+        <!-- ====== 成员卡片 ====== -->
+        <div class="member-header">
+            <div class="mh-avatar" id="mhAvatar">👤</div>
+            <div class="mh-info">
+                <div class="mh-name" id="mhName">张晓宇</div>
+                <div class="mh-hint">当前创作成员</div>
+            </div>
+            <button class="mh-switch" onclick="showSwitchPopup()">切换成员 ▼</button>
+        </div>
+
         <!-- ====== 创作区 ====== -->
         <div class="creation-area">
             <div class="course-bar">
@@ -429,18 +541,45 @@
         </div>
     </div>
 
+    <!-- 成员切换弹窗 -->
+    <div class="switch-overlay" id="switchOverlay">
+        <div class="switch-popup">
+            <div class="sp-title">👤 切换成员</div>
+            <div class="sp-item active" data-member="张晓宇" onclick="switchMember('张晓宇')">
+                <span class="sp-avatar">👤</span> 张晓宇
+            </div>
+            <div class="sp-item" data-member="杨梅" onclick="switchMember('杨梅')">
+                <span class="sp-avatar">👩</span> 杨梅
+            </div>
+            <div class="sp-item" data-member="刘飞" onclick="switchMember('刘飞')">
+                <span class="sp-avatar">👦</span> 刘飞
+            </div>
+            <div class="sp-item" data-member="王浩宇" onclick="switchMember('王浩宇')">
+                <span class="sp-avatar">👨</span> 王浩宇
+            </div>
+            <button class="sp-close" onclick="closeSwitchPopup()">取消</button>
+        </div>
+    </div>
+
     <!-- 功能说明文档 -->
     <div class="doc-panel">
         <div class="doc-title">AI创作模块 - 功能说明</div>
 
         <div class="doc-section">
             <h3>1 页面概述</h3>
-            <p>AI创作页面是用户使用AI生成视频和游戏作品的核心功能页面。页面分为上下两大区域：上部为创作区（输入描述、选择模板、生成作品），下部为作品区（展示创作中和已完成的作品列表）。</p>
+            <p>AI创作页面是用户使用AI生成视频和游戏作品的核心功能页面。页面顶部为成员卡片，支持切换成员，每个成员的作品数据相互隔离，互不共享。</p>
         </div>
 
         <div class="doc-section">
             <h3>2 页面布局</h3>
-            <h4>2.1 创作区（上部）</h4>
+            <h4>2.1 成员卡片（顶部）</h4>
+            <ul>
+                <li>显示当前创作成员的头像和姓名</li>
+                <li>点击「切换成员」弹出成员列表弹窗</li>
+                <li>切换成员后，作品数据跟随切换，每个成员的作品相互隔离</li>
+                <li>AI创作的免费额度每个成员之间是独立的。比如后台设置为3次，则每个成员都可以享受3次，且A的额度不能给B使用</li>
+            </ul>
+            <h4>2.2 创作区（中部）</h4>
             <p>从上到下排列：</p>
             <ol>
                 <li>课程横幅：显示当前课程名称</li>
@@ -453,7 +592,7 @@
                 <li>进度条：生成过程中显示，完成后自动消失</li>
             </ol>
 
-            <h4>2.2 作品区（下部）</h4>
+            <h4>2.3 作品区（下部）</h4>
             <p>作品区根据当前Tab显示对应类型的作品列表：</p>
             <ul>
                 <li>AI视频作品板块（视频Tab下显示）/ AI游戏作品板块（游戏Tab下显示）</li>
@@ -493,18 +632,39 @@
 </div>
 
 <script>
+    var currentMember = '张晓宇';
     var currentTab = 'video';
     var genTimer = null;
     var genIdCounter = 0;
 
-    // 作品数据: { id, type, name, status, img }
-    var videoWorks = [];
-    var gameWorks = [];
-    var allWorks = [];
+    // 成员作品数据隔离: { 成员名: { video: [], game: [] } }
+    var memberWorks = {};
+
+    function getWorks() {
+        if (!memberWorks[currentMember]) memberWorks[currentMember] = { video: [], game: [] };
+        return memberWorks[currentMember];
+    }
 
     function goBack() {
         window.location.href = '研学手记.html';
     }
+
+    /* ===== 成员切换 ===== */
+    function showSwitchPopup() { document.getElementById('switchOverlay').classList.add('show'); }
+    function closeSwitchPopup() { document.getElementById('switchOverlay').classList.remove('show'); }
+
+    function switchMember(name) {
+        currentMember = name;
+        document.getElementById('mhName').textContent = name;
+        document.querySelectorAll('.sp-item').forEach(function(el) { el.classList.remove('active'); });
+        var found = document.querySelector('.sp-item[data-member="' + name + '"]');
+        if (found) found.classList.add('active');
+        closeSwitchPopup();
+        renderWorks();
+    }
+    document.getElementById('switchOverlay').addEventListener('click', function(e) {
+        if (e.target === this) closeSwitchPopup();
+    });
 
     function switchTab(tab) {
         currentTab = tab;
@@ -563,14 +723,14 @@
     }
 
     function addGeneratingWork() {
+        var works = getWorks();
         var isVideo = currentTab === 'video';
         var name = document.getElementById('nameInput').value.trim() || (isVideo ? '杜甫和李白' : '快速搭建茅屋');
         var imgSrc = isVideo ? '杜甫和李白.png' : '快速搭建茅屋';
         var icon = isVideo ? '🎬' : '🎮';
 
         var work = { id: ++genIdCounter, type: currentTab, name: name, img: imgSrc, icon: icon, status: 'generating' };
-        allWorks.push(work);
-        if (isVideo) videoWorks.push(work); else gameWorks.push(work);
+        if (isVideo) works.video.push(work); else works.game.push(work);
         renderWorks();
     }
 
@@ -599,7 +759,9 @@
             setTimeout(function() {
                 pb.classList.remove('show');
                 // 将最后一个生成中的作品标记为已完成
-                var target = allWorks[allWorks.length - 1];
+                var works = getWorks();
+                var arr = currentTab === 'video' ? works.video : works.game;
+                var target = arr[arr.length - 1];
                 if (target) {
                     target.status = 'done';
                 }
@@ -614,28 +776,24 @@
 
     function deleteWork(id) {
         if (!confirm('确定要删除该作品吗？')) return;
-        for (var i = 0; i < allWorks.length; i++) {
-            if (allWorks[i].id === id) {
-                allWorks.splice(i, 1);
-                break;
-            }
+        var works = getWorks();
+        for (var j = 0; j < works.video.length; j++) {
+            if (works.video[j].id === id) { works.video.splice(j, 1); break; }
         }
-        for (var j = 0; j < videoWorks.length; j++) {
-            if (videoWorks[j].id === id) { videoWorks.splice(j, 1); break; }
-        }
-        for (var k = 0; k < gameWorks.length; k++) {
-            if (gameWorks[k].id === id) { gameWorks.splice(k, 1); break; }
+        for (var k = 0; k < works.game.length; k++) {
+            if (works.game[k].id === id) { works.game.splice(k, 1); break; }
         }
         renderWorks();
     }
 
     function renderWorks() {
+        var works = getWorks();
         // 视频 - 创作中
-        var videoGen = videoWorks.filter(function(w) { return w.status === 'generating'; });
-        var videoDone = videoWorks.filter(function(w) { return w.status === 'done'; });
+        var videoGen = works.video.filter(function(w) { return w.status === 'generating'; });
+        var videoDone = works.video.filter(function(w) { return w.status === 'done'; });
         // 游戏
-        var gameGen = gameWorks.filter(function(w) { return w.status === 'generating'; });
-        var gameDone = gameWorks.filter(function(w) { return w.status === 'done'; });
+        var gameGen = works.game.filter(function(w) { return w.status === 'generating'; });
+        var gameDone = works.game.filter(function(w) { return w.status === 'done'; });
 
         renderWorkList('videoGeneratingList', videoGen, 'videoGenCount', true);
         renderWorkList('videoDoneList', videoDone, 'videoDoneCount', false);
