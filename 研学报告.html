@@ -693,7 +693,7 @@
                 </div>
                 <div class="switch-btn-wrap">
                     <div class="switch-btn" onclick="showSwitchPopup()">
-                        切换报告人
+                        切换成员
                         <span>▼</span>
                     </div>
                 </div>
@@ -785,7 +785,7 @@
         <!-- 切换用户弹窗 -->
         <div class="switch-overlay" id="switchOverlay">
             <div class="switch-popup">
-                <div class="sp-title">👤 切换报告人</div>
+                <div class="sp-title">👤 切换成员</div>
                 <div class="sp-item active" onclick="switchUser('张晓宇', '🏚️ 我为杜甫建茅屋', '📅 2026.5.28 14:00 - 17:00')">张晓宇</div>
                 <div class="sp-item" onclick="switchUser('杨梅', '🏚️ 我为杜甫建茅屋', '📅 2026.5.10 09:00 - 12:00')">杨梅</div>
                 <div class="sp-item" onclick="switchUser('刘飞', '🌿 盆景美学·指尖上山水', '📅 2026.5.15 09:00 - 11:30')">刘飞</div>
@@ -848,14 +848,14 @@
 
         <div class="doc-section">
             <h3>1 页面概述</h3>
-            <p>研学报告页面是展示单个学生的完整研学报告详情页，包含学生的研学内容记录、AI创作作品展示和研学评价三大模块。页面支持切换报告人，查看不同学生的研学报告（必须是当前登录用户在该订单下面填报的成员）。</p>
+            <p>研学报告页面是展示单个学生的完整研学报告详情页，包含学生的研学内容记录、AI创作作品展示和研学评价三大模块。页面支持切换成员，查看不同学生的研学报告（必须是当前登录用户在该订单下面填报的成员）。</p>
         </div>
 
         <div class="doc-section">
             <h3>2 页面布局</h3>
             <p>页面从上到下分为以下区域（如果某个模块无数据，需要显示“待老师上传，稍后再来查看～”（ui设计空白展示））：</p>
             <ol>
-                <li><strong>学生信息头部</strong>：展示学生头像（需要有个默认头像）、姓名、课程名称、课程时间，右上角有"切换报告人"按钮</li>
+                <li><strong>学生信息头部</strong>：展示学生头像（需要有个默认头像）、姓名、课程名称、课程时间，右上角有"切换成员"按钮</li>
                 <li><strong>统计卡片</strong>：浮动在学生信息头部下方，展示AI作品数和研学时长两项统计数据</li>
                 <li><strong>研学内容模块</strong>：展示本次课程的详细研学内容文本</li>
                 <li><strong>AI作品模块</strong>：分视频和游戏两类展示AI创作作品，每类以横向滑动列表展示，每个作品有封面图和播放按钮。<strong style="color:#E53935;">注意这里只展示已完成的AI作品</strong></li>
@@ -866,9 +866,9 @@
         <div class="doc-section">
             <h3>3 功能说明</h3>
 
-            <h4>3.1 切换报告人</h4>
+            <h4>3.1 切换成员人</h4>
             <ul>
-                <li>点击学生信息头部的"切换报告人"按钮，弹出操作浮层</li>
+                <li>点击学生信息头部的"切换成员"按钮，弹出操作浮层</li>
                 <li>浮层中列出可选的学生名单，每个选项显示学生姓名</li>
                 <li>选中后页面数据（课程名称、时间、研学内容、AI作品、评价等）会随之切换显示对应的内容</li>
                 <li>支持点击遮罩层关闭弹窗</li>
