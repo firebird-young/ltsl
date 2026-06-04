@@ -61,65 +61,107 @@
             margin-top: 2px;
         }
 
-        /* ===== 日期滚动条 ===== */
-        .date-strip-wrap {
+        /* ===== 月历导航 ===== */
+        .cal-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px 8px;
             background: #fff;
-            padding: 12px 0;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
             position: sticky;
             top: 50px;
             z-index: 40;
         }
-        .date-strip {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding: 0 16px;
-            scroll-snap-type: x mandatory;
-            -webkit-overflow-scrolling: touch;
-        }
-        .date-strip::-webkit-scrollbar { height: 0; }
-        .date-chip {
-            flex: 0 0 auto;
-            scroll-snap-align: start;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            padding: 8px 16px;
-            border-radius: 12px;
-            background: #f5f5f5;
-            cursor: pointer;
-            transition: all 0.2s;
-            min-width: 60px;
+        .cal-nav .cn-btn {
+            width: 36px; height: 36px;
+            border-radius: 50%;
             border: none;
+            background: #f5f5f5;
+            font-size: 18px;
+            color: #666;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
         }
-        .date-chip:active { transform: scale(0.95); }
-        .date-chip.active {
-            background: #0669FF;
-            color: #fff;
-            box-shadow: 0 2px 8px rgba(6,105,255,0.3);
-        }
-        .date-chip.past {
-            opacity: 0.55;
-        }
-        .date-chip.past.active { opacity: 1; }
-        .date-chip .dc-weekday {
-            font-size: 11px;
-            color: #999;
-        }
-        .date-chip.active .dc-weekday { color: rgba(255,255,255,0.8); }
-        .date-chip .dc-day {
-            font-size: 16px;
+        .cal-nav .cn-btn:active { background: #e0e0e0; }
+        .cal-nav .cn-title {
+            font-size: 17px;
             font-weight: 600;
             color: #333;
         }
-        .date-chip.active .dc-day { color: #fff; }
-        .date-chip .dc-month {
-            font-size: 10px;
+
+        /* ===== 月历网格 ===== */
+        .cal-grid {
+            background: #fff;
+            padding: 0 16px 12px;
+        }
+        .cal-grid .cg-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            margin-bottom: 4px;
+        }
+        .cal-grid .cg-weekdays .cg-wd {
+            font-size: 11px;
+            color: #bbb;
+            padding: 6px 0;
+        }
+        .cal-grid .cg-weekdays .cg-wd:first-child,
+        .cal-grid .cg-weekdays .cg-wd:last-child { color: #ddd; }
+        .cal-grid .cg-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+        }
+        .cal-grid .cg-days .cg-day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: default;
+            font-size: 15px;
+            font-weight: 500;
+            color: #ccc;
+            position: relative;
+            transition: all 0.15s;
+            border: none;
+            background: transparent;
+            padding: 2px;
+        }
+        .cal-grid .cg-days .cg-day .cg-dot {
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            background: #0669FF;
+            margin-top: 3px;
+        }
+        .cal-grid .cg-days .cg-day.has-course {
+            color: #333;
+            cursor: pointer;
+        }
+        .cal-grid .cg-days .cg-day.has-course:hover {
+            background: #F0F6FF;
+        }
+        .cal-grid .cg-days .cg-day.selected {
+            background: #0669FF;
+            color: #fff;
+            font-weight: 600;
+        }
+        .cal-grid .cg-days .cg-day.selected .cg-dot {
+            background: #fff;
+        }
+        .cal-grid .cg-days .cg-day.past {
+            color: #ddd;
+        }
+        .cal-grid .cg-days .cg-day.past.has-course {
             color: #bbb;
         }
-        .date-chip.active .dc-month { color: rgba(255,255,255,0.7); }
+        .cal-grid .cg-days .cg-day.other-month {
+            visibility: hidden;
+        }
 
         /* ===== 课程区标题 ===== */
         .section-title {
@@ -255,8 +297,25 @@
             <div class="sdd-count" id="sdCount">共 3 个课程</div>
         </div>
 
-        <div class="date-strip-wrap">
-            <div class="date-strip" id="dateStrip"></div>
+        <!-- ====== 月历导航 ====== -->
+        <div class="cal-nav">
+            <button class="cn-btn" onclick="prevMonth()">‹</button>
+            <span class="cn-title" id="calTitle">2026年6月</span>
+            <button class="cn-btn" onclick="nextMonth()">›</button>
+        </div>
+
+        <!-- ====== 月历网格 ====== -->
+        <div class="cal-grid">
+            <div class="cg-weekdays">
+                <span class="cg-wd">日</span>
+                <span class="cg-wd">一</span>
+                <span class="cg-wd">二</span>
+                <span class="cg-wd">三</span>
+                <span class="cg-wd">四</span>
+                <span class="cg-wd">五</span>
+                <span class="cg-wd">六</span>
+            </div>
+            <div class="cg-days" id="calDays"></div>
         </div>
 
         <div class="section-title">
@@ -278,25 +337,28 @@
         <div class="doc-title">研学日历模块 - 功能说明</div>
         <div class="doc-section">
             <h3>1 页面概述</h3>
-            <p>研学日历展示有课程安排的日期列表，默认选中最近的有课日期（当天有课则展示当天，否则展示接下来最近的有课日期）。</p>
+            <p>研学日历采用完整月历网格展示，默认选中最近的有课日期。月历中每格代表一天，有课程的日期用蓝色圆点标记并可点击，无课程日期置灰不可点击。</p>
         </div>
         <div class="doc-section">
             <h3>2 页面布局</h3>
             <ol>
                 <li>顶部：选中日期的星期、月日、课程数量</li>
-                <li>日期滚动条：横向滑动标签，只显示有课程的日期</li>
+                <li>月历导航：左右箭头切换月份，中间显示年月</li>
+                <li>月历网格：7列（日~六），有课日蓝色圆点标记，选中高亮</li>
                 <li>课程列表：课程卡片，含封面图、名称、场次、状态角标</li>
                 <li>底部导航栏</li>
             </ol>
         </div>
         <div class="doc-section">
             <h3>3 功能说明</h3>
-            <h4>3.1 日期选择</h4>
+            <h4>3.1 日历展示</h4>
             <ul>
-                <li>只显示有课程数据的日期</li>
-                <li>默认选中最近的有课日期（当天优先，其次未来最近，再次历史最近）</li>
-                <li>过去日期半透明灰色区分</li>
-                <li>选择当天或之后日期显示"即将到来的研学课程"，之前显示"过往的研学课程"</li>
+                <li>完整月份日历网格，每格代表一天</li>
+                <li>有课程的日期显示蓝色圆点标记，可点击查看课程详情</li>
+                <li>无课程的日期置灰不可点击</li>
+                <li>过去日期颜色更淡（past 样式）</li>
+                <li>左右箭头切换月份，不在当月时自动跳转到最近有课日期</li>
+                <li>默认选中最近的有课日期（当天优先，其次未来最近），无课时默认选中当前日期</li>
             </ul>
             <h4>3.2 课程列表</h4>
             <ul>
@@ -360,6 +422,7 @@
     };
 
     var weekdayNames = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+    var shortWeekday = ['日','一','二','三','四','五','六'];
     var statusTextMap = { travel:'待出行', done:'已核销', expired:'已过期' };
     var statusClsMap = { travel:'travel', done:'done', expired:'expired' };
     var thumbImgMap = { bonsai:'盆景美学·指尖上的山水.jpg', hut:'我为杜甫建茅屋.jpg' };
@@ -367,6 +430,12 @@
     var thumbBgMap = { bonsai:'thumb-bonsai', hut:'thumb-hut', spring:'thumb-spring' };
 
     courseDates.sort();
+    var dateSet = {};
+    courseDates.forEach(function(d) { dateSet[d] = true; });
+
+    var currentYear = 2026, currentMonth = 6; // 初始6月
+    var todayStr = getTodayStr();
+    var selectedDate = findDefaultDate();
 
     function getTodayStr() {
         var d = new Date();
@@ -384,46 +453,78 @@
         return courseDates[courseDates.length - 1] || courseDates[0];
     }
 
-    var selectedDate = findDefaultDate();
+    function pad2(n) { return String(n).padStart(2,'0'); }
 
-    function renderDateStrip() {
-        var strip = document.getElementById('dateStrip');
-        var todayStr = getTodayStr();
+    /* ===== 月历渲染 ===== */
+    function renderCalendar() {
+        var title = document.getElementById('calTitle');
+        title.textContent = currentYear + '年' + currentMonth + '月';
+
+        var daysEl = document.getElementById('calDays');
+        var firstDay = new Date(currentYear, currentMonth - 1, 1).getDay();
+        var daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+
         var html = '';
-        for (var i = 0; i < courseDates.length; i++) {
-            var ds = courseDates[i];
-            var parts = ds.split('-');
-            var m = parseInt(parts[1],10);
-            var d = parseInt(parts[2],10);
-            var dateObj = new Date(parseInt(parts[0]), m-1, d);
-            var weekday = '周' + weekdayNames[dateObj.getDay()].slice(-1);
-            var isActive = ds === selectedDate;
-            var isPast = ds < todayStr;
-            html += '<button class="date-chip' + (isActive ? ' active' : '') + (isPast && !isActive ? ' past' : '') + '" onclick="selectDate(\'' + ds + '\', this)">' +
-                '<span class="dc-weekday">' + weekday + '</span>' +
-                '<span class="dc-day">' + m + '/' + d + '</span>' +
-                '<span class="dc-month">' + m + '月</span>' +
-                '</button>';
+        // 前导空白
+        for (var i = 0; i < firstDay; i++) {
+            html += '<div class="cg-day other-month"></div>';
         }
-        strip.innerHTML = html;
-        var chips = strip.querySelectorAll('.date-chip');
-        for (var j = 0; j < chips.length; j++) {
-            if (chips[j].classList.contains('active')) {
-                chips[j].scrollIntoView({ behavior:'smooth', inline:'center', block:'nearest' });
-                break;
+        // 每日
+        for (var d = 1; d <= daysInMonth; d++) {
+            var dateStr = currentYear + '-' + pad2(currentMonth) + '-' + pad2(d);
+            var hasCourse = !!dateSet[dateStr];
+            var isPast = dateStr < todayStr;
+            var isSel = dateStr === selectedDate;
+            var cls = 'cg-day';
+            if (hasCourse) cls += ' has-course';
+            if (isPast) cls += ' past';
+            if (isSel) cls += ' selected';
+            html += '<button class="' + cls + '" onclick="selectDay(\'' + dateStr + '\')"';
+            if (!hasCourse) html += ' disabled';
+            html += '>';
+            html += '<span>' + d + '</span>';
+            if (hasCourse) html += '<span class="cg-dot"></span>';
+            html += '</button>';
+        }
+        daysEl.innerHTML = html;
+        updateDisplay();
+    }
+
+    function selectDay(ds) {
+        if (!dateSet[ds]) return;
+        selectedDate = ds;
+        renderCalendar();
+    }
+
+    function prevMonth() {
+        currentMonth--;
+        if (currentMonth < 1) { currentMonth = 12; currentYear--; }
+        // 若当月无课，跳到最近有课的月
+        renderCalendar();
+        ensureSelectedInView();
+    }
+
+    function nextMonth() {
+        currentMonth++;
+        if (currentMonth > 12) { currentMonth = 1; currentYear++; }
+        renderCalendar();
+        ensureSelectedInView();
+    }
+
+    function ensureSelectedInView() {
+        var parts = selectedDate.split('-');
+        var sy = parseInt(parts[0]), sm = parseInt(parts[1]);
+        if (sy !== currentYear || sm !== currentMonth) {
+            // 选中的日期不在当月，找当月第一个有课的日期
+            for (var d = 1; d <= 31; d++) {
+                var ds = currentYear + '-' + pad2(currentMonth) + '-' + pad2(d);
+                if (dateSet[ds]) { selectedDate = ds; break; }
             }
         }
-        updateDisplay();
+        renderCalendar();
     }
 
-    function selectDate(ds, el) {
-        selectedDate = ds;
-        var chips = document.querySelectorAll('.date-chip');
-        for (var i = 0; i < chips.length; i++) chips[i].classList.remove('active');
-        if (el) el.classList.add('active');
-        updateDisplay();
-    }
-
+    /* ===== 日期详情 ===== */
     function updateDisplay() {
         var parts = selectedDate.split('-');
         var m = parseInt(parts[1],10);
@@ -431,15 +532,13 @@
         var dateObj = new Date(parseInt(parts[0]), m-1, d);
         var weekday = weekdayNames[dateObj.getDay()];
         var courses = courseData[selectedDate] || [];
-        var todayStr = getTodayStr();
 
         document.getElementById('sdWeekday').textContent = weekday;
         document.getElementById('sdDate').textContent = m + '月' + d + '日';
         document.getElementById('sdCount').textContent = '共 ' + courses.length + ' 个课程';
         document.getElementById('courseCount').textContent = '共 ' + courses.length + ' 个';
 
-        var label = selectedDate >= todayStr ? '📅 即将到来的研学课程' : '📅 过往的研学课程';
-        document.getElementById('sectionLabel').textContent = label;
+        document.getElementById('sectionLabel').textContent = selectedDate >= todayStr ? '📅 即将到来的研学课程' : '📅 过往的研学课程';
 
         renderCourses(courses);
     }
@@ -477,7 +576,7 @@
         list.innerHTML = html;
     }
 
-    renderDateStrip();
+    renderCalendar();
 </script>
 <a href="index.html" style="position:fixed;top:12px;right:16px;z-index:99999;background:#E53935;color:#fff;padding:7px 16px;border-radius:20px;text-decoration:none;font-size:13px;font-weight:600;box-shadow:0 2px 10px rgba(229,57,53,0.4);display:inline-flex;align-items:center;gap:5px;">🏠 首页</a>
 </body>
