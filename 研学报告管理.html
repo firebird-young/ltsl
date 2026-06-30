@@ -280,6 +280,58 @@
             padding: 10px 0;
         }
 
+        /* ===== 研学现场上传 ===== */
+        .scene-section { margin-bottom: 20px; }
+        .scene-section .scene-title {
+            font-size: 14px; font-weight: 600; color: #333; margin-bottom: 10px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .scene-upload-area {
+            border: 2px dashed #d0d5e0;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            background: #fafbfc;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 10px;
+        }
+        .scene-upload-area:hover { border-color: #0669FF; background: #F0F6FF; }
+        .scene-upload-area .su-icon { font-size: 28px; margin-bottom: 6px; }
+        .scene-upload-area .su-text { font-size: 13px; color: #999; }
+        .scene-upload-area .su-tip { font-size: 11px; color: #bbb; margin-top: 2px; }
+        .scene-upload-area input[type="file"] { display: none; }
+        .scene-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .scene-grid .sg-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: default;
+            background: #f0f0f0;
+        }
+        .scene-grid .sg-item img, .scene-grid .sg-item video {
+            width: 100%; height: 100%; object-fit: cover; display: block;
+        }
+        .scene-grid .sg-item .sg-video-tag {
+            position: absolute; top: 4px; left: 4px;
+            background: rgba(0,0,0,0.55); color: #fff;
+            font-size: 10px; padding: 2px 6px; border-radius: 4px;
+        }
+        .scene-grid .sg-item .sg-del {
+            position: absolute; top: 4px; right: 4px;
+            width: 22px; height: 22px; border-radius: 50%;
+            background: rgba(0,0,0,0.5); color: #fff;
+            font-size: 12px; border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .scene-grid .sg-item .sg-del:hover { background: #D43828; }
+
         /* ===== 功能说明文档面板 ===== */
         .doc-panel {
             background: #fff;
@@ -345,6 +397,35 @@
             </div>
         </div>
 
+        <!-- 研学现场 -->
+        <div class="section-card" id="sceneCard">
+            <div class="section-title"><span class="icon icon-green">📷</span>研学现场</div>
+
+            <!-- 视频 -->
+            <div style="margin-bottom:16px;">
+                <div style="font-size:13px;font-weight:600;color:#333;margin-bottom:8px;display:flex;align-items:center;gap:4px;">🎬 视频</div>
+                <div id="sceneVideoGrid" class="scene-grid"></div>
+                <div class="scene-upload-area" onclick="document.getElementById('sceneVideoInput').click()">
+                    <div class="su-icon">🎬</div>
+                    <div class="su-text">点击上传视频</div>
+                    <div class="su-tip">支持 mp4，单文件最大 20MB</div>
+                </div>
+                <input type="file" id="sceneVideoInput" accept="video/*" multiple style="display:none;" onchange="handleSceneVideoFiles(this.files)">
+            </div>
+
+            <!-- 图片 -->
+            <div>
+                <div style="font-size:13px;font-weight:600;color:#333;margin-bottom:8px;display:flex;align-items:center;gap:4px;">🖼️ 图片</div>
+                <div id="sceneImageGrid" class="scene-grid"></div>
+                <div class="scene-upload-area" onclick="document.getElementById('sceneImageInput').click()">
+                    <div class="su-icon">🖼️</div>
+                    <div class="su-text">点击上传图片</div>
+                    <div class="su-tip">支持 jpg/png，单文件最大 20MB</div>
+                </div>
+                <input type="file" id="sceneImageInput" accept="image/*" multiple style="display:none;" onchange="handleSceneImageFiles(this.files)">
+            </div>
+        </div>
+
         <!-- 订单成员列表（子订单卡片） -->
         <div class="section-card">
             <div class="section-title"><span class="icon icon-green">👥</span>订单成员列表</div>
@@ -370,9 +451,15 @@
             &nbsp;&nbsp;- 提示词输入框首先将研学手记配置中该项的提示词自动填入框内，可以补充输入内容<br>
             &nbsp;&nbsp;- 提示词输入框支持插入变量 <code>{用户姓名}</code>，生成评价时自动替换为成员实际姓名<br>
             &nbsp;&nbsp;- 已保存评价的成员显示"查看评价"按钮，点击可查看已有内容并重新生成<br><br>
-            5. <strong>AI作品展示</strong>：<br>
+            <strong style="color:#0669FF;">5. 研学现场（需求变更）：</strong><br>
+            &nbsp;&nbsp;- 研学信息下方新增“研学现场”板块，区分视频和图片两个子板块<br>
+            &nbsp;&nbsp;- 评价浮层内新增“专属精彩”板块，位于评价下方，同样区分视频和图片<br>
+            &nbsp;&nbsp;- 上传的文件以网格形式预览，点击 × 可删除<br>
+            6. <strong>AI作品展示</strong>：<br>
             &nbsp;&nbsp;- 评价浮层底部展示该成员的AI作品（视频和游戏）<br>
-            &nbsp;&nbsp;- <strong style="color:#E53935;">注意：只展示已完成的AI作品</strong>
+            &nbsp;&nbsp;- <strong style="color:#E53935;">注意：只展示已完成的AI作品</strong><br><br>
+            <strong style="color:#0669FF;">7. 保存逻辑（需求变更）：</strong><br>
+            &nbsp;&nbsp;- 评价保存按钮移至浮层最底部，同时保存评价内容和研学现场文件</p>
         </p>
     </div>
     <div class="overlay" id="infoOverlay">
@@ -424,34 +511,6 @@
                 <span class="ol-close" onclick="closeEvalOverlay()">✕ 关闭</span>
             </div>
             <div class="ol-body">
-                <div style="margin-bottom:10px;">
-                    <div style="font-size:13px;font-weight:600;color:#333;margin-bottom:2px;">填写评价提示词</div>
-                    <div style="font-size:12px;color:#888;">输入提示词，AI自动生成评价内容</div>
-                </div>
-                <textarea id="evalInput" rows="2" placeholder="请输入评价提示词..." style="width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;outline:none;resize:none;font-family:inherit;"></textarea>
-                <div style="display:flex;align-items:center;gap:8px;margin:6px 0;">
-                    <span style="font-size:12px;color:#888;flex-shrink:0;">插入变量：</span>
-                    <span onclick="insertEvalVar('{用户姓名}')" style="padding:3px 10px;border-radius:12px;border:1px solid #0669FF;background:#E8F0FE;font-size:11px;color:#0669FF;cursor:pointer;font-weight:500;">{用户姓名}</span>
-                </div>
-
-                <div id="evalGenArea"><button class="btn btn-primary" id="evalGenBtn" onclick="startEvalGenerate()">✨ 生成评价</button></div>
-                <div class="rip-progress" id="evalProg" style="display:none;margin-top:10px;">
-                    <div id="evalProgText" style="font-size:12px;color:#888;margin-bottom:4px;">🤖 AI正在生成评价...</div>
-                    <div style="width:100%;height:4px;background:#eee;border-radius:2px;overflow:hidden;"><div id="evalProgFill" style="height:100%;width:0%;background:linear-gradient(90deg,#0669FF,#4A9EFF);border-radius:2px;"></div></div>
-                </div>
-                <div id="evalResult" style="display:none;margin-top:10px;">
-                    <div style="font-size:12px;font-weight:600;color:#0669FF;margin-bottom:4px;">📄 评价内容</div>
-                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-                        <span style="font-size:11px;color:#888;">插入变量：</span>
-                        <span onclick="insertEvalResultVar('{用户姓名}')" style="padding:2px 8px;border-radius:10px;border:1px solid #0669FF;background:#E8F0FE;font-size:11px;color:#0669FF;cursor:pointer;font-weight:500;">{用户姓名}</span>
-                    </div>
-                    <div id="evalResultBox" contenteditable="true" style="background:#fff;border-radius:6px;padding:10px 12px;border:1px solid #e0e0e0;font-size:12px;color:#444;line-height:1.7;white-space:pre-wrap;min-height:50px;outline:none;"></div>
-                </div>
-                <div id="evalActions" style="display:none;margin-top:10px;gap:8px;">
-                    <button class="btn" style="background:#D4A84B;color:#fff;border:none;" onclick="saveEval()">💾 保存</button>
-                    <button class="btn" style="border:1px solid #0669FF;background:#fff;color:#0669FF;" onclick="reGenerateEval()">🔄 重新生成</button>
-                </div>
-
                 <!-- ===== AI作品 ===== -->
                 <div class="eval-ai-section" id="evalAiSection">
                     <div class="eai-header">
@@ -459,6 +518,68 @@
                         AI作品
                     </div>
                     <div id="evalAiContent"></div>
+                </div>
+
+                <!-- ===== 评价 ===== -->
+                <div style="margin-top:16px;padding-top:14px;border-top:1px solid #f0f0f0;">
+                    <div style="margin-bottom:10px;">
+                        <div style="font-size:13px;font-weight:600;color:#333;margin-bottom:2px;">填写评价提示词</div>
+                        <div style="font-size:12px;color:#888;">输入提示词，AI自动生成评价内容</div>
+                    </div>
+                    <textarea id="evalInput" rows="2" placeholder="请输入评价提示词..." style="width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;outline:none;resize:none;font-family:inherit;"></textarea>
+                    <div style="display:flex;align-items:center;gap:8px;margin:6px 0;">
+                        <span style="font-size:12px;color:#888;flex-shrink:0;">插入变量：</span>
+                        <span onclick="insertEvalVar('{用户姓名}')" style="padding:3px 10px;border-radius:12px;border:1px solid #0669FF;background:#E8F0FE;font-size:11px;color:#0669FF;cursor:pointer;font-weight:500;">{用户姓名}</span>
+                    </div>
+
+                    <div id="evalGenArea"><button class="btn btn-primary" id="evalGenBtn" onclick="startEvalGenerate()">✨ 生成评价</button></div>
+                    <div class="rip-progress" id="evalProg" style="display:none;margin-top:10px;">
+                        <div id="evalProgText" style="font-size:12px;color:#888;margin-bottom:4px;">🤖 AI正在生成评价...</div>
+                        <div style="width:100%;height:4px;background:#eee;border-radius:2px;overflow:hidden;"><div id="evalProgFill" style="height:100%;width:0%;background:linear-gradient(90deg,#0669FF,#4A9EFF);border-radius:2px;"></div></div>
+                    </div>
+                    <div id="evalResult" style="display:none;margin-top:10px;">
+                        <div style="font-size:12px;font-weight:600;color:#0669FF;margin-bottom:4px;">📄 评价内容</div>
+                        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                            <span style="font-size:11px;color:#888;">插入变量：</span>
+                            <span onclick="insertEvalResultVar('{用户姓名}')" style="padding:2px 8px;border-radius:10px;border:1px solid #0669FF;background:#E8F0FE;font-size:11px;color:#0669FF;cursor:pointer;font-weight:500;">{用户姓名}</span>
+                        </div>
+                        <div id="evalResultBox" contenteditable="true" style="background:#fff;border-radius:6px;padding:10px 12px;border:1px solid #e0e0e0;font-size:12px;color:#444;line-height:1.7;white-space:pre-wrap;min-height:50px;outline:none;"></div>
+                    </div>
+                    <div id="evalActions" style="display:none;margin-top:10px;gap:8px;">
+                        <button class="btn" style="border:1px solid #0669FF;background:#fff;color:#0669FF;" onclick="reGenerateEval()">🔄 重新生成</button>
+                    </div>
+                </div>
+
+                <!-- ===== 专属精彩 ===== -->
+                <div style="margin-top:16px;padding-top:14px;border-top:1px solid #f0f0f0;">
+                    <div class="scene-title">🌟 专属精彩</div>
+
+                    <!-- 视频 -->
+                    <div style="margin-bottom:14px;">
+                        <div style="font-size:12px;font-weight:600;color:#555;margin-bottom:6px;display:flex;align-items:center;gap:4px;">🎬 视频</div>
+                        <div id="evalVideoGrid" class="scene-grid"></div>
+                        <div class="scene-upload-area" onclick="document.getElementById('evalVideoInput').click()">
+                            <div class="su-icon">🎬</div>
+                            <div class="su-text">点击上传视频</div>
+                        </div>
+                        <input type="file" id="evalVideoInput" accept="video/*" multiple style="display:none;" onchange="handleEvalVideoFiles(this.files)">
+                    </div>
+
+                    <!-- 图片 -->
+                    <div>
+                        <div style="font-size:12px;font-weight:600;color:#555;margin-bottom:6px;display:flex;align-items:center;gap:4px;">🖼️ 图片</div>
+                        <div id="evalImageGrid" class="scene-grid"></div>
+                        <div class="scene-upload-area" onclick="document.getElementById('evalImageInput').click()">
+                            <div class="su-icon">🖼️</div>
+                            <div class="su-text">点击上传图片</div>
+                        </div>
+                        <input type="file" id="evalImageInput" accept="image/*" multiple style="display:none;" onchange="handleEvalImageFiles(this.files)">
+                    </div>
+                </div>
+
+                <!-- ===== 底部保存按钮 ===== -->
+                <div style="border-top:1px solid #f0f0f0;padding-top:14px;margin-top:14px;text-align:right;">
+                    <button class="btn" style="background:#D4A84B;color:#fff;border:none;" onclick="saveEval()">💾 保存评价和专属精彩</button>
                 </div>
             </div>
         </div>
@@ -517,6 +638,96 @@
         var currentOrderId = '';
         var currentEvalName = '';
 
+        // ===== 研学现场文件 =====
+        var sceneVideoFiles = [];      // 主页面 - 视频
+        var sceneImageFiles = [];      // 主页面 - 图片
+        var evalVideoFiles = [];       // 评价弹窗 - 视频
+        var evalImageFiles = [];       // 评价弹窗 - 图片
+
+        function handleSceneVideoFiles(fileList) { addFilesToList(fileList, sceneVideoFiles, 'sceneVideoGrid'); }
+        function handleSceneImageFiles(fileList) { addFilesToList(fileList, sceneImageFiles, 'sceneImageGrid'); }
+        function handleEvalVideoFiles(fileList) { addFilesToList(fileList, evalVideoFiles, 'evalVideoGrid'); }
+        function handleEvalImageFiles(fileList) { addFilesToList(fileList, evalImageFiles, 'evalImageGrid'); }
+
+        function addFilesToList(fileList, targetArr, gridId) {
+            for (var i = 0; i < fileList.length; i++) {
+                var f = fileList[i];
+                if (targetArr.some(function(x) { return x.name === f.name && x.size === f.size; })) continue;
+                var reader = new FileReader();
+                reader.onload = (function(file) {
+                    return function(e) {
+                        targetArr.push({ name: file.name, type: file.type, size: file.size, dataUrl: e.target.result });
+                        renderSceneGrid(targetArr, gridId);
+                    };
+                })(f);
+                reader.readAsDataURL(f);
+            }
+        }
+
+        function getArrRef(arrName) {
+            switch(arrName) {
+                case 'sceneVideoFiles': return sceneVideoFiles;
+                case 'sceneImageFiles': return sceneImageFiles;
+                case 'evalVideoFiles': return evalVideoFiles;
+                case 'evalImageFiles': return evalImageFiles;
+                default: return [];
+            }
+        }
+
+        function removeSceneFile(arrName, idx, gridId) {
+            var arr = getArrRef(arrName);
+            arr.splice(idx, 1);
+            renderSceneGrid(arr, gridId);
+        }
+
+        function renderSceneGrid(arr, gridId) {
+            var el = document.getElementById(gridId);
+            if (!el) return;
+            if (!arr || arr.length === 0) { el.innerHTML = ''; return; }
+            var html = '';
+            for (var i = 0; i < arr.length; i++) {
+                var item = arr[i];
+                var isVideo = item.type.indexOf('video') !== -1;
+                // 找到对应的 arrName
+                var arrName = '';
+                if (arr === sceneVideoFiles) arrName = 'sceneVideoFiles';
+                else if (arr === sceneImageFiles) arrName = 'sceneImageFiles';
+                else if (arr === evalVideoFiles) arrName = 'evalVideoFiles';
+                else if (arr === evalImageFiles) arrName = 'evalImageFiles';
+                html += '<div class="sg-item">';
+                if (isVideo) {
+                    html += '<span class="sg-video-tag">▶ 视频</span>';
+                    html += '<video src="' + item.dataUrl + '"></video>';
+                } else {
+                    html += '<img src="' + item.dataUrl + '" alt="' + item.name + '">';
+                }
+                html += '<button class="sg-del" onclick="removeSceneFile(\'' + arrName + '\',' + i + ',\'' + gridId + '\')">×</button>';
+                html += '</div>';
+            }
+            el.innerHTML = html;
+        }
+
+        function loadSceneData(orderId) {
+            var key = 'scene_' + orderId;
+            var saved = localStorage.getItem(key);
+            if (saved) {
+                try {
+                    var data = JSON.parse(saved);
+                    sceneVideoFiles = data.video || [];
+                    sceneImageFiles = data.image || [];
+                } catch(e) { sceneVideoFiles = []; sceneImageFiles = []; }
+            } else {
+                sceneVideoFiles = [];
+                sceneImageFiles = [];
+            }
+            renderSceneGrid(sceneVideoFiles, 'sceneVideoGrid');
+            renderSceneGrid(sceneImageFiles, 'sceneImageGrid');
+        }
+        function saveSceneData(orderId) {
+            localStorage.setItem('scene_' + orderId, JSON.stringify({ video: sceneVideoFiles, image: sceneImageFiles }));
+            alert('✅ 研学现场已保存');
+        }
+
         // ===== 初始化 =====
         function init() {
             var params = new URLSearchParams(window.location.search);
@@ -531,6 +742,8 @@
             }
             // 研学信息按钮状态
             updateInfoBtn();
+            // 加载研学现场
+            loadSceneData(currentOrderId);
             // 渲染成员
             renderMembers();
         }
@@ -717,9 +930,13 @@
                     var data = JSON.parse(saved);
                     document.getElementById('evalInput').value = data.input || '';
                     document.getElementById('evalResultBox').textContent = data.content || '';
+                    evalVideoFiles = (data.sceneFiles && data.sceneFiles.video) || [];
+                    evalImageFiles = (data.sceneFiles && data.sceneFiles.image) || [];
                 } catch(e) {
                     document.getElementById('evalInput').value = '';
                     document.getElementById('evalResultBox').textContent = saved;
+                    evalVideoFiles = [];
+                    evalImageFiles = [];
                 }
                 document.getElementById('evalResult').style.display = 'block';
                 document.getElementById('evalResultBox').setAttribute('contenteditable', 'false');
@@ -731,9 +948,14 @@
                 document.getElementById('evalResultBox').textContent = '';
                 document.getElementById('evalGenArea').style.display = 'block';
                 document.getElementById('evalActions').style.display = 'none';
+                evalVideoFiles = [];
+                evalImageFiles = [];
             }
             // 渲染该成员的AI作品
             renderEvalAiWorks(name);
+            // 渲染专属精彩
+            renderSceneGrid(evalVideoFiles, 'evalVideoGrid');
+            renderSceneGrid(evalImageFiles, 'evalImageGrid');
         }
         function renderEvalAiWorks(name) {
             var container = document.getElementById('evalAiContent');
@@ -842,13 +1064,13 @@
         }
         function saveEval() {
             var content = document.getElementById('evalResultBox').textContent.trim();
-            if (!content) { alert('请先生成评价内容'); return; }
             var inputText = document.getElementById('evalInput').value.trim();
-            var data = { input: inputText, content: content, saveTime: new Date().toLocaleString() };
+            if (!content && evalVideoFiles.length === 0 && evalImageFiles.length === 0) { alert('请先生成评价内容或上传专属精彩'); return; }
+            var data = { input: inputText, content: content, sceneFiles: { video: evalVideoFiles, image: evalImageFiles }, saveTime: new Date().toLocaleString() };
             localStorage.setItem('eval_' + currentOrderId + '_' + currentEvalName, JSON.stringify(data));
             renderMembers();
             closeEvalOverlay();
-            alert('✅ 评价保存成功！');
+            alert('✅ 评价和专属精彩保存成功！');
         }
 
         // 遮罩点击关闭
