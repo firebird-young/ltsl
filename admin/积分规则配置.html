@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>积分规则配置 - 管理后台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header .logo {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0669FF;
+            margin-right: 32px;
+        }
+        .header .nav-list {
+            display: flex;
+            gap: 24px;
+            list-style: none;
+        }
+        .header .nav-list li {
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+            padding: 4px 0;
+            position: relative;
+        }
+        .header .nav-list li:hover { color: #0669FF; }
+        .header .nav-list li.active {
+            color: #0669FF;
+            font-weight: 600;
+        }
+        .header .nav-list li.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #0669FF;
+            border-radius: 1px;
+        }
+        .header .user-area {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .header .user-area .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #E8F0FE;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #0669FF;
+        }
+        .header .user-area .name { font-size: 14px; color: #333; }
+
+        .breadcrumb {
+            padding: 16px 24px 0;
+            font-size: 13px;
+            color: #999;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .breadcrumb a {
+            color: #999;
+            text-decoration: none;
+        }
+        .breadcrumb a:hover { color: #0669FF; }
+        .breadcrumb .sep { color: #ccc; }
+        .breadcrumb .current { color: #333; font-weight: 500; }
+
+        .main {
+            padding: 16px 24px 40px;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        .page-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .tab-btn {
+            height: 34px;
+            padding: 0 18px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid #d9d9d9;
+            background: #fff;
+            color: #666;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .tab-btn:hover { color: #0669FF; border-color: #0669FF; }
+        .tab-btn.active {
+            background: #0669FF;
+            border-color: #0669FF;
+            color: #fff;
+        }
+
+        .config-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            margin-bottom: 16px;
+        }
+        .config-card:last-of-type { margin-bottom: 0; }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-title .icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            background: #E8F0FE;
+            color: #0669FF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .form-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .editor-wrap {
+            border: 1px solid #d9d9d9;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .editor-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 12px;
+            background: #fafafa;
+            border-bottom: 1px solid #e8e8e8;
+            flex-wrap: wrap;
+        }
+        .editor-toolbar .tool-group {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            padding-right: 10px;
+            margin-right: 6px;
+            border-right: 1px solid #e8e8e8;
+        }
+        .editor-toolbar .tool-group:last-child {
+            border-right: none;
+            padding-right: 0;
+            margin-right: 0;
+        }
+        .editor-toolbar button {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: transparent;
+            border-radius: 4px;
+            cursor: pointer;
+            color: #555;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+        .editor-toolbar button:hover {
+            background: #E8F0FE;
+            color: #0669FF;
+        }
+        .editor-toolbar .tool-text {
+            font-size: 12px;
+            color: #666;
+            padding: 0 4px;
+        }
+        .editor-content {
+            width: 100%;
+            min-height: 280px;
+            padding: 16px;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            line-height: 1.8;
+            color: #333;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .rule-list {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .rule-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .rule-row .switch-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 180px;
+            flex: 0 0 auto;
+        }
+        .switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .switch .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #d9d9d9;
+            border-radius: 24px;
+            transition: 0.2s;
+        }
+        .switch .slider::before {
+            content: '';
+            position: absolute;
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background: #fff;
+            border-radius: 50%;
+            transition: 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
+        .switch input:checked + .slider { background: #0669FF; }
+        .switch input:checked + .slider::before { transform: translateX(20px); }
+        .rule-label {
+            font-size: 14px;
+            color: #333;
+            white-space: nowrap;
+        }
+        .rule-inputs {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            flex-wrap: wrap;
+        }
+        .rule-inputs input[type="text"],
+        .rule-inputs input[type="number"] {
+            height: 34px;
+            padding: 0 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #333;
+            outline: none;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+        .rule-inputs input[type="text"]:focus,
+        .rule-inputs input[type="number"]:focus {
+            border-color: #0669FF;
+            box-shadow: 0 0 0 2px rgba(6,105,255,0.08);
+        }
+        .rule-inputs input.number-sm { width: 90px; }
+        .rule-inputs input.number-md { width: 140px; }
+        .rule-inputs .unit {
+            font-size: 13px;
+            color: #666;
+        }
+        .rule-inputs .inline-label {
+            font-size: 13px;
+            color: #666;
+            white-space: nowrap;
+        }
+        .rule-inputs .split-line {
+            width: 1px;
+            height: 20px;
+            background: #e8e8e8;
+            margin: 0 8px;
+        }
+
+        .bottom-actions {
+            margin-top: 24px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+        .btn {
+            height: 40px;
+            padding: 0 32px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .btn-cancel {
+            background: #f5f5f5;
+            color: #666;
+            border: 1px solid #d9d9d9;
+        }
+        .btn-cancel:hover { background: #eee; }
+        .btn-save {
+            background: #0669FF;
+            color: #fff;
+        }
+        .btn-save:hover { background: #0052CC; }
+        .btn-save:active { background: #0040A0; }
+
+        /* ── 功能说明浮窗 ── */
+        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 500px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .f-modal .fm-title:active { cursor: grabbing; }
+        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
+        .f-modal .fm-close:hover { background: #e8e8e8; }
+        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
+        .f-modal .fm-body h4:first-child { margin-top: 0; }
+        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
+        .f-modal .fm-body li { margin-bottom: 4px; }
+
+        @media (max-width: 768px) {
+            .header { padding: 0 16px; }
+            .header .nav-list { display: none; }
+            .breadcrumb { padding: 12px 16px 0; }
+            .main { padding: 12px 16px 24px; }
+            .rule-row { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .rule-inputs { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">离泰数链</div>
+        <div class="user-area">
+            <button class="btn-func" onclick="toggleFuncModal()" style="height:32px;padding:0 14px;border-radius:6px;font-size:12px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:inline-flex;align-items:center;gap:4px;transition:all 0.2s;margin-right:12px;" onmouseover="this.style.borderColor='#0669FF';this.style.color='#0669FF'" onmouseout="this.style.borderColor='#d9d9d9';this.style.color='#666'">📖 功能说明</button>
+            <span class="avatar">管</span>
+            <span class="name">管理员</span>
+        </div>
+    </div>
+
+    <div class="breadcrumb">
+        <a href="../index.html">首页</a>
+        <span class="sep">&gt;</span>
+        <a href="#">积分管理</a>
+        <span class="sep">&gt;</span>
+        <span class="current">积分规则配置</span>
+    </div>
+
+    <div class="main">
+        <div class="page-header">
+            <h2>积分规则配置</h2>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn">首页</button>
+            <button class="tab-btn active">积分规则配置</button>
+        </div>
+
+        <div class="config-card">
+            <div class="section-title">
+                <span class="icon">积</span>
+                积分规则配置
+            </div>
+            <div style="margin-bottom:10px;">
+                <span class="form-label">积分规则说明</span>
+            </div>
+            <div class="editor-wrap">
+                <div class="editor-toolbar">
+                    <div class="tool-group">
+                        <button type="button" title="加粗"><b>B</b></button>
+                        <button type="button" title="斜体"><i>I</i></button>
+                        <button type="button" title="下划线"><u>U</u></button>
+                        <button type="button" title="删除线">S</button>
+                    </div>
+                    <div class="tool-group">
+                        <button type="button" title="有序列表">①</button>
+                        <button type="button" title="无序列表">☰</button>
+                        <button type="button" title="左对齐">≡</button>
+                        <button type="button" title="居中对齐">≡</button>
+                        <button type="button" title="右对齐">≡</button>
+                    </div>
+                    <div class="tool-group">
+                        <span class="tool-text">14px</span>
+                        <span class="tool-text">文本</span>
+                        <button type="button" title="字体颜色">A</button>
+                    </div>
+                    <div class="tool-group">
+                        <button type="button" title="插入链接">🔗</button>
+                        <button type="button" title="插入图片">🖼</button>
+                        <button type="button" title="撤销">↩</button>
+                        <button type="button" title="重做">↪</button>
+                    </div>
+                </div>
+                <textarea class="editor-content" id="ruleDesc" placeholder="请输入积分规则说明，用户将在积分页面查看到此内容">离泰数链积分</textarea>
+            </div>
+        </div>
+
+        <div class="config-card">
+            <div class="section-title">
+                <span class="icon">获</span>
+                积分获取规则
+            </div>
+            <div class="rule-list">
+                <div class="rule-row">
+                    <div class="switch-wrap">
+                        <label class="switch">
+                            <input type="checkbox" id="regSwitch" checked>
+                            <span class="slider"></span>
+                        </label>
+                        <span class="rule-label">注册获得积分</span>
+                    </div>
+                    <div class="rule-inputs">
+                        <input type="number" class="number-sm" id="regPoints" value="10">
+                    </div>
+                </div>
+
+                <div class="rule-row">
+                    <div class="switch-wrap">
+                        <label class="switch">
+                            <input type="checkbox" id="studyConsumeSwitch" checked>
+                            <span class="slider"></span>
+                        </label>
+                        <span class="rule-label">研学消费获得积分</span>
+                    </div>
+                    <div class="rule-inputs">
+                        <span class="inline-label">1积分 =</span>
+                        <input type="number" class="number-sm" id="studyConsumePoints" value="1">
+                        <span class="unit">分</span>
+                    </div>
+                </div>
+
+                <div class="rule-row">
+                    <div class="switch-wrap">
+                        <label class="switch">
+                            <input type="checkbox" id="shopConsumeSwitch">
+                            <span class="slider"></span>
+                        </label>
+                        <span class="rule-label">商城消费获得积分</span>
+                    </div>
+                    <div class="rule-inputs">
+                        <span class="inline-label">1积分 =</span>
+                        <input type="number" class="number-sm" id="shopConsumePoints" value="1">
+                        <span class="unit">分</span>
+                    </div>
+                </div>
+
+                <div class="rule-row">
+                    <div class="switch-wrap">
+                        <label class="switch">
+                            <input type="checkbox" id="checkinSwitch" checked>
+                            <span class="slider"></span>
+                        </label>
+                        <span class="rule-label">每次签到获得积分</span>
+                    </div>
+                    <div class="rule-inputs">
+                        <input type="number" class="number-sm" id="checkinPoints" value="5">
+                    </div>
+                </div>
+
+                <div class="rule-row">
+                    <div class="switch-wrap">
+                        <label class="switch">
+                            <input type="checkbox" id="shareSwitch" checked>
+                            <span class="slider"></span>
+                        </label>
+                        <span class="rule-label">分享获得积分</span>
+                    </div>
+                    <div class="rule-inputs">
+                        <input type="number" class="number-sm" id="sharePoints" value="10">
+                        <span class="split-line"></span>
+                        <span class="inline-label">每天最多分享次数</span>
+                        <input type="number" class="number-sm" id="shareMaxTimes" value="2">
+                    </div>
+                </div>
+
+                <div class="rule-row">
+                    <div class="switch-wrap">
+                        <label class="switch">
+                            <input type="checkbox" id="commentSwitch" checked>
+                            <span class="slider"></span>
+                        </label>
+                        <span class="rule-label">评论获得积分</span>
+                    </div>
+                    <div class="rule-inputs">
+                        <input type="number" class="number-sm" id="commentPoints" value="5">
+                        <span class="split-line"></span>
+                        <span class="inline-label">带图带视频额外获取积分</span>
+                        <input type="number" class="number-sm" id="mediaExtraPoints" value="15">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-actions">
+            <button class="btn btn-cancel" onclick="history.back()">取消</button>
+            <button class="btn btn-save" onclick="saveRules()">提交</button>
+        </div>
+    </div>
+
+    <script>
+        function saveRules() {
+            var data = {
+                ruleDesc: document.getElementById('ruleDesc').value,
+                reg: {
+                    enabled: document.getElementById('regSwitch').checked,
+                    points: document.getElementById('regPoints').value
+                },
+                studyConsume: {
+                    enabled: document.getElementById('studyConsumeSwitch').checked,
+                    points: document.getElementById('studyConsumePoints').value
+                },
+                shopConsume: {
+                    enabled: document.getElementById('shopConsumeSwitch').checked,
+                    points: document.getElementById('shopConsumePoints').value
+                },
+                checkin: {
+                    enabled: document.getElementById('checkinSwitch').checked,
+                    points: document.getElementById('checkinPoints').value
+                },
+                share: {
+                    enabled: document.getElementById('shareSwitch').checked,
+                    points: document.getElementById('sharePoints').value,
+                    maxTimes: document.getElementById('shareMaxTimes').value
+                },
+                comment: {
+                    enabled: document.getElementById('commentSwitch').checked,
+                    points: document.getElementById('commentPoints').value,
+                    mediaExtra: document.getElementById('mediaExtraPoints').value
+                }
+            };
+            localStorage.setItem('pointsRules', JSON.stringify(data));
+            alert('积分规则配置已保存');
+        }
+
+        function loadRules() {
+            var saved = localStorage.getItem('pointsRules');
+            if (!saved) return;
+            try {
+                var data = JSON.parse(saved);
+                if (data.ruleDesc) document.getElementById('ruleDesc').value = data.ruleDesc;
+                if (data.reg) setRule('reg', data.reg);
+                if (data.studyConsume) setRule('studyConsume', data.studyConsume);
+                if (data.shopConsume) setRule('shopConsume', data.shopConsume);
+                if (data.checkin) setRule('checkin', data.checkin);
+                if (data.share) setRule('share', data.share);
+                if (data.comment) setRule('comment', data.comment);
+            } catch (e) {}
+        }
+
+        function setRule(prefix, cfg) {
+            var sw = document.getElementById(prefix + 'Switch');
+            if (sw) sw.checked = !!cfg.enabled;
+            if (cfg.points !== undefined) {
+                var input = document.getElementById(prefix + 'Points');
+                if (input) input.value = cfg.points;
+            }
+            if (cfg.maxTimes !== undefined) {
+                var mt = document.getElementById(prefix + 'MaxTimes');
+                if (mt) mt.value = cfg.maxTimes;
+            }
+            if (cfg.mediaExtra !== undefined) {
+                var me = document.getElementById('mediaExtraPoints');
+                if (me) me.value = cfg.mediaExtra;
+            }
+        }
+
+        loadRules();
+
+        /* ── 功能说明浮窗 ── */
+        function toggleFuncModal() {
+            var el = document.getElementById('funcModal');
+            el.classList.toggle('show');
+            if (el.classList.contains('show') && !el.dataset.dragged) {
+                el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
+            }
+        }
+        (function() {
+            var modal, titleBar, offX, offY, dragging = false;
+            document.addEventListener('DOMContentLoaded', function() {
+                modal = document.getElementById('funcModal');
+                if (!modal) return;
+                titleBar = modal.querySelector('.fm-title');
+                if (!titleBar) return;
+                titleBar.addEventListener('mousedown', startDrag);
+                titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+                document.addEventListener('mousemove', onDrag);
+                document.addEventListener('mouseup', endDrag);
+                document.addEventListener('touchmove', onDragTouch, {passive:true});
+                document.addEventListener('touchend', endDrag);
+            });
+            function startDrag(e) {
+                if (e.target.closest('.fm-close')) return;
+                modal.dataset.dragged = '1'; modal.style.transform = '';
+                var rect = modal.getBoundingClientRect();
+                offX = e.clientX - rect.left; offY = e.clientY - rect.top;
+                dragging = true; if (titleBar) titleBar.style.cursor = 'grabbing';
+            }
+            function startDragTouch(e) {
+                if (e.target.closest('.fm-close')) return;
+                var t = e.touches[0];
+                modal.dataset.dragged = '1'; modal.style.transform = '';
+                var rect = modal.getBoundingClientRect();
+                offX = t.clientX - rect.left; offY = t.clientY - rect.top;
+                dragging = true;
+            }
+            function onDrag(e) {
+                if (!dragging) return;
+                modal.style.left = (e.clientX - offX) + 'px';
+                modal.style.top = (e.clientY - offY) + 'px';
+            }
+            function onDragTouch(e) {
+                if (!dragging) return;
+                var t = e.touches[0];
+                modal.style.left = (t.clientX - offX) + 'px';
+                modal.style.top = (t.clientY - offY) + 'px';
+            }
+            function endDrag() {
+                dragging = false; if (titleBar) titleBar.style.cursor = 'grab';
+            }
+        })();
+    </script>
+    <!-- ====== 功能说明浮窗 ====== -->
+    <div class="f-modal" id="funcModal">
+      <div class="fm-title">
+        <span>📖 功能说明</span>
+        <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+      </div>
+      <div class="fm-body">
+        <h4>一、研学消费积分</h4>
+        <ul>
+          <li>将原来的<strong>"消费获得积分"</strong>改成<strong>"研学消费获得积分"</strong>，逻辑不变</li>
+        </ul>
+        <h4>二、商城消费积分</h4>
+        <ul>
+          <li>新增商城消费获得积分规则，默认关闭</li>
+          <li><strong>积分兑换比例</strong>：可配置商城消费积分兑换比例，最少 1 分，正整数，同上面的研学消费获得积分</li>
+          <li><strong>积分发放逻辑</strong>：用户在商场消费订单达到已完成状态后进行发放</li>
+        </ul>
+      </div>
+    </div>
+</body>
+</html>
