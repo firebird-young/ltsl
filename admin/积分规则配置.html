@@ -5,21 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>积分规则配置 - 管理后台</title>
     <style>
+        :root {
+            --bg: #ffffff;
+            --accent: #0066cc;
+            --accent-hover: #0071e3;
+            --link: #0071e3;
+            --ink: #1d1d1f;
+            --ink-muted: #3f424b;
+            --ink-subtle: #86868b;
+            --border: #e0e0e0;
+            --card-bg: #ffffff;
+            --radius-sm: 9999px;
+            --radius-card: 18px;
+            --radius-pill: 9999px;
+            --shadow-card: 0 0 0 1px rgba(0,0,0,0.06);
+            --font: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
-            background: #f0f2f5;
+            font-family: var(--font);
+            background: var(--bg);
             min-height: 100vh;
-            color: #333;
+            color: var(--ink);
         }
 
         .header {
-            background: #fff;
+            background: var(--card-bg);
             height: 56px;
             display: flex;
             align-items: center;
             padding: 0 24px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            border-bottom: 1px solid var(--border);
             position: sticky;
             top: 0;
             z-index: 100;
@@ -27,35 +44,8 @@
         .header .logo {
             font-size: 18px;
             font-weight: 700;
-            color: #0669FF;
+            color: var(--accent);
             margin-right: 32px;
-        }
-        .header .nav-list {
-            display: flex;
-            gap: 24px;
-            list-style: none;
-        }
-        .header .nav-list li {
-            font-size: 14px;
-            color: #666;
-            cursor: pointer;
-            padding: 4px 0;
-            position: relative;
-        }
-        .header .nav-list li:hover { color: #0669FF; }
-        .header .nav-list li.active {
-            color: #0669FF;
-            font-weight: 600;
-        }
-        .header .nav-list li.active::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: #0669FF;
-            border-radius: 1px;
         }
         .header .user-area {
             margin-left: auto;
@@ -67,30 +57,30 @@
             width: 32px;
             height: 32px;
             border-radius: 50%;
-            background: #E8F0FE;
+            background: rgba(218,41,28,0.2);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 14px;
-            color: #0669FF;
+            color: var(--accent);
         }
-        .header .user-area .name { font-size: 14px; color: #333; }
+        .header .user-area .name { font-size: 14px; color: var(--ink); }
 
         .breadcrumb {
             padding: 16px 24px 0;
             font-size: 13px;
-            color: #999;
+            color: var(--ink-subtle);
             display: flex;
             align-items: center;
             gap: 6px;
         }
         .breadcrumb a {
-            color: #999;
+            color: var(--ink-subtle);
             text-decoration: none;
         }
-        .breadcrumb a:hover { color: #0669FF; }
-        .breadcrumb .sep { color: #ccc; }
-        .breadcrumb .current { color: #333; font-weight: 500; }
+        .breadcrumb a:hover { color: var(--accent); }
+        .breadcrumb .sep { color: var(--border); }
+        .breadcrumb .current { color: var(--ink-muted); font-weight: 500; }
 
         .main {
             padding: 16px 24px 40px;
@@ -105,7 +95,7 @@
         .page-header h2 {
             font-size: 20px;
             font-weight: 600;
-            color: #1a1a1a;
+            color: var(--ink);
         }
 
         .tabs {
@@ -116,29 +106,29 @@
         .tab-btn {
             height: 34px;
             padding: 0 18px;
-            border-radius: 6px;
+            border-radius: var(--radius-sm);
             font-size: 13px;
             cursor: pointer;
-            border: 1px solid #d9d9d9;
-            background: #fff;
-            color: #666;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--ink-subtle);
             transition: all 0.2s;
             display: inline-flex;
             align-items: center;
             gap: 5px;
         }
-        .tab-btn:hover { color: #0669FF; border-color: #0669FF; }
+        .tab-btn:hover { color: var(--accent); border-color: var(--accent); }
         .tab-btn.active {
-            background: #0669FF;
-            border-color: #0669FF;
+            background: var(--accent);
+            border-color: var(--accent);
             color: #fff;
         }
 
         .config-card {
-            background: #fff;
-            border-radius: 12px;
+            background: var(--card-bg);
+            border-radius: var(--radius-card);
             padding: 24px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            box-shadow: var(--shadow-card);
             margin-bottom: 16px;
         }
         .config-card:last-of-type { margin-bottom: 0; }
@@ -146,18 +136,20 @@
         .section-title {
             font-size: 15px;
             font-weight: 600;
-            color: #1a1a1a;
+            color: var(--ink);
             margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 8px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--accent);
         }
         .section-title .icon {
             width: 20px;
             height: 20px;
-            border-radius: 4px;
-            background: #E8F0FE;
-            color: #0669FF;
+            border-radius: var(--radius-sm);
+            background: rgba(218,41,28,0.2);
+            color: var(--accent);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -167,13 +159,13 @@
         .form-label {
             font-size: 14px;
             font-weight: 500;
-            color: #333;
+            color: var(--ink-muted);
             margin-bottom: 10px;
             display: block;
         }
 
         .editor-wrap {
-            border: 1px solid #d9d9d9;
+            border: 1px solid var(--border);
             border-radius: 8px;
             overflow: hidden;
         }
@@ -182,8 +174,8 @@
             align-items: center;
             gap: 4px;
             padding: 8px 12px;
-            background: #fafafa;
-            border-bottom: 1px solid #e8e8e8;
+            background: #fafafc;
+            border-bottom: 1px solid var(--border);
             flex-wrap: wrap;
         }
         .editor-toolbar .tool-group {
@@ -192,7 +184,7 @@
             gap: 2px;
             padding-right: 10px;
             margin-right: 6px;
-            border-right: 1px solid #e8e8e8;
+            border-right: 1px solid var(--border);
         }
         .editor-toolbar .tool-group:last-child {
             border-right: none;
@@ -204,9 +196,9 @@
             height: 28px;
             border: none;
             background: transparent;
-            border-radius: 4px;
+            border-radius: var(--radius-sm);
             cursor: pointer;
-            color: #555;
+            color: var(--ink-subtle);
             font-size: 13px;
             display: flex;
             align-items: center;
@@ -214,12 +206,12 @@
             transition: all 0.15s;
         }
         .editor-toolbar button:hover {
-            background: #E8F0FE;
-            color: #0669FF;
+            background: rgba(218,41,28,0.15);
+            color: var(--accent);
         }
         .editor-toolbar .tool-text {
             font-size: 12px;
-            color: #666;
+            color: var(--ink-subtle);
             padding: 0 4px;
         }
         .editor-content {
@@ -230,7 +222,8 @@
             outline: none;
             font-size: 14px;
             line-height: 1.8;
-            color: #333;
+            color: var(--ink);
+            background: #fff;
             font-family: inherit;
             resize: vertical;
         }
@@ -245,6 +238,10 @@
             align-items: center;
             gap: 16px;
             flex-wrap: wrap;
+            padding: 12px 16px;
+            background: #fafafc;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
         }
         .rule-row .switch-wrap {
             display: flex;
@@ -268,7 +265,7 @@
             position: absolute;
             cursor: pointer;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: #d9d9d9;
+            background: #d0d5dd;
             border-radius: 24px;
             transition: 0.2s;
         }
@@ -284,11 +281,11 @@
             transition: 0.2s;
             box-shadow: 0 1px 3px rgba(0,0,0,0.15);
         }
-        .switch input:checked + .slider { background: #0669FF; }
+        .switch input:checked + .slider { background: var(--accent); }
         .switch input:checked + .slider::before { transform: translateX(20px); }
         .rule-label {
             font-size: 14px;
-            color: #333;
+            color: var(--ink);
             white-space: nowrap;
         }
         .rule-inputs {
@@ -302,34 +299,35 @@
         .rule-inputs input[type="number"] {
             height: 34px;
             padding: 0 12px;
-            border: 1px solid #d9d9d9;
-            border-radius: 6px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
             font-size: 13px;
-            color: #333;
+            color: var(--ink);
+            background: #fff;
             outline: none;
             transition: border-color 0.2s;
             font-family: inherit;
         }
         .rule-inputs input[type="text"]:focus,
         .rule-inputs input[type="number"]:focus {
-            border-color: #0669FF;
-            box-shadow: 0 0 0 2px rgba(6,105,255,0.08);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(0,102,204,0.08);
         }
         .rule-inputs input.number-sm { width: 90px; }
         .rule-inputs input.number-md { width: 140px; }
         .rule-inputs .unit {
             font-size: 13px;
-            color: #666;
+            color: var(--ink-subtle);
         }
         .rule-inputs .inline-label {
             font-size: 13px;
-            color: #666;
+            color: var(--ink-subtle);
             white-space: nowrap;
         }
         .rule-inputs .split-line {
             width: 1px;
             height: 20px;
-            background: #e8e8e8;
+            background: var(--border);
             margin: 0 8px;
         }
 
@@ -342,42 +340,79 @@
         .btn {
             height: 40px;
             padding: 0 32px;
-            border-radius: 8px;
+            border-radius: var(--radius-sm);
             font-size: 14px;
             cursor: pointer;
             border: none;
             transition: all 0.2s;
             font-weight: 500;
+            font-family: inherit;
         }
         .btn-cancel {
-            background: #f5f5f5;
-            color: #666;
-            border: 1px solid #d9d9d9;
+            background: transparent;
+            color: var(--ink-subtle);
+            border: 1px solid var(--border);
         }
-        .btn-cancel:hover { background: #eee; }
+        .btn-cancel:hover { border-color: var(--accent); color: var(--accent); }
         .btn-save {
-            background: #0669FF;
+            background: var(--accent);
             color: #fff;
         }
-        .btn-save:hover { background: #0052CC; }
-        .btn-save:active { background: #0040A0; }
+        .btn-save:hover { background: var(--accent-hover); }
+        .btn-save:active { background: #8a150a; }
+
+        .btn-func {
+            height: 32px;
+            padding: 0 14px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--ink-subtle);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+            margin-right: 12px;
+        }
+        .btn-func:hover { border-color: var(--accent); color: var(--accent); }
+
+        .back-home-btn {
+            position: fixed;
+            top: 12px;
+            right: 16px;
+            z-index: 99999;
+            background: var(--accent);
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: var(--radius-pill);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 2px 10px rgba(0,102,204,0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+        .back-home-btn:hover { background: var(--accent-hover); box-shadow: 0 2px 14px rgba(0,102,204,0.4); }
 
         /* ── 功能说明浮窗 ── */
-        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 500px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
+        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 500px; max-height: 80vh; overflow-y: auto; background: var(--card-bg); border-radius: var(--radius-card); box-shadow: 0 8px 40px rgba(0,0,0,0.4); z-index: 9999; padding: 24px; display: none; border: 1px solid var(--border); }
         .f-modal.show { display: block; }
-        .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .f-modal .fm-title { font-size: 16px; font-weight: 600; color: var(--ink); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
         .f-modal .fm-title:active { cursor: grabbing; }
-        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
-        .f-modal .fm-close:hover { background: #e8e8e8; }
-        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
-        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
+        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: var(--ink-subtle); border: none; flex-shrink: 0; }
+        .f-modal .fm-close:hover { background: rgba(255,255,255,0.12); }
+        .f-modal .fm-body { font-size: 13px; color: var(--ink-muted); line-height: 1.8; }
+        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: var(--accent); margin: 16px 0 8px; }
         .f-modal .fm-body h4:first-child { margin-top: 0; }
         .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
         .f-modal .fm-body li { margin-bottom: 4px; }
 
         @media (max-width: 768px) {
             .header { padding: 0 16px; }
-            .header .nav-list { display: none; }
             .breadcrumb { padding: 12px 16px 0; }
             .main { padding: 12px 16px 24px; }
             .rule-row { flex-direction: column; align-items: flex-start; gap: 10px; }
@@ -389,7 +424,7 @@
     <div class="header">
         <div class="logo">离泰数链</div>
         <div class="user-area">
-            <button class="btn-func" onclick="toggleFuncModal()" style="height:32px;padding:0 14px;border-radius:6px;font-size:12px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:inline-flex;align-items:center;gap:4px;transition:all 0.2s;margin-right:12px;" onmouseover="this.style.borderColor='#0669FF';this.style.color='#0669FF'" onmouseout="this.style.borderColor='#d9d9d9';this.style.color='#666'">📖 功能说明</button>
+            <button class="btn-func" onclick="toggleFuncModal()">📖 功能说明</button>
             <span class="avatar">管</span>
             <span class="name">管理员</span>
         </div>
@@ -695,6 +730,6 @@
         </ul>
       </div>
     </div>
-<a href="../index.html" style="position:fixed;top:12px;right:16px;z-index:99999;background:#E53935;color:#fff;padding:7px 16px;border-radius:20px;text-decoration:none;font-size:13px;font-weight:600;box-shadow:0 2px 10px rgba(229,57,53,0.4);display:inline-flex;align-items:center;gap:5px;">📋 目录</a>
+<a href="../index.html" class="back-home-btn">📋 目录</a>
 </body>
 </html>

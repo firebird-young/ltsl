@@ -203,6 +203,70 @@
         }
         .prompt-box textarea::placeholder { color: #bbb; }
 
+        /* ===== 参考图上传 ===== */
+        .ref-upload {
+            display: flex;
+            gap: 8px;
+            padding: 10px 0 8px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            min-height: 72px;
+        }
+        .ref-upload::-webkit-scrollbar { height: 3px; }
+        .ref-upload::-webkit-scrollbar-thumb { background: #d0d5e0; border-radius: 2px; }
+        .ref-item {
+            flex-shrink: 0;
+            width: 72px;
+            height: 72px;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid #e0e0e0;
+            background: #f0f0f0;
+        }
+        .ref-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .ref-item .ref-del {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 18px;
+            height: 18px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.55);
+            color: #fff;
+            font-size: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .ref-add {
+            flex-shrink: 0;
+            width: 72px;
+            height: 72px;
+            border-radius: 8px;
+            border: 1px dashed #ccc;
+            background: #fafafa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #bbb;
+            font-size: 11px;
+            gap: 2px;
+            transition: all 0.2s;
+        }
+        .ref-add:hover { border-color: #0669FF; color: #0669FF; background: #E8F1FF; }
+        .ref-add .ref-add-icon { font-size: 20px; line-height: 1; }
+
         .templates {
             display: flex; flex-wrap: wrap; gap: 8px;
             padding: 8px 16px 6px;
@@ -478,6 +542,7 @@
             </div>
 
             <div class="prompt-box">
+                <div class="ref-upload" id="refUpload"></div>
                 <textarea id="promptInput" rows="3" placeholder="输入创作描述，如：杜甫在草堂前与李白相遇..."></textarea>
             </div>
 
@@ -832,6 +897,58 @@
         }
         list.innerHTML = html;
     }
+
+    /* ===== 参考图上传 ===== */
+    var refImages = [];
+
+    function renderRefUpload() {
+        var container = document.getElementById('refUpload');
+        var html = '';
+        for (var i = 0; i < refImages.length; i++) {
+            html += '<div class="ref-item">'
+                 + '<img src="' + refImages[i] + '" alt="参考图' + (i+1) + '">'
+                 + '<button class="ref-del" onclick="removeRefImage(' + i + ')">✕</button>'
+                 + '</div>';
+        }
+        if (refImages.length < 3) {
+            html += '<div class="ref-add" onclick="document.getElementById(\'refFileInput\').click()">'
+                 + '<span class="ref-add-icon">+</span>'
+                 + '<span>参考图</span>'
+                 + '</div>';
+        }
+        container.innerHTML = html;
+    }
+
+    function removeRefImage(idx) {
+        refImages.splice(idx, 1);
+        renderRefUpload();
+    }
+
+    function handleRefFile(e) {
+        var file = e.target.files[0];
+        if (!file) return;
+        if (refImages.length >= 3) { alert('最多上传3张参考图'); return; }
+        if (!file.type.startsWith('image/')) { alert('请上传图片文件'); return; }
+        var reader = new FileReader();
+        reader.onload = function(ev) {
+            refImages.push(ev.target.result);
+            renderRefUpload();
+            e.target.value = '';
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // 隐藏的文件输入
+    var fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+    fileInput.id = 'refFileInput';
+    fileInput.style.display = 'none';
+    fileInput.addEventListener('change', handleRefFile);
+    document.body.appendChild(fileInput);
+
+    // 初始化渲染参考图区域（显示上传按钮）
+    renderRefUpload();
 
     // 初始化
     switchTab('video');

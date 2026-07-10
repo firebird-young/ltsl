@@ -5,15 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>需求目录 - 离泰数链</title>
     <style>
+        :root {
+            --bg: #ffffff;
+            --accent: #533afd;
+            --accent-hover: #4434d4;
+            --link: #4434d4;
+            --ink: #0d253d;
+            --ink-muted: #3f424b;
+            --ink-subtle: #64748d;
+            --border: #e3e8ee;
+            --card-bg: #ffffff;
+            --radius-card: 12px;
+            --radius-pill: 9999px;
+            --shadow-card: 0 1px 3px rgba(83,58,253,0.06);
+            --shadow-card-hover: 0 4px 20px rgba(83,58,253,0.10);
+            --font-display: 'sohne-var', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif;
+            --font-body: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', 'PingFang SC', Arial, sans-serif;
-            background: #f5f5f7;
+            font-family: var(--font-body);
+            background: var(--bg);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             padding: 60px 24px 100px;
             -webkit-font-smoothing: antialiased;
+            color: var(--ink);
         }
         .page-wrap {
             width: 100%;
@@ -27,13 +46,15 @@
             font-size: 40px;
             font-weight: 700;
             letter-spacing: -0.5px;
-            color: #1d1d1f;
+            color: var(--ink);
+            font-family: var(--font-display);
         }
         .header-area .app-desc {
             font-size: 17px;
-            color: #86868b;
+            color: var(--ink-subtle);
             margin-top: 6px;
             font-weight: 400;
+            font-family: var(--font-body);
         }
 
         .section {
@@ -45,23 +66,23 @@
             gap: 10px;
             padding-bottom: 14px;
             margin-bottom: 16px;
-            border-bottom: 1px solid #d2d2d7;
+            border-bottom: 1px solid var(--border);
         }
         .section-header .sh-label {
             font-size: 20px;
             font-weight: 600;
-            color: #1d1d1f;
+            color: var(--ink);
             letter-spacing: -0.2px;
         }
         .section-header .sh-badge {
             font-size: 12px;
             padding: 3px 12px;
-            border-radius: 20px;
+            border-radius: var(--radius-pill);
             font-weight: 500;
             margin-left: auto;
         }
-        .section-header .sh-badge.green { background: #E8F5E9; color: #2E7D32; }
-        .section-header .sh-badge.gray { background: #e8e8ed; color: #86868b; }
+        .section-header .sh-badge.green { background: #f0edff; color: #533afd; }
+        .section-header .sh-badge.gray { background: #f6f9fc; color: #64748d; }
 
         .list { display: flex; flex-direction: column; gap: 8px; }
         .item {
@@ -69,56 +90,55 @@
             align-items: center;
             gap: 12px;
             padding: 14px 18px;
-            background: #fff;
-            border-radius: 14px;
+            background: var(--card-bg);
+            border-radius: var(--radius-card);
             cursor: pointer;
             text-decoration: none;
             transition: all 0.2s ease;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            box-shadow: var(--shadow-card);
         }
-        .item:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .item:hover { transform: translateY(-1px); box-shadow: var(--shadow-card-hover); }
         .item:active { transform: scale(0.98); }
         .item .it-label {
             font-size: 15px;
             font-weight: 500;
-            color: #1d1d1f;
+            color: var(--ink);
             flex: 1;
         }
         .item .it-tag {
             font-size: 12px;
             padding: 3px 12px;
-            border-radius: 20px;
+            border-radius: var(--radius-pill);
             font-weight: 500;
             flex-shrink: 0;
         }
-        .item .it-tag.green { background: #E8F5E9; color: #2E7D32; }
-        .item .it-tag.gray { background: #f0f0f5; color: #86868b; }
+        .item .it-tag.green { background: #f0edff; color: #533afd; }
+        .item .it-tag.gray { background: #f6f9fc; color: #64748d; }
         .item .it-arrow {
             font-size: 14px;
-            color: #c7c7cc;
+            color: var(--border);
             flex-shrink: 0;
             font-weight: 300;
         }
-        .item:hover .it-arrow { color: #0669FF; }
+        .item:hover .it-arrow { color: var(--accent); }
 
         .back-home {
             position: fixed;
             bottom: 32px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            background: #533afd;
             color: #fff;
-            padding: 10px 28px;
-            border-radius: 24px;
+            padding: 12px 32px;
+            border-radius: 6px;
             text-decoration: none;
             font-size: 14px;
-            font-weight: 500;
-            letter-spacing: 0.2px;
+            font-weight: 600;
             transition: all 0.2s;
+            border: none;
+            font-family: var(--font-body);
         }
-        .back-home:hover { background: rgba(0,0,0,0.95); }
+        .back-home:hover { background: #4434d4; }
     </style>
 </head>
 <body>
