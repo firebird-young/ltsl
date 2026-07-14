@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>购买次数 - 离泰数链</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 430px;
+            background: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            margin: 0 auto;
+            position: relative;
+        }
+        .content-area { flex: 1; padding: 0 16px 24px; }
+
+        .top-nav {
+            height: 50px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            border-bottom: 1px solid #f0f0f0;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .top-nav .back-btn {
+            width: 32px; height: 32px;
+            border-radius: 50%; border: none;
+            background: #f5f5f5;
+            font-size: 18px; color: #666;
+            cursor: pointer; display: flex;
+            align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .top-nav .back-btn:active { background: #e8e8e8; }
+        .top-nav .title {
+            flex: 1; text-align: center;
+            font-size: 17px; font-weight: 600; color: #333;
+            padding-right: 32px;
+        }
+        .top-nav .record-btn {
+            position: absolute;
+            right: 16px;
+            font-size: 13px;
+            color: #0669FF;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-family: inherit;
+            font-weight: 500;
+            padding: 6px 10px;
+        }
+
+        .bp-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+            text-align: center;
+            padding: 24px 0 4px;
+        }
+        .bp-sub {
+            font-size: 12px;
+            color: #999;
+            text-align: center;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .buy-tab {
+            display: flex;
+            gap: 0;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 20px;
+            background: #fff;
+        }
+        .buy-tab .bt-item {
+            flex: 1;
+            padding: 12px 0;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #fff;
+        }
+        .buy-tab .bt-item.active { background: #0669FF; color: #fff; }
+
+        .buy-plan {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .buy-plan .bp-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 18px;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .buy-plan .bp-card:active { background: #E8F1FF; }
+        .buy-plan .bp-card.selected { border-color: #0669FF; background: #E8F1FF; }
+        .buy-plan .bp-card .bpc-info { flex: 1; }
+        .buy-plan .bp-card .bpc-info .bpc-name { font-size: 15px; font-weight: 600; color: #333; }
+        .buy-plan .bp-card .bpc-info .bpc-desc { font-size: 12px; color: #999; margin-top: 2px; }
+        .buy-plan .bp-card .bpc-price { font-size: 18px; font-weight: 700; color: #E53935; }
+        .buy-plan .bp-card .bpc-radio {
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-left: 12px;
+            transition: all 0.2s;
+        }
+        .buy-plan .bp-card.selected .bpc-radio { border-color: #0669FF; }
+        .buy-plan .bp-card.selected .bpc-radio::after {
+            content: '';
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: #0669FF;
+        }
+
+        .buy-count-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+        }
+        .buy-count-area .bca-label { font-size: 14px; color: #666; flex-shrink: 0; }
+        .buy-count-area .bca-control { display: flex; align-items: center; gap: 8px; }
+        .buy-count-area .bca-control button {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            border: 1px solid #d9d9d9;
+            background: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+        .buy-count-area .bca-control button:active { background: #f0f0f0; }
+        .buy-count-area .bca-control input {
+            width: 60px; height: 34px;
+            border: 1px solid #d9d9d9;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 15px;
+            color: #333;
+            outline: none;
+            font-family: inherit;
+        }
+        .buy-count-area .bca-control input:focus { border-color: #0669FF; }
+        .buy-count-area .bca-total {
+            margin-left: auto;
+            font-size: 14px;
+            color: #666;
+        }
+        .buy-count-area .bca-total strong { font-size: 20px; color: #E53935; }
+
+        .unit-hint {
+            text-align: right;
+            font-size: 12px;
+            color: #999;
+            margin-top: 6px;
+            padding: 0 4px;
+        }
+
+        .buy-footer {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        .buy-footer button {
+            flex: 1;
+            height: 46px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: opacity 0.2s;
+        }
+        .buy-footer button:active { opacity: 0.85; }
+        .buy-footer .bf-cancel { background: #f5f5f5; color: #666; }
+        .buy-footer .bf-pay { background: #0669FF; color: #fff; }
+
+        /* ── 功能说明浮窗 ── */
+        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 500px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .f-modal .fm-title:active { cursor: grabbing; }
+        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
+        .f-modal .fm-close:hover { background: #e8e8e8; }
+        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
+        .f-modal .fm-body h4:first-child { margin-top: 0; }
+        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
+        .f-modal .fm-body li { margin-bottom: 4px; }
+
+        @media (max-width: 430px) { .app-container { max-width: 100%; } }
+    </style>
+</head>
+<body>
+<div class="app-container">
+        <div class="top-nav">
+            <button class="back-btn" onclick="goBack()">‹</button>
+            <div class="title">购买次数</div>
+            <button class="record-btn" onclick="goRecord()">购买记录</button>
+        </div>
+
+    <div class="content-area">
+        <div class="bp-title">视频创作次数购买</div>
+        <div class="bp-sub">仅限 AI 视频创作使用，次数无有效期，全课程通用</div>
+
+        <div class="buy-tab">
+            <div class="bt-item active" onclick="switchBuyTab('count')">按次购买</div>
+            <div class="bt-item" onclick="switchBuyTab('plan')">套餐购买</div>
+        </div>
+
+        <div id="buyContent"></div>
+
+        <div class="buy-footer">
+            <button class="bf-cancel" onclick="goBack()">取消</button>
+            <button class="bf-pay" onclick="payBuy()">立即支付</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    var buyTab = 'count';
+    var buyCount = 1;
+    var UNIT_PRICE = 9.9;
+    var plans = [
+        { name: '基础套餐', desc: '10次创作次数', count: 10, price: 88 },
+        { name: '标准套餐', desc: '30次创作次数', count: 30, price: 198 },
+        { name: '高级套餐', desc: '100次创作次数', count: 100, price: 498 },
+    ];
+    var selectedPlan = 0;
+
+    function goBack() {
+        window.location.href = 'AI创作.html';
+    }
+
+    function goRecord() {
+        window.location.href = '购买记录.html';
+    }
+
+    function switchBuyTab(tab) {
+        buyTab = tab;
+        var items = document.querySelectorAll('.buy-tab .bt-item');
+        for (var i = 0; i < items.length; i++) items[i].classList.remove('active');
+        items[tab === 'count' ? 0 : 1].classList.add('active');
+        renderBuyContent();
+    }
+
+    function renderBuyContent() {
+        var el = document.getElementById('buyContent');
+        if (buyTab === 'count') {
+            var total = (buyCount * UNIT_PRICE).toFixed(2);
+            el.innerHTML = '<div class="buy-count-area">'
+                + '<span class="bca-label">购买次数</span>'
+                + '<div class="bca-control">'
+                + '<button onclick="changeCount(-1)">−</button>'
+                + '<input type="number" id="buyCountInput" value="' + buyCount + '" min="1" onchange="updateCount()">'
+                + '<button onclick="changeCount(1)">+</button>'
+                + '</div>'
+                + '<div class="bca-total">合计：<strong>¥' + total + '</strong></div>'
+                + '</div>'
+                + '<div class="unit-hint">单价：¥' + UNIT_PRICE.toFixed(1) + '/次</div>';
+        } else {
+            var html = '<div class="buy-plan">';
+            for (var i = 0; i < plans.length; i++) {
+                var p = plans[i];
+                html += '<div class="bp-card' + (i === selectedPlan ? ' selected' : '') + '" onclick="selectPlan(' + i + ')">'
+                    + '<div class="bpc-info">'
+                    + '<div class="bpc-name">' + p.name + '</div>'
+                    + '<div class="bpc-desc">' + p.desc + '</div>'
+                    + '</div>'
+                    + '<div class="bpc-price">¥' + p.price + '</div>'
+                    + '<div class="bpc-radio"></div>'
+                    + '</div>';
+            }
+            html += '</div>';
+            el.innerHTML = html;
+        }
+    }
+
+    function changeCount(delta) {
+        buyCount = Math.max(1, buyCount + delta);
+        renderBuyContent();
+    }
+
+    function updateCount() {
+        var val = parseInt(document.getElementById('buyCountInput').value);
+        if (isNaN(val) || val < 1) val = 1;
+        buyCount = val;
+        renderBuyContent();
+    }
+
+    function selectPlan(idx) {
+        selectedPlan = idx;
+        renderBuyContent();
+    }
+
+    function payBuy() {
+        var text = buyTab === 'count'
+            ? '支付 ¥' + (buyCount * UNIT_PRICE).toFixed(2) + ' 购买 ' + buyCount + ' 次创作次数'
+            : '支付 ¥' + plans[selectedPlan].price + ' 购买「' + plans[selectedPlan].name + '」';
+        alert('✅ ' + text);
+        // 模拟添加购买记录
+        var records = JSON.parse(localStorage.getItem('buyRecords') || '[]');
+        records.push({
+            id: 'AI' + new Date().getTime(),
+            type: 'video',
+            method: buyTab === 'count' ? 'count' : 'plan',
+            planName: buyTab === 'count' ? '-' : plans[selectedPlan].name,
+            quantity: buyTab === 'count' ? buyCount : plans[selectedPlan].count,
+            total: buyTab === 'count' ? (buyCount * UNIT_PRICE) : plans[selectedPlan].price,
+            user: '13812345678',
+            time: new Date().toLocaleString(),
+            status: 'success',
+            refundReason: ''
+        });
+        localStorage.setItem('buyRecords', JSON.stringify(records));
+    }
+
+    renderBuyContent();
+
+    /* ── 功能说明浮窗 ── */
+    function toggleFuncModal() {
+        var el = document.getElementById('funcModal');
+        el.classList.toggle('show');
+        if (el.classList.contains('show') && !el.dataset.dragged) {
+            el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
+        }
+    }
+    (function() {
+        var modal, titleBar, offX, offY, dragging = false;
+        document.addEventListener('DOMContentLoaded', function() {
+            modal = document.getElementById('funcModal');
+            if (!modal) return;
+            titleBar = modal.querySelector('.fm-title');
+            if (!titleBar) return;
+            titleBar.addEventListener('mousedown', startDrag);
+            titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+            document.addEventListener('mousemove', onDrag);
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('touchmove', onDragTouch, {passive:true});
+            document.addEventListener('touchend', endDrag);
+        });
+        function startDrag(e) {
+            if (e.target.closest('.fm-close')) return;
+            modal.dataset.dragged = '1'; modal.style.transform = '';
+            var rect = modal.getBoundingClientRect();
+            offX = e.clientX - rect.left; offY = e.clientY - rect.top;
+            dragging = true; if (titleBar) titleBar.style.cursor = 'grabbing';
+        }
+        function startDragTouch(e) {
+            if (e.target.closest('.fm-close')) return;
+            var t = e.touches[0];
+            modal.dataset.dragged = '1'; modal.style.transform = '';
+            var rect = modal.getBoundingClientRect();
+            offX = t.clientX - rect.left; offY = t.clientY - rect.top;
+            dragging = true;
+        }
+        function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+        function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+        function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
+    })();
+</script>
+<button onclick="toggleFuncModal()" style="position:fixed;top:12px;right:16px;z-index:99999;background:#fff;color:#666;padding:7px 16px;border-radius:20px;border:1px solid #ddd;font-size:13px;font-weight:500;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-family:inherit;display:inline-flex;align-items:center;gap:4px;">📖 说明</button>
+
+<!-- ====== 功能说明浮窗 ====== -->
+<div class="f-modal" id="funcModal">
+    <div class="fm-title">
+        <span>📖 功能说明</span>
+        <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+    </div>
+    <div class="fm-body">
+        <h4>一、购买方式</h4>
+        <ul>
+            <li><strong>按次购买</strong>：可自由输入购买次数，根据单价自动计算总价，最少购买1次</li>
+            <li><strong>套餐购买</strong>：提供预设套餐（基础/标准/高级），点击选中后直接显示总价</li>
+        </ul>
+        <h4>二、购买流程</h4>
+        <ul>
+            <li><strong>选择方式</strong>：在按次购买和套餐购买间切换</li>
+            <li><strong>确认支付</strong>：点击立即支付，模拟支付成功后自动记录到购买记录</li>
+        </ul>
+        <h4>三、购买记录</h4>
+        <ul>
+            <li><strong>查看记录</strong>：右上角「购买记录」按钮跳转至购买记录页面，展示所有历史购买</li>
+        </ul>
+        <h4>四、适用范围</h4>
+        <ul>
+            <li><strong>文案根据视频还是游戏做调整</strong></li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    // 根据页面URL参数或当前页面类型动态调整适用范围文案
+    var isGame = window.location.href.indexOf('game') !== -1 || window.location.href.indexOf('Game') !== -1;
+    var scopeEl = document.getElementById('funcScope');
+    if (scopeEl) {
+        scopeEl.innerHTML = '<strong>仅限' + (isGame ? 'AI游戏' : 'AI视频') + '创作使用</strong>，次数无有效期，全课程通用';
+    }
+</script>
+</body>
+</html>

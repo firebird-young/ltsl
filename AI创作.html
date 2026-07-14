@@ -300,9 +300,31 @@
             background: #0669FF; color: #fff;
             font-size: 16px; font-weight: 600;
             cursor: pointer; transition: opacity 0.2s;
+            font-family: inherit;
         }
         .gen-btn:active { opacity: 0.8; }
         .gen-btn:disabled { opacity: 0.5; cursor: default; }
+        .gen-btn .gb-remain {
+            font-size: 12px;
+            font-weight: 400;
+            opacity: 0.8;
+        }
+
+        .buy-btn-wrap { padding: 0 16px 10px; }
+        .buy-btn {
+            width: 100%; padding: 10px;
+            border: 1px dashed #FF9500;
+            border-radius: 10px;
+            background: #FFF8F0;
+            color: #FF9500;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .buy-btn:hover { background: #FFF0E0; }
+        .buy-btn:active { opacity: 0.8; }
 
         .progress-bar-wrap {
             display: none;
@@ -557,7 +579,11 @@
             </div>
 
             <div class="gen-btn-wrap">
-                <button class="gen-btn" id="genBtn" onclick="startGenerate()">✨ 立即生成</button>
+                <button class="gen-btn" id="genBtn" onclick="onGenClick()"><span id="genBtnText">✨ 立即生成</span> <span class="gb-remain" id="genRemain">(剩余 3 次)</span></button>
+            </div>
+
+            <div class="buy-btn-wrap">
+                <button class="buy-btn" id="buyBtn" onclick="goBuyPage()">⚡ 购买生成次数</button>
             </div>
 
             <div class="progress-bar-wrap" id="progressBarWrap">
@@ -591,22 +617,22 @@
                 </div>
             </div>
         </div>
+</div>
 
-        <!-- 弹窗 -->
-        <div class="gen-overlay" id="genOverlay">
-            <div class="gen-popup">
-                <div class="gp-icon">⏳</div>
-                <h3>正在生成中</h3>
-                <p>稍后可以在作品中查看</p>
-                <div class="gp-btns">
-                    <button class="gp-btn-primary" onclick="laterView()">稍后查看</button>
-                    <button class="gp-btn-secondary" onclick="continueWait()">继续等待</button>
-                </div>
-            </div>
+<!-- 弹窗 -->
+<div class="gen-overlay" id="genOverlay">
+    <div class="gen-popup">
+        <div class="gp-icon">⏳</div>
+        <h3>正在生成中</h3>
+        <p>稍后可以在作品中查看</p>
+        <div class="gp-btns">
+            <button class="gp-btn-primary" onclick="laterView()">稍后查看</button>
+            <button class="gp-btn-secondary" onclick="continueWait()">继续等待</button>
         </div>
     </div>
+</div>
 
-    <!-- 成员切换弹窗 -->
+<!-- 成员切换弹窗 -->
     <div class="switch-overlay" id="switchOverlay">
         <div class="switch-popup">
             <div class="sp-title">👤 切换成员</div>
@@ -693,6 +719,15 @@
             <h4>3.3 作品管理</h4>
             <p>作品按类型（视频/游戏）自动分类展示。每个类型下再分为"创作中"和"已完成"两个列表。生成中的作品显示灰色封面和"生成中"标签，完成后恢复正常显示。用户可以随时删除作品。</p>
         </div>
+
+        <!-- ===== 迭代记录 ===== -->
+        <div style="margin-top:24px;padding-top:20px;border-top:2px solid #E53935;">
+            <div style="font-size:15px;font-weight:700;color:#E53935;margin-bottom:12px;">2026.7.7 迭代 - AI创作优化</div>
+            <ol style="padding-left:20px;margin:4px 0 8px;">
+                <li style="margin-bottom:6px;font-size:13px;color:#555;"><strong>AI视频创作增加参考图</strong>，最多3张，可以删除</li>
+                <li style="margin-bottom:6px;font-size:13px;color:#555;"><strong>AI视频次数不足时增加购买逻辑</strong>进入创作页面，要先预查次数足够不，不足时立即生成按钮变为"生成次数不足，点此购买”按钮，点击购买按钮后出现购买弹窗，选择次数购买或者套餐购买</li>
+            </ol>
+        </div>
     </div>
 </div>
 
@@ -701,6 +736,7 @@
     var currentTab = 'video';
     var genTimer = null;
     var genIdCounter = 0;
+    var remainCount = 3; // 剩余创作次数
 
     // 成员作品数据隔离: { 成员名: { video: [], game: [] } }
     var memberWorks = {};
@@ -760,30 +796,54 @@
         document.getElementById('promptInput').value = '';
         document.getElementById('progressBarWrap').classList.remove('show');
         if (genTimer) { clearTimeout(genTimer); genTimer = null; }
-        var btn = document.getElementById('genBtn');
-        btn.disabled = false;
-        btn.textContent = '✨ 立即生成';
+        updateRemainDisplay();
     }
 
     function useTemplate(el) {
         document.getElementById('promptInput').value = el.textContent;
     }
 
+    function updateRemainDisplay() {
+        var btn = document.getElementById('genBtn');
+        var remainEl = document.getElementById('genRemain');
+        var textEl = document.getElementById('genBtnText');
+        if (remainCount <= 0) {
+            btn.disabled = true;
+            textEl.textContent = '⛔ 生成次数不足';
+            remainEl.textContent = '';
+        } else {
+            btn.disabled = false;
+            textEl.textContent = '✨ 立即生成';
+            remainEl.textContent = '(剩余 ' + remainCount + ' 次)';
+        }
+    }
+
+    function onGenClick() {
+        if (remainCount <= 0) {
+            return;
+        }
+        startGenerate();
+    }
+
     function startGenerate() {
         var btn = document.getElementById('genBtn');
         btn.disabled = true;
-        btn.textContent = '⏳ 生成中...';
+        document.getElementById('genBtnText').textContent = '⏳ 生成中...';
+        document.getElementById('genRemain').textContent = '';
         document.getElementById('progressBarWrap').classList.remove('show');
         document.getElementById('genOverlay').classList.add('show');
+    }
+
+    function goBuyPage() {
+        window.location.href = '购买次数.html';
     }
 
     function laterView() {
         document.getElementById('genOverlay').classList.remove('show');
         document.getElementById('progressBarWrap').classList.remove('show');
         addGeneratingWork();
-        var btn = document.getElementById('genBtn');
-        btn.disabled = false;
-        btn.textContent = '✨ 立即生成';
+        remainCount = Math.max(0, remainCount - 1);
+        updateRemainDisplay();
         if (genTimer) { clearTimeout(genTimer); genTimer = null; }
     }
 
@@ -823,17 +883,15 @@
             fill.style.width = '100%';
             setTimeout(function() {
                 pb.classList.remove('show');
-                // 将最后一个生成中的作品标记为已完成
                 var works = getWorks();
                 var arr = currentTab === 'video' ? works.video : works.game;
                 var target = arr[arr.length - 1];
                 if (target) {
                     target.status = 'done';
                 }
+                remainCount = Math.max(0, remainCount - 1);
+                updateRemainDisplay();
                 renderWorks();
-                var btn = document.getElementById('genBtn');
-                btn.disabled = false;
-                btn.textContent = '✨ 立即生成';
                 genTimer = null;
             }, 300);
         }, 2000);
@@ -949,6 +1007,7 @@
 
     // 初始化渲染参考图区域（显示上传按钮）
     renderRefUpload();
+    updateRemainDisplay();
 
     // 初始化
     switchTab('video');

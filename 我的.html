@@ -471,6 +471,10 @@
                 <span class="nav-icon">📅</span>
                 <span class="nav-label">研学日历</span>
             </button>
+            <button class="nav-item" onclick="goNav('社区')">
+                <span class="nav-icon">🌐</span>
+                <span class="nav-label">社区</span>
+            </button>
             <button class="nav-item" onclick="goNav('甄选')">
                 <span class="nav-icon">🎁</span>
                 <span class="nav-label">甄选</span>
@@ -507,8 +511,14 @@
         }
         function goNav(name) {
             if (name === '我的') return;
-            if (name === '研学日历') {
-                window.location.href = '研学日历.html';
+            var map = {
+                '研学日历': '研学日历.html',
+                '社区': '社区.html',
+                '甄选': '甄选.html',
+                '首页': '研学手记.html'
+            };
+            if (map[name]) {
+                window.location.href = map[name];
             } else {
                 alert('📍 前往：' + name);
             }

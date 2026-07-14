@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>视频详情 - 离泰数链</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 430px;
+            background: #000;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .top-nav {
+            height: 50px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            z-index: 10;
+            background: linear-gradient(rgba(0,0,0,0.5), transparent);
+        }
+        .top-nav .back-btn {
+            width: 32px; height: 32px;
+            border-radius: 50%; border: none;
+            background: rgba(255,255,255,0.15);
+            color: #fff; font-size: 18px;
+            cursor: pointer; display: flex;
+            align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .top-nav .title {
+            flex: 1; text-align: center;
+            font-size: 16px; font-weight: 600;
+            color: #fff; padding-right: 32px;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+
+
+        .video-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+        }
+        .video-area video {
+            width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+        .video-area .center-play {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 64px; height: 64px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: #fff;
+            cursor: pointer;
+            pointer-events: none;
+        }
+
+        .bottom-area {
+            flex-shrink: 0;
+            background: #1a1a1a;
+        }
+
+        .info-section {
+            padding: 14px 16px 10px;
+        }
+        .info-section .creator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .info-section .creator .ca-avatar {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        .info-section .creator .ca-text { flex: 1; }
+        .info-section .creator .ca-text .ca-name {
+            font-size: 14px; font-weight: 600; color: #fff;
+        }
+        .info-section .creator .ca-text .ca-name .ca-real {
+            font-size: 12px; color: rgba(255,255,255,0.45);
+            font-weight: 400; margin-left: 4px;
+        }
+        .info-section .creator .ca-text .ca-course {
+            font-size: 12px; color: rgba(255,255,255,0.5);
+            margin-top: 2px;
+        }
+        .info-section .creator .ca-text .ca-course .ca-tag {
+            display: inline-block;
+            font-size: 10px;
+            padding: 1px 6px;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.6);
+            margin-right: 4px;
+            font-weight: 500;
+        }
+
+        .action-bar {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            padding: 8px 16px 14px;
+        }
+        .action-bar .ab-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            font-size: 11px;
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            border: none;
+            background: none;
+            padding: 4px;
+        }
+        .action-bar .ab-btn .ab-icon { font-size: 24px; }
+        .action-bar .ab-btn.liked { color: #E53935; }
+
+        .comment-preview {
+            padding: 0 16px 14px;
+        }
+        .comment-preview .cp-hint {
+            font-size: 13px;
+            color: rgba(255,255,255,0.35);
+            cursor: pointer;
+            border: none;
+            background: none;
+            padding: 4px 0;
+            display: block;
+        }
+
+        /* ===== 评论浮层 ===== */
+        .comment-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 9998;
+        }
+        .comment-overlay.show { display: block; }
+
+        .comment-sheet {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            background: #fff;
+            border-radius: 16px 16px 0 0;
+            z-index: 9999;
+            flex-direction: column;
+            max-height: 65vh;
+            animation: sheetUp 0.25s ease-out;
+        }
+        .comment-sheet.show { display: flex; }
+        @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .comment-sheet.show { display: flex; }
+        @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        .comment-sheet .cs-handle {
+            width: 36px; height: 4px;
+            border-radius: 2px;
+            background: #ddd;
+            margin: 8px auto;
+            flex-shrink: 0;
+        }
+        .comment-sheet .cs-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px 10px;
+            border-bottom: 1px solid #f0f0f0;
+            flex-shrink: 0;
+        }
+        .comment-sheet .cs-header .cs-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+        }
+        .comment-sheet .cs-header .cs-close {
+            width: 28px; height: 28px;
+            border: none;
+            background: #f5f5f5;
+            border-radius: 50%;
+            font-size: 14px;
+            color: #999;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .comment-sheet .cs-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 16px;
+        }
+        .comment-sheet .cs-list .cs-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .comment-sheet .cs-list .cs-item .cs-avatar {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            background: #E8F0FE;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+        .comment-sheet .cs-list .cs-item .cs-body { flex: 1; }
+        .comment-sheet .cs-list .cs-item .cs-body .cs-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #0669FF;
+        }
+        .comment-sheet .cs-list .cs-item .cs-body .cs-text {
+            font-size: 13px;
+            color: #333;
+            margin-top: 2px;
+            line-height: 1.4;
+        }
+        .comment-sheet .cs-list .cs-item .cs-body .cs-time {
+            font-size: 11px;
+            color: #bbb;
+            margin-top: 2px;
+        }
+        .comment-sheet .cs-list .cs-item {
+            position: relative;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        .comment-sheet .cs-list .cs-item .cs-del-hint {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 0;
+            font-size: 10px;
+            color: #ff3b30;
+            background: #FFF0F0;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+            pointer-events: none;
+        }
+        .comment-sheet .cs-list .cs-item .cs-del-hint.show { display: block; }
+        .comment-sheet .cs-list .cs-empty {
+            text-align: center;
+            color: #bbb;
+            padding: 30px 0;
+            font-size: 13px;
+        }
+        .comment-sheet .cs-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px 16px;
+            border-top: 1px solid #f0f0f0;
+            flex-shrink: 0;
+        }
+        .comment-sheet .cs-input input {
+            flex: 1;
+            height: 36px;
+            border: 1px solid #e0e0e0;
+            border-radius: 18px;
+            padding: 0 14px;
+            font-size: 13px;
+            outline: none;
+            font-family: inherit;
+        }
+        .comment-sheet .cs-input input:focus { border-color: #0669FF; }
+        .comment-sheet .cs-input .cs-send {
+            width: 36px; height: 36px;
+            border: none;
+            border-radius: 50%;
+            background: #0669FF;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* ── 功能说明浮窗 ── */
+        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 500px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .f-modal .fm-title:active { cursor: grabbing; }
+        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
+        .f-modal .fm-close:hover { background: #e8e8e8; }
+        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
+        .f-modal .fm-body h4:first-child { margin-top: 0; }
+        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
+        .f-modal .fm-body li { margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+<div class="app-container">
+        <div class="top-nav">
+            <button class="back-btn" onclick="goBack()">‹</button>
+            <div class="title" id="pageTitle">视频</div>
+        </div>
+
+    <div class="video-area" id="videoWrap">
+        <video id="mainVideo" src="" playsinline webkit-playsinline onclick="togglePlay()"></video>
+        <div class="center-play" id="centerPlay" onclick="togglePlay()">▶</div>
+    </div>
+
+    <div class="bottom-area">
+        <div class="info-section">
+            <div class="creator">
+                <div class="ca-avatar">👤</div>
+                <div class="ca-text">
+                    <div class="ca-name" id="caName">创作者 <span class="ca-real" id="caReal"></span></div>
+                    <div class="ca-course" id="caCourse"><span class="ca-tag">课程</span><span id="caCourseText"></span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <button class="ab-btn" id="likeBtn" onclick="toggleLike()">
+                <span class="ab-icon" id="likeIcon">♡</span>
+                <span id="likeCount">0</span>
+            </button>
+            <button class="ab-btn" onclick="focusComment()">
+                <span class="ab-icon">💬</span>
+                <span id="commentCount">0</span>
+            </button>
+            <button class="ab-btn" onclick="alert('分享功能')">
+                <span class="ab-icon">↗</span>
+                <span>分享</span>
+            </button>
+        </div>
+
+        <div class="comment-preview" id="commentPreview">
+            <button class="cp-hint" onclick="openCommentSheet()">查看全部评论</button>
+        </div>
+        </div>
+    </div>
+
+    <!-- ===== 评论遮罩 ===== -->
+    <div class="comment-overlay" id="commentOverlay" onclick="closeCommentSheet()"></div>
+
+    <!-- ===== 评论浮层 ===== -->
+    <div class="comment-sheet" id="commentSheet">
+        <div class="cs-handle"></div>
+        <div class="cs-header">
+            <span class="cs-title">评论 (<span id="csCount">0</span>)</span>
+            <button class="cs-close" onclick="closeCommentSheet()">✕</button>
+        </div>
+        <div class="cs-list" id="csList">
+            <div class="cs-empty">暂无评论</div>
+        </div>
+        <div class="cs-input">
+            <input type="text" id="csInput" placeholder="说点什么..." maxlength="200">
+            <button class="cs-send" onclick="sendComment()">↵</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    var feedData = [
+        { id: 1, title: '博物馆犀牛', video: '博物馆.mp4', cover: '博物馆.mp4', creator: '晓宇', realCreator: '张**', course: '我为杜甫建茅屋', liked: false, likes: 28, showAllComments: false, comments: [
+            { cid: 1, avatar: '👦', name: '小梅', text: '好有意思的画面，感觉回到了唐代！', time: '2小时前', isMine: false },
+            { cid: 2, avatar: '👨', name: '浩浩', text: 'AI生成的视频越来越棒了', time: '5小时前', isMine: false }
+        ]},
+        { id: 2, title: '茅屋搭建的完整过程', video: '博物馆.mp4', cover: '快速搭建茅屋', creator: '梅梅', realCreator: '杨*', course: '快速搭建茅屋', liked: false, likes: 15, showAllComments: false, comments: [
+            { cid: 3, avatar: '👤', name: '飞飞', text: '这个搭建过程讲解得很清楚', time: '1天前', isMine: false }
+        ]},
+        { id: 3, title: '诗界无心·草堂寻心', video: '博物馆.mp4', cover: '诗界无心·草堂寻心.jpg', creator: '浩宇', realCreator: '王**', course: '诗界无心·草堂寻心', liked: true, likes: 42, showAllComments: false, comments: [
+            { cid: 4, avatar: '👩', name: '小红', text: '画面太美了，像水墨画一样', time: '1天前', isMine: false },
+            { cid: 5, avatar: '👦', name: '小明', text: '下次我也要去草堂看看', time: '2天前', isMine: false },
+            { cid: 6, avatar: '👨', name: '大力', text: 'AI创作的水平越来越高了', time: '2天前', isMine: false }
+        ]},
+        { id: 4, title: '盆景美学·指尖上的山水', video: '博物馆.mp4', cover: '盆景美学·指尖上的山水.jpg', creator: '小宇', realCreator: '刘*', course: '盆景美学·指尖山水', liked: false, likes: 33, showAllComments: false, comments: [
+            { cid: 7, avatar: '👤', name: '晓华', text: '盆景艺术配上AI视频太有创意了', time: '3天前', isMine: false }
+        ]},
+        { id: 5, title: '杜甫和李白的故事', video: '博物馆.mp4', cover: '杜甫和李白.png', creator: '小明', realCreator: '赵**', course: '杜甫和李白的故事', liked: false, likes: 21, showAllComments: false, comments: []},
+        { id: 6, title: '春假托管班精彩回顾', video: '博物馆.mp4', cover: '盆景美学·指尖上的山水.jpg', creator: '芳芳', realCreator: '李*', course: '春假托管班', liked: false, likes: 18, showAllComments: false, comments: [
+            { cid: 8, avatar: '👩', name: '小芳', text: '孩子们玩得很开心', time: '4天前', isMine: false }
+        ]},
+    ];
+
+    var currentIdx = parseInt(new URLSearchParams(window.location.search).get('idx')) || 0;
+    var isPlaying = false;
+    var currentUser = '我'; // 当前登录用户
+    var commentIdCounter = 100;
+
+    function init() {
+        var f = feedData[currentIdx];
+        if (!f) { goBack(); return; }
+
+        document.getElementById('pageTitle').textContent = f.title;
+        document.getElementById('caName').innerHTML = f.creator + ' <span class="ca-real">' + f.realCreator + '</span>';
+        document.getElementById('caCourseText').textContent = f.course;
+
+        var video = document.getElementById('mainVideo');
+        video.src = f.video;
+        video.load();
+        updateActions();
+        renderComments();
+
+        setTimeout(function() {
+            video.play().then(function() {
+                isPlaying = true;
+                document.getElementById('centerPlay').style.display = 'none';
+            }).catch(function(){});
+        }, 300);
+    }
+
+    function goBack() {
+        window.location.href = '社区.html';
+    }
+
+    function togglePlay() {
+        var video = document.getElementById('mainVideo');
+        var cp = document.getElementById('centerPlay');
+        if (isPlaying) {
+            video.pause();
+            cp.style.display = 'flex';
+        } else {
+            video.play();
+            cp.style.display = 'none';
+        }
+        isPlaying = !isPlaying;
+    }
+
+    function toggleLike() {
+        var f = feedData[currentIdx];
+        f.liked = !f.liked;
+        f.likes += f.liked ? 1 : -1;
+        updateActions();
+    }
+
+    function updateActions() {
+        var f = feedData[currentIdx];
+        document.getElementById('likeCount').textContent = f.likes;
+        document.getElementById('commentCount').textContent = f.comments.length;
+        var btn = document.getElementById('likeBtn');
+        var icon = document.getElementById('likeIcon');
+        icon.textContent = f.liked ? '❤' : '♡';
+        btn.className = 'ab-btn' + (f.liked ? ' liked' : '');
+    }
+
+    function renderComments() {
+        var f = feedData[currentIdx];
+        document.getElementById('csCount').textContent = f.comments.length;
+        var list = document.getElementById('csList');
+        var isMyVideo = f.creator === '我' || f.creator === '晓宇';
+        var html = '';
+        for (var i = 0; i < f.comments.length; i++) {
+            var c = f.comments[i];
+            var canDelete = c.isMine || isMyVideo;
+            var hintHtml = canDelete ? '<div class="cs-del-hint" id="hint_' + c.cid + '">松手删除</div>' : '';
+            var attrs = canDelete
+                ? ' ontouchstart="startLongPress(event, ' + c.cid + ')" ontouchend="endLongPress(event, ' + c.cid + ')" ontouchmove="cancelLongPress()" onmousedown="startLongPress(event, ' + c.cid + ')" onmouseup="endLongPress(event, ' + c.cid + ')" onmouseleave="cancelLongPress()"'
+                : '';
+            html += '<div class="cs-item"' + attrs + '>'
+                 + '<div class="cs-avatar">' + c.avatar + '</div>'
+                 + '<div class="cs-body">'
+                 + '<div class="cs-name">' + c.name + '</div>'
+                 + '<div class="cs-text">' + c.text + '</div>'
+                 + '<div class="cs-time">' + c.time + '</div>'
+                 + '</div>'
+                 + hintHtml
+                 + '</div>';
+        }
+        if (!html) html = '<div class="cs-empty">暂无评论，来说点什么吧</div>';
+        list.innerHTML = html;
+    }
+
+    var longPressTimer = null;
+    var longPressTarget = null;
+
+    function startLongPress(e, cid) {
+        longPressTarget = cid;
+        longPressTimer = setTimeout(function() {
+            var hint = document.getElementById('hint_' + cid);
+            if (hint) hint.classList.add('show');
+        }, 600);
+    }
+
+    function endLongPress(e, cid) {
+        if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+        var hint = document.getElementById('hint_' + cid);
+        if (hint && hint.classList.contains('show')) {
+            hint.classList.remove('show');
+            if (confirm('确定删除该评论？')) {
+                var f = feedData[currentIdx];
+                for (var i = 0; i < f.comments.length; i++) {
+                    if (f.comments[i].cid === cid) {
+                        f.comments.splice(i, 1);
+                        break;
+                    }
+                }
+                renderComments();
+                updateActions();
+            }
+        }
+        longPressTarget = null;
+    }
+
+    function cancelLongPress() {
+        if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+        if (longPressTarget !== null) {
+            var hint = document.getElementById('hint_' + longPressTarget);
+            if (hint) hint.classList.remove('show');
+            longPressTarget = null;
+        }
+    }
+
+    function openCommentSheet() {
+        renderComments();
+        // 获取app-container的位置，将fixed元素限制在容器范围内
+        var container = document.querySelector('.app-container');
+        var rect = container.getBoundingClientRect();
+        var overlay = document.getElementById('commentOverlay');
+        var sheet = document.getElementById('commentSheet');
+        overlay.style.left = rect.left + 'px';
+        overlay.style.width = rect.width + 'px';
+        sheet.style.left = rect.left + 'px';
+        sheet.style.width = rect.width + 'px';
+        overlay.classList.add('show');
+        sheet.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeCommentSheet() {
+        document.getElementById('commentOverlay').classList.remove('show');
+        document.getElementById('commentSheet').classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+    function sendComment() {
+        var input = document.getElementById('csInput');
+        var text = input.value.trim();
+        if (!text) return;
+        feedData[currentIdx].comments.push({
+            cid: ++commentIdCounter, avatar: '👤', name: currentUser, text: text, time: '刚刚', isMine: true
+        });
+        input.value = '';
+        renderComments();
+        updateActions();
+    }
+
+    function focusComment() {
+        openCommentSheet();
+        setTimeout(function() { document.getElementById('csInput').focus(); }, 300);
+    }
+
+    init();
+
+    /* ── 功能说明浮窗 ── */
+    function toggleFuncModal() {
+        var el = document.getElementById('funcModal');
+        el.classList.toggle('show');
+        if (el.classList.contains('show') && !el.dataset.dragged) {
+            el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
+        }
+    }
+    (function() {
+        var modal, titleBar, offX, offY, dragging = false;
+        document.addEventListener('DOMContentLoaded', function() {
+            modal = document.getElementById('funcModal');
+            if (!modal) return;
+            titleBar = modal.querySelector('.fm-title');
+            if (!titleBar) return;
+            titleBar.addEventListener('mousedown', startDrag);
+            titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+            document.addEventListener('mousemove', onDrag);
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('touchmove', onDragTouch, {passive:true});
+            document.addEventListener('touchend', endDrag);
+        });
+        function startDrag(e) {
+            if (e.target.closest('.fm-close')) return;
+            modal.dataset.dragged = '1'; modal.style.transform = '';
+            var rect = modal.getBoundingClientRect();
+            offX = e.clientX - rect.left; offY = e.clientY - rect.top;
+            dragging = true; if (titleBar) titleBar.style.cursor = 'grabbing';
+        }
+        function startDragTouch(e) {
+            if (e.target.closest('.fm-close')) return;
+            var t = e.touches[0];
+            modal.dataset.dragged = '1'; modal.style.transform = '';
+            var rect = modal.getBoundingClientRect();
+            offX = t.clientX - rect.left; offY = t.clientY - rect.top;
+            dragging = true;
+        }
+        function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+        function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+        function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
+    })();
+</script>
+
+<a href="index.html" style="position:fixed;top:12px;right:16px;z-index:99999;background:#E53935;color:#fff;padding:7px 16px;border-radius:20px;text-decoration:none;font-size:13px;font-weight:600;box-shadow:0 2px 10px rgba(229,57,53,0.4);display:inline-flex;align-items:center;gap:5px;">📋 目录</a>
+<button onclick="toggleFuncModal()" style="position:fixed;top:12px;right:90px;z-index:99999;background:#fff;color:#666;padding:7px 16px;border-radius:20px;border:1px solid #ddd;font-size:13px;font-weight:500;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-family:inherit;display:inline-flex;align-items:center;gap:4px;">📖 说明</button>
+
+<!-- ====== 功能说明浮窗（手机框外） ====== -->
+<div class="f-modal" id="funcModal">
+    <div class="fm-title">
+        <span>📖 功能说明</span>
+        <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+    </div>
+    <div class="fm-body">
+        <h4>一、视频播放</h4>
+        <ul>
+            <li><strong>全屏播放</strong>：进入页面自动播放视频，点击视频切换播放/暂停</li>
+            <li><strong>顶部信息</strong>：显示视频标题，左侧返回按钮回到社区列表</li>
+        </ul>
+        <h4>二、创作者信息</h4>
+        <ul>
+            <li><strong>头像与昵称</strong>：显示创作者头像、登录账号昵称和打码真实姓名</li>
+            <li><strong>关联课程</strong>：展示视频关联的研学课程名称，带「课程」标识标签</li>
+        </ul>
+        <h4>三、互动操作</h4>
+        <ul>
+            <li><strong>点赞</strong>：点击爱心按钮点赞/取消点赞，实时更新点赞数</li>
+            <li><strong>评论</strong>：点击评论按钮弹出底部浮层，可查看全部评论和发送新评论</li>
+            <li><strong>长按删除评论</strong>：长按评论条目 600ms 后出现「松手删除」提示，松手确认后可删除。自己发的评论可删，自己创作的视频下所有评论均可删</li>
+            <li><strong>分享</strong>：点击分享按钮（原型示意）</li>
+        </ul>
+    </div>
+</div>
+</body>
+</html>
+

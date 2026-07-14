@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>社区视频管理 - 管理后台</title>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --accent: #0066cc;
+            --accent-hover: #0071e3;
+            --link: #0071e3;
+            --ink: #1d1d1f;
+            --ink-muted: #3f424b;
+            --ink-subtle: #86868b;
+            --border: #e0e0e0;
+            --card-bg: #ffffff;
+            --radius-sm: 9999px;
+            --radius-card: 18px;
+            --radius-pill: 9999px;
+            --shadow-card: 0 0 0 1px rgba(0,0,0,0.06);
+            --font: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font);
+            background: #f5f5f7;
+            min-height: 100vh;
+            color: var(--ink);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .header {
+            background: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header .logo { font-size: 18px; font-weight: 700; color: var(--accent); margin-right: 32px; }
+        .header .nav-list { display: flex; gap: 24px; list-style: none; }
+        .header .nav-list li { font-size: 14px; color: var(--ink-subtle); cursor: pointer; padding: 4px 0; position: relative; }
+        .header .nav-list li:hover { color: var(--accent); }
+        .header .nav-list li.active { color: var(--accent); font-weight: 600; }
+        .header .nav-list li.active::after { content: ''; position: absolute; bottom: -4px; left: 0; right: 0; height: 2px; background: var(--accent); border-radius: 1px; }
+        .header .user-area { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+        .header .user-area .avatar { width: 32px; height: 32px; border-radius: 50%; background: #E8F0FE; display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--accent); }
+        .header .user-area .name { font-size: 14px; color: var(--ink); }
+
+        .breadcrumb { padding: 16px 24px 0; font-size: 13px; color: var(--ink-subtle); }
+        .breadcrumb a { color: var(--ink-subtle); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--accent); }
+        .breadcrumb .current { color: var(--ink); font-weight: 500; }
+
+        .main { padding: 16px 24px 40px; }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        .page-header h2 { font-size: 20px; font-weight: 600; color: var(--ink); }
+        .page-header .stat-badge {
+            font-size: 12px; color: var(--ink-subtle); background: #f5f5f7;
+            padding: 6px 16px; border-radius: var(--radius-pill);
+        }
+
+        .search-area {
+            background: #fff; border-radius: var(--radius-card);
+            padding: 20px 24px; margin-bottom: 16px; box-shadow: var(--shadow-card);
+        }
+        .search-row { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; }
+        .search-item { display: flex; flex-direction: column; gap: 4px; min-width: 140px; flex: 0 0 auto; }
+        .search-item label { font-size: 12px; color: var(--ink-subtle); font-weight: 500; }
+        .search-item input, .search-item select {
+            height: 36px; padding: 0 12px; border: 1px solid var(--border);
+            border-radius: var(--radius-pill); font-size: 13px; color: var(--ink);
+            background: #fff; outline: none; font-family: inherit; transition: border-color 0.2s;
+        }
+        .search-item input:focus, .search-item select:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,102,204,0.08); }
+        .search-actions { display: flex; gap: 10px; align-items: flex-end; flex: 0 0 auto; }
+        .search-actions .btn {
+            height: 36px; padding: 0 20px; border-radius: var(--radius-pill);
+            font-size: 13px; cursor: pointer; border: none; transition: all 0.2s;
+            font-family: inherit; font-weight: 500;
+        }
+        .search-actions .btn-search { background: var(--accent); color: #fff; }
+        .search-actions .btn-search:hover { background: var(--accent-hover); }
+        .search-actions .btn-reset { background: #f5f5f7; color: var(--ink-subtle); border: 1px solid var(--border); }
+        .search-actions .btn-reset:hover { border-color: var(--accent); color: var(--accent); }
+
+        /* 表格 */
+        .table-wrap {
+            background: #fff; border-radius: var(--radius-card);
+            overflow: hidden; box-shadow: var(--shadow-card);
+        }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        thead th {
+            font-size: 12px; font-weight: 600; color: var(--ink-subtle);
+            text-align: left; padding: 14px 16px;
+            border-bottom: 1px solid var(--border); background: #fafafc;
+            white-space: nowrap;
+        }
+        tbody td {
+            font-size: 13px; color: var(--ink);
+            padding: 14px 16px; border-bottom: 1px solid #f5f5f5;
+            vertical-align: middle;
+        }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: #FAFBFF; }
+
+        .td-cover {
+            width: 80px; height: 50px;
+            border-radius: 6px; overflow: hidden;
+            background: #e0e0e0; display: block;
+        }
+        .td-cover video, .td-cover img {
+            width: 100%; height: 100%; object-fit: cover; display: block;
+        }
+
+        .status-tag {
+            display: inline-block; padding: 3px 12px;
+            border-radius: 6px; font-size: 11px; font-weight: 500;
+        }
+        .status-tag.published { background: #E8F5E9; color: #34c759; }
+        .status-tag.offline { background: #f5f5f7; color: var(--ink-subtle); }
+
+        .action-btn {
+            padding: 5px 14px; border: none; border-radius: var(--radius-pill);
+            font-size: 12px; font-weight: 500; cursor: pointer;
+            transition: all 0.2s; font-family: inherit; margin-right: 4px;
+        }
+        .action-btn.comment { background: #E8F0FE; color: var(--accent); }
+        .action-btn.comment:hover { background: #D6E4FF; }
+        .action-btn.offline { background: #FFF0F0; color: #ff3b30; }
+        .action-btn.offline:hover { background: #ff3b30; color: #fff; }
+        .action-btn.online { background: #E8F5E9; color: #34c759; }
+        .action-btn.online:hover { background: #34c759; color: #fff; }
+
+        .pagination {
+            display: flex; align-items: center; justify-content: center;
+            padding: 16px 24px; gap: 6px; border-top: 1px solid #f0f0f0;
+        }
+        .pagination .page-info { font-size: 13px; color: var(--ink-subtle); margin-right: 12px; }
+        .pagination .page-btn {
+            width: 32px; height: 32px; border-radius: var(--radius-pill);
+            border: 1px solid var(--border); background: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; color: var(--ink-subtle); cursor: pointer; transition: all 0.2s;
+        }
+        .pagination .page-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .pagination .page-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .pagination .page-btn.disabled { opacity: 0.4; cursor: default; }
+
+        .table-total {
+            padding: 12px 24px; font-size: 13px; color: var(--ink-subtle);
+            border-top: 1px solid #f0f0f0; display: flex; justify-content: space-between;
+        }
+
+        /* ===== 评论弹窗 ===== */
+        .comment-overlay {
+            display: none; position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4); z-index: 9998;
+        }
+        .comment-overlay.show { display: block; }
+        .comment-modal {
+            display: none; position: fixed;
+            bottom: 0; left: 0; right: 0; z-index: 9999;
+            background: #fff; border-radius: 16px 16px 0 0;
+            flex-direction: column; max-height: 60vh;
+            animation: sheetUp 0.25s ease-out;
+        }
+        .comment-modal.show { display: flex; }
+        @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .comment-modal .cm-handle { width: 36px; height: 4px; border-radius: 2px; background: #ddd; margin: 8px auto; flex-shrink: 0; }
+        .comment-modal .cm-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 16px 10px; border-bottom: 1px solid #f0f0f0; flex-shrink: 0;
+        }
+        .comment-modal .cm-header .cm-title { font-size: 15px; font-weight: 600; color: var(--ink); }
+        .comment-modal .cm-header .cm-close {
+            width: 28px; height: 28px; border: none; background: #f5f5f5;
+            border-radius: 50%; font-size: 14px; color: #999; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .comment-modal .cm-list {
+            flex: 1; overflow-y: auto; padding: 12px 16px;
+        }
+        .comment-modal .cm-list .cm-item {
+            display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f5f5f5;
+        }
+        .comment-modal .cm-list .cm-item:last-child { border-bottom: none; }
+        .comment-modal .cm-list .cm-item .cm-name { font-size: 12px; font-weight: 600; color: var(--accent); flex-shrink: 0; }
+        .comment-modal .cm-list .cm-item .cm-text { flex: 1; font-size: 13px; color: var(--ink); }
+        .comment-modal .cm-list .cm-item .cm-time { font-size: 11px; color: #bbb; flex-shrink: 0; }
+        .comment-modal .cm-list .cm-item .cm-del {
+            width: 24px; height: 24px; border-radius: 50%; border: none;
+            background: #f0f0f0; color: #999; font-size: 11px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+            transition: all 0.2s;
+        }
+        .comment-modal .cm-list .cm-item .cm-del:hover { background: #FFF0F0; color: #ff3b30; }
+        .comment-modal .cm-list .cm-empty { text-align: center; color: #bbb; padding: 30px 0; font-size: 13px; }
+
+        @media (max-width: 768px) {
+            .header { padding: 0 16px; }
+            .header .nav-list { display: none; }
+            .breadcrumb { padding: 12px 16px 0; }
+            .main { padding: 12px 16px 24px; }
+        }
+
+        /* ── 功能说明浮窗 ── */
+        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 500px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .f-modal .fm-title:active { cursor: grabbing; }
+        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
+        .f-modal .fm-close:hover { background: #e8e8e8; }
+        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
+        .f-modal .fm-body h4:first-child { margin-top: 0; }
+        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
+        .f-modal .fm-body li { margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">离泰数链</div>
+        <ul class="nav-list">
+            <li>概览</li>
+            <li class="active">社区管理</li>
+            <li onclick="window.location.href='AI创作销售配置.html'" style="cursor:pointer;">AI配置</li>
+            <li onclick="window.location.href='积分规则配置.html'" style="cursor:pointer;">积分管理</li>
+            <li onclick="window.location.href='../系统参数配置.html'" style="cursor:pointer;">系统设置</li>
+        </ul>
+        <div class="user-area">
+            <button class="btn-func" onclick="toggleFuncModal()" style="height:32px;padding:0 14px;border-radius:6px;font-size:12px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--ink-subtle);display:inline-flex;align-items:center;gap:4px;transition:all 0.2s;margin-right:12px;font-family:inherit;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--ink-subtle)'">📖 功能说明</button>
+            <span class="avatar">管</span>
+            <span class="name">管理员</span>
+        </div>
+    </div>
+
+    <div class="breadcrumb">
+        <a href="../index.html">首页</a>
+        <span class="sep"> &gt; </span>
+        <span class="current">社区视频管理</span>
+    </div>
+
+    <div class="main">
+        <div class="page-header">
+            <h2>社区视频管理</h2>
+            <span class="stat-badge">共 <strong id="totalCount">0</strong> 个视频</span>
+        </div>
+
+        <div class="search-area">
+            <div class="search-row">
+                <div class="search-item">
+                    <label>视频标题</label>
+                    <input type="text" id="searchTitle" placeholder="输入视频标题" oninput="doSearch()">
+                </div>
+                <div class="search-item">
+                    <label>创作者</label>
+                    <input type="text" id="searchCreator" placeholder="输入创作者昵称" oninput="doSearch()">
+                </div>
+                <div class="search-item">
+                    <label>视频状态</label>
+                    <select id="searchStatus" onchange="doSearch()">
+                        <option value="all">全部</option>
+                        <option value="published">已发布</option>
+                        <option value="offline">已下架</option>
+                    </select>
+                </div>
+                <div class="search-actions">
+                    <button class="btn btn-reset" onclick="resetSearch()">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:5%">封面</th>
+                        <th style="width:14%">视频标题</th>
+                        <th style="width:10%">创作者</th>
+                        <th style="width:12%">关联课程</th>
+                        <th style="width:8%">创作日期</th>
+                        <th style="width:6%">点赞</th>
+                        <th style="width:6%">评论</th>
+                        <th style="width:7%">状态</th>
+                        <th style="width:12%">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+            <div class="table-total">
+                <span>已发布：<strong id="publishedCount">0</strong> &nbsp; 已下架：<strong id="offlineCount">0</strong></span>
+                <span>共 <strong id="totalCount2">0</strong> 条</span>
+            </div>
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </div>
+
+    <!-- ===== 评论弹窗 ===== -->
+    <div class="comment-overlay" id="commentOverlay" onclick="closeCommentModal()"></div>
+    <div class="comment-modal" id="commentModal">
+        <div class="cm-handle"></div>
+        <div class="cm-header">
+            <span class="cm-title">评论列表</span>
+            <button class="cm-close" onclick="closeCommentModal()">✕</button>
+        </div>
+        <div class="cm-list" id="commentList"></div>
+    </div>
+
+    <script>
+        var videoData = [
+            { id: 1, title: '博物馆犀牛', video: '博物馆.mp4', cover: '博物馆.mp4', creator: '晓宇', realCreator: '张**', course: '我为杜甫建茅屋', date: '2026-07-10', likes: 28, status: 'published', comments: [
+                { name: '小梅', text: '好有意思的画面，感觉回到了唐代！', time: '2小时前' },
+                { name: '浩浩', text: 'AI生成的视频越来越棒了', time: '5小时前' }
+            ]},
+            { id: 2, title: '茅屋搭建的完整过程', video: '博物馆.mp4', cover: '快速搭建茅屋', creator: '梅梅', realCreator: '杨*', course: '快速搭建茅屋', date: '2026-07-09', likes: 15, status: 'published', comments: [
+                { name: '飞飞', text: '这个搭建过程讲解得很清楚', time: '1天前' }
+            ]},
+            { id: 3, title: '诗界无心·草堂寻心', video: '博物馆.mp4', cover: '诗界无心·草堂寻心.jpg', creator: '浩宇', realCreator: '王**', course: '诗界无心·草堂寻心', date: '2026-07-08', likes: 42, status: 'published', comments: [
+                { name: '小红', text: '画面太美了，像水墨画一样', time: '1天前' },
+                { name: '小明', text: '下次我也要去草堂看看', time: '2天前' },
+                { name: '大力', text: 'AI创作的水平越来越高了', time: '2天前' }
+            ]},
+            { id: 4, title: '盆景美学·指尖上的山水', video: '博物馆.mp4', cover: '盆景美学·指尖上的山水.jpg', creator: '小宇', realCreator: '刘*', course: '盆景美学·指尖山水', date: '2026-07-07', likes: 33, status: 'published', comments: [
+                { name: '晓华', text: '盆景艺术配上AI视频太有创意了', time: '3天前' }
+            ]},
+            { id: 5, title: '杜甫和李白的故事', video: '博物馆.mp4', cover: '杜甫和李白.png', creator: '小明', realCreator: '赵**', course: '杜甫和李白的故事', date: '2026-07-06', likes: 21, status: 'offline', comments: []},
+            { id: 6, title: '春假托管班精彩回顾', video: '博物馆.mp4', cover: '盆景美学·指尖上的山水.jpg', creator: '芳芳', realCreator: '李*', course: '春假托管班', date: '2026-07-05', likes: 18, status: 'published', comments: [
+                { name: '小芳', text: '孩子们玩得很开心', time: '4天前' }
+            ]},
+            { id: 7, title: '杜甫草堂探秘之旅', video: '博物馆.mp4', cover: '杜甫和李白.png', creator: '小华', realCreator: '陈*', course: '我为杜甫建茅屋', date: '2026-07-04', likes: 35, status: 'published', comments: [
+                { name: '乐乐', text: '很有意思的探索', time: '5天前' },
+                { name: '天天', text: '下次一起去', time: '6天前' }
+            ]},
+        ];
+
+        var filteredData = [];
+        var currentPage = 1;
+        var pageSize = 10;
+        var currentVideoIdx = -1;
+
+        function doSearch() {
+            currentPage = 1;
+            var titleKw = document.getElementById('searchTitle').value.trim().toLowerCase();
+            var creatorKw = document.getElementById('searchCreator').value.trim().toLowerCase();
+            var statusFilter = document.getElementById('searchStatus').value;
+
+            filteredData = videoData.filter(function(v) {
+                if (titleKw && v.title.toLowerCase().indexOf(titleKw) === -1) return false;
+                if (creatorKw && v.creator.toLowerCase().indexOf(creatorKw) === -1) return false;
+                if (statusFilter !== 'all' && v.status !== statusFilter) return false;
+                return true;
+            });
+            renderTable();
+        }
+
+        function resetSearch() {
+            document.getElementById('searchTitle').value = '';
+            document.getElementById('searchCreator').value = '';
+            document.getElementById('searchStatus').value = 'all';
+            doSearch();
+        }
+
+        function renderTable() {
+            var total = filteredData.length;
+            var totalPages = Math.ceil(total / pageSize) || 1;
+            var start = (currentPage - 1) * pageSize;
+            var end = Math.min(start + pageSize, total);
+            var pageData = filteredData.slice(start, end);
+
+            var pubCount = 0, offCount = 0;
+            videoData.forEach(function(v) {
+                if (v.status === 'published') pubCount++;
+                else offCount++;
+            });
+
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('totalCount2').textContent = total;
+            document.getElementById('publishedCount').textContent = pubCount;
+            document.getElementById('offlineCount').textContent = offCount;
+
+            var tbody = document.getElementById('tableBody');
+            if (total === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--ink-subtle);">暂无视频</td></tr>';
+                document.getElementById('pagination').innerHTML = '';
+                return;
+            }
+
+            var html = '';
+            for (var i = 0; i < pageData.length; i++) {
+                var v = pageData[i];
+                var isVideoCover = v.cover && v.cover.indexOf('.mp4') !== -1;
+                var coverHtml = isVideoCover
+                    ? '<video src="' + v.cover + '" muted playsinline preload="metadata"></video>'
+                    : '<img src="' + v.cover + '" onerror="this.style.display=\'none\';this.parentNode.style.background=\'linear-gradient(135deg,#667eea,#764ba2)\'">';
+                var globalIdx = videoData.indexOf(v);
+                var isOffline = v.status === 'offline';
+
+                html += '<tr>'
+                    + '<td><div class="td-cover">' + coverHtml + '</div></td>'
+                    + '<td><strong>' + v.title + '</strong></td>'
+                    + '<td>' + v.creator + ' (' + v.realCreator + ')</td>'
+                    + '<td>' + v.course + '</td>'
+                    + '<td>' + v.date + '</td>'
+                    + '<td>❤️ ' + v.likes + '</td>'
+                    + '<td><button class="action-btn comment" onclick="openCommentModal(' + globalIdx + ')">' + v.comments.length + ' 条</button></td>'
+                    + '<td><span class="status-tag ' + v.status + '">' + (isOffline ? '已下架' : '已发布') + '</span></td>'
+                    + '<td>'
+                    + (isOffline
+                        ? '<button class="action-btn online" onclick="toggleStatus(' + globalIdx + ')">上架</button>'
+                        : '<button class="action-btn offline" onclick="toggleStatus(' + globalIdx + ')">下架</button>')
+                    + '</td>'
+                    + '</tr>';
+            }
+            tbody.innerHTML = html;
+            renderPagination(totalPages);
+        }
+
+        function toggleStatus(idx) {
+            var v = videoData[idx];
+            v.status = v.status === 'published' ? 'offline' : 'published';
+            doSearch();
+        }
+
+        /* ===== 评论弹窗 ===== */
+        function openCommentModal(idx) {
+            currentVideoIdx = idx;
+            var v = videoData[idx];
+            var list = document.getElementById('commentList');
+            if (v.comments.length === 0) {
+                list.innerHTML = '<div class="cm-empty">暂无评论</div>';
+            } else {
+                var html = '';
+                for (var i = 0; i < v.comments.length; i++) {
+                    var c = v.comments[i];
+                    html += '<div class="cm-item">'
+                        + '<span class="cm-name">' + c.name + '</span>'
+                        + '<span class="cm-text">' + c.text + '</span>'
+                        + '<span class="cm-time">' + c.time + '</span>'
+                        + '<button class="cm-del" onclick="deleteComment(' + i + ')" title="删除">✕</button>'
+                        + '</div>';
+                }
+                list.innerHTML = html;
+            }
+            document.getElementById('commentOverlay').classList.add('show');
+            document.getElementById('commentModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeCommentModal() {
+            document.getElementById('commentOverlay').classList.remove('show');
+            document.getElementById('commentModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        function deleteComment(idx) {
+            if (!confirm('确定删除该评论？')) return;
+            videoData[currentVideoIdx].comments.splice(idx, 1);
+            openCommentModal(currentVideoIdx);
+            doSearch();
+        }
+
+        function renderPagination(totalPages) {
+            var el = document.getElementById('pagination');
+            if (totalPages <= 1) { el.innerHTML = ''; return; }
+            var html = '<span class="page-info">共 ' + totalPages + ' 页</span>';
+            html += '<button class="page-btn' + (currentPage <= 1 ? ' disabled' : '') + '" onclick="goPage(' + (currentPage - 1) + ')">‹</button>';
+            for (var p = 1; p <= totalPages; p++) {
+                if (p === currentPage) {
+                    html += '<button class="page-btn active">' + p + '</button>';
+                } else if (p <= 3 || p > totalPages - 2 || Math.abs(p - currentPage) <= 1) {
+                    html += '<button class="page-btn" onclick="goPage(' + p + ')">' + p + '</button>';
+                } else if (p === 4 && currentPage > 4) {
+                    html += '<button class="page-btn disabled" style="border:none;">…</button>';
+                }
+            }
+            html += '<button class="page-btn' + (currentPage >= totalPages ? ' disabled' : '') + '" onclick="goPage(' + (currentPage + 1) + ')">›</button>';
+            el.innerHTML = html;
+        }
+
+        function goPage(page) {
+            var total = filteredData.length;
+            var totalPages = Math.ceil(total / pageSize) || 1;
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            renderTable();
+        }
+
+        doSearch();
+    </script>
+
+    <!-- ====== 功能说明浮窗 ====== -->
+    <div class="f-modal" id="funcModal">
+        <div class="fm-title">
+            <span>📖 功能说明</span>
+            <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+        </div>
+        <div class="fm-body">
+            <h4>一、视频列表管理</h4>
+            <ul>
+                <li><strong>表格展示</strong>：以表格形式展示所有社区视频，包含封面缩略图、标题、创作者、关联课程、创作日期、点赞数、评论数、状态</li>
+                <li><strong>搜索筛选</strong>：支持按视频标题、创作者昵称、视频状态（已发布/已下架）进行筛选</li>
+            </ul>
+            <h4>二、视频状态管理</h4>
+            <ul>
+                <li><strong>发布/下架</strong>：管理员可对视频进行上架或下架操作，下架后视频在社区不再展示</li>
+                <li><strong>状态标签</strong>：已发布显示绿色标签，已下架显示灰色标签</li>
+            </ul>
+            <h4>三、评论管理</h4>
+            <ul>
+                <li><strong>查看评论</strong>：点击评论数按钮弹出底部浮层，展示该视频的全部评论</li>
+                <li><strong>删除评论</strong>：管理员可在弹窗中删除任何评论</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        /* ── 功能说明浮窗 ── */
+        function toggleFuncModal() {
+            var el = document.getElementById('funcModal');
+            el.classList.toggle('show');
+            if (el.classList.contains('show') && !el.dataset.dragged) {
+                el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
+            }
+        }
+        (function() {
+            var modal, titleBar, offX, offY, dragging = false;
+            document.addEventListener('DOMContentLoaded', function() {
+                modal = document.getElementById('funcModal');
+                if (!modal) return;
+                titleBar = modal.querySelector('.fm-title');
+                if (!titleBar) return;
+                titleBar.addEventListener('mousedown', startDrag);
+                titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+                document.addEventListener('mousemove', onDrag);
+                document.addEventListener('mouseup', endDrag);
+                document.addEventListener('touchmove', onDragTouch, {passive:true});
+                document.addEventListener('touchend', endDrag);
+            });
+            function startDrag(e) {
+                if (e.target.closest('.fm-close')) return;
+                modal.dataset.dragged = '1'; modal.style.transform = '';
+                var rect = modal.getBoundingClientRect();
+                offX = e.clientX - rect.left; offY = e.clientY - rect.top;
+                dragging = true; if (titleBar) titleBar.style.cursor = 'grabbing';
+            }
+            function startDragTouch(e) {
+                if (e.target.closest('.fm-close')) return;
+                var t = e.touches[0];
+                modal.dataset.dragged = '1'; modal.style.transform = '';
+                var rect = modal.getBoundingClientRect();
+                offX = t.clientX - rect.left; offY = t.clientY - rect.top;
+                dragging = true;
+            }
+            function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+            function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+            function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
+        })();
+    </script>
+</body>
+</html>

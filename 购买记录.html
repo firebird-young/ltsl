@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>购买记录 - 离泰数链</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 430px;
+            background: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            margin: 0 auto;
+        }
+        .content-area { flex: 1; padding: 0 0 24px; }
+
+        .top-nav {
+            height: 50px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            border-bottom: 1px solid #f0f0f0;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .top-nav .back-btn {
+            width: 32px; height: 32px;
+            border-radius: 50%; border: none;
+            background: #f5f5f5;
+            font-size: 18px; color: #666;
+            cursor: pointer; display: flex;
+            align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .top-nav .back-btn:active { background: #e8e8e8; }
+        .top-nav .title {
+            flex: 1; text-align: center;
+            font-size: 17px; font-weight: 600; color: #333;
+            padding-right: 32px;
+        }
+
+        .record-list { padding: 12px 16px; }
+        .record-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .record-card .rc-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .record-card .rc-top .rc-id {
+            font-size: 12px;
+            color: #999;
+            font-family: monospace;
+        }
+        .record-card .rc-top .rc-status {
+            font-size: 11px;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        .record-card .rc-top .rc-status.success { background: #E8F5E9; color: #34c759; }
+        .record-card .rc-top .rc-status.refunding { background: #FFF0F0; color: #D43828; }
+        .record-card .rc-top .rc-status.refunded { background: #f5f5f7; color: #999; }
+
+        .record-card .rc-body {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .record-card .rc-body .rc-info { flex: 1; }
+        .record-card .rc-body .rc-info .rc-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+        .record-card .rc-body .rc-info .rc-meta {
+            font-size: 12px;
+            color: #999;
+            margin-top: 2px;
+        }
+        .record-card .rc-body .rc-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: #E53935;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 0;
+            color: #bbb;
+            font-size: 14px;
+        }
+
+        /* ── 功能说明浮窗 ── */
+        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 500px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .f-modal .fm-title:active { cursor: grabbing; }
+        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
+        .f-modal .fm-close:hover { background: #e8e8e8; }
+        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
+        .f-modal .fm-body h4:first-child { margin-top: 0; }
+        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
+        .f-modal .fm-body li { margin-bottom: 4px; }
+
+        @media (max-width: 430px) { .app-container { max-width: 100%; } }
+    </style>
+</head>
+<body>
+<div class="app-container">
+        <div class="top-nav">
+            <button class="back-btn" onclick="goBack()">‹</button>
+            <div class="title">购买记录</div>
+        </div>
+
+    <div class="content-area">
+        <div class="record-list" id="recordList"></div>
+    </div>
+</div>
+
+<script>
+    var statusMap = { success: '支付成功', refunding: '退款中', refunded: '退款成功' };
+    var methodMap = { count: '按次购买', plan: '套餐购买' };
+
+    function goBack() {
+        window.location.href = '购买次数.html';
+    }
+
+    var mockRecords = [
+        { id: 'AI20260712001', type: 'video', method: 'plan', planName: '高级套餐', quantity: 100, total: 498.00, time: '2026-07-12 14:30', status: 'success' },
+        { id: 'AI20260711002', type: 'video', method: 'count', planName: '-', quantity: 5, total: 49.50, time: '2026-07-11 10:20', status: 'success' },
+        { id: 'AI20260710003', type: 'video', method: 'plan', planName: '标准套餐', quantity: 30, total: 198.00, time: '2026-07-10 09:15', status: 'refunding' },
+        { id: 'AI20260709004', type: 'video', method: 'count', planName: '-', quantity: 3, total: 29.70, time: '2026-07-09 16:00', status: 'success' },
+        { id: 'AI20260708005', type: 'video', method: 'plan', planName: '基础套餐', quantity: 10, total: 88.00, time: '2026-07-08 11:30', status: 'refunded' },
+        { id: 'AI20260707006', type: 'video', method: 'count', planName: '-', quantity: 2, total: 19.80, time: '2026-07-07 08:00', status: 'success' },
+        { id: 'AI20260714001', type: 'game', method: 'plan', planName: '标准套餐', quantity: 30, total: 348.00, time: '2026-07-14 10:00', status: 'success' },
+        { id: 'AI20260713002', type: 'game', method: 'count', planName: '-', quantity: 4, total: 59.60, time: '2026-07-13 15:30', status: 'success' },
+        { id: 'AI20260712003', type: 'game', method: 'plan', planName: '基础套餐', quantity: 10, total: 138.00, time: '2026-07-12 09:00', status: 'refunding' },
+        { id: 'AI20260711004', type: 'game', method: 'count', planName: '-', quantity: 2, total: 29.80, time: '2026-07-11 17:20', status: 'refunded' },
+    ];
+
+    function renderRecords() {
+        var list = document.getElementById('recordList');
+        if (mockRecords.length === 0) {
+            list.innerHTML = '<div class="empty-state">暂无购买记录</div>';
+            return;
+        }
+
+        var html = '';
+        for (var i = 0; i < mockRecords.length; i++) {
+            var r = mockRecords[i];
+            var typeLabel = r.type === 'game' ? 'AI游戏' : 'AI视频';
+            var methodLabel = methodMap[r.method] || r.method;
+            var quantityText = r.method === 'count' ? r.quantity + '次' : r.planName + ' (' + r.quantity + '次)';
+            html += '<div class="record-card">'
+                + '<div class="rc-top">'
+                + '<span class="rc-id">' + r.id + '</span>'
+                + '<span class="rc-status ' + r.status + '">' + statusMap[r.status] + '</span>'
+                + '</div>'
+                + '<div class="rc-body">'
+                + '<div class="rc-info">'
+                + '<div class="rc-name">' + typeLabel + ' · ' + methodLabel + '</div>'
+                + '<div class="rc-meta">' + quantityText + ' · ' + r.time + '</div>'
+                + '</div>'
+                + '<div class="rc-price">¥' + r.total.toFixed(2) + '</div>'
+                + '</div>'
+                + '</div>';
+        }
+        list.innerHTML = html;
+    }
+
+    renderRecords();
+
+    /* ── 功能说明浮窗 ── */
+    function toggleFuncModal() {
+        var el = document.getElementById('funcModal');
+        el.classList.toggle('show');
+        if (el.classList.contains('show') && !el.dataset.dragged) {
+            el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
+        }
+    }
+    (function() {
+        var modal, titleBar, offX, offY, dragging = false;
+        document.addEventListener('DOMContentLoaded', function() {
+            modal = document.getElementById('funcModal');
+            if (!modal) return;
+            titleBar = modal.querySelector('.fm-title');
+            if (!titleBar) return;
+            titleBar.addEventListener('mousedown', startDrag);
+            titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+            document.addEventListener('mousemove', onDrag);
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('touchmove', onDragTouch, {passive:true});
+            document.addEventListener('touchend', endDrag);
+        });
+        function startDrag(e) {
+            if (e.target.closest('.fm-close')) return;
+            modal.dataset.dragged = '1'; modal.style.transform = '';
+            var rect = modal.getBoundingClientRect();
+            offX = e.clientX - rect.left; offY = e.clientY - rect.top;
+            dragging = true; if (titleBar) titleBar.style.cursor = 'grabbing';
+        }
+        function startDragTouch(e) {
+            if (e.target.closest('.fm-close')) return;
+            var t = e.touches[0];
+            modal.dataset.dragged = '1'; modal.style.transform = '';
+            var rect = modal.getBoundingClientRect();
+            offX = t.clientX - rect.left; offY = t.clientY - rect.top;
+            dragging = true;
+        }
+        function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+        function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+        function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
+    })();
+</script>
+
+<button onclick="toggleFuncModal()" style="position:fixed;top:12px;right:16px;z-index:99999;background:#fff;color:#666;padding:7px 16px;border-radius:20px;border:1px solid #ddd;font-size:13px;font-weight:500;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-family:inherit;display:inline-flex;align-items:center;gap:4px;">📖 说明</button>
+
+<!-- ====== 功能说明浮窗 ====== -->
+<div class="f-modal" id="funcModal">
+    <div class="fm-title">
+        <span>📖 功能说明</span>
+        <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+    </div>
+    <div class="fm-body">
+        <h4>一、购买记录展示</h4>
+        <ul>
+            <li><strong>记录列表</strong>：按时间倒序展示所有购买记录，包含AI视频和AI游戏两种类型</li>
+            <li><strong>记录信息</strong>：每条记录显示订单编号、产品类型（AI视频/AI游戏）、购买方式、套餐名称/次数、金额、时间、状态</li>
+            <li><strong>状态标识</strong>：支付成功（绿色）、退款中（红色）、退款成功（灰色）三种状态标签</li>
+        </ul>
+        <h4>二、页面导航</h4>
+        <ul>
+            <li><strong>返回</strong>：点击左上角返回按钮回到购买次数页面</li>
+        </ul>
+    </div>
+</div>
+</body>
+</html>

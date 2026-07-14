@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI销售查询 - 管理后台</title>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --accent: #0066cc;
+            --accent-hover: #0071e3;
+            --link: #0071e3;
+            --ink: #1d1d1f;
+            --ink-muted: #3f424b;
+            --ink-subtle: #86868b;
+            --border: #e0e0e0;
+            --card-bg: #ffffff;
+            --radius-sm: 9999px;
+            --radius-card: 18px;
+            --radius-pill: 9999px;
+            --shadow-card: 0 0 0 1px rgba(0,0,0,0.06);
+            --font: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font);
+            background: #f5f5f7;
+            min-height: 100vh;
+            color: var(--ink);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .header {
+            background: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header .logo { font-size: 18px; font-weight: 700; color: var(--accent); margin-right: 32px; }
+        .header .nav-list { display: flex; gap: 24px; list-style: none; }
+        .header .nav-list li { font-size: 14px; color: var(--ink-subtle); cursor: pointer; padding: 4px 0; position: relative; }
+        .header .nav-list li:hover { color: var(--accent); }
+        .header .nav-list li.active { color: var(--accent); font-weight: 600; }
+        .header .nav-list li.active::after { content: ''; position: absolute; bottom: -4px; left: 0; right: 0; height: 2px; background: var(--accent); border-radius: 1px; }
+        .header .user-area { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+        .header .user-area .avatar { width: 32px; height: 32px; border-radius: 50%; background: #E8F0FE; display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--accent); }
+        .header .user-area .name { font-size: 14px; color: var(--ink); }
+
+        .breadcrumb { padding: 16px 24px 0; font-size: 13px; color: var(--ink-subtle); }
+        .breadcrumb a { color: var(--ink-subtle); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--accent); }
+        .breadcrumb .current { color: var(--ink); font-weight: 500; }
+
+        .main { padding: 16px 24px 40px; }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        .page-header h2 { font-size: 20px; font-weight: 600; color: var(--ink); }
+        .page-header .stat-badge {
+            font-size: 12px;
+            color: var(--ink-subtle);
+            background: #f5f5f7;
+            padding: 6px 16px;
+            border-radius: var(--radius-pill);
+        }
+
+        .search-area {
+            background: #fff;
+            border-radius: var(--radius-card);
+            padding: 20px 24px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-card);
+        }
+        .search-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            align-items: flex-end;
+        }
+        .search-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 140px;
+            flex: 0 0 auto;
+        }
+        .search-item label { font-size: 12px; color: var(--ink-subtle); font-weight: 500; }
+        .search-item input,
+        .search-item select {
+            height: 36px;
+            padding: 0 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-pill);
+            font-size: 13px;
+            color: var(--ink);
+            background: #fff;
+            outline: none;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        .search-item input:focus,
+        .search-item select:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,102,204,0.08); }
+        .search-actions {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            padding-bottom: 1px;
+            flex: 0 0 auto;
+        }
+        .search-actions .btn {
+            height: 36px;
+            padding: 0 20px;
+            border-radius: var(--radius-pill);
+            font-size: 13px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            font-family: inherit;
+            font-weight: 500;
+        }
+        .search-actions .btn-search { background: var(--accent); color: #fff; }
+        .search-actions .btn-search:hover { background: var(--accent-hover); }
+        .search-actions .btn-reset { background: #f5f5f7; color: var(--ink-subtle); border: 1px solid var(--border); }
+        .search-actions .btn-reset:hover { border-color: var(--accent); color: var(--accent); }
+
+        .table-wrap {
+            background: #fff;
+            border-radius: var(--radius-card);
+            overflow: hidden;
+            box-shadow: var(--shadow-card);
+        }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        thead th {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--ink-subtle);
+            text-align: left;
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            background: #fafafc;
+            white-space: nowrap;
+        }
+        tbody td {
+            font-size: 13px;
+            color: var(--ink);
+            padding: 14px 16px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: #FAFBFF; }
+
+        .tag {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .tag.video { background: #E8F0FE; color: var(--accent); }
+        .tag.game { background: #F3E8FF; color: #7c3aed; }
+        .tag.count { background: #FFF3E0; color: #ff9500; }
+        .tag.plan { background: #E8F5E9; color: #34c759; }
+        .tag.success { background: #E8F5E9; color: #34c759; }
+        .tag.pending { background: #FFF3E0; color: #ff9500; }
+        .tag.refunding { background: #FFF0F0; color: #D43828; }
+        .tag.refunded { background: #f5f5f7; color: var(--ink-subtle); }
+        .tag.success { background: #E8F5E9; color: #34c759; }
+
+        .action-btn {
+            padding: 5px 14px;
+            border: none;
+            border-radius: var(--radius-pill);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .action-btn.refund { background: #FFF0F0; color: #D43828; }
+        .action-btn.refund:hover { background: #D43828; color: #fff; }
+        .action-btn.disabled { opacity: 0.4; cursor: default; background: #f5f5f7; color: var(--ink-subtle); }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 24px;
+            gap: 6px;
+            border-top: 1px solid #f0f0f0;
+        }
+        .pagination .page-info { font-size: 13px; color: var(--ink-subtle); margin-right: 12px; }
+        .pagination .page-btn {
+            width: 32px; height: 32px;
+            border-radius: var(--radius-pill);
+            border: 1px solid var(--border);
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            color: var(--ink-subtle);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .pagination .page-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .pagination .page-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .pagination .page-btn.disabled { opacity: 0.4; cursor: default; }
+
+        .table-total {
+            padding: 12px 24px;
+            font-size: 13px;
+            color: var(--ink-subtle);
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+        }
+        .table-total .tt-summary strong { color: var(--ink); }
+
+        /* ===== 退款弹窗 ===== */
+        .refund-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .refund-overlay.show { display: flex; }
+        .refund-modal {
+            background: #fff;
+            width: 100%;
+            max-width: 400px;
+            border-radius: var(--radius-card);
+            padding: 28px 24px 24px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+        }
+        .refund-modal .rm-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 16px;
+        }
+        .refund-modal .rm-info {
+            background: #fafafc;
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+        .refund-modal .rm-info .rm-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
+        .refund-modal .rm-info .rm-row:last-child { margin-bottom: 0; }
+        .refund-modal .rm-info .rm-label { color: var(--ink-subtle); }
+        .refund-modal .rm-info .rm-value { color: var(--ink); font-weight: 500; }
+        .refund-modal textarea {
+            width: 100%;
+            height: 80px;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 13px;
+            color: var(--ink);
+            outline: none;
+            font-family: inherit;
+            resize: none;
+            margin-bottom: 16px;
+        }
+        .refund-modal textarea:focus { border-color: var(--accent); }
+        .refund-modal .rm-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .refund-modal .rm-actions button {
+            flex: 1;
+            height: 40px;
+            border: none;
+            border-radius: var(--radius-pill);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .refund-modal .rm-actions .rm-cancel { background: #f5f5f7; color: var(--ink-subtle); }
+        .refund-modal .rm-actions .rm-cancel:hover { background: #eee; }
+        .refund-modal .rm-actions .rm-confirm { background: #D43828; color: #fff; }
+        .refund-modal .rm-actions .rm-confirm:hover { background: #b52c1e; }
+
+        @media (max-width: 768px) {
+            .header { padding: 0 16px; }
+            .header .nav-list { display: none; }
+            .breadcrumb { padding: 12px 16px 0; }
+            .main { padding: 12px 16px 24px; }
+            .search-row { flex-direction: column; gap: 10px; }
+            .search-item { min-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">离泰数链</div>
+        <ul class="nav-list">
+            <li>概览</li>
+            <li>内容管理</li>
+            <li class="active">AI配置</li>
+            <li onclick="window.location.href='积分规则配置.html'" style="cursor:pointer;">积分管理</li>
+            <li onclick="window.location.href='../系统参数配置.html'" style="cursor:pointer;">系统设置</li>
+        </ul>
+        <div class="user-area">
+            <span class="avatar">管</span>
+            <span class="name">管理员</span>
+        </div>
+    </div>
+
+    <div class="breadcrumb">
+        <a href="../index.html">首页</a>
+        <span class="sep"> &gt; </span>
+        <a href="#">AI配置</a>
+        <span class="sep"> &gt; </span>
+        <span class="current">AI销售查询</span>
+    </div>
+
+    <div class="main">
+        <div class="page-header">
+            <h2>AI销售查询</h2>
+            <span class="stat-badge">总收入：<strong id="totalRevenue">¥0.00</strong></span>
+        </div>
+
+        <div class="search-area">
+            <div class="search-row">
+                <div class="search-item">
+                    <label>产品类型</label>
+                    <select id="searchType">
+                        <option value="all">全部</option>
+                        <option value="video">AI视频</option>
+                        <option value="game">AI游戏</option>
+                    </select>
+                </div>
+                <div class="search-item">
+                    <label>购买方式</label>
+                    <select id="searchMethod">
+                        <option value="all">全部</option>
+                        <option value="count">按次购买</option>
+                        <option value="plan">套餐购买</option>
+                    </select>
+                </div>
+                <div class="search-item">
+                    <label>支付状态</label>
+                    <select id="searchStatus">
+                        <option value="all">全部</option>
+                        <option value="pending">待支付</option>
+                        <option value="success">支付成功</option>
+                        <option value="refunding">退款中</option>
+                        <option value="refunded">退款成功</option>
+                    </select>
+                </div>
+                <div class="search-item">
+                    <label>手机号</label>
+                    <input type="text" id="searchUser" placeholder="输入手机号">
+                </div>
+                <div class="search-item">
+                    <label>开始日期</label>
+                    <input type="date" id="searchStart">
+                </div>
+                <div class="search-item">
+                    <label>结束日期</label>
+                    <input type="date" id="searchEnd">
+                </div>
+                <div class="search-actions">
+                    <button class="btn btn-search" onclick="doSearch()">搜索</button>
+                    <button class="btn btn-reset" onclick="resetSearch()">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:7%">订单编号</th>
+                        <th style="width:6%">产品类型</th>
+                        <th style="width:7%">购买方式</th>
+                        <th style="width:9%">套餐名称</th>
+                        <th style="width:7%">数量</th>
+                        <th style="width:7%">单价</th>
+                        <th style="width:8%">总金额</th>
+                        <th style="width:9%">手机号</th>
+                        <th style="width:9%">支付时间</th>
+                        <th style="width:6%">状态</th>
+                        <th style="width:7%">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+            <div class="table-total">
+                <span>共 <strong id="totalCount">0</strong> 条记录</span>
+                <span class="tt-summary">总收入：<strong id="summaryRevenue">¥0.00</strong></span>
+            </div>
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </div>
+
+    <script>
+        var mockData = [
+            { id: 'AI20260701001', type: 'video', method: 'count', planName: '-', quantity: 5, unitPrice: 9.9, total: 49.50, user: '13812345678', time: '2026-07-01 10:30', status: 'success', refundReason: '' },
+            { id: 'AI20260701002', type: 'video', method: 'plan', planName: '基础套餐', quantity: 10, unitPrice: 8.8, total: 88.00, user: '13900139002', time: '2026-07-01 14:20', status: 'success', refundReason: '' },
+            { id: 'AI20260702003', type: 'video', method: 'plan', planName: '标准套餐', quantity: 30, unitPrice: 6.6, total: 198.00, user: '18698765432', time: '2026-07-02 09:15', status: 'pending', refundReason: '' },
+            { id: 'AI20260703004', type: 'game', method: 'count', planName: '-', quantity: 3, unitPrice: 14.9, total: 44.70, user: '13655667788', time: '2026-07-03 16:00', status: 'success', refundReason: '' },
+            { id: 'AI20260703005', type: 'video', method: 'plan', planName: '高级套餐', quantity: 100, unitPrice: 4.98, total: 498.00, user: '15099887766', time: '2026-07-03 11:20', status: 'refunding', refundReason: '' },
+            { id: 'AI20260704006', type: 'game', method: 'plan', planName: '基础套餐', quantity: 10, unitPrice: 13.8, total: 138.00, user: '17712340987', time: '2026-07-04 09:00', status: 'success', refundReason: '' },
+            { id: 'AI20260705007', type: 'video', method: 'count', planName: '-', quantity: 8, unitPrice: 9.9, total: 79.20, user: '18856781234', time: '2026-07-05 14:30', status: 'success', refundReason: '' },
+            { id: 'AI20260706008', type: 'game', method: 'count', planName: '-', quantity: 2, unitPrice: 14.9, total: 29.80, user: '13812345678', time: '2026-07-06 10:00', status: 'refunded', refundReason: '用户重复购买，协商后退款' },
+            { id: 'AI20260707009', type: 'video', method: 'plan', planName: '标准套餐', quantity: 30, unitPrice: 6.6, total: 198.00, user: '13655667788', time: '2026-07-07 08:30', status: 'success', refundReason: '' },
+            { id: 'AI20260708010', type: 'game', method: 'plan', planName: '高级套餐', quantity: 100, unitPrice: 4.98, total: 498.00, user: '17712340987', time: '2026-07-08 15:00', status: 'refunding', refundReason: '' },
+            { id: 'AI20260709011', type: 'video', method: 'count', planName: '-', quantity: 12, unitPrice: 9.9, total: 118.80, user: '13900139002', time: '2026-07-09 11:00', status: 'success', refundReason: '' },
+            { id: 'AI20260710012', type: 'game', method: 'plan', planName: '标准套餐', quantity: 30, unitPrice: 11.6, total: 348.00, user: '18856781234', time: '2026-07-10 09:20', status: 'refunded', refundReason: '课程调整，用户申请退款' },
+        ];
+
+        var filteredData = [];
+        var currentPage = 1;
+        var pageSize = 8;
+
+        var typeMap = { video: 'AI视频', game: 'AI游戏' };
+        var methodMap = { count: '按次购买', plan: '套餐购买' };
+        var statusMap = { pending: '待支付', success: '支付成功', refunding: '退款中', refunded: '退款成功' };
+
+        function typeTag(type) { return '<span class="tag ' + type + '">' + typeMap[type] + '</span>'; }
+        function methodTag(method) { return '<span class="tag ' + method + '">' + methodMap[method] + '</span>'; }
+        function statusTag(status) { return '<span class="tag ' + status + '">' + statusMap[status] + '</span>'; }
+
+        var currentRefundIdx = -1;
+
+        function openRefund(idx) {
+            currentRefundIdx = idx;
+            var r = filteredData[idx];
+            document.getElementById('refundInfo').innerHTML = ''
+                + '<div class="rm-row"><span class="rm-label">订单编号</span><span class="rm-value">' + r.id + '</span></div>'
+                + '<div class="rm-row"><span class="rm-label">产品类型</span><span class="rm-value">' + typeMap[r.type] + '</span></div>'
+                + '<div class="rm-row"><span class="rm-label">用户</span><span class="rm-value">' + r.user + '</span></div>'
+                + '<div class="rm-row"><span class="rm-label">金额</span><span class="rm-value" style="color:#D43828;">¥' + r.total.toFixed(2) + '</span></div>';
+            document.getElementById('refundReason').value = '';
+            document.getElementById('refundOverlay').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function openRefundDetail(idx) {
+            var r = filteredData[idx];
+            document.getElementById('refundInfo').innerHTML = ''
+                + '<div class="rm-row"><span class="rm-label">订单编号</span><span class="rm-value">' + r.id + '</span></div>'
+                + '<div class="rm-row"><span class="rm-label">产品类型</span><span class="rm-value">' + typeMap[r.type] + '</span></div>'
+                + '<div class="rm-row"><span class="rm-label">用户</span><span class="rm-value">' + r.user + '</span></div>'
+                + '<div class="rm-row"><span class="rm-label">金额</span><span class="rm-value" style="color:#D43828;">¥' + r.total.toFixed(2) + '</span></div>'
+                + '<div class="rm-row"><span class="rm-label">退款原因</span><span class="rm-value">' + (r.refundReason || '未填写') + '</span></div>';
+            document.getElementById('refundReason').style.display = 'none';
+            document.querySelector('#refundOverlay .rm-actions').style.display = 'none';
+            document.querySelector('#refundOverlay .rm-title').textContent = '退款详情';
+            document.getElementById('refundOverlay').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeRefund() {
+            document.getElementById('refundOverlay').classList.remove('show');
+            document.body.style.overflow = '';
+            currentRefundIdx = -1;
+            document.getElementById('refundReason').style.display = '';
+            document.querySelector('#refundOverlay .rm-actions').style.display = '';
+            document.querySelector('#refundOverlay .rm-title').textContent = '确认退款';
+        }
+
+        function confirmRefund() {
+            if (currentRefundIdx < 0) return;
+            var reason = document.getElementById('refundReason').value.trim() || '管理员手动退款';
+            var r = filteredData[currentRefundIdx];
+            r.status = 'refunded';
+            r.refundReason = reason;
+            closeRefund();
+            renderTable();
+            alert('✅ 退款成功\n订单：' + r.id + '\n金额：¥' + r.total.toFixed(2));
+        }
+
+        function doSearch() {
+            currentPage = 1;
+            var type = document.getElementById('searchType').value;
+            var method = document.getElementById('searchMethod').value;
+            var status = document.getElementById('searchStatus').value;
+            var user = document.getElementById('searchUser').value.trim().toLowerCase();
+            var start = document.getElementById('searchStart').value;
+            var end = document.getElementById('searchEnd').value;
+
+            filteredData = mockData.filter(function(item) {
+                if (type !== 'all' && item.type !== type) return false;
+                if (method !== 'all' && item.method !== method) return false;
+                if (status !== 'all' && item.status !== status) return false;
+                if (user && item.user.toLowerCase().indexOf(user) === -1) return false;
+                if (start && item.time < start) return false;
+                if (end && item.time > end + ' 23:59:59') return false;
+                return true;
+            });
+            renderTable();
+        }
+
+        function resetSearch() {
+            document.getElementById('searchType').value = 'all';
+            document.getElementById('searchMethod').value = 'all';
+            document.getElementById('searchStatus').value = 'all';
+            document.getElementById('searchUser').value = '';
+            document.getElementById('searchStart').value = '';
+            document.getElementById('searchEnd').value = '';
+            doSearch();
+        }
+
+        function renderTable() {
+            var total = filteredData.length;
+            var totalPages = Math.ceil(total / pageSize) || 1;
+            var start = (currentPage - 1) * pageSize;
+            var end = Math.min(start + pageSize, total);
+            var pageData = filteredData.slice(start, end);
+
+            var revenue = 0;
+            var pendingCount = 0;
+            for (var i = 0; i < filteredData.length; i++) {
+                if (filteredData[i].status === 'success') revenue += filteredData[i].total;
+                if (filteredData[i].status === 'pending') pendingCount++;
+            }
+
+            document.getElementById('totalCount').textContent = total + (pendingCount > 0 ? '（待支付 ' + pendingCount + ' 笔）' : '');
+            document.getElementById('summaryRevenue').textContent = '¥' + revenue.toFixed(2);
+            document.getElementById('totalRevenue').textContent = '¥' + revenue.toFixed(2);
+
+            var tbody = document.getElementById('tableBody');
+            if (total === 0) {
+                tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:40px;color:var(--ink-subtle);">暂无销售记录</td></tr>';
+                document.getElementById('pagination').innerHTML = '';
+                return;
+            }
+
+            var html = '';
+            for (var j = 0; j < pageData.length; j++) {
+                var r = pageData[j];
+                var actionHtml = '';
+                if (r.status === 'success') {
+                    actionHtml = '<button class="action-btn refund" onclick="openRefund(' + (start + j) + ')">退款</button>';
+                } else if (r.status === 'refunded') {
+                    actionHtml = '<button class="action-btn refund" style="background:#f5f5f7;color:#666;" onclick="openRefundDetail(' + (start + j) + ')">查看原因</button>';
+                } else {
+                    actionHtml = '<button class="action-btn disabled">-</button>';
+                }
+                html += '<tr>'
+                    + '<td style="font-size:12px;color:var(--ink-subtle);font-family:monospace;">' + r.id + '</td>'
+                    + '<td>' + typeTag(r.type) + '</td>'
+                    + '<td>' + methodTag(r.method) + '</td>'
+                    + '<td>' + r.planName + '</td>'
+                    + '<td>' + r.quantity + ' 次</td>'
+                    + '<td>¥' + r.unitPrice.toFixed(1) + '</td>'
+                    + '<td style="font-weight:600;color:#D46B08;">¥' + r.total.toFixed(2) + '</td>'
+                    + '<td>' + r.user + '</td>'
+                    + '<td style="font-size:12px;color:var(--ink-subtle);">' + r.time + '</td>'
+                    + '<td>' + statusTag(r.status) + '</td>'
+                    + '<td>' + actionHtml + '</td>'
+                    + '</tr>';
+            }
+            tbody.innerHTML = html;
+            renderPagination(totalPages);
+        }
+
+        function renderPagination(totalPages) {
+            var el = document.getElementById('pagination');
+            if (totalPages <= 1) { el.innerHTML = ''; return; }
+            var html = '<span class="page-info">共 ' + totalPages + ' 页</span>';
+            html += '<button class="page-btn' + (currentPage <= 1 ? ' disabled' : '') + '" onclick="goPage(' + (currentPage - 1) + ')">‹</button>';
+            for (var p = 1; p <= totalPages; p++) {
+                if (p === currentPage) {
+                    html += '<button class="page-btn active">' + p + '</button>';
+                } else if (p <= 3 || p > totalPages - 2 || Math.abs(p - currentPage) <= 1) {
+                    html += '<button class="page-btn" onclick="goPage(' + p + ')">' + p + '</button>';
+                } else if (p === 4 && currentPage > 4) {
+                    html += '<button class="page-btn disabled" style="border:none;">…</button>';
+                }
+            }
+            html += '<button class="page-btn' + (currentPage >= totalPages ? ' disabled' : '') + '" onclick="goPage(' + (currentPage + 1) + ')">›</button>';
+            el.innerHTML = html;
+        }
+
+        function goPage(page) {
+            var total = filteredData.length;
+            var totalPages = Math.ceil(total / pageSize) || 1;
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            renderTable();
+        }
+
+        doSearch();
+    </script>
+
+    <!-- ===== 退款弹窗 ===== -->
+    <div class="refund-overlay" id="refundOverlay">
+        <div class="refund-modal">
+            <div class="rm-title">确认退款</div>
+            <div class="rm-info" id="refundInfo"></div>
+            <textarea id="refundReason" placeholder="请输入退款原因（选填）"></textarea>
+            <div class="rm-actions">
+                <button class="rm-cancel" onclick="closeRefund()">取消</button>
+                <button class="rm-confirm" onclick="confirmRefund()">确认退款</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
