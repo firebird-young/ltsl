@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>我的作品 - 离泰数链</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 430px;
+            background: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            margin: 0 auto;
+        }
+        .content-area { flex: 1; padding-bottom: 24px; }
+
+        .top-nav {
+            height: 50px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            border-bottom: 1px solid #f0f0f0;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .top-nav .back-btn {
+            width: 32px; height: 32px;
+            border-radius: 50%; border: none;
+            background: #f5f5f5;
+            font-size: 18px; color: #666;
+            cursor: pointer; display: flex;
+            align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .top-nav .back-btn:active { background: #e8e8e8; }
+        .top-nav .title {
+            flex: 1; text-align: center;
+            font-size: 17px; font-weight: 600; color: #333;
+        }
+
+        .feed-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            padding: 12px 8px 0;
+        }
+        .feed-card {
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .feed-card:active { opacity: 0.9; }
+        .feed-cover {
+            width: 100%;
+            aspect-ratio: 16 / 11;
+            background: #e0e0e0;
+            position: relative;
+            overflow: hidden;
+        }
+        .feed-cover img, .feed-cover video {
+            width: 100%; height: 100%;
+            object-fit: cover; display: block;
+        }
+        .feed-cover .play-badge {
+            position: absolute; bottom: 6px; right: 6px;
+            background: rgba(0,0,0,0.6); color: #fff;
+            font-size: 10px; padding: 2px 6px; border-radius: 4px;
+        }
+        .feed-cover .like-badge {
+            position: absolute; bottom: 6px; left: 6px;
+            background: rgba(0,0,0,0.5); color: #fff;
+            font-size: 10px; padding: 2px 6px; border-radius: 4px;
+            display: flex; align-items: center; gap: 2px;
+        }
+        .feed-body { padding: 8px 10px 10px; }
+        .feed-title {
+            font-size: 12px; font-weight: 500; color: #333;
+            line-height: 1.4;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+            overflow: hidden; margin-bottom: 6px;
+        }
+        .feed-creator {
+            display: flex; align-items: center; gap: 4px;
+        }
+        .feed-creator .fc-avatar {
+            width: 18px; height: 18px; border-radius: 50%;
+            background: #E8F0FE; display: flex; align-items: center;
+            justify-content: center; font-size: 9px; color: #0669FF; flex-shrink: 0;
+        }
+        .feed-creator .fc-name { font-size: 11px; color: #999; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .feed-creator .fc-real { font-size: 10px; color: #ccc; }
+
+        .feed-stats {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 4px;
+            font-size: 10px;
+            color: #bbb;
+        }
+        .feed-stats span { display: flex; align-items: center; gap: 2px; }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 0;
+            color: #bbb;
+            font-size: 14px;
+            grid-column: 1 / -1;
+        }
+
+        /* ── 功能说明浮窗 ── */
+        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 500px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .f-modal .fm-title:active { cursor: grabbing; }
+        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
+        .f-modal .fm-close:hover { background: #e8e8e8; }
+        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
+        .f-modal .fm-body h4:first-child { margin-top: 0; }
+        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
+        .f-modal .fm-body li { margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+<div class="app-container">
+        <div class="top-nav">
+            <button class="back-btn" onclick="goBack()">‹</button>
+            <div class="title">我的作品</div>
+        </div>
+
+    <div class="content-area">
+        <div class="feed-grid" id="feedGrid"></div>
+    </div>
+</div>
+
+<script>
+    var myWorks = [
+        { id: 0, title: '博物馆犀牛', cover: '博物馆.mp4', creator: '晓宇', realCreator: '张**', course: '我为杜甫建茅屋', likes: 28, comments: 2 },
+        { id: 1, title: '杜甫和李白的故事', cover: '杜甫和李白.png', creator: '晓宇', realCreator: '张**', course: '我为杜甫建茅屋', likes: 35, comments: 5 },
+        { id: 2, title: '茅屋搭建的完整过程', cover: '快速搭建茅屋', creator: '晓宇', realCreator: '张**', course: '快速搭建茅屋', likes: 15, comments: 1 },
+        { id: 3, title: '诗界无心·草堂寻心', cover: '诗界无心·草堂寻心.jpg', creator: '晓宇', realCreator: '张**', course: '诗界无心·草堂寻心', likes: 42, comments: 3 },
+        { id: 4, title: '盆景美学·指尖上的山水', cover: '盆景美学·指尖上的山水.jpg', creator: '晓宇', realCreator: '张**', course: '盆景美学·指尖山水', likes: 33, comments: 4 },
+        { id: 5, title: '春假托管班精彩回顾', cover: '盆景美学·指尖上的山水.jpg', creator: '晓宇', realCreator: '张**', course: '春假托管班', likes: 18, comments: 0 },
+    ];
+
+    function goBack() {
+        window.location.href = '我的.html';
+    }
+
+    function renderWorks() {
+        var grid = document.getElementById('feedGrid');
+        if (myWorks.length === 0) {
+            grid.innerHTML = '<div class="empty-state">暂无作品</div>';
+            return;
+        }
+        var html = '';
+        for (var i = 0; i < myWorks.length; i++) {
+            var w = myWorks[i];
+            var isVideo = w.cover && w.cover.indexOf('.mp4') !== -1;
+            var coverHtml = isVideo
+                ? '<video src="' + w.cover + '" muted playsinline preload="metadata"></video>'
+                : '<img src="' + w.cover + '" onerror="this.style.display=\'none\';this.parentNode.style.background=\'linear-gradient(135deg,#667eea,#764ba2)\'">';
+            html += '<div class="feed-card" onclick="goDetail(' + i + ')">'
+                + '<div class="feed-cover">' + coverHtml
+                + '<span class="play-badge">▶</span>'
+                + '<span class="like-badge">♡ ' + w.likes + '</span>'
+                + '</div>'
+                + '<div class="feed-body">'
+                + '<div class="feed-title">' + w.title + '</div>'
+                + '<div class="feed-creator">'
+                + '<div class="fc-avatar">👤</div>'
+                + '<span class="fc-name">' + w.creator + '</span>'
+                + '<span class="fc-real">' + w.realCreator + '</span>'
+                + '</div>'
+                + '<div class="feed-stats">'
+                + '<span>💬 ' + w.comments + '</span>'
+                + '<span>📚 ' + w.course + '</span>'
+                + '</div>'
+                + '</div>'
+                + '</div>';
+        }
+        grid.innerHTML = html;
+    }
+
+    function goDetail(idx) {
+        window.location.href = '视频详情.html?idx=' + idx;
+    }
+
+    renderWorks();
+
+    /* ── 功能说明浮窗 ── */
+    function toggleFuncModal() {
+        var el = document.getElementById('funcModal');
+        el.classList.toggle('show');
+        if (el.classList.contains('show') && !el.dataset.dragged) {
+            el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
+        }
+    }
+    (function() {
+        var modal, titleBar, offX, offY, dragging = false;
+        document.addEventListener('DOMContentLoaded', function() {
+            modal = document.getElementById('funcModal');
+            if (!modal) return;
+            titleBar = modal.querySelector('.fm-title');
+            if (!titleBar) return;
+            titleBar.addEventListener('mousedown', startDrag);
+            titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+            document.addEventListener('mousemove', onDrag);
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('touchmove', onDragTouch, {passive:true});
+            document.addEventListener('touchend', endDrag);
+        });
+        function startDrag(e) {
+            if (e.target.closest('.fm-close')) return;
+            modal.dataset.dragged = '1'; modal.style.transform = '';
+            var rect = modal.getBoundingClientRect();
+            offX = e.clientX - rect.left; offY = e.clientY - rect.top;
+            dragging = true; if (titleBar) titleBar.style.cursor = 'grabbing';
+        }
+        function startDragTouch(e) {
+            if (e.target.closest('.fm-close')) return;
+            var t = e.touches[0];
+            modal.dataset.dragged = '1'; modal.style.transform = '';
+            var rect = modal.getBoundingClientRect();
+            offX = t.clientX - rect.left; offY = t.clientY - rect.top;
+            dragging = true;
+        }
+        function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+        function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+        function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
+    })();
+</script>
+
+<button onclick="toggleFuncModal()" style="position:fixed;top:12px;right:16px;z-index:99999;background:#fff;color:#666;padding:7px 16px;border-radius:20px;border:1px solid #ddd;font-size:13px;font-weight:500;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-family:inherit;display:inline-flex;align-items:center;gap:4px;">📖 说明</button>
+
+<!-- ====== 功能说明浮窗 ====== -->
+<div class="f-modal" id="funcModal">
+    <div class="fm-title">
+        <span>📖 功能说明</span>
+        <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+    </div>
+    <div class="fm-body">
+        <h4>一、作品列表</h4>
+        <ul>
+            <li><strong>双列网格展示</strong>：小红书风格双列布局，展示用户所有已生成的AI视频作品（以后可能还有AI游戏、文章等作品）</li>
+            <li><strong>作品信息</strong>：每个视频卡片显示封面、标题、点赞数、评论数、创作者信息、关联课程</li>
+        </ul>
+        <h4>二、作品操作</h4>
+        <ul>
+            <li><strong>查看详情</strong>：点击卡片跳转至视频详情页，可播放视频、点赞、评论</li>
+            <li><strong>删除作品</strong>：在视频详情页中，如果是自己的作品可点击删除按钮删除</li>
+        </ul>
+    </div>
+</div>
+</body>
+</html>

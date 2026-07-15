@@ -364,6 +364,10 @@
                 <span class="ab-icon">↗</span>
                 <span>分享</span>
             </button>
+            <button class="ab-btn" id="deleteBtn" style="color:#ff3b30;" onclick="deleteVideo()">
+                <span class="ab-icon">🗑</span>
+                <span>删除</span>
+            </button>
         </div>
 
         <div class="comment-preview" id="commentPreview">
@@ -417,7 +421,7 @@
 
     var currentIdx = parseInt(new URLSearchParams(window.location.search).get('idx')) || 0;
     var isPlaying = false;
-    var currentUser = '我'; // 当前登录用户
+    var currentUser = '晓宇'; // 当前登录用户
     var commentIdCounter = 100;
 
     function init() {
@@ -427,6 +431,10 @@
         document.getElementById('pageTitle').textContent = f.title;
         document.getElementById('caName').innerHTML = f.creator + ' <span class="ca-real">' + f.realCreator + '</span>';
         document.getElementById('caCourseText').textContent = f.course;
+
+        // 判断是否是自己的作品，显示删除按钮
+        var isMyVideo = f.creator === currentUser;
+        document.getElementById('deleteBtn').style.display = isMyVideo ? 'flex' : 'none';
 
         var video = document.getElementById('mainVideo');
         video.src = f.video;
@@ -440,6 +448,12 @@
                 document.getElementById('centerPlay').style.display = 'none';
             }).catch(function(){});
         }, 300);
+    }
+
+    function deleteVideo() {
+        if (!confirm('确定删除该视频作品？')) return;
+        alert('✅ 视频已删除');
+        window.location.href = '我的作品.html';
     }
 
     function goBack() {
@@ -652,6 +666,7 @@
             <li><strong>点赞</strong>：点击爱心按钮点赞/取消点赞，实时更新点赞数</li>
             <li><strong>评论</strong>：点击评论按钮弹出底部浮层，可查看全部评论和发送新评论</li>
             <li><strong>长按删除评论</strong>：长按评论条目 600ms 后出现「松手删除」提示，松手确认后可删除。自己发的评论可删，自己创作的视频下所有评论均可删</li>
+            <li><strong>删除作品</strong>：如果是自己的作品，操作栏显示红色「删除」按钮，点击确认后可删除视频并跳转回我的作品页</li>
             <li><strong>分享</strong>：点击分享按钮（原型示意）</li>
         </ul>
     </div>

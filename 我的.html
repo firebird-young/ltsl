@@ -369,14 +369,6 @@
             </button>
         </div>
 
-        <!-- 我的成员按钮 -->
-        <div class="visitor-btn-wrap">
-            <button class="visitor-btn" onclick="goVisitors()">
-                <span>👥</span>
-                <span>我的成员</span>
-            </button>
-        </div>
-
         <!-- 积分优惠券 -->
         <div class="stats-card">
             <div class="stat-item">
@@ -391,6 +383,20 @@
                 <div class="stat-info">
                     <div class="label">我的优惠券</div>
                     <div class="value">12</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 我的成员 + 作品 -->
+        <div class="order-section">
+            <div class="order-grid">
+                <div class="order-item" onclick="goVisitors()">
+                    <div class="icon">👥</div>
+                    <span class="label">我的成员</span>
+                </div>
+                <div class="order-item" onclick="location.href='我的作品.html'">
+                    <div class="icon">🎨</div>
+                    <span class="label">作品</span>
                 </div>
             </div>
         </div>
@@ -502,6 +508,15 @@
              <ul>
                 <li>页面新增"我的成员"按钮，方便用户管理已填报的成员信息。</li>
             </ul>
+        <!-- ===== 迭代记录 ===== -->
+        <div style="margin-top:24px;padding-top:20px;border-top:2px solid #E53935;">
+            <div style="font-size:15px;font-weight:700;color:#E53935;margin-bottom:12px;">2026.7.7 迭代 - 社区</div>
+            <ol style="padding-left:20px;margin:4px 0 8px;">
+                <li style="margin-bottom:6px;font-size:13px;color:#555;"><strong>增加作品按钮，点击后跳转到我的作品页面</strong></li>
+            </ol>
+        </div>
+
+            
     </div>
 </div>
 
