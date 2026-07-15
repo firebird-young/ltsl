@@ -351,40 +351,7 @@
             background: #f5f7fa; border-radius: 10px;
             border: 1px dashed #d0d5e0;
         }
-        .cp-ref-wrap .cp-ref-label {
-            font-size: 12px; color: #999; margin-bottom: 8px;
-        }
-        .cp-ref-wrap .cp-ref-upload {
-            display: flex; align-items: center; gap: 10px;
-        }
-        .cp-ref-wrap .cp-ref-upload input[type="file"] { display: none; }
-        .cp-ref-wrap .cp-ref-btn {
-            height: 34px; padding: 0 16px;
-            border: 1px solid #0669FF; border-radius: 8px;
-            background: #fff; color: #0669FF;
-            font-size: 12px; cursor: pointer; display: flex;
-            align-items: center; gap: 4px; font-family: inherit;
-            transition: all 0.2s;
-        }
-        .cp-ref-wrap .cp-ref-btn:hover { background: #E8F0FE; }
-        .cp-ref-wrap .cp-ref-preview {
-            width: 60px; height: 60px;
-            border-radius: 6px; overflow: hidden;
-            background: #e0e0e0; flex-shrink: 0; position: relative;
-        }
-        .cp-ref-wrap .cp-ref-preview img {
-            width: 100%; height: 100%; object-fit: cover; display: block;
-        }
-        .cp-ref-wrap .cp-ref-preview .cp-ref-del {
-            position: absolute; top: -4px; right: -4px;
-            width: 18px; height: 18px; border-radius: 50%;
-            border: none; background: #ff3b30; color: #fff;
-            font-size: 10px; cursor: pointer; display: flex;
-            align-items: center; justify-content: center;
-        }
-        .cp-ref-wrap .cp-ref-hint {
-            font-size: 11px; color: #bbb; margin-left: auto;
-        }
+
 
         /* ── 功能说明浮窗 ── */
         .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 500px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 99999; padding: 24px; display: none; }
@@ -473,6 +440,8 @@
 </div>
 </div>
 
+<div id="qaPanel" style="position:fixed;top:80px;left:16px;z-index:99999;background:#fff;color:#333;padding:14px 18px;border-radius:12px;border:1px solid #e0e0e0;font-size:12px;line-height:1.7;max-width:320px;box-shadow:0 4px 16px rgba(0,0,0,0.08);display:none;font-family:inherit;"></div>
+
 <button onclick="toggleFuncModal()" style="position:fixed;top:12px;right:16px;z-index:99999;background:#fff;color:#666;padding:7px 16px;border-radius:20px;border:1px solid #ddd;font-size:13px;font-weight:500;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-family:inherit;display:inline-flex;align-items:center;gap:4px;">📖 说明</button>
 
 <!-- ====== 功能说明浮窗 ====== -->
@@ -504,7 +473,6 @@
         <h4>四、Prompt预览与视频生成</h4>
         <ul>
             <li><strong>Prompt预览</strong>：根据选择生成专业视频Prompt，支持手动修改</li>
-            <li><strong>上传参考图</strong>：Prompt下方可上传1张参考图（JPG/PNG），作为AI视频画面参考</li>
             <li><strong>确认Prompt</strong>：点击确认后弹出标题输入框</li>
             <li><strong>生成视频</strong>：输入标题后点击「生成视频」提交创作，消耗1次剩余次数</li>
         </ul>
@@ -605,7 +573,8 @@
             { emoji: '', label: '好奇', desc: '让人想问「为什么」' },
             { emoji: '', label: '开心', desc: '让人看完笑出来' }
         ]},
-        { key: 'name', num: 'Question 08', title: '给你的主角起个名字', why: '有了名字，主角就有了灵魂！你可以自己取一个喜欢的名字～', type: 'name' }
+        { key: 'titleText', num: 'Question 08', title: '视频第一帧加上什么文字？', why: '视频的第一帧画面加上一段文字标题，让观众一眼就知道视频的主题～', type: 'input' },
+        { key: 'name', num: 'Question 09', title: '给你的主角起个名字', why: '有了名字，主角就有了灵魂！你可以自己取一个喜欢的名字～', type: 'name' }
     ];
     var nameSuggestions = [];
     var currentStep = 0;
@@ -663,8 +632,30 @@
         document.getElementById('createOverlay').classList.remove('show');
         document.getElementById('createPopup').classList.remove('show');
         document.body.style.overflow = '';
+        var panel = document.getElementById('qaPanel');
+        if (panel) panel.style.display = 'none';
     }
     function delWork(idx) { if(confirm('确定删除？')) alert('已删除'); }
+
+    function getQAText() {
+        var parts = [];
+        for (var i = 0; i < questions.length; i++) {
+            var q = questions[i];
+            if (q.type === 'name' || q.type === 'input') {
+                parts.push(q.title + '：' + (answers[q.key] || '未填写'));
+            } else if (answers[q.key] !== undefined) {
+                parts.push(q.title + '：' + q.options[answers[q.key]].label);
+            }
+        }
+        return parts.join('；');
+    }
+
+    function updateQAPanel() {
+        var panel = document.getElementById('qaPanel');
+        if (!panel) return;
+        panel.textContent = getQAText();
+        panel.style.display = 'block';
+    }
 
     function getPromptText() {
         var gender = questions[0].options[answers['gender']].label;
@@ -674,22 +665,26 @@
         var style = questions[4].options[answers['style']].label;
         var rhythm = questions[5].options[answers['rhythm']].label;
         var mood = questions[6].options[answers['mood']].label;
+        var titleText = answers['titleText'] || '';
         var name = answers['name'] || '小主角';
-        return '创作一个15秒竖屏AI视频。主角是' + age + '的' + gender + '，名叫' + name + '。'
+        var result = '创作一个15秒竖屏AI视频。主角是' + age + '的' + gender + '，名叫' + name + '。'
             + '场景设定在' + scene + '。'
             + '开场方式：' + hook + '。'
             + '视觉风格：' + style + '。'
             + '剪辑节奏：' + rhythm + '。'
             + '情绪基调：' + mood + '。'
             + '配古风BGM。';
+        if (titleText) {
+            result += '视频第一帧显示文字：' + titleText + '。';
+        }
+        return result;
     }
 
-    var DEMO_PROMPT = '创作一个15秒竖屏AI视频。主角是8-10岁的小女生，名叫锦宝。场景设定在花楼木织机工坊。开场方式：一个小惊喜——突然蹦出一只可爱的织锦小精灵。视觉风格：国潮卡通——Q版明亮卡通可爱风。剪辑节奏：一镜到底——不切镜头跟着主角走到底。情绪基调：好奇——让人想问「为什么」。配古风BGM。';
+    var DEMO_PROMPT = '创作一个15秒竖屏AI视频。主角是8-10岁的小女生，名叫锦宝。场景设定在花楼木织机工坊。开场方式：一个小惊喜——突然蹦出一只可爱的织锦小精灵。视觉风格：国潮卡通——Q版明亮卡通可爱风。剪辑节奏：一镜到底——不切镜头跟着主角走到底。情绪基调：好奇——让人想问「为什么」。配古风BGM。视频第一帧显示文字：蜀锦探秘之旅。';
 
     function renderStep() {
         var total = questions.length;
         var isPromptStep = currentStep === total;
-        var progressTotal = total + 1;
 
         // 次数不足时直接显示购买提示
         if (remainCount <= 0 && !isPromptStep) {
@@ -705,34 +700,30 @@
             return;
         }
 
-        // Progress
-        var progressHtml = '';
-        for (var i = 0; i < progressTotal; i++) {
-            var cls = i < currentStep ? 'done' : (i === currentStep ? 'active' : '');
-            progressHtml += '<div class="cp-dot ' + cls + '"></div>';
+        // Progress - prompt预览页不显示进度条
+        if (isPromptStep) {
+            document.getElementById('progressBar').innerHTML = '';
+        } else {
+            var progressHtml = '';
+            for (var i = 0; i < total; i++) {
+                var cls = i < currentStep ? 'done' : (i === currentStep ? 'active' : '');
+                progressHtml += '<div class="cp-dot ' + cls + '"></div>';
+            }
+            progressHtml += '<span class="cp-count">' + (currentStep + 1) + '/' + total + '</span>';
+            document.getElementById('progressBar').innerHTML = progressHtml;
         }
-        progressHtml += '<span class="cp-count">' + (currentStep + 1) + '/' + progressTotal + '</span>';
-        document.getElementById('progressBar').innerHTML = progressHtml;
 
         var body = document.getElementById('questionBody');
         var actions = document.getElementById('actionBar');
 
         // Prompt预览页
         if (isPromptStep) {
+            updateQAPanel();
             var prompt = getPromptText();
             body.innerHTML = '<div style="padding:4px 0;">'
                 + '<div class="cp-q-title" style="font-size:16px;margin-bottom:12px;">我的 Prompt</div>'
                 + '<div style="font-size:13px;color:#666;margin-bottom:10px;">以下是 AI 根据你的选择生成的视频创作指令，你可以直接使用或修改：</div>'
                 + '<textarea class="cp-prompt-textarea" id="promptPreview">' + DEMO_PROMPT + '</textarea>'
-                + '<div class="cp-ref-wrap">'
-                + '<div class="cp-ref-label">📷 参考图（可选，上传1张作为视频画面参考）</div>'
-                + '<div class="cp-ref-upload">'
-                + '<div class="cp-ref-preview" id="refPreview" style="display:none;"><img id="refImage" src=""><button class="cp-ref-del" onclick="removeRefImage()">✕</button></div>'
-                + '<label class="cp-ref-btn" id="refUploadBtn" for="refFileInput">📤 上传参考图</label>'
-                + '<input type="file" id="refFileInput" accept="image/*" onchange="handleRefUpload(event)">'
-                + '<span class="cp-ref-hint">支持 JPG/PNG</span>'
-                + '</div>'
-                + '</div>'
                 + '</div>';
             actions.innerHTML = ''
                 + '<button class="cp-prev" onclick="prevStep()">← 重新选</button>'
@@ -742,14 +733,15 @@
 
         var q = questions[currentStep];
         var isLast = currentStep === total - 1;
-        var isName = q.type === 'name';
+        var isInput = q.type === 'name' || q.type === 'input';
 
-        if (isName) {
+        if (isInput) {
             var val = answers[q.key] || '';
+            var placeholder = q.type === 'name' ? '输入主角名字' : '输入视频第一帧文字';
             body.innerHTML = '<div class="cp-q-num">' + q.num + '</div>'
                 + '<div class="cp-q-title">' + q.title + '</div>'
                 + '<div class="cp-q-why">' + q.why + '</div>'
-                + '<input class="cp-name-input" id="nameInput" value="' + val + '" placeholder="输入主角名字" maxlength="10" oninput="onNameInput()" onblur="onNameBlur()">';
+                + '<input class="cp-name-input" id="inputField" value="' + val + '" placeholder="' + placeholder + '" maxlength="100" oninput="onInputChange(\'' + q.key + '\')" onblur="onInputBlur(\'' + q.key + '\')" autocomplete="off">';
         } else {
             var optsHtml = '<div class="cp-q-num">' + q.num + '</div>'
                 + '<div class="cp-q-title">' + q.title + '</div>'
@@ -772,7 +764,7 @@
         }
 
         // Actions
-        var hasAnswer = isName ? (answers[q.key] && answers[q.key].trim()) : (answers[q.key] !== undefined);
+        var hasAnswer = isInput ? (answers[q.key] && answers[q.key].trim()) : (answers[q.key] !== undefined);
         var actions = document.getElementById('actionBar');
         actions.innerHTML = ''
             + (currentStep > 0 ? '<button class="cp-prev" onclick="prevStep()">← 上一题</button>' : '<button class="cp-prev" style="visibility:hidden">← 上一题</button>')
@@ -787,15 +779,12 @@
         renderStep();
     }
 
-    function onNameInput() {
-        var input = document.getElementById('nameInput');
-        answers['name'] = input.value;
-        renderStep();
+    function onInputChange(key) {
+        var input = document.getElementById('inputField');
+        if (input) answers[key] = input.value;
     }
 
-    function onNameBlur() {
-        var input = document.getElementById('nameInput');
-        answers['name'] = input.value;
+    function onInputBlur(key) {
         renderStep();
     }
 
@@ -822,11 +811,12 @@
         // 检查所有题目是否已答
         for (var i = 0; i < questions.length; i++) {
             var q = questions[i];
-            if (q.type === 'name') {
+            if (q.type === 'name' || q.type === 'input') {
                 if (!answers[q.key] || !answers[q.key].trim()) {
                     currentStep = i;
                     renderStep();
-                    alert('请给主角起个名字');
+                    var msg = q.type === 'name' ? '请给主角起个名字' : '请填写视频第一帧文字';
+                    alert(msg);
                     return;
                 }
             } else {
@@ -840,31 +830,6 @@
         // 进入prompt预览页
         currentStep = questions.length;
         renderStep();
-    }
-
-    var refImageData = null;
-
-    function handleRefUpload(e) {
-        var file = e.target.files[0];
-        if (!file) return;
-        var reader = new FileReader();
-        reader.onload = function(ev) {
-            refImageData = ev.target.result;
-            var preview = document.getElementById('refPreview');
-            var img = document.getElementById('refImage');
-            preview.style.display = 'block';
-            img.src = refImageData;
-            document.getElementById('refUploadBtn').textContent = '📤 重新上传';
-        };
-        reader.readAsDataURL(file);
-    }
-
-    function removeRefImage() {
-        refImageData = null;
-        document.getElementById('refPreview').style.display = 'none';
-        document.getElementById('refImage').src = '';
-        document.getElementById('refUploadBtn').textContent = '📤 上传参考图';
-        document.getElementById('refFileInput').value = '';
     }
 
     function generateVideo() {
