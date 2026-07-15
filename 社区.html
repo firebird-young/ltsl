@@ -89,10 +89,14 @@
         .filter-input:focus { border-color: #D43828; }
 
         .feed-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
+            column-count: 2;
+            column-gap: 8px;
             padding: 8px 8px 0;
+        }
+        .feed-card {
+            display: inline-block;
+            width: 100%;
+            margin-bottom: 8px;
         }
         .feed-card {
             background: #fff;
@@ -104,11 +108,12 @@
         .feed-card:active { opacity: 0.9; }
         .feed-cover {
             width: 100%;
-            aspect-ratio: 16 / 11;
             background: #e0e0e0;
             position: relative;
             overflow: hidden;
         }
+        .feed-cover.h { aspect-ratio: 4 / 3; }
+        .feed-cover.v { aspect-ratio: 3 / 4; }
         .feed-cover img, .feed-cover video {
             width: 100%; height: 100%;
             object-fit: cover;
@@ -125,6 +130,7 @@
             font-size: 10px; padding: 2px 6px; border-radius: 4px;
             display: flex; align-items: center; gap: 2px;
         }
+
         .feed-body { padding: 8px 10px 10px; }
         .feed-title {
             font-size: 12px; font-weight: 500; color: #333;
@@ -227,13 +233,13 @@
 </div>
 <script>
     var feedData = [
-        { id: 1, title: '博物馆犀牛', video: '博物馆.mp4', cover: '博物馆.mp4', creator: '晓宇', realCreator: '张**', course: '我为杜甫建茅屋', date: '2026-07-10', likes: 28, comments: ['好有意思的画面','AI生成的视频越来越棒了'] },
-        { id: 2, title: '茅屋搭建的完整过程', video: '博物馆.mp4', cover: '快速搭建茅屋', creator: '梅梅', realCreator: '杨*', course: '快速搭建茅屋', date: '2026-07-09', likes: 15, comments: ['这个搭建过程讲解得很清楚'] },
-        { id: 3, title: '诗界无心·草堂寻心', video: '博物馆.mp4', cover: '诗界无心·草堂寻心.jpg', creator: '浩宇', realCreator: '王**', course: '诗界无心·草堂寻心', date: '2026-07-08', likes: 42, comments: ['画面太美了','下次我也要去草堂看看','AI创作的水平越来越高了'] },
-        { id: 4, title: '盆景美学·指尖上的山水', video: '博物馆.mp4', cover: '盆景美学·指尖上的山水.jpg', creator: '小宇', realCreator: '刘*', course: '盆景美学·指尖山水', date: '2026-07-07', likes: 33, comments: ['盆景艺术配上AI视频太有创意了'] },
-        { id: 5, title: '杜甫和李白的故事', video: '博物馆.mp4', cover: '杜甫和李白.png', creator: '小明', realCreator: '赵**', course: '杜甫和李白的故事', date: '2026-07-06', likes: 21, comments: [] },
-        { id: 6, title: '春假托管班精彩回顾', video: '博物馆.mp4', cover: '盆景美学·指尖上的山水.jpg', creator: '芳芳', realCreator: '李*', course: '春假托管班', date: '2026-07-05', likes: 18, comments: ['孩子们玩得很开心'] },
-        { id: 7, title: '杜甫草堂探秘之旅', video: '博物馆.mp4', cover: '杜甫和李白.png', creator: '小华', realCreator: '陈*', course: '我为杜甫建茅屋', date: '2026-07-04', likes: 35, comments: ['很有意思的探索'] },
+        { id: 1, title: '博物馆犀牛', video: '博物馆.mp4', cover: '博物馆.mp4', creator: '晓宇', realCreator: '张**', course: '我为杜甫建茅屋', date: '2026-07-10', likes: 28, orient: 'v', comments: ['好有意思的画面','AI生成的视频越来越棒了'] },
+        { id: 2, title: '茅屋搭建的完整过程', video: '博物馆.mp4', cover: '快速搭建茅屋', creator: '梅梅', realCreator: '杨*', course: '快速搭建茅屋', date: '2026-07-09', likes: 15, orient: 'v', comments: ['这个搭建过程讲解得很清楚'] },
+        { id: 3, title: '诗界无心·草堂寻心', video: '博物馆.mp4', cover: '诗界无心·草堂寻心.jpg', creator: '浩宇', realCreator: '王**', course: '诗界无心·草堂寻心', date: '2026-07-08', likes: 42, orient: 'h', comments: ['画面太美了','下次我也要去草堂看看','AI创作的水平越来越高了'] },
+        { id: 4, title: '盆景美学·指尖上的山水', video: '博物馆.mp4', cover: '盆景美学·指尖上的山水.jpg', creator: '小宇', realCreator: '刘*', course: '盆景美学·指尖山水', date: '2026-07-07', likes: 33, orient: 'v', comments: ['盆景艺术配上AI视频太有创意了'] },
+        { id: 5, title: '杜甫和李白的故事', video: '博物馆.mp4', cover: '杜甫和李白.png', creator: '小明', realCreator: '赵**', course: '杜甫和李白的故事', date: '2026-07-06', likes: 21, orient: 'h', comments: [] },
+        { id: 6, title: '春假托管班精彩回顾', video: '博物馆.mp4', cover: '盆景美学·指尖上的山水.jpg', creator: '芳芳', realCreator: '李*', course: '春假托管班', date: '2026-07-05', likes: 18, orient: 'v', comments: ['孩子们玩得很开心'] },
+        { id: 7, title: '杜甫草堂探秘之旅', video: '博物馆.mp4', cover: '杜甫和李白.png', creator: '小华', realCreator: '陈*', course: '我为杜甫建茅屋', date: '2026-07-04', likes: 35, orient: 'h', comments: ['很有意思的探索'] },
     ];
 
     var currentSort = 'hot';
@@ -273,11 +279,12 @@
             var idx = indices[i];
             var f = feedData[idx];
             var isVideo = f.cover.indexOf('.mp4') !== -1;
+            var orient = f.orient || 'h';
             var coverHtml = isVideo
                 ? '<video src="' + f.cover + '" muted playsinline preload="metadata"></video>'
                 : '<img src="' + f.cover + '" onerror="this.style.display=\'none\';this.parentNode.style.background=\'linear-gradient(135deg,#667eea,#764ba2)\'">';
             html += '<div class="feed-card" onclick="goDetail(' + idx + ')">'
-                 + '<div class="feed-cover">' + coverHtml
+                 + '<div class="feed-cover ' + orient + '">' + coverHtml
                  + '<span class="play-badge">▶</span>'
                  + '<span class="like-badge">♡ ' + f.likes + '</span>'
                  + '</div>'

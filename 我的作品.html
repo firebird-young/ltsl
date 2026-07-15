@@ -50,12 +50,14 @@
         }
 
         .feed-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
+            column-count: 2;
+            column-gap: 8px;
             padding: 12px 8px 0;
         }
         .feed-card {
+            display: inline-block;
+            width: 100%;
+            margin-bottom: 8px;
             background: #fff;
             border-radius: 10px;
             overflow: hidden;
@@ -65,11 +67,12 @@
         .feed-card:active { opacity: 0.9; }
         .feed-cover {
             width: 100%;
-            aspect-ratio: 16 / 11;
             background: #e0e0e0;
             position: relative;
             overflow: hidden;
         }
+        .feed-cover.h { aspect-ratio: 4 / 3; }
+        .feed-cover.v { aspect-ratio: 3 / 4; }
         .feed-cover img, .feed-cover video {
             width: 100%; height: 100%;
             object-fit: cover; display: block;
@@ -149,12 +152,12 @@
 
 <script>
     var myWorks = [
-        { id: 0, title: '博物馆犀牛', cover: '博物馆.mp4', creator: '晓宇', realCreator: '张**', course: '我为杜甫建茅屋', likes: 28, comments: 2 },
-        { id: 1, title: '杜甫和李白的故事', cover: '杜甫和李白.png', creator: '晓宇', realCreator: '张**', course: '我为杜甫建茅屋', likes: 35, comments: 5 },
-        { id: 2, title: '茅屋搭建的完整过程', cover: '快速搭建茅屋', creator: '晓宇', realCreator: '张**', course: '快速搭建茅屋', likes: 15, comments: 1 },
-        { id: 3, title: '诗界无心·草堂寻心', cover: '诗界无心·草堂寻心.jpg', creator: '晓宇', realCreator: '张**', course: '诗界无心·草堂寻心', likes: 42, comments: 3 },
-        { id: 4, title: '盆景美学·指尖上的山水', cover: '盆景美学·指尖上的山水.jpg', creator: '晓宇', realCreator: '张**', course: '盆景美学·指尖山水', likes: 33, comments: 4 },
-        { id: 5, title: '春假托管班精彩回顾', cover: '盆景美学·指尖上的山水.jpg', creator: '晓宇', realCreator: '张**', course: '春假托管班', likes: 18, comments: 0 },
+        { id: 0, title: '博物馆犀牛', cover: '博物馆.mp4', creator: '晓宇', realCreator: '张**', course: '我为杜甫建茅屋', likes: 28, comments: 2, orient: 'v' },
+        { id: 1, title: '杜甫和李白的故事', cover: '杜甫和李白.png', creator: '晓宇', realCreator: '张**', course: '我为杜甫建茅屋', likes: 35, comments: 5, orient: 'h' },
+        { id: 2, title: '茅屋搭建的完整过程', cover: '快速搭建茅屋', creator: '晓宇', realCreator: '张**', course: '快速搭建茅屋', likes: 15, comments: 1, orient: 'v' },
+        { id: 3, title: '诗界无心·草堂寻心', cover: '诗界无心·草堂寻心.jpg', creator: '晓宇', realCreator: '张**', course: '诗界无心·草堂寻心', likes: 42, comments: 3, orient: 'h' },
+        { id: 4, title: '盆景美学·指尖上的山水', cover: '盆景美学·指尖上的山水.jpg', creator: '晓宇', realCreator: '张**', course: '盆景美学·指尖山水', likes: 33, comments: 4, orient: 'v' },
+        { id: 5, title: '春假托管班精彩回顾', cover: '盆景美学·指尖上的山水.jpg', creator: '晓宇', realCreator: '张**', course: '春假托管班', likes: 18, comments: 0, orient: 'h' },
     ];
 
     function goBack() {
@@ -171,11 +174,12 @@
         for (var i = 0; i < myWorks.length; i++) {
             var w = myWorks[i];
             var isVideo = w.cover && w.cover.indexOf('.mp4') !== -1;
+            var orient = w.orient || 'h';
             var coverHtml = isVideo
                 ? '<video src="' + w.cover + '" muted playsinline preload="metadata"></video>'
                 : '<img src="' + w.cover + '" onerror="this.style.display=\'none\';this.parentNode.style.background=\'linear-gradient(135deg,#667eea,#764ba2)\'">';
             html += '<div class="feed-card" onclick="goDetail(' + i + ')">'
-                + '<div class="feed-cover">' + coverHtml
+                + '<div class="feed-cover ' + orient + '">' + coverHtml
                 + '<span class="play-badge">▶</span>'
                 + '<span class="like-badge">♡ ' + w.likes + '</span>'
                 + '</div>'
