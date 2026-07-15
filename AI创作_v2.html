@@ -573,7 +573,7 @@
             { emoji: '', label: '好奇', desc: '让人想问「为什么」' },
             { emoji: '', label: '开心', desc: '让人看完笑出来' }
         ]},
-        { key: 'titleText', num: 'Question 08', title: '视频第一帧加上什么文字？', why: '视频的第一帧画面加上一段文字标题，让观众一眼就知道视频的主题～', type: 'input' },
+        { key: 'titleText', num: 'Question 08', title: '视频前3s加上什么文字？', why: '视频的前3秒画面加上一段文字标题，让观众一眼就知道视频的主题～', type: 'input' },
         { key: 'name', num: 'Question 09', title: '给你的主角起个名字', why: '有了名字，主角就有了灵魂！你可以自己取一个喜欢的名字～', type: 'name' }
     ];
     var nameSuggestions = [];
@@ -675,7 +675,7 @@
             + '情绪基调：' + mood + '。'
             + '配古风BGM。';
         if (titleText) {
-            result += '视频第一帧显示文字：' + titleText + '。';
+            result += '视频前3秒显示文字：' + titleText + '。';
         }
         return result;
     }
@@ -737,7 +737,7 @@
 
         if (isInput) {
             var val = answers[q.key] || '';
-            var placeholder = q.type === 'name' ? '输入主角名字' : '输入视频第一帧文字';
+            var placeholder = q.type === 'name' ? '输入主角名字' : '输入视频前3s文字';
             body.innerHTML = '<div class="cp-q-num">' + q.num + '</div>'
                 + '<div class="cp-q-title">' + q.title + '</div>'
                 + '<div class="cp-q-why">' + q.why + '</div>'
@@ -815,7 +815,7 @@
                 if (!answers[q.key] || !answers[q.key].trim()) {
                     currentStep = i;
                     renderStep();
-                    var msg = q.type === 'name' ? '请给主角起个名字' : '请填写视频第一帧文字';
+                    var msg = q.type === 'name' ? '请给主角起个名字' : '请填写视频前3s文字';
                     alert(msg);
                     return;
                 }
