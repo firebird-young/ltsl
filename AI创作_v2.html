@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI创作 - 离泰数链</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            background: #e8e8e8;
+        }
+        .page-wrap {
+            display: flex;
+            gap: 20px;
+            padding: 0;
+            min-height: 100vh;
+            align-items: flex-start;
+            justify-content: center;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 430px;
+            background: #f3f0fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
+        .content-area { flex: 1; padding: 0 14px 90px; }
+
+        .status-bar {
+            height: 44px;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            font-size: 14px;
+            color: #333;
+            flex-shrink: 0;
+        }
+        .status-bar .right { display: flex; align-items: center; gap: 4px; }
+
+        .top-nav {
+            height: 44px;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            flex-shrink: 0;
+        }
+        .top-nav .back-btn {
+            width: 32px; height: 32px;
+            background: transparent; border: none;
+            font-size: 22px; color: #333;
+            cursor: pointer; display: flex;
+            align-items: center; justify-content: center;
+        }
+        .top-nav .title { font-size: 16px; font-weight: 600; color: #333; }
+        .top-nav .right-icons { display: flex; gap: 10px; }
+        .top-nav .right-icon {
+            width: 30px; height: 30px; border-radius: 50%;
+            background: rgba(255,255,255,0.6);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; color: #333; cursor: pointer;
+        }
+
+        .member-card {
+            background: rgba(255,255,255,0.6);
+            border-radius: 14px; padding: 14px 16px;
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 16px; backdrop-filter: blur(10px);
+        }
+        .member-card .mc-left { display: flex; align-items: center; gap: 12px; }
+        .member-card .mc-avatar {
+            width: 44px; height: 44px; border-radius: 50%;
+            background: linear-gradient(135deg, #4285F4, #1A73E8);
+            color: #fff; display: flex; align-items: center;
+            justify-content: center; font-size: 18px; font-weight: 600; flex-shrink: 0;
+        }
+        .member-card .mc-info .mc-name { font-size: 16px; font-weight: 600; color: #333; }
+        .member-card .mc-info .mc-hint { font-size: 12px; color: #999; margin-top: 2px; }
+        .member-card .mc-switch {
+            padding: 6px 14px; border: 1px solid #4285F4; border-radius: 16px;
+            font-size: 13px; color: #4285F4; background: rgba(255,255,255,0.6);
+            cursor: pointer; display: flex; align-items: center; gap: 4px;
+        }
+
+        .course-tag {
+            background: rgba(174, 207, 255, 0.4); border-radius: 10px;
+            padding: 12px 16px; font-size: 14px; font-weight: 500;
+            color: #1A1A1A; margin-bottom: 16px;
+        }
+
+        .creating-section, .done-section {
+            background: rgba(255,255,255,0.6); border-radius: 14px;
+            padding: 14px 16px; margin-bottom: 16px; backdrop-filter: blur(10px);
+        }
+        .section-header {
+            display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;
+        }
+        .section-header .sh-left { display: flex; align-items: center; gap: 8px; }
+        .section-header .sh-title { font-size: 15px; font-weight: 600; color: #333; }
+        .section-header .sh-count { font-size: 14px; color: #666; }
+        .section-header .sh-count strong { color: #333; }
+
+        .creating-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .creating-card {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, #f0f0f5, #e8e8f0);
+            border-radius: 10px; position: relative; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .creating-card .cc-icon { font-size: 36px; color: #b0b0c0; opacity: 0.7; }
+        .creating-card .cc-progress {
+            position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, #4285F4, #1A73E8);
+        }
+
+        .done-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .done-card {
+            background: linear-gradient(135deg, #f0f0fa, #e6e1f5);
+            border-radius: 10px; padding: 12px; position: relative; overflow: hidden;
+        }
+        .done-card .dc-cover {
+            aspect-ratio: 16 / 10;
+            background: linear-gradient(135deg, #c5b0f4, #b9b9f9);
+            border-radius: 8px; display: flex; align-items: center;
+            justify-content: center; font-size: 40px; color: rgba(255,255,255,0.8);
+            position: relative;
+        }
+        .done-card .dc-cover::after {
+            content: '▶';
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 36px; height: 36px;
+            background: rgba(0,0,0,0.35); border-radius: 50%;
+            color: #fff; display: flex; align-items: center;
+            justify-content: center; font-size: 14px;
+        }
+        .done-card .dc-del {
+            position: absolute; bottom: 12px; right: 12px;
+            width: 26px; height: 26px; border-radius: 6px; border: none;
+            background: rgba(0,0,0,0.4); color: #fff;
+            font-size: 12px; cursor: pointer; display: flex;
+            align-items: center; justify-content: center;
+        }
+        .done-card .dc-name { font-size: 13px; color: #333; margin-top: 8px; text-align: center; }
+        .group-title {
+            font-size: 13px; color: #4285F4; font-weight: 600;
+            margin: 12px 0 10px; padding-left: 8px;
+            border-left: 3px solid #4285F4;
+        }
+        .group-title span { color: #999; font-weight: 400; }
+
+        .ai-create-btn {
+            position: fixed; bottom: 16px;
+            left: 50%; transform: translateX(-50%);
+            width: calc(100% - 28px); max-width: 402px; height: 50px;
+            border: none; border-radius: 25px;
+            background: linear-gradient(135deg, #4A9EFF, #0669FF);
+            color: #fff; font-size: 16px; font-weight: 600;
+            cursor: pointer; display: flex; align-items: center;
+            justify-content: center; gap: 6px;
+            box-shadow: 0 4px 16px rgba(6,105,255,0.3); z-index: 10;
+        }
+        .ai-create-btn:active { opacity: 0.9; }
+
+        /* ===== 创作弹窗 ===== */
+        .create-overlay {
+            display: none; position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4); z-index: 9999;
+        }
+        .create-overlay.show { display: block; }
+        .create-popup {
+            display: none; position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: #fff; border-radius: 20px 20px 0 0;
+            width: 100%; max-width: 430px; margin: 0 auto;
+            z-index: 10000; flex-direction: column;
+            max-height: 90vh; animation: slideUp 0.3s ease-out;
+        }
+        .create-popup.show { display: flex; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .create-popup .cp-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 20px; border-bottom: 1px solid #f0f0f0; flex-shrink: 0;
+        }
+        .create-popup .cp-title { font-size: 16px; font-weight: 600; color: #333; }
+        .create-popup .cp-close {
+            width: 28px; height: 28px; border-radius: 50%; border: none;
+            background: #f5f5f5; color: #999; font-size: 14px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .create-popup .cp-progress {
+            display: flex; align-items: center; gap: 6px;
+            padding: 12px 20px; flex-shrink: 0;
+        }
+        .create-popup .cp-progress .cp-dot {
+            flex: 1; height: 4px; border-radius: 2px;
+            background: #e0e0e0; transition: background 0.3s;
+        }
+        .create-popup .cp-progress .cp-dot.active { background: #0669FF; }
+        .create-popup .cp-progress .cp-dot.done { background: #4A9EFF; }
+        .create-popup .cp-progress .cp-count {
+            font-size: 12px; color: #999; margin-left: 4px; flex-shrink: 0;
+        }
+
+        .create-popup .cp-body {
+            flex: 1; overflow-y: auto; padding: 20px;
+        }
+        .create-popup .cp-body::-webkit-scrollbar { width: 3px; }
+        .create-popup .cp-body::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
+
+        .create-popup .cp-q-num {
+            font-size: 12px; color: #0669FF; font-weight: 600; margin-bottom: 4px;
+        }
+        .create-popup .cp-q-title {
+            font-size: 18px; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; line-height: 1.3;
+        }
+        .create-popup .cp-q-tip {
+            font-size: 13px; color: #999; margin-bottom: 6px;
+        }
+        .create-popup .cp-q-why {
+            font-size: 13px; color: #4285F4; background: #E8F1FF;
+            padding: 10px 14px; border-radius: 8px; margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .create-popup .cp-tabs {
+            display: flex; gap: 0; flex-shrink: 0;
+            padding: 0 20px 12px;
+        }
+        .create-popup .cp-tab {
+            flex: 1; padding: 10px 0; text-align: center;
+            font-size: 14px; font-weight: 500; color: #666;
+            cursor: pointer; border: none; background: none;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s; font-family: inherit;
+        }
+        .create-popup .cp-tab.active {
+            color: #0669FF; border-bottom-color: #0669FF; font-weight: 600;
+        }
+        .create-popup .cp-q-options {
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .create-popup .cp-option {
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px 16px;
+            border: 1px solid #e8e8e8; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s;
+            background: #fafafa;
+        }
+        .create-popup .cp-option:active { background: #E8F1FF; }
+        .create-popup .cp-option.selected {
+            border-color: #0669FF; background: #E8F1FF;
+        }
+        .create-popup .cp-option .cp-opt-emoji { font-size: 24px; flex-shrink: 0; }
+        .create-popup .cp-option .cp-opt-text { flex: 1; }
+        .create-popup .cp-option .cp-opt-text .cp-opt-label { font-size: 14px; font-weight: 500; color: #333; }
+        .create-popup .cp-option .cp-opt-text .cp-opt-desc { font-size: 12px; color: #999; margin-top: 2px; }
+        .create-popup .cp-option .cp-opt-radio {
+            width: 20px; height: 20px; border-radius: 50%;
+            border: 2px solid #ddd; display: flex;
+            align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .create-popup .cp-option.selected .cp-opt-radio {
+            border-color: #0669FF;
+        }
+        .create-popup .cp-option.selected .cp-opt-radio::after {
+            content: ''; width: 10px; height: 10px;
+            border-radius: 50%; background: #0669FF;
+        }
+
+        .create-popup .cp-actions {
+            display: flex; gap: 10px;
+            padding: 16px 20px; border-top: 1px solid #f0f0f0; flex-shrink: 0;
+        }
+        .create-popup .cp-actions button {
+            flex: 1; height: 44px; border: none; border-radius: 10px;
+            font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit;
+        }
+        .create-popup .cp-prev { background: #f5f5f7; color: #666; }
+        .create-popup .cp-next { background: #0669FF; color: #fff; }
+        .create-popup .cp-next:disabled { opacity: 0.5; cursor: default; }
+
+        .create-popup .cp-name-input {
+            width: 100%; height: 44px; padding: 0 14px;
+            border: 1px solid #e0e0e0; border-radius: 10px;
+            font-size: 15px; color: #333; outline: none; font-family: inherit;
+        }
+        .create-popup .cp-name-input:focus { border-color: #0669FF; }
+        .create-popup .cp-name-suggestions {
+            display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;
+        }
+        .create-popup .cp-name-suggestions span {
+            padding: 8px 16px; border: 1px solid #e0e0e0;
+            border-radius: 20px; font-size: 13px; color: #666;
+            cursor: pointer; background: #fff;
+        }
+        .create-popup .cp-name-suggestions span:active { background: #E8F1FF; border-color: #0669FF; color: #0669FF; }
+
+        .create-popup .cp-prompt-textarea {
+            width: 100%; min-height: 180px;
+            padding: 14px; border: 1px solid #e0e0e0;
+            border-radius: 10px; font-size: 13px; color: #333;
+            resize: vertical; outline: none; font-family: inherit;
+            line-height: 1.7; background: #fafafa;
+        }
+        .create-popup .cp-prompt-textarea:focus { border-color: #0669FF; }
+
+        /* ===== 标题输入弹窗 ===== */
+        .title-overlay {
+            display: none; position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.45); z-index: 10001;
+            align-items: center; justify-content: center; padding: 20px;
+        }
+        .title-overlay.show { display: flex; }
+        .title-popup {
+            background: #fff; border-radius: 18px;
+            width: 100%; max-width: 320px; padding: 28px 24px 24px;
+            animation: popIn 0.25s;
+        }
+        @keyframes popIn { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .title-popup .tp-title {
+            font-size: 17px; font-weight: 600; color: #333;
+            text-align: center; margin-bottom: 16px;
+        }
+        .title-popup .tp-input {
+            width: 100%; height: 44px; padding: 0 14px;
+            border: 1px solid #e0e0e0; border-radius: 10px;
+            font-size: 15px; color: #333; outline: none; font-family: inherit;
+            margin-bottom: 20px;
+        }
+        .title-popup .tp-input:focus { border-color: #0669FF; }
+        .title-popup .tp-actions { display: flex; gap: 10px; }
+        .title-popup .tp-actions button {
+            flex: 1; height: 42px; border: none; border-radius: 10px;
+            font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit;
+        }
+        .title-popup .tp-cancel { background: #f5f5f7; color: #666; }
+        .title-popup .tp-confirm { background: #0669FF; color: #fff; }
+
+        .cp-ref-wrap {
+            margin-top: 12px; padding: 12px;
+            background: #f5f7fa; border-radius: 10px;
+            border: 1px dashed #d0d5e0;
+        }
+        .cp-ref-wrap .cp-ref-label {
+            font-size: 12px; color: #999; margin-bottom: 8px;
+        }
+        .cp-ref-wrap .cp-ref-upload {
+            display: flex; align-items: center; gap: 10px;
+        }
+        .cp-ref-wrap .cp-ref-upload input[type="file"] { display: none; }
+        .cp-ref-wrap .cp-ref-btn {
+            height: 34px; padding: 0 16px;
+            border: 1px solid #0669FF; border-radius: 8px;
+            background: #fff; color: #0669FF;
+            font-size: 12px; cursor: pointer; display: flex;
+            align-items: center; gap: 4px; font-family: inherit;
+            transition: all 0.2s;
+        }
+        .cp-ref-wrap .cp-ref-btn:hover { background: #E8F0FE; }
+        .cp-ref-wrap .cp-ref-preview {
+            width: 60px; height: 60px;
+            border-radius: 6px; overflow: hidden;
+            background: #e0e0e0; flex-shrink: 0; position: relative;
+        }
+        .cp-ref-wrap .cp-ref-preview img {
+            width: 100%; height: 100%; object-fit: cover; display: block;
+        }
+        .cp-ref-wrap .cp-ref-preview .cp-ref-del {
+            position: absolute; top: -4px; right: -4px;
+            width: 18px; height: 18px; border-radius: 50%;
+            border: none; background: #ff3b30; color: #fff;
+            font-size: 10px; cursor: pointer; display: flex;
+            align-items: center; justify-content: center;
+        }
+        .cp-ref-wrap .cp-ref-hint {
+            font-size: 11px; color: #bbb; margin-left: auto;
+        }
+
+        /* ── 功能说明浮窗 ── */
+        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 500px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 99999; padding: 24px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .f-modal .fm-title:active { cursor: grabbing; }
+        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
+        .f-modal .fm-close:hover { background: #e8e8e8; }
+        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
+        .f-modal .fm-body h4:first-child { margin-top: 0; }
+        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
+        .f-modal .fm-body li { margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+<div class="page-wrap">
+<div class="app-container">
+    <div class="status-bar">
+        <span>9:41</span>
+        <div class="right"><span>📶</span><span>📡</span><span>🔋</span></div>
+    </div>
+    <div class="top-nav">
+        <button class="back-btn" onclick="goBack()">‹</button>
+        <div class="title">AI创作</div>
+        <div class="right-icons"><div class="right-icon">⋯</div><div class="right-icon">⊙</div></div>
+    </div>
+    <div class="content-area">
+        <div class="member-card">
+            <div class="mc-left">
+                <div class="mc-avatar">陈</div>
+                <div class="mc-info"><div class="mc-name">陈昭君</div><div class="mc-hint">当前创作成员</div></div>
+            </div>
+            <button class="mc-switch" onclick="alert('切换成员')">切换成员 ▾</button>
+        </div>
+        <div class="course-tag">我为杜甫建茅屋</div>
+        <div class="creating-section">
+            <div class="section-header">
+                <div class="sh-left"><span class="sh-icon">⏳</span><span class="sh-title">创作中</span><span class="sh-count"><strong>2</strong></span></div>
+            </div>
+            <div class="creating-grid">
+                <div class="creating-card"><span class="cc-icon">📹</span><div class="cc-progress"></div></div>
+                <div class="creating-card"><span class="cc-icon">📹</span><div class="cc-progress"></div></div>
+                <div class="creating-card"><span class="cc-icon">🎮</span><div class="cc-progress" style="background:#ccc;"></div></div>
+            </div>
+        </div>
+        <div class="done-section">
+            <div class="section-header">
+                <div class="sh-left"><span class="sh-icon">✅</span><span class="sh-title">已完成</span><span class="sh-count"><strong>32</strong></span></div>
+            </div>
+            <div class="group-title">AI创作视频 <span>（共2个）</span></div>
+            <div class="done-grid">
+                <div class="done-card"><div class="dc-cover">📹</div><div class="dc-name">快速搭建茅屋</div><button class="dc-del" onclick="delWork(0)">🗑</button></div>
+                <div class="done-card"><div class="dc-cover">📹</div><div class="dc-name">快速搭建茅屋</div><button class="dc-del" onclick="delWork(1)">🗑</button></div>
+            </div>
+        </div>
+    </div>
+    <button class="ai-create-btn" onclick="openCreate()">✨ AI创作</button>
+</div>
+
+    <div class="create-overlay" id="createOverlay" onclick="if(event.target===this)closeCreate()"></div>
+<div class="create-popup" id="createPopup">
+    <div class="cp-header">
+        <span class="cp-title">AI创作</span>
+        <button class="cp-close" onclick="closeCreate()">✕</button>
+    </div>
+    <div class="cp-tabs">
+        <button class="cp-tab active" onclick="switchCreateTab('video')">🎬 视频创作</button>
+        <button class="cp-tab" onclick="switchCreateTab('game')">🎮 游戏创作</button>
+    </div>
+    <div class="cp-progress" id="progressBar"></div>
+    <div class="cp-body" id="questionBody"></div>
+    <div class="cp-actions" id="actionBar"></div>
+</div>
+
+<!-- 标题输入弹窗 -->
+<div class="title-overlay" id="titleOverlay" onclick="if(event.target===this)closeTitlePopup()">
+    <div class="title-popup">
+        <div class="tp-title">给视频起个名字</div>
+        <input class="tp-input" id="videoTitleInput" placeholder="输入视频标题" maxlength="20">
+        <div class="tp-actions">
+            <button class="tp-cancel" onclick="closeTitlePopup()">取消</button>
+            <button class="tp-confirm" onclick="confirmGenerate()">✨ 生成视频</button>
+        </div>
+    </div>
+</div>
+</div>
+
+<button onclick="toggleFuncModal()" style="position:fixed;top:12px;right:16px;z-index:99999;background:#fff;color:#666;padding:7px 16px;border-radius:20px;border:1px solid #ddd;font-size:13px;font-weight:500;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-family:inherit;display:inline-flex;align-items:center;gap:4px;">📖 说明</button>
+
+<!-- ====== 功能说明浮窗 ====== -->
+<div class="f-modal" id="funcModal">
+    <div class="fm-title">
+        <span>📖 功能说明</span>
+        <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+    </div>
+    <div class="fm-body">
+        <h4>一、页面布局</h4>
+        <ul>
+            <li><strong>成员与课程</strong>：顶部显示当前创作成员信息和关联课程</li>
+            <li><strong>作品区</strong>：分为创作中（进度条）和已完成（双列卡片）两个区块</li>
+            <li><strong>AI创作按钮</strong>：底部固定「✨ AI创作」按钮，点击弹出创作浮层</li>
+        </ul>
+        <h4>二、创作弹窗 - 视频/游戏Tab</h4>
+        <ul>
+            <li><strong>Tab切换</strong>：支持视频创作和游戏创作切换（游戏保持原样，后台直接配成不开启，等后续完善后再打开）</li>
+            <li><strong>剩余次数</strong>：Tab下方显示「视频创作剩余N次」，不足时显示0次并引导购买，注意这里的次数是用当前课程赠送的免费次数+用户购买的次数（用户购买的次数是不限课程的，全场通用）</li>
+            <li><strong>购买入口</strong>：次数不足时横幅显示「立即购买」按钮，跳转购买页面</li>
+        </ul>
+        <h4>三、创作弹窗 - 视频内容问题填写</h4>
+        <ul>
+            <li><strong>逐题选择</strong>根据后台研学手记的配置的问题，按顺序选择</li>
+            <li><strong>题型</strong>：选择题（点选选项）和输入题（填写名字）</li>
+            <li><strong>进度条</strong>：顶部显示答题进度</li>
+            <li><strong>导航</strong>：支持上一题/下一题，最后一题为「生成我的 Prompt」</li>
+        </ul>
+        <h4>四、Prompt预览与视频生成</h4>
+        <ul>
+            <li><strong>Prompt预览</strong>：根据选择生成专业视频Prompt，支持手动修改</li>
+            <li><strong>上传参考图</strong>：Prompt下方可上传1张参考图（JPG/PNG），作为AI视频画面参考</li>
+            <li><strong>确认Prompt</strong>：点击确认后弹出标题输入框</li>
+            <li><strong>生成视频</strong>：输入标题后点击「生成视频」提交创作，消耗1次剩余次数</li>
+        </ul>
+        <h4>五、次数不足处理</h4>
+        <ul>
+            <li><strong>横幅提示</strong>：弹窗Tab下方显示剩余次数</li>
+            <li><strong>次数为0</strong>：不展示问卷题目，直接显示购买引导页面</li>
+            <li><strong>生成消耗</strong>：每次成功提交创作消耗1次</li>
+        </ul>
+        <div style="margin-top:16px;">
+            <div style="font-size:13px;font-weight:600;color:#333;margin-bottom:8px;">视频生成流程图</div>
+            <img src="视频生成流程图.png" style="width:100%;border-radius:8px;border:1px solid #e0e0e0;" alt="视频生成流程图">
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleFuncModal() {
+        var el = document.getElementById('funcModal');
+        el.classList.toggle('show');
+        if (el.classList.contains('show') && !el.dataset.dragged) {
+            el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
+        }
+    }
+    (function() {
+        var modal, titleBar, offX, offY, dragging = false;
+        document.addEventListener('DOMContentLoaded', function() {
+            modal = document.getElementById('funcModal');
+            if (!modal) return;
+            titleBar = modal.querySelector('.fm-title');
+            if (!titleBar) return;
+            titleBar.addEventListener('mousedown', startDrag);
+            titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+            document.addEventListener('mousemove', onDrag);
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('touchmove', onDragTouch, {passive:true});
+            document.addEventListener('touchend', endDrag);
+        });
+        function startDrag(e) {
+            if (e.target.closest('.fm-close')) return;
+            modal.dataset.dragged = '1'; modal.style.transform = '';
+            var rect = modal.getBoundingClientRect();
+            offX = e.clientX - rect.left; offY = e.clientY - rect.top;
+            dragging = true; if (titleBar) titleBar.style.cursor = 'grabbing';
+        }
+        function startDragTouch(e) {
+            if (e.target.closest('.fm-close')) return;
+            var t = e.touches[0];
+            modal.dataset.dragged = '1'; modal.style.transform = '';
+            var rect = modal.getBoundingClientRect();
+            offX = t.clientX - rect.left; offY = t.clientY - rect.top;
+            dragging = true;
+        }
+        function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+        function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+        function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
+    })();
+</script>
+</body>
+<script>
+    var questions = [
+        { key: 'gender', num: 'Question 01', title: '我是小男生还是小女生？', why: '选了这个，AI 才知道视频里的小主角长什么样子，出来的画面才更像你哦～', options: [
+            { emoji: '', label: '小男生', desc: 'AI 把你生成成阳光小男孩' },
+            { emoji: '', label: '小女生', desc: 'AI 把你生成成可爱小女孩' }
+        ]},
+        { key: 'age', num: 'Question 02', title: '我今年多大啦？', why: '不同年龄的小朋友说话、走路、穿衣都不一样，选对了年龄，AI 才能做出最适合你的视频～', options: [
+            { emoji: '', label: '6-7岁', desc: '低年级小朋友，天真又活泼' },
+            { emoji: '', label: '8-10岁', desc: '中年级同学，好奇心满满' },
+            { emoji: '', label: '11-14岁', desc: '高年级大哥哥大姐姐，有主见' }
+        ]},
+        { key: 'scene', num: 'Question 03', title: '穿越到哪个时空？', why: '选一个你喜欢的地方，AI 就会把视频的背景设在那里，带你"穿越"到那个时空去探险！', options: [
+            { emoji: '', label: '花楼木织机工坊', desc: '镇馆之宝：清代小花楼木织机现场' },
+            { emoji: '', label: '锦官城集市', desc: '唐代丝绸之路上的成都大集市' },
+            { emoji: '', label: '陵阳公梦境', desc: '蜀锦大师做的五彩斑斓的梦' },
+            { emoji: '', label: '现代博物馆展厅', desc: '回到现在的蜀锦博物馆' }
+        ]},
+        { key: 'hook', num: 'Question 04', title: '视频第一秒给大家看到什么？', why: '视频的开头最吸引人啦！选一个有趣的开场，让看视频的人一下子就被吸引住～', options: [
+            { emoji: '', label: '织机咔哒咔哒', desc: '一上来就直接看织机在动' },
+            { emoji: '', label: '我问大家一个问题', desc: '「你见过五彩斑斓的布吗？」' },
+            { emoji: '', label: '一个小惊喜', desc: '突然蹦出一只可爱的织锦小精灵' },
+            { emoji: '', label: '我先打个招呼', desc: '「我是锦宝，今天我带你……」' }
+        ]},
+        { key: 'style', num: 'Question 05', title: '画面什么调调？', why: '画面风格决定了视频好不好看！就像画画要选颜色一样，选一个你喜欢的风格，AI 就能画出最美的画面～', options: [
+            { emoji: '', label: '敦煌暖色', desc: '红、金、暖黄——敦煌壁画的颜色' },
+            { emoji: '', label: '国潮卡通', desc: 'Q 版、明亮、卡通可爱风' },
+            { emoji: '', label: '治愈水彩', desc: '轻软透明，像彩色水彩晕开' },
+            { emoji: '', label: '史诗大片', desc: '电影感、深色调、镜头感强' }
+        ]},
+        { key: 'rhythm', num: 'Question 06', title: '用什么节奏剪？', why: '节奏就像视频的"心跳"，快的让人兴奋，慢的让人感动。选一个你喜欢的节奏，视频看起来会更带感！', options: [
+            { emoji: '', label: '慢慢织', desc: '像真实织锦一样——治愈慢镜头' },
+            { emoji: '', label: '一镜到底', desc: '不切镜头，跟着主角走到底' },
+            { emoji: '', label: '倒叙揭秘', desc: '先出成片，再倒回去讲工艺' },
+            { emoji: '', label: '跟着织机节拍', desc: '配合织机咔哒声踩点剪辑' }
+        ]},
+        { key: 'mood', num: 'Question 07', title: '想让观众看完什么心情？', why: '一个好的视频会让看的人心里暖暖的。你想让大家看完后是什么感觉？选一个，AI 帮你实现～', options: [
+            { emoji: '', label: '震撼', desc: '让人张大嘴巴「哇塞」' },
+            { emoji: '', label: '感动', desc: '让人想哭、想鼓掌' },
+            { emoji: '', label: '好奇', desc: '让人想问「为什么」' },
+            { emoji: '', label: '开心', desc: '让人看完笑出来' }
+        ]},
+        { key: 'name', num: 'Question 08', title: '给你的主角起个名字', why: '有了名字，主角就有了灵魂！你可以自己取一个喜欢的名字～', type: 'name' }
+    ];
+    var nameSuggestions = [];
+    var currentStep = 0;
+    var answers = {};
+    var totalSteps = questions.length + 1;
+    var remainCount = 1;
+
+    function goBack() { window.location.href = '我的.html'; }
+
+    var createTab = 'video';
+
+    function switchCreateTab(tab) {
+        createTab = tab;
+        var tabs = document.querySelectorAll('.cp-tab');
+        for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('active');
+        tabs[tab === 'video' ? 0 : 1].classList.add('active');
+        if (tab === 'game') {
+            closeCreate();
+            alert('🎮 游戏创作功能即将上线，敬请期待！');
+        }
+    }
+
+    function renderRemainBanner() {
+        var tabs = document.querySelector('.cp-tabs');
+        var existBanner = document.getElementById('remainBanner');
+        if (existBanner) existBanner.remove();
+        if (!tabs) return;
+        var banner = document.createElement('div');
+        banner.id = 'remainBanner';
+        if (remainCount <= 0) {
+            banner.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:#FFF3E0;font-size:12px;color:#E65100;flex-shrink:0;';
+            banner.innerHTML = '<span>⛔ 视频创作剩余0次</span>'
+                + '<a href="购买次数.html" style="padding:4px 12px;background:#FF9500;color:#fff;border-radius:16px;text-decoration:none;font-size:12px;font-weight:600;">立即购买</a>';
+        } else {
+            banner.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:#E8F5E9;font-size:12px;color:#2E7D32;flex-shrink:0;';
+            banner.innerHTML = '<span>🎬 视频创作剩余<strong>' + remainCount + '</strong>次</span>'
+                + '<a href="购买次数.html" style="padding:4px 12px;background:#0669FF;color:#fff;border-radius:16px;text-decoration:none;font-size:12px;font-weight:600;">购买</a>';
+        }
+        tabs.parentNode.insertBefore(banner, tabs.nextSibling);
+    }
+
+    function openCreate() {
+        currentStep = 0;
+        createTab = 'video';
+        var tabs = document.querySelectorAll('.cp-tab');
+        for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('active');
+        tabs[0].classList.add('active');
+        document.getElementById('createOverlay').classList.add('show');
+        document.getElementById('createPopup').classList.add('show');
+        document.body.style.overflow = 'hidden';
+        renderRemainBanner();
+        renderStep();
+    }
+    function closeCreate() {
+        document.getElementById('createOverlay').classList.remove('show');
+        document.getElementById('createPopup').classList.remove('show');
+        document.body.style.overflow = '';
+    }
+    function delWork(idx) { if(confirm('确定删除？')) alert('已删除'); }
+
+    function getPromptText() {
+        var gender = questions[0].options[answers['gender']].label;
+        var age = questions[1].options[answers['age']].label;
+        var scene = questions[2].options[answers['scene']].label;
+        var hook = questions[3].options[answers['hook']].label;
+        var style = questions[4].options[answers['style']].label;
+        var rhythm = questions[5].options[answers['rhythm']].label;
+        var mood = questions[6].options[answers['mood']].label;
+        var name = answers['name'] || '小主角';
+        return '创作一个15秒竖屏AI视频。主角是' + age + '的' + gender + '，名叫' + name + '。'
+            + '场景设定在' + scene + '。'
+            + '开场方式：' + hook + '。'
+            + '视觉风格：' + style + '。'
+            + '剪辑节奏：' + rhythm + '。'
+            + '情绪基调：' + mood + '。'
+            + '配古风BGM。';
+    }
+
+    var DEMO_PROMPT = '创作一个15秒竖屏AI视频。主角是8-10岁的小女生，名叫锦宝。场景设定在花楼木织机工坊。开场方式：一个小惊喜——突然蹦出一只可爱的织锦小精灵。视觉风格：国潮卡通——Q版明亮卡通可爱风。剪辑节奏：一镜到底——不切镜头跟着主角走到底。情绪基调：好奇——让人想问「为什么」。配古风BGM。';
+
+    function renderStep() {
+        var total = questions.length;
+        var isPromptStep = currentStep === total;
+        var progressTotal = total + 1;
+
+        // 次数不足时直接显示购买提示
+        if (remainCount <= 0 && !isPromptStep) {
+            document.getElementById('progressBar').innerHTML = '';
+            var body = document.getElementById('questionBody');
+            body.innerHTML = '<div style="text-align:center;padding:30px 10px;">'
+                + '<div style="font-size:48px;margin-bottom:16px;">⛔</div>'
+                + '<div style="font-size:18px;font-weight:700;color:#333;margin-bottom:8px;">生成次数已用完</div>'
+                + '<div style="font-size:13px;color:#999;margin-bottom:20px;line-height:1.6;">您当前的 AI 视频生成次数已用完，<br>购买后即可继续创作精彩视频</div>'
+                + '<a href="购买次数.html" style="display:inline-block;padding:12px 40px;background:linear-gradient(135deg,#FF9500,#FF6B00);color:#fff;border-radius:25px;text-decoration:none;font-size:16px;font-weight:600;box-shadow:0 4px 16px rgba(255,149,0,0.3);">🔥 立即购买次数</a>'
+                + '</div>';
+            document.getElementById('actionBar').innerHTML = '';
+            return;
+        }
+
+        // Progress
+        var progressHtml = '';
+        for (var i = 0; i < progressTotal; i++) {
+            var cls = i < currentStep ? 'done' : (i === currentStep ? 'active' : '');
+            progressHtml += '<div class="cp-dot ' + cls + '"></div>';
+        }
+        progressHtml += '<span class="cp-count">' + (currentStep + 1) + '/' + progressTotal + '</span>';
+        document.getElementById('progressBar').innerHTML = progressHtml;
+
+        var body = document.getElementById('questionBody');
+        var actions = document.getElementById('actionBar');
+
+        // Prompt预览页
+        if (isPromptStep) {
+            var prompt = getPromptText();
+            body.innerHTML = '<div style="padding:4px 0;">'
+                + '<div class="cp-q-title" style="font-size:16px;margin-bottom:12px;">我的 Prompt</div>'
+                + '<div style="font-size:13px;color:#666;margin-bottom:10px;">以下是 AI 根据你的选择生成的视频创作指令，你可以直接使用或修改：</div>'
+                + '<textarea class="cp-prompt-textarea" id="promptPreview">' + DEMO_PROMPT + '</textarea>'
+                + '<div class="cp-ref-wrap">'
+                + '<div class="cp-ref-label">📷 参考图（可选，上传1张作为视频画面参考）</div>'
+                + '<div class="cp-ref-upload">'
+                + '<div class="cp-ref-preview" id="refPreview" style="display:none;"><img id="refImage" src=""><button class="cp-ref-del" onclick="removeRefImage()">✕</button></div>'
+                + '<label class="cp-ref-btn" id="refUploadBtn" for="refFileInput">📤 上传参考图</label>'
+                + '<input type="file" id="refFileInput" accept="image/*" onchange="handleRefUpload(event)">'
+                + '<span class="cp-ref-hint">支持 JPG/PNG</span>'
+                + '</div>'
+                + '</div>'
+                + '</div>';
+            actions.innerHTML = ''
+                + '<button class="cp-prev" onclick="prevStep()">← 重新选</button>'
+                + '<button class="cp-next" onclick="generateVideo()">✅ 确认 Prompt</button>';
+            return;
+        }
+
+        var q = questions[currentStep];
+        var isLast = currentStep === total - 1;
+        var isName = q.type === 'name';
+
+        if (isName) {
+            var val = answers[q.key] || '';
+            body.innerHTML = '<div class="cp-q-num">' + q.num + '</div>'
+                + '<div class="cp-q-title">' + q.title + '</div>'
+                + '<div class="cp-q-why">' + q.why + '</div>'
+                + '<input class="cp-name-input" id="nameInput" value="' + val + '" placeholder="输入主角名字" maxlength="10" oninput="onNameInput()" onblur="onNameBlur()">';
+        } else {
+            var optsHtml = '<div class="cp-q-num">' + q.num + '</div>'
+                + '<div class="cp-q-title">' + q.title + '</div>'
+                + '<div class="cp-q-why">' + q.why + '</div>'
+                + '<div class="cp-q-options">';
+            for (var o = 0; o < q.options.length; o++) {
+                var opt = q.options[o];
+                var sel = answers[q.key] === o ? ' selected' : '';
+                optsHtml += '<div class="cp-option' + sel + '" onclick="selectOption(' + currentStep + ',' + o + ')">'
+                    + '<span class="cp-opt-emoji">' + opt.emoji + '</span>'
+                    + '<div class="cp-opt-text">'
+                    + '<div class="cp-opt-label">' + opt.label + '</div>'
+                    + '<div class="cp-opt-desc">' + opt.desc + '</div>'
+                    + '</div>'
+                    + '<div class="cp-opt-radio"></div>'
+                    + '</div>';
+            }
+            optsHtml += '</div>';
+            body.innerHTML = optsHtml;
+        }
+
+        // Actions
+        var hasAnswer = isName ? (answers[q.key] && answers[q.key].trim()) : (answers[q.key] !== undefined);
+        var actions = document.getElementById('actionBar');
+        actions.innerHTML = ''
+            + (currentStep > 0 ? '<button class="cp-prev" onclick="prevStep()">← 上一题</button>' : '<button class="cp-prev" style="visibility:hidden">← 上一题</button>')
+            + (isLast
+                ? '<button class="cp-next" ' + (hasAnswer ? '' : 'disabled') + ' onclick="submitAll()">生成我的 Prompt</button>'
+                : '<button class="cp-next" ' + (hasAnswer ? '' : 'disabled') + ' onclick="nextStep()">下一题 →</button>');
+    }
+
+    function selectOption(step, optIdx) {
+        var q = questions[step];
+        answers[q.key] = optIdx;
+        renderStep();
+    }
+
+    function onNameInput() {
+        var input = document.getElementById('nameInput');
+        answers['name'] = input.value;
+        renderStep();
+    }
+
+    function onNameBlur() {
+        var input = document.getElementById('nameInput');
+        answers['name'] = input.value;
+        renderStep();
+    }
+
+    function nextStep() {
+        var total = questions.length;
+        if (currentStep < total - 1) {
+            currentStep++;
+            renderStep();
+        } else {
+            // 最后一题 -> 进入prompt预览页
+            currentStep = total;
+            renderStep();
+        }
+    }
+
+    function prevStep() {
+        if (currentStep > 0) {
+            currentStep--;
+            renderStep();
+        }
+    }
+
+    function submitAll() {
+        // 检查所有题目是否已答
+        for (var i = 0; i < questions.length; i++) {
+            var q = questions[i];
+            if (q.type === 'name') {
+                if (!answers[q.key] || !answers[q.key].trim()) {
+                    currentStep = i;
+                    renderStep();
+                    alert('请给主角起个名字');
+                    return;
+                }
+            } else {
+                if (answers[q.key] === undefined) {
+                    currentStep = i;
+                    renderStep();
+                    return;
+                }
+            }
+        }
+        // 进入prompt预览页
+        currentStep = questions.length;
+        renderStep();
+    }
+
+    var refImageData = null;
+
+    function handleRefUpload(e) {
+        var file = e.target.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function(ev) {
+            refImageData = ev.target.result;
+            var preview = document.getElementById('refPreview');
+            var img = document.getElementById('refImage');
+            preview.style.display = 'block';
+            img.src = refImageData;
+            document.getElementById('refUploadBtn').textContent = '📤 重新上传';
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function removeRefImage() {
+        refImageData = null;
+        document.getElementById('refPreview').style.display = 'none';
+        document.getElementById('refImage').src = '';
+        document.getElementById('refUploadBtn').textContent = '📤 上传参考图';
+        document.getElementById('refFileInput').value = '';
+    }
+
+    function generateVideo() {
+        document.getElementById('titleOverlay').classList.add('show');
+    }
+
+    function closeTitlePopup() {
+        document.getElementById('titleOverlay').classList.remove('show');
+    }
+
+    function confirmGenerate() {
+        var title = document.getElementById('videoTitleInput').value.trim();
+        if (!title) { alert('请输入视频标题'); return; }
+        var prompt = document.getElementById('promptPreview').value;
+        remainCount = Math.max(0, remainCount - 1);
+        closeCreate();
+        closeTitlePopup();
+        alert('✅ 已提交AI创作\n\n标题：' + title + '\n\n提示词：\n' + prompt);
+    }
+</script>
+</html>

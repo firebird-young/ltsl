@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>研学手记配置</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            color: #333;
+        }
+        .page-wrap {
+            display: flex;
+            gap: 24px;
+            padding: 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+            align-items: flex-start;
+        }
+        .left-col { flex: 1; min-width: 0; }
+        .right-col { width: 380px; flex-shrink: 0; }
+        .modal {
+            width: 100%;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+            overflow: hidden;
+        }
+
+        /* ===== 功能说明 ===== */
+        .doc-panel {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+            padding: 20px 22px;
+            position: sticky;
+            top: 24px;
+            font-size: 13px;
+            line-height: 1.8;
+            color: #555;
+        }
+        .doc-panel .doc-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1F3864;
+            border-bottom: 2px solid #2E75B6;
+            padding-bottom: 8px;
+            margin-bottom: 14px;
+        }
+        .doc-panel h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2E75B6;
+            margin: 14px 0 6px;
+        }
+        .doc-panel ul { padding-left: 18px; margin: 4px 0 8px; }
+        .doc-panel li { margin-bottom: 3px; font-size: 13px; color: #555; }
+        .doc-panel .doc-note {
+            font-size: 12px; color: #bbb; margin-top: 8px; padding-top: 8px; border-top: 1px solid #f0f0f0;
+        }
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 28px;
+            border-bottom: 1px solid #f0f0f0;
+            background: #fafbff;
+        }
+        .modal-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .modal-header .close-btn {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: #f0f0f0;
+            font-size: 20px;
+            color: #999;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .modal-header .close-btn:hover { background: #e0e0e0; color: #333; }
+        .modal-body {
+            padding: 28px;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+        }
+
+        /* ===== 板块 ===== */
+        .section {
+            margin-bottom: 32px;
+        }
+        .section:last-child { margin-bottom: 0; }
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+            border-bottom: 2px solid #0669FF;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-title .icon { font-size: 18px; }
+
+        /* ===== 分类卡片 ===== */
+        .category-card {
+            background: #f8f9fc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid #eef0f5;
+        }
+        .category-card:last-child { margin-bottom: 0; }
+        .category-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .category-title .badge {
+            font-size: 11px;
+            background: #0669FF;
+            color: #fff;
+            padding: 1px 8px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+
+        /* ===== 配置行 ===== */
+        .config-row {
+            margin-bottom: 14px;
+        }
+        .config-row:last-child { margin-bottom: 0; }
+        .config-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        /* ===== 比例选项 ===== */
+        .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .radio-group label {
+            padding: 5px 14px;
+            border-radius: 6px;
+            border: 1px solid #d9d9d9;
+            background: #fff;
+            font-size: 13px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .radio-group input[type="radio"] { display: none; }
+        .radio-group input[type="radio"]:checked + label {
+            border-color: #0669FF;
+            background: #E8F0FE;
+            color: #0669FF;
+            font-weight: 500;
+        }
+        .radio-group label:hover { border-color: #0669FF; }
+
+        /* ===== 输入框 ===== */
+        .text-input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #d9d9d9;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #333;
+            outline: none;
+            transition: border-color 0.2s;
+            font-family: inherit;
+            resize: vertical;
+        }
+        .text-input:focus {
+            border-color: #0669FF;
+            box-shadow: 0 0 0 2px rgba(6,105,255,0.08);
+        }
+        textarea.text-input {
+            min-height: 80px;
+            line-height: 1.6;
+        }
+
+        /* ===== 非必填标识 ===== */
+        .optional { font-size: 11px; color: #bbb; font-weight: 400; margin-left: 4px; }
+
+        /* ===== 滑动条 ===== */
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .slider-row input[type="range"] {
+            flex: 1;
+            height: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #d9d9d9;
+            border-radius: 2px;
+            outline: none;
+        }
+        .slider-row input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #0669FF;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+        }
+        .slider-row input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #0669FF;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+        }
+        .slider-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: #0669FF;
+            min-width: 36px;
+            text-align: center;
+        }
+        
+        /* ===== 数字输入 ===== */
+        .number-input {
+            width: 100px;
+            height: 34px;
+            padding: 0 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #333;
+            outline: none;
+            text-align: center;
+            transition: border-color 0.2s;
+        }
+        .number-input:focus { border-color: #0669FF; }
+        .number-input::-webkit-inner-spin-button { opacity: 1; }
+
+        /* ===== 开关 ===== */
+        .switch-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        .switch-row .sw-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .switch-row .sw-label .sw-desc {
+            font-size: 11px;
+            color: #bbb;
+            font-weight: 400;
+        }
+        .switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+        .switch input { display: none; }
+        .switch .slider {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #d0d5e0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.25s;
+        }
+        .switch .slider::after {
+            content: '';
+            position: absolute;
+            top: 2px; left: 2px;
+            width: 20px; height: 20px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+            transition: transform 0.25s;
+        }
+        .switch input:checked + .slider { background: #07C160; }
+        .switch input:checked + .slider::after { transform: translateX(20px); }
+        #sectionAI, #sectionCourse { display: none; }
+        .switch-sub {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #666;
+        }
+        .switch-sub .switch { width: 36px; height: 20px; }
+        .switch-sub .switch .slider::after { width: 16px; height: 16px; }
+        .switch-sub .switch input:checked + .slider::after { transform: translateX(16px); }
+
+        /* ===== 多选下拉 ===== */
+        .multi-select-wrap {
+            position: relative;
+            width: 100%;
+        }
+        .ms-trigger {
+            width: 100%;
+            height: 42px;
+            padding: 0 38px 0 14px;
+            border: 1px solid #d9d9d9;
+            border-radius: 8px;
+            background: #fff;
+            font-size: 13px;
+            color: #333;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .ms-trigger:focus { border-color: #0669FF; box-shadow: 0 0 0 2px rgba(6,105,255,0.08); }
+        .ms-trigger::placeholder { color: #bbb; }
+        .multi-select-wrap { position: relative; }
+        .ms-arrow-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 10px;
+            color: #bbb;
+            pointer-events: none;
+        }
+        .ms-dropdown {
+            display: none;
+            position: absolute;
+            top: 44px;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border: 1px solid #d9d9d9;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            z-index: 100;
+            max-height: 220px;
+            overflow-y: auto;
+        }
+        .ms-dropdown.show { display: block; }
+        .ms-option {
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #333;
+            transition: background 0.15s;
+        }
+        .ms-option:hover { background: #F5F8FF; }
+        .ms-option .ms-check {
+            width: 18px; height: 18px;
+            border-radius: 4px;
+            border: 1px solid #d0d5e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.15s;
+            font-size: 12px;
+            color: #fff;
+        }
+        .ms-option.checked .ms-check {
+            background: #0669FF;
+            border-color: #0669FF;
+        }
+        .ms-option .ms-cname { flex: 1; }
+        .ms-search {
+            width: 100%;
+            padding: 8px 12px;
+            border: none;
+            border-bottom: 1px solid #eef0f5;
+            font-size: 13px;
+            outline: none;
+            color: #333;
+            background: #fafafa;
+        }
+        .ms-search:focus { background: #fff; }
+        .ms-search::placeholder { color: #bbb; }
+
+        /* ===== 视频内容问题配置浮层 ===== */
+        .qconfig-overlay {
+            display: none; position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4); z-index: 9999;
+            align-items: center; justify-content: center; padding: 20px;
+        }
+        .qconfig-overlay.show { display: flex; }
+        .qconfig-popup {
+            background: #fff; border-radius: 18px;
+            width: 100%; max-width: 600px; max-height: 85vh;
+            overflow: hidden; display: flex; flex-direction: column;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+        }
+        .qconfig-popup .qcp-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 18px 24px; border-bottom: 1px solid #f0f0f0; flex-shrink: 0;
+        }
+        .qconfig-popup .qcp-title { font-size: 16px; font-weight: 600; color: #333; }
+        .qconfig-popup .qcp-close {
+            width: 28px; height: 28px; border-radius: 50%; border: none;
+            background: #f5f5f5; color: #999; font-size: 14px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .qconfig-popup .qcp-body { flex: 1; overflow-y: auto; padding: 20px 24px; }
+        .qconfig-popup .qcp-body::-webkit-scrollbar { width: 5px; }
+        .qconfig-popup .qcp-body::-webkit-scrollbar-thumb { background: #d0d5e0; border-radius: 3px; }
+        .qconfig-popup .qcp-footer {
+            padding: 16px 24px; border-top: 1px solid #f0f0f0;
+            display: flex; justify-content: flex-end; gap: 10px; flex-shrink: 0;
+        }
+        .qconfig-popup .qcp-footer .btn {
+            padding: 10px 28px; border-radius: 8px; font-size: 14px;
+            cursor: pointer; border: none; font-weight: 500; font-family: inherit;
+        }
+        .qconfig-popup .qcp-footer .btn-cancel { background: #f5f5f5; color: #666; }
+        .qconfig-popup .qcp-footer .btn-save { background: #0669FF; color: #fff; }
+
+        .qconfig-popup .question-card {
+            background: #f8f9fc; border: 1px solid #eef0f5; border-radius: 12px;
+            padding: 16px 18px; margin-bottom: 12px; position: relative;
+        }
+        .qconfig-popup .question-card .qc-header {
+            display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
+        }
+        .qconfig-popup .question-card .qc-header .qc-num { font-size: 12px; color: #0669FF; font-weight: 600; }
+        .qconfig-popup .question-card .qc-header .qc-actions { display: flex; gap: 6px; }
+        .qconfig-popup .question-card .qc-header .qc-actions button {
+            width: 26px; height: 26px; border-radius: 50%; border: none;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 12px; transition: all 0.2s;
+        }
+        .qconfig-popup .question-card .qc-move { background: #f0f0f0; color: #999; }
+        .qconfig-popup .question-card .qc-move:hover { background: #E8F0FE; color: #0669FF; }
+        .qconfig-popup .question-card .qc-del { background: #FFF0F0; color: #ff3b30; }
+        .qconfig-popup .question-card .qc-del:hover { background: #ff3b30; color: #fff; }
+        .qconfig-popup .question-card .qc-field { margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .qconfig-popup .question-card .qc-field .qc-label { font-size: 12px; color: #888; min-width: 60px; flex-shrink: 0; }
+        .qconfig-popup .question-card .qc-field input[type="text"] { flex: 1; height: 32px; padding: 0 10px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 13px; color: #333; outline: none; font-family: inherit; }
+        .qconfig-popup .question-card .qc-field input[type="text"]:focus { border-color: #0669FF; }
+        .qconfig-popup .question-card .qc-field textarea { flex: 1; height: 32px; padding: 5px 10px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 12px; color: #666; outline: none; font-family: inherit; resize: none; }
+        .qconfig-popup .question-card .qc-field textarea:focus { border-color: #0669FF; }
+        .qconfig-popup .question-card .qc-type-toggle { display: flex; gap: 8px; margin-bottom: 10px; }
+        .qconfig-popup .question-card .qc-type-toggle button {
+            padding: 3px 12px; border: 1px solid #e0e0e0; border-radius: 4px;
+            font-size: 11px; color: #666; cursor: pointer; background: #fff; transition: all 0.2s;
+        }
+        .qconfig-popup .question-card .qc-type-toggle button.active { background: #0669FF; color: #fff; border-color: #0669FF; }
+        .qconfig-popup .question-card .qc-options { padding-left: 68px; }
+        .qconfig-popup .question-card .qc-option { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+        .qconfig-popup .question-card .qc-option input[type="text"] { flex: 1; height: 30px; padding: 0 10px; border: 1px solid #e8e8e8; border-radius: 6px; font-size: 12px; color: #333; outline: none; font-family: inherit; }
+        .qconfig-popup .question-card .qc-option input[type="text"]:focus { border-color: #0669FF; }
+        .qconfig-popup .question-card .qc-option .qc-opt-del { width: 20px; height: 20px; border-radius: 50%; border: none; background: #f5f5f5; color: #ccc; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .qconfig-popup .question-card .qc-option .qc-opt-del:hover { background: #FFF0F0; color: #ff3b30; }
+        .qconfig-popup .question-card .qc-add-opt { margin-top: 4px; padding-left: 68px; }
+        .qconfig-popup .question-card .qc-add-opt button { padding: 4px 12px; border: 1px dashed #d9d9d9; border-radius: 6px; background: #fff; font-size: 12px; color: #0669FF; cursor: pointer; transition: all 0.2s; }
+        .qconfig-popup .question-card .qc-add-opt button:hover { border-color: #0669FF; background: #E8F0FE; }
+        .qconfig-popup .add-question-btn { width: 100%; height: 42px; border: 1px dashed #d9d9d9; border-radius: 12px; background: transparent; font-size: 13px; color: #0669FF; cursor: pointer; font-weight: 500; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; font-family: inherit; }
+        .qconfig-popup .add-question-btn:hover { background: #E8F0FE; border-color: #0669FF; }
+
+        /* ===== 底部按钮 ===== */
+        .modal-footer {
+            padding: 16px 28px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            background: #fafbff;
+        }
+        .modal-footer .btn {
+            padding: 10px 28px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .modal-footer .btn-cancel {
+            background: #f5f5f5;
+            color: #666;
+            border: 1px solid #d9d9d9;
+        }
+        .modal-footer .btn-cancel:hover { background: #eee; }
+        .modal-footer .btn-save {
+            background: #0669FF;
+            color: #fff;
+        }
+        .modal-footer .btn-save:hover { background: #0052CC; }
+        .modal-footer .btn-save:active { background: #0040A0; }
+
+        /* ===== 滚动条 ===== */
+        .modal-body::-webkit-scrollbar { width: 6px; }
+        .modal-body::-webkit-scrollbar-track { background: transparent; }
+        .modal-body::-webkit-scrollbar-thumb { background: #d0d5e0; border-radius: 3px; }
+        .modal-body::-webkit-scrollbar-thumb:hover { background: #b0b8c8; }
+
+        @media (max-width: 640px) {
+            body { padding: 16px; align-items: stretch; }
+            .modal { border-radius: 12px; }
+            .modal-header { padding: 16px 20px; }
+            .modal-body { padding: 20px; }
+            .modal-footer { padding: 14px 20px; }
+            .radio-group label { padding: 4px 10px; font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+<div class="page-wrap">
+    <div class="left-col">
+    <div class="modal">
+        <!-- 头部 -->
+        <div class="modal-header">
+            <h2>📝 研学手记配置 v2</h2>
+            <button class="close-btn" onclick="closeModal()">✕</button>
+        </div>
+
+        <!-- 主体 -->
+        <div class="modal-body">
+            <!-- ====== 总开关 ====== -->
+            <div class="switch-row">
+                <span class="sw-label">🔘 研学手记配置 <span class="sw-desc">总开关</span></span>
+                <label class="switch">
+                    <input type="checkbox" id="masterSwitch" onchange="onMasterToggle()">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <!-- ====== 第一板块：AI研学创作工坊 ====== -->
+            <div class="section" id="sectionAI">
+                <div class="section-title">
+                    <span class="icon">🤖</span>
+                    AI研学创作工坊
+                </div>
+
+                <!-- 分类一：AI视频创作 -->
+                <div class="category-card" id="videoSection">
+                    <div class="category-title" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0;">
+                        <span>🎬 AI视频创作 <span class="badge">视频</span></span>
+                        <label class="switch-sub">
+                            <label class="switch">
+                                <input type="checkbox" id="videoSwitch" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </label>
+                    </div>
+                    <div style="margin-top:16px;" id="videoContent">
+
+                    <!-- 比例 -->
+                    <div class="config-row">
+                        <span class="config-label">比例</span>
+                        <div class="radio-group" id="ratioGroup">
+                            <input type="radio" name="ratio" id="ratio0" value="不限" checked>
+                            <label for="ratio0">不限</label>
+                            <input type="radio" name="ratio" id="ratio1" value="1:1">
+                            <label for="ratio1">1:1</label>
+                            <input type="radio" name="ratio" id="ratio2" value="3:4">
+                            <label for="ratio2">3:4</label>
+                            <input type="radio" name="ratio" id="ratio3" value="4:3">
+                            <label for="ratio3">4:3</label>
+                            <input type="radio" name="ratio" id="ratio4" value="9:16">
+                            <label for="ratio4">9:16</label>
+                            <input type="radio" name="ratio" id="ratio5" value="16:9">
+                            <label for="ratio5">16:9</label>
+                            <input type="radio" name="ratio" id="ratio6" value="21:9">
+                            <label for="ratio6">21:9</label>
+                        </div>
+                    </div>
+
+                    <!-- 视频 Prompt（改1：主题Prompt → 视频Prompt） -->
+                    <div class="config-row">
+                        <span class="config-label">视频 Prompt <span class="optional">（选填）</span></span>
+                        <textarea class="text-input" id="videoPrompt" placeholder="请帮我生成一段15s的视频创作脚本，视频内容元素包含："></textarea>
+                    </div>
+
+                    <!-- 分辨率 -->
+                    <div class="config-row">
+                        <span class="config-label">分辨率</span>
+                        <div class="radio-group" id="resolutionGroup">
+                            <input type="radio" name="resolution" id="res0" value="480p" checked>
+                            <label for="res0">480p</label>
+                            <input type="radio" name="resolution" id="res1" value="720p">
+                            <label for="res1">720p</label>
+                            <input type="radio" name="resolution" id="res2" value="1080p">
+                            <label for="res2">1080p</label>
+                        </div>
+                    </div>
+
+                    <!-- 视频时长 -->
+                    <div class="config-row">
+                        <span class="config-label">视频时长</span>
+                        <div class="slider-row">
+                            <input type="range" id="videoDuration" min="2" max="15" value="5" step="1" oninput="document.getElementById('durationDisplay').textContent=this.value+'s'">
+                            <span class="slider-value" id="durationDisplay">5s</span>
+                        </div>
+                    </div>
+
+                    <!-- 免费次数 -->
+                    <div class="config-row">
+                        <span class="config-label">每个成员免费次数</span>
+                        <input type="number" class="number-input" id="videoFreeCount" value="3" min="0" placeholder="0">
+                    </div>
+
+                    <!-- 视频内容问题配置（新增） -->
+                    <div class="config-row" style="margin-top:20px;padding-top:16px;border-top:1px solid #eef0f5;">
+                        <span class="config-label">视频内容问题配置</span>
+                        <div style="font-size:12px;color:#999;margin-bottom:10px;">配置 AI 创作弹窗中的问卷题目，让用户选择后生成精准的 Prompt</div>
+                        <button onclick="openQConfig()" style="height:36px;padding:0 20px;border:1px dashed #0669FF;border-radius:8px;background:#fff;color:#0669FF;font-size:13px;cursor:pointer;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.background='#E8F0FE'" onmouseout="this.style.background='#fff'">✏️ 编辑问题配置</button>
+                    </div>
+                </div>
+                </div>
+
+                <!-- 分类二：AI游戏创作 -->
+                <div class="category-card" id="gameSection">
+                    <div class="category-title" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0;">
+                        <span>🎮 AI游戏创作 <span class="badge">游戏</span></span>
+                        <label class="switch-sub">
+                            <label class="switch">
+                                <input type="checkbox" id="gameSwitch" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </label>
+                    </div>
+                    <div style="margin-top:16px;" id="gameContent">
+
+                    <!-- 免费次数 -->
+                    <div class="config-row">
+                        <span class="config-label">每个成员免费次数</span>
+                        <input type="number" class="number-input" id="gameFreeCount" value="3" min="0" placeholder="0">
+                    </div>
+
+                    <!-- prompt -->
+                    <div class="config-row">
+                        <span class="config-label">主题 Prompt <span class="optional">（选填）</span></span>
+                        <textarea class="text-input" id="gamePrompt" placeholder="请输入游戏创作主题描述，例如：&#10;设计一款关于杜甫草堂的搭建游戏，玩家通过拖拽木材、茅草等材料完成茅屋搭建，学习唐代建筑知识..."></textarea>
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            <!-- ====== 第二板块：研学课程推荐 ====== -->
+            <div class="section" id="sectionCourse">
+                <div class="section-title">
+                    <span class="icon">📚</span>
+                    研学课程推荐
+                </div>
+                <div class="category-card">
+                    <div class="config-row" style="margin-bottom:0;">
+                        <span class="config-label">推荐课程 <span class="optional">（可多选）</span></span>
+                        <div class="multi-select-wrap">
+                            <input type="text" class="ms-trigger" id="msSearch" placeholder="搜索或选择推荐课程..." onfocus="openDropdown()" oninput="onSearchInput()" onkeydown="onSearchKeydown(event)">
+                            <span class="ms-arrow-icon">▼</span>
+                            <div class="ms-dropdown" id="msDropdown">
+                                <div id="msOptionList"></div>
+                            </div>
+                        </div>
+                        <div class="tag-container" id="selectedCourses" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:8px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部 -->
+        <div class="modal-footer">
+            <button class="btn btn-cancel" onclick="closeModal()">取消</button>
+            <button class="btn btn-save" onclick="saveConfig()">💾 保存配置</button>
+        </div>
+    </div>
+    </div>
+
+    <!-- 功能说明 -->
+    <div class="right-col">
+        <div class="doc-panel">
+            <div class="doc-title">研学手记配置 v2 - 功能说明</div>
+
+            <h3>总开关</h3>
+            <ul>
+                <li>页面顶部「研学手记配置」总开关，关闭后下方 AI 创作工坊和课程推荐区域全部隐藏/淡化。</li>
+                <li>默认不开启。</li>
+            </ul>
+
+            <h3>AI 研学创作工坊</h3>
+
+            <p style="font-weight:600;color:#333;margin:6px 0 2px;">AI 视频创作</p>
+            <ul>
+                <li>独立开关控制启停。</li>
+                <li><strong>比例</strong>：不限/1:1/3:4/4:3/9:16/16:9/21:9。根据视频接口参数配置在字典里。</li>
+                <li><strong>视频 Prompt</strong>：选填，视频创作描述，默认填入视频脚本模板。</li>
+                <li><strong>视频内容问题配置</strong>：点击编辑按钮打开浮层，配置AI创作弹窗中的问卷题目，支持增删改排序，选择题/输入题切换。</li>
+                <li><strong>分辨率</strong>：480p/720p/1080p，字典配置。</li>
+                <li><strong>视频时长</strong>：2s~15s 滑块调节，字典配置。</li>
+                <li><strong>免费次数</strong>：设置每位用户免费生成次数。</li>
+            </ul>
+
+            <p style="font-weight:600;color:#333;margin:8px 0 2px;">AI 游戏创作</p>
+            <ul>
+                <li>独立开关控制启停。</li>
+                <li><strong>免费次数</strong>：设置每位用户免费生成次数。</li>
+                <li><strong>主题 Prompt</strong>：选填，游戏创作描述。</li>
+            </ul>
+
+            <h3>研学课程推荐</h3>
+            <ul>
+                <li>多选推荐课程列表，支持搜索筛选和自定义输入。</li>
+            </ul>
+
+            <div class="doc-note">所有配置（含开关状态、问题配置、推荐课程）保存至本地存储。</div>
+
+            <!-- ===== 迭代记录 ===== -->
+            <div style="margin-top:24px;padding-top:20px;border-top:2px solid #E53935;">
+                <div style="font-size:15px;font-weight:700;color:#E53935;margin-bottom:12px;">2026.7.7 迭代 - AI创作优化</div>
+                <ol style="padding-left:20px;margin:4px 0 8px;">
+                    <li style="margin-bottom:6px;font-size:13px;color:#555;"><strong>视频 Prompt 调整</strong>：主题 Prompt 改为视频 Prompt（选填），默认填入视频脚本模板</li>
+                    <li style="margin-bottom:6px;font-size:13px;color:#555;"><strong>移除快捷提示词</strong>：去掉视频和游戏创作中的快捷提示词配置</li>
+                    <li style="margin-bottom:6px;font-size:13px;color:#555;"><strong>视频内容问题配置</strong>：新增独立浮层，支持自定义 AI 创作问卷题目，可选选择题/输入题，支持增删改排序</li>
+                </ol>
+                <div style="margin-top:16px;">
+                    <div style="font-size:13px;font-weight:600;color:#333;margin-bottom:8px;">视频生成流程图</div>
+                    <img src="../视频生成流程图.png" style="width:100%;border-radius:8px;border:1px solid #e0e0e0;" alt="视频生成流程图">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== 视频内容问题配置浮层 ===== -->
+<div class="qconfig-overlay" id="qconfigOverlay" onclick="if(event.target===this)closeQConfig()">
+    <div class="qconfig-popup">
+        <div class="qcp-header">
+            <span class="qcp-title">📋 视频内容问题配置</span>
+            <button class="qcp-close" onclick="closeQConfig()">✕</button>
+        </div>
+        <div class="qcp-body" id="qconfigBody">
+            <div id="qconfigQuestionList"></div>
+            <button class="add-question-btn" onclick="addQConfigQuestion()">+ 新增题目</button>
+        </div>
+        <div class="qcp-footer">
+            <button class="btn btn-cancel" onclick="closeQConfig()">取消</button>
+            <button class="btn btn-save" onclick="saveQConfig()">💾 保存问题配置</button>
+        </div>
+    </div>
+</div>
+
+    <script>
+        // ===== 多选下拉 - 研学课程推荐 =====
+        var allCourses = [
+            '盆景美学·指尖山水', '春假托管班', '诗界无心·草堂寻心',
+            '杜甫和李白的故事', '搭建小茅屋', '快速搭建茅屋',
+            '唐代诗歌赏析', '盆景制作入门', '自然探索营',
+            '春假艺术工坊', '户外生存技能', '国画水墨体验'
+        ];
+        var selectedCourses = [];
+
+        function openDropdown() {
+            document.getElementById('msDropdown').classList.add('show');
+            renderOptions();
+        }
+
+        function onSearchInput() {
+            renderOptions();
+        }
+
+        function onSearchKeydown(e) {
+            e.stopPropagation();
+            if (e.key === 'Enter') {
+                var val = e.target.value.trim();
+                if (val && allCourses.indexOf(val) === -1 && selectedCourses.indexOf(val) === -1) {
+                    selectedCourses.push(val);
+                    renderOptions();
+                    renderSelectedTags();
+                    updatePlaceholder();
+                }
+            }
+        }
+
+        function renderOptions() {
+            var el = document.getElementById('msOptionList');
+            var searchInput = document.getElementById('msSearch');
+            var keyword = searchInput.value.trim().toLowerCase();
+            var html = '';
+            var filtered = [];
+            for (var i = 0; i < allCourses.length; i++) {
+                if (!keyword || allCourses[i].toLowerCase().includes(keyword)) {
+                    filtered.push({ index: i, name: allCourses[i] });
+                }
+            }
+            if (filtered.length === 0) {
+                el.innerHTML = '<div style="padding:16px;text-align:center;color:#bbb;font-size:13px;">未找到匹配课程</div>';
+                return;
+            }
+            for (var j = 0; j < filtered.length; j++) {
+                var item = filtered[j];
+                var checked = selectedCourses.indexOf(item.name) !== -1;
+                html += '<div class="ms-option' + (checked ? ' checked' : '') + '" onclick="toggleCourse(' + item.index + ')">';
+                html += '  <div class="ms-check">' + (checked ? '✓' : '') + '</div>';
+                html += '  <span class="ms-cname">' + item.name + '</span>';
+                html += '</div>';
+            }
+            el.innerHTML = html;
+        }
+
+        function toggleCourse(index) {
+            var c = allCourses[index];
+            var idx = selectedCourses.indexOf(c);
+            if (idx !== -1) {
+                selectedCourses.splice(idx, 1);
+            } else {
+                selectedCourses.push(c);
+            }
+            renderOptions();
+            renderSelectedTags();
+            updatePlaceholder();
+        }
+
+        function removeSelectedCourse(name) {
+            var idx = selectedCourses.indexOf(name);
+            if (idx !== -1) {
+                selectedCourses.splice(idx, 1);
+                renderOptions();
+                renderSelectedTags();
+                updatePlaceholder();
+            }
+        }
+
+        function renderSelectedTags() {
+            var el = document.getElementById('selectedCourses');
+            if (selectedCourses.length === 0) {
+                el.innerHTML = '';
+                return;
+            }
+            el.innerHTML = selectedCourses.map(function(n, i) {
+                return '<span class="tag" style="display:inline-flex;align-items:center;gap:4px;padding:4px 12px;background:#E8F0FE;color:#0669FF;border-radius:6px;font-size:12px;font-weight:500;cursor:default;">' + n + '<span class="del" style="cursor:pointer;font-size:14px;color:#0669FF;opacity:0.6;margin-left:2px;line-height:1;" onclick="removeSelectedCourse(\'' + n + '\')">×</span></span>';
+            }).join('');
+        }
+
+        function updatePlaceholder() {
+            var input = document.getElementById('msSearch');
+            if (selectedCourses.length > 0) {
+                input.placeholder = '已选 ' + selectedCourses.length + ' 门课程';
+            } else {
+                input.placeholder = '搜索或选择推荐课程...';
+            }
+        }
+
+        // 点击外部关闭下拉
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.multi-select-wrap')) {
+                document.getElementById('msDropdown').classList.remove('show');
+            }
+        });
+
+        // ===== 总开关逻辑 =====
+        function onMasterToggle() {
+            var on = document.getElementById('masterSwitch').checked;
+            document.getElementById('sectionAI').style.display = on ? 'block' : 'none';
+            document.getElementById('sectionCourse').style.display = on ? 'block' : 'none';
+        }
+
+        document.getElementById('masterSwitch').addEventListener('change', onMasterToggle);
+
+        // ===== 问题配置 =====
+        var questions = [
+            { title: '我是小男生还是小女生？', tip: '选了这个，AI 才知道视频里的小主角长什么样子', type: 'choice', options: ['小男生', '小女生'] },
+            { title: '我今年多大啦？', tip: '不同年龄的小朋友说话、走路都不一样', type: 'choice', options: ['6-7岁', '8-10岁', '11-14岁'] },
+            { title: '穿越到哪个时空？', tip: '选一个你喜欢的地方，AI 把视频背景设在那里', type: 'choice', options: ['花楼木织机工坊', '锦官城集市', '陵阳公梦境', '现代博物馆展厅'] },
+            { title: '视频第一秒给大家看到什么？', tip: '选一个有趣的开场，让看视频的人一下子被吸引住', type: 'choice', options: ['织机咔哒咔哒', '我问大家一个问题', '一个小惊喜', '我先打个招呼'] },
+            { title: '画面什么调调？', tip: '选一个你喜欢的风格，AI 画出最美的画面', type: 'choice', options: ['敦煌暖色', '国潮卡通', '治愈水彩', '史诗大片'] },
+            { title: '给你的主角起个名字', tip: '有了名字，主角就有了灵魂', type: 'input' }
+        ];
+
+        function openQConfig() {
+            document.getElementById('qconfigOverlay').classList.add('show');
+            document.body.style.overflow = 'hidden';
+            renderQConfigQuestions();
+        }
+
+        function closeQConfig() {
+            document.getElementById('qconfigOverlay').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        function renderQConfigQuestions() {
+            var list = document.getElementById('qconfigQuestionList');
+            var html = '';
+            for (var i = 0; i < questions.length; i++) {
+                var q = questions[i];
+                var isChoice = q.type === 'choice';
+                html += '<div class="question-card" data-idx="' + i + '">'
+                    + '<div class="qc-header">'
+                    + '<span class="qc-num">Q' + (i + 1).toString().padStart(2, '0') + '</span>'
+                    + '<div class="qc-actions">'
+                    + '<button class="qc-move" onclick="moveQConfigQ(' + i + ',-1)" title="上移">↑</button>'
+                    + '<button class="qc-move" onclick="moveQConfigQ(' + i + ',1)" title="下移">↓</button>'
+                    + '<button class="qc-del" onclick="delQConfigQ(' + i + ')" title="删除">✕</button>'
+                    + '</div></div>'
+                    + '<div class="qc-field"><span class="qc-label">题目</span><input type="text" value="' + q.title + '" onchange="questions[' + i + '].title=this.value"></div>'
+                    + '<div class="qc-field"><span class="qc-label">提示</span><textarea onchange="questions[' + i + '].tip=this.value">' + (q.tip || '') + '</textarea></div>'
+                    + '<div class="qc-type-toggle">'
+                    + '<button class="' + (isChoice ? 'active' : '') + '" onclick="setQConfigType(' + i + ',\'choice\')">选择题</button>'
+                    + '<button class="' + (!isChoice ? 'active' : '') + '" onclick="setQConfigType(' + i + ',\'input\')">输入题</button>'
+                    + '</div>';
+                if (isChoice) {
+                    html += '<div class="qc-options">';
+                    for (var j = 0; j < q.options.length; j++) {
+                        html += '<div class="qc-option">'
+                            + '<input type="text" value="' + q.options[j] + '" onchange="questions[' + i + '].options[' + j + ']=this.value">'
+                            + '<button class="qc-opt-del" onclick="delQConfigOpt(' + i + ',' + j + ')">✕</button>'
+                            + '</div>';
+                    }
+                    html += '</div>'
+                        + '<div class="qc-add-opt"><button onclick="addQConfigOpt(' + i + ')">+ 添加选项</button></div>';
+                }
+                html += '</div>';
+            }
+            list.innerHTML = html;
+        }
+
+        function addQConfigQuestion() {
+            questions.push({ title: '新问题', tip: '', type: 'choice', options: ['选项1', '选项2'] });
+            renderQConfigQuestions();
+        }
+
+        function delQConfigQ(idx) {
+            if (!confirm('确定删除该问题？')) return;
+            questions.splice(idx, 1);
+            renderQConfigQuestions();
+        }
+
+        function moveQConfigQ(idx, dir) {
+            var target = idx + dir;
+            if (target < 0 || target >= questions.length) return;
+            var tmp = questions[idx];
+            questions[idx] = questions[target];
+            questions[target] = tmp;
+            renderQConfigQuestions();
+        }
+
+        function setQConfigType(idx, type) {
+            questions[idx].type = type;
+            if (type === 'choice' && (!questions[idx].options || questions[idx].options.length < 2)) {
+                questions[idx].options = ['选项1', '选项2'];
+            }
+            renderQConfigQuestions();
+        }
+
+        function addQConfigOpt(idx) {
+            questions[idx].options.push('新选项' + (questions[idx].options.length + 1));
+            renderQConfigQuestions();
+        }
+
+        function delQConfigOpt(qIdx, optIdx) {
+            if (questions[qIdx].options.length <= 2) { alert('选择题至少需要2个选项'); return; }
+            questions[qIdx].options.splice(optIdx, 1);
+            renderQConfigQuestions();
+        }
+
+        function saveQConfig() {
+            alert('✅ 问题配置已保存，关闭浮层后请点击主页面「保存配置」完成整体保存');
+        }
+
+        // ===== 读取localStorage保存的配置 =====
+        function loadSavedConfig() {
+            var saved = localStorage.getItem('studyNoteConfigV2');
+            if (!saved) return;
+            try {
+                var cfg = JSON.parse(saved);
+                if (cfg.questions && cfg.questions.length > 0) questions = cfg.questions;
+                if (cfg.ratio) {
+                    var r = document.querySelector('input[name="ratio"][value="' + cfg.ratio + '"]');
+                    if (r) r.checked = true;
+                }
+                if (cfg.resolution) {
+                    var res = document.querySelector('input[name="resolution"][value="' + cfg.resolution + '"]');
+                    if (res) res.checked = true;
+                }
+                if (cfg.videoPrompt !== undefined) { document.getElementById('videoPrompt').value = cfg.videoPrompt; }
+                if (cfg.videoDuration) { document.getElementById('videoDuration').value = cfg.videoDuration; document.getElementById('durationDisplay').textContent = cfg.videoDuration + 's'; }
+                if (cfg.videoFreeCount !== undefined) { document.getElementById('videoFreeCount').value = cfg.videoFreeCount; }
+                if (cfg.gameFreeCount !== undefined) { document.getElementById('gameFreeCount').value = cfg.gameFreeCount; }
+                if (cfg.gamePrompt !== undefined) { document.getElementById('gamePrompt').value = cfg.gamePrompt; }
+                if (cfg.recommendedCourses) { selectedCourses = cfg.recommendedCourses; renderSelectedTags(); updatePlaceholder(); }
+                if (cfg.masterSwitch !== undefined) { document.getElementById('masterSwitch').checked = cfg.masterSwitch; onMasterToggle(); }
+                if (cfg.videoSwitch !== undefined) { document.getElementById('videoSwitch').checked = cfg.videoSwitch; }
+                if (cfg.gameSwitch !== undefined) { document.getElementById('gameSwitch').checked = cfg.gameSwitch; }
+            } catch(e) {}
+        }
+
+        // ===== 保存 =====
+        function saveConfig() {
+            var ratio = document.querySelector('input[name="ratio"]:checked');
+            var resolution = document.querySelector('input[name="resolution"]:checked');
+            var config = {
+                ratio: ratio ? ratio.value : '不限',
+                resolution: resolution ? resolution.value : '480p',
+                videoPrompt: document.getElementById('videoPrompt').value.trim(),
+                videoDuration: parseInt(document.getElementById('videoDuration').value) || 5,
+                videoFreeCount: parseInt(document.getElementById('videoFreeCount').value) || 0,
+                gameFreeCount: parseInt(document.getElementById('gameFreeCount').value) || 0,
+                gamePrompt: document.getElementById('gamePrompt').value.trim(),
+                questions: JSON.parse(JSON.stringify(questions)),
+                recommendedCourses: selectedCourses,
+                masterSwitch: document.getElementById('masterSwitch').checked,
+                videoSwitch: document.getElementById('videoSwitch').checked,
+                gameSwitch: document.getElementById('gameSwitch').checked
+            };
+            localStorage.setItem('studyNoteConfigV2', JSON.stringify(config));
+            alert('✅ 研学手记配置已保存');
+            closeModal();
+        }
+
+        function closeModal() {
+            window.location.href = '../index.html';
+        }
+
+        loadSavedConfig();
+    </script>
+</body>
+</html>
