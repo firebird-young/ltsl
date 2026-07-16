@@ -353,6 +353,21 @@
         }
 
 
+        /* ── 图片预览遮罩 ── */
+        .img-preview-overlay {
+            display: none; position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.75); z-index: 999999;
+            align-items: center; justify-content: center; padding: 40px;
+            cursor: zoom-out;
+        }
+        .img-preview-overlay.show { display: flex; }
+        .img-preview-overlay img {
+            max-width: 90%; max-height: 90%;
+            border-radius: 8px; box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+            object-fit: contain;
+        }
+
         /* ── 功能说明浮窗 ── */
         .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 500px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 99999; padding: 24px; display: none; }
         .f-modal.show { display: block; }
@@ -442,6 +457,10 @@
 
 <div id="qaPanel" style="position:fixed;top:80px;left:16px;z-index:99999;background:#fff;color:#333;padding:14px 18px;border-radius:12px;border:1px solid #e0e0e0;font-size:12px;line-height:1.7;max-width:320px;box-shadow:0 4px 16px rgba(0,0,0,0.08);display:none;font-family:inherit;"></div>
 
+<div class="img-preview-overlay" id="imgPreviewOverlay" onclick="closeImagePreview()">
+    <img id="imgPreviewSrc" src="">
+</div>
+
 <button onclick="toggleFuncModal()" style="position:fixed;top:12px;right:16px;z-index:99999;background:#fff;color:#666;padding:7px 16px;border-radius:20px;border:1px solid #ddd;font-size:13px;font-weight:500;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-family:inherit;display:inline-flex;align-items:center;gap:4px;">📖 说明</button>
 
 <!-- ====== 功能说明浮窗 ====== -->
@@ -484,12 +503,23 @@
         </ul>
         <div style="margin-top:16px;">
             <div style="font-size:13px;font-weight:600;color:#333;margin-bottom:8px;">视频生成流程图</div>
-            <img src="视频生成流程图.png" style="width:100%;border-radius:8px;border:1px solid #e0e0e0;" alt="视频生成流程图">
+            <img src="视频生成流程图.png" style="width:100%;border-radius:8px;border:1px solid #e0e0e0;cursor:pointer;" alt="视频生成流程图" onclick="openImagePreview(this.src)">
         </div>
     </div>
 </div>
 
 <script>
+    function openImagePreview(src) {
+        document.getElementById('imgPreviewSrc').src = src;
+        document.getElementById('imgPreviewOverlay').classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeImagePreview() {
+        document.getElementById('imgPreviewOverlay').classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
     function toggleFuncModal() {
         var el = document.getElementById('funcModal');
         el.classList.toggle('show');
