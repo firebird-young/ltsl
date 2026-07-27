@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>密码管理 - 离泰数链</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif; background: #f5f5f5; min-height: 100vh; display: flex; justify-content: center; color: #333; }
+        .page-wrap { display: flex; gap: 20px; padding: 20px; min-height: 100vh; align-items: flex-start; justify-content: center; }
+        .app-container { width: 100%; max-width: 430px; background: #f5f5f5; min-height: 100vh; display: flex; flex-direction: column; box-shadow: 0 0 20px rgba(0,0,0,0.05); border-radius: 12px; overflow: hidden; }
+        .content-area { flex: 1; padding-bottom: 30px; }
+
+        /* 顶部导航 */
+        .nav-bar { background: #fff; height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; position: sticky; top: 0; z-index: 10; }
+        .nav-back { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #333; cursor: pointer; }
+        .nav-title { font-size: 17px; font-weight: 600; color: #1f1f1f; position: absolute; left: 50%; transform: translateX(-50%); }
+        .nav-right { display: flex; align-items: center; gap: 0; height: 32px; background: rgba(255,255,255,.65); border-radius: 18px; padding: 0 6px; }
+        .nav-right .dot-icon { font-size: 16px; color: #111; padding: 0 8px; letter-spacing: 2px; }
+        .nav-right .divider { width: 1px; height: 16px; background: #ddd; }
+        .nav-right .circle { width: 18px; height: 18px; border: 2px solid #111; border-radius: 50%; position: relative; margin: 0 4px; }
+        .nav-right .circle::after { content: ""; position: absolute; width: 5px; height: 5px; border: 1.5px solid #111; border-radius: 50%; top: 3px; left: 3px; }
+
+        /* 介绍区 */
+        .intro { background: linear-gradient(135deg, #fff4e6, #fff); margin: 16px 16px 0; border-radius: 12px; padding: 18px 18px; display: flex; align-items: center; gap: 14px; }
+        .intro-icon { width: 50px; height: 50px; background: #ffe3c2; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; }
+        .intro-text h4 { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 4px; }
+        .intro-text p { font-size: 12px; color: #888; line-height: 1.5; }
+
+        /* 主开关卡片 */
+        .switch-card { background: #fff; border-radius: 12px; margin: 16px; overflow: hidden; }
+        .switch-row { display: flex; align-items: center; justify-content: space-between; padding: 18px; }
+        .switch-row .meta { display: flex; align-items: center; gap: 12px; }
+        .switch-row .icon-box { width: 38px; height: 38px; border-radius: 10px; background: #e8f0fe; color: #0669ff; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .switch-row .text .title { font-size: 15px; font-weight: 600; color: #333; }
+        .switch-row .text .desc { font-size: 12px; color: #999; margin-top: 3px; }
+        .switch { position: relative; width: 50px; height: 28px; background: #e0e0e0; border-radius: 14px; cursor: pointer; transition: background 200ms; flex-shrink: 0; }
+        .switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 24px; height: 24px; background: #fff; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,.15); transition: left 200ms; }
+        .switch.on { background: #34c759; }
+        .switch.on::after { left: 24px; }
+
+        /* 密码设置区 */
+        .pwd-setup { display: none; padding: 0 18px 18px; border-top: 1px solid #f2f2f2; }
+        .pwd-setup.show { display: block; }
+        .pwd-setup .field { margin-top: 14px; }
+        .pwd-setup .label { font-size: 13px; color: #666; margin-bottom: 6px; display: block; }
+        .pwd-setup input { width: 100%; height: 44px; padding: 0 14px; border: 1px solid #e0e0e0; border-radius: 10px; font-size: 15px; outline: none; background: #fafafa; }
+        .pwd-setup input:focus { border-color: #0669ff; background: #fff; }
+        .pwd-setup .hint { font-size: 12px; color: #999; margin-top: 6px; }
+        .pwd-setup .btn-row { display: flex; gap: 10px; margin-top: 18px; }
+        .pwd-setup .btn { flex: 1; height: 44px; border: 0; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; }
+        .pwd-setup .btn-cancel { background: #f0f0f0; color: #666; }
+        .pwd-setup .btn-save { background: linear-gradient(100deg, #4b8bec, #2866ed); color: #fff; }
+        .pwd-setup .btn-save:disabled { opacity: .55; cursor: default; }
+
+        /* 温馨提示 */
+        .tip-card { background: #fff; margin: 0 16px 16px; border-radius: 12px; padding: 16px; }
+        .tip-card h4 { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 10px; }
+        .tip-card ul { padding-left: 20px; }
+        .tip-card li { font-size: 13px; color: #666; line-height: 1.8; }
+
+        /* 右侧状态面板 */
+        .side-panel { width: 260px; flex-shrink: 0; padding-top: 60px; }
+        .side-title { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 14px; }
+        .status-card { background: #fff; border-radius: 10px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 6px rgba(0,0,0,.06); display: flex; align-items: flex-start; gap: 12px; transition: all 200ms; }
+        .status-card.active { box-shadow: 0 0 0 2px #0669ff, 0 2px 10px rgba(6,105,255,.15); }
+        .status-card .sc-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+        .status-card .sc-icon.blue { background: #e8f0fe; color: #0669ff; }
+        .status-card .sc-icon.gray { background: #f0f0f0; color: #999; }
+        .status-card .sc-body { flex: 1; }
+        .status-card .sc-body .sc-title { font-size: 14px; font-weight: 600; color: #333; }
+        .status-card .sc-body .sc-desc { font-size: 12px; color: #888; margin-top: 3px; }
+        .status-card .sc-body .sc-tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-top: 6px; }
+        .sc-tag.green { background: #e8f5e9; color: #2e7d32; }
+        .sc-tag.red { background: #fce6e6; color: #c62828; }
+        .sc-tag.gray { background: #f0f0f0; color: #888; }
+
+        /* 弹窗 */
+        .modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: none; align-items: center; justify-content: center; z-index: 100; }
+        .modal-mask.show { display: flex; }
+        .modal { background: #fff; border-radius: 14px; padding: 26px 28px 22px; max-width: 320px; width: calc(100% - 60px); text-align: center; box-shadow: 0 12px 40px rgba(0,0,0,.2); }
+        .modal h3 { font-size: 17px; font-weight: 600; color: #1f2937; margin-bottom: 10px; }
+        .modal p { font-size: 14px; color: #555; line-height: 1.6; margin-bottom: 22px; }
+        .modal-buttons { display: flex; gap: 10px; }
+        .modal-buttons button { flex: 1; height: 44px; border: 0; border-radius: 10px; font-size: 15px; cursor: pointer; }
+        .modal-buttons .btn-cancel { background: #f0f0f0; color: #666; }
+        .modal-buttons .btn-confirm { background: linear-gradient(100deg, #4b8bec, #2866ed); color: #fff; }
+
+        /* 功能说明 */
+        .doc-panel { width: 560px; background: #fff; border-radius: 16px; box-shadow: 0 2px 20px rgba(0,0,0,.08); padding: 24px 28px; max-height: calc(100vh - 40px); overflow-y: auto; font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', Arial, sans-serif; line-height: 1.7; font-size: 14px; color: #333; }
+        .doc-panel::-webkit-scrollbar { width: 5px; }
+        .doc-panel::-webkit-scrollbar-thumb { background: #d0d5e0; border-radius: 3px; }
+        .doc-panel .doc-title { font-size: 20px; font-weight: 700; color: #1F3864; border-bottom: 2px solid #2E75B6; padding-bottom: 10px; margin-bottom: 16px; }
+        .doc-panel h3 { font-size: 16px; font-weight: 600; color: #2E75B6; margin: 16px 0 8px; }
+        .doc-panel p { font-size: 13px; color: #555; margin-bottom: 6px; }
+        .doc-panel ul { padding-left: 20px; margin: 4px 0 8px; }
+        .doc-panel li { margin-bottom: 3px; font-size: 13px; color: #555; }
+
+        @media (max-width: 1100px) { .page-wrap { flex-direction: column; align-items: center; } .side-panel, .doc-panel { width: 100%; max-width: 430px; max-height: none; } }
+    </style>
+</head>
+<body>
+<div class="page-wrap">
+    <div class="app-container">
+        <div class="nav-bar">
+            <div class="nav-back" onclick="history.back()">‹</div>
+            <div class="nav-title">密码管理</div>
+            <div class="nav-right">
+                <span class="dot-icon">⋯</span>
+                <span class="divider"></span>
+                <span class="circle"></span>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <div class="intro">
+                <div class="intro-icon">🔐</div>
+                <div class="intro-text">
+                    <h4>密码登录</h4>
+                    <p>开启后可在登录页使用「手机号+密码」方式登录</p>
+                </div>
+            </div>
+
+            <div class="switch-card">
+                <div class="switch-row">
+                    <div class="meta">
+                        <div class="icon-box">🔑</div>
+                        <div class="text">
+                            <div class="title">启用密码登录</div>
+                            <div class="desc" id="switchDesc">当前未开启</div>
+                        </div>
+                    </div>
+                    <div class="switch" id="mainSwitch" onclick="toggleSwitch()"></div>
+                </div>
+
+                <!-- 设置密码表单 -->
+                <div class="pwd-setup" id="pwdSetup">
+                    <div class="field">
+                        <label class="label">设置登录密码</label>
+                        <input type="password" id="newPwd" placeholder="请输入 6-16 位密码" oninput="checkForm()">
+                    </div>
+                    <div class="field">
+                        <label class="label">确认密码</label>
+                        <input type="password" id="confirmPwd" placeholder="请再次输入密码" oninput="checkForm()">
+                        <div class="hint" id="formHint"></div>
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn btn-cancel" onclick="cancelSetup()">取消</button>
+                        <button class="btn btn-save" id="saveBtn" disabled onclick="savePwd()">确认开启</button>
+                    </div>
+                </div>
+
+                <!-- 开启后的修改密码按钮 -->
+                <div class="pwd-setup" id="pwdActions">
+                    <div class="field">
+                        <label class="label">新密码</label>
+                        <input type="password" id="changePwd" placeholder="请输入 6-16 位新密码" oninput="checkChange()">
+                    </div>
+                    <div class="field">
+                        <label class="label">确认新密码</label>
+                        <input type="password" id="changeConfirm" placeholder="请再次输入新密码" oninput="checkChange()">
+                        <div class="hint" id="changeHint"></div>
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn btn-cancel" onclick="cancelChange()">取消</button>
+                        <button class="btn btn-save" id="changeBtn" disabled onclick="saveChange()">确认修改</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tip-card">
+                <h4>温馨提示</h4>
+                <ul>
+                    <li>开启后请妥善保管密码。密码连续输错 5 次，30 分钟内无法使用密码登录；重置密码可解除该限制。</li>
+                    <li>手机号一键登录方式始终可用，不受此开关影响</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="side-panel">
+        <div class="side-title">登录方式</div>
+        <div class="status-card" id="cardQuick" onclick="switchLoginType('quick')" style="cursor:pointer;">
+            <div class="sc-icon blue">📱</div>
+            <div class="sc-body">
+                <div class="sc-title">手机号一键登录</div>
+                <div class="sc-desc">可使用此功能开启密码登录</div>
+                <span class="sc-tag green" id="tagQuick">当前</span>
+            </div>
+        </div>
+        <div class="status-card" id="cardPwd" onclick="switchLoginType('pwd')" style="cursor:pointer;">
+            <div class="sc-icon gray">🔐</div>
+            <div class="sc-body">
+                <div class="sc-title">手机号+密码登录</div>
+                <div class="sc-desc">不能使用此功能</div>
+                <span class="sc-tag gray" id="tagPwd">无权限</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="doc-panel">
+        <div class="doc-title">密码管理 - 功能说明</div>
+        <div class="doc-section">
+            <h3>1. 页面用途</h3>
+            <p>密码管理页用于让用户手动开启或关闭「密码登录」功能。开启后用户可在登录页使用手机号+密码方式登录，关闭后只能使用手机号一键登录。</p>
+        </div>
+        <div class="doc-section">
+            <h3>2. 核心交互</h3>
+            <ul>
+                <li><b>主开关</b>：关闭状态下点击唤起「设置密码」表单，开启状态下再次点击开关直接关闭。</li>
+                <li><b>设置密码</b>：首次开启需设置 6-16 位密码并二次确认，两次输入一致且符合长度后「确认开启」按钮高亮。</li>
+                <li><b>修改密码</b>：开启后开关下方出现「修改密码」表单，无需输入旧密码，直接输入新密码并确认即可。</li>
+                <li><b>权限控制</b>：只有「手机号一键登录」用户有权限开启此功能；「手机号+密码登录」用户无权限。</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    var switchEl = document.getElementById('mainSwitch');
+    var descEl = document.getElementById('switchDesc');
+    var setupEl = document.getElementById('pwdSetup');
+    var actionsEl = document.getElementById('pwdActions');
+    var saveBtn = document.getElementById('saveBtn');
+    var changeBtn = document.getElementById('changeBtn');
+    var cardQuick = document.getElementById('cardQuick');
+    var cardPwd = document.getElementById('cardPwd');
+    var tagQuick = document.getElementById('tagQuick');
+    var tagPwd = document.getElementById('tagPwd');
+
+    function syncState() {
+        var enabled = localStorage.getItem('pwdLoginEnabled') === '1';
+        if (enabled) { switchEl.classList.add('on'); descEl.textContent = '当前已开启'; setupEl.classList.remove('show'); actionsEl.classList.add('show'); }
+        else { switchEl.classList.remove('on'); descEl.textContent = '当前未开启'; actionsEl.classList.remove('show'); }
+    }
+    syncState();
+
+    function toggleSwitch() {
+        var enabled = localStorage.getItem('pwdLoginEnabled') === '1';
+        if (enabled) {
+            if (confirm('关闭后只能使用手机号一键登录，确定要关闭吗？')) { localStorage.setItem('pwdLoginEnabled', '0'); syncState(); showToast('密码登录已关闭'); }
+        } else {
+            setupEl.classList.add('show'); document.getElementById('newPwd').focus();
+        }
+    }
+    function cancelSetup() { setupEl.classList.remove('show'); document.getElementById('newPwd').value = ''; document.getElementById('confirmPwd').value = ''; document.getElementById('formHint').textContent = ''; checkForm(); }
+    function checkForm() { var p1 = document.getElementById('newPwd').value; var p2 = document.getElementById('confirmPwd').value; var hint = document.getElementById('formHint'); var ok = p1.length >= 6 && p1.length <= 16 && p1 === p2; saveBtn.disabled = !ok; if (p1 && p2) { hint.textContent = p1 === p2 ? '✓ 两次输入一致' : '✗ 两次密码不一致'; hint.style.color = p1 === p2 ? '#34c759' : '#e35353'; } else { hint.textContent = ''; } }
+    function savePwd() { localStorage.setItem('pwdLoginEnabled', '1'); cancelSetup(); syncState(); showToast('密码登录已开启'); }
+    function cancelChange() { actionsEl.classList.remove('show'); document.getElementById('changePwd').value = ''; document.getElementById('changeConfirm').value = ''; document.getElementById('changeHint').textContent = ''; checkChange(); }
+    function checkChange() { var p1 = document.getElementById('changePwd').value; var p2 = document.getElementById('changeConfirm').value; var hint = document.getElementById('changeHint'); var ok = p1.length >= 6 && p1.length <= 16 && p1 === p2; changeBtn.disabled = !ok; if (p1 && p2) { hint.textContent = p1 === p2 ? '✓ 两次输入一致' : '✗ 两次密码不一致'; hint.style.color = p1 === p2 ? '#34c759' : '#e35353'; } else { hint.textContent = ''; } }
+    function saveChange() { cancelChange(); showToast('密码已更新'); }
+
+    function switchLoginType(type) {
+        var isQuick = type === 'quick';
+        cardQuick.className = 'status-card' + (isQuick ? ' active' : '');
+        cardPwd.className = 'status-card' + (isQuick ? '' : ' active');
+        tagQuick.textContent = isQuick ? '当前' : '有权限';
+        tagQuick.className = 'sc-tag ' + (isQuick ? 'green' : 'green');
+        tagPwd.textContent = isQuick ? '无权限' : '当前';
+        tagPwd.className = 'sc-tag ' + (isQuick ? 'gray' : 'red');
+        // 切换手机框内内容
+        var introDesc = document.querySelector('.intro-text p');
+        if (isQuick) {
+            introDesc.textContent = '开启后可在登录页使用「手机号+密码」方式登录';
+            document.querySelector('.intro-icon').textContent = '🔐';
+            document.querySelector('.intro').style.background = 'linear-gradient(135deg, #fff4e6, #fff)';
+            switchEl.style.display = '';
+            document.querySelector('.switch-card').style.display = '';
+        } else {
+            introDesc.textContent = '当前使用手机号+密码登录，无法进行密码登录管理';
+            document.querySelector('.intro-icon').textContent = '🔒';
+            document.querySelector('.intro').style.background = 'linear-gradient(135deg, #f0f0f0, #fff)';
+            switchEl.style.display = 'none';
+            document.querySelector('.switch-card').style.display = 'none';
+        }
+    }
+    // 默认选中一键登录
+    switchLoginType('quick');
+
+    function showToast(text) { var t = document.createElement('div'); t.textContent = text; t.style.cssText = 'position:fixed;top:30%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.78);color:#fff;padding:10px 18px;border-radius:8px;font-size:14px;z-index:9999;'; document.body.appendChild(t); setTimeout(function() { t.remove(); }, 1800); }
+</script>
+</body>
+</html>

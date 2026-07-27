@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>个人资料 - 离泰数链</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif; background: #f5f5f5; min-height: 100vh; display: flex; justify-content: center; color: #333; }
+        .page-wrap { display: flex; gap: 20px; padding: 20px; min-height: 100vh; align-items: flex-start; justify-content: center; }
+        .app-container { width: 100%; max-width: 430px; background: #f5f5f5; min-height: 100vh; display: flex; flex-direction: column; box-shadow: 0 0 20px rgba(0,0,0,0.05); border-radius: 12px; overflow: hidden; }
+        .content-area { flex: 1; padding-bottom: 30px; }
+
+        /* 顶部背景区 */
+        .top-section { position: relative; padding-bottom: 70px; }
+        .top-bg { position: absolute; inset: 0; background: linear-gradient(180deg, #b8c2cf 0%, #d4dae0 60%, #f5f5f5 100%); z-index: 0; }
+        .nav-bar { position: relative; z-index: 2; height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; }
+        .nav-back { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #333; cursor: pointer; }
+        .nav-title { font-size: 17px; font-weight: 600; color: #1f1f1f; position: absolute; left: 50%; transform: translateX(-50%); }
+        .nav-right { display: flex; align-items: center; gap: 0; height: 32px; background: rgba(255,255,255,.65); border-radius: 18px; padding: 0 6px; }
+        .nav-right .dot-icon { font-size: 16px; color: #111; padding: 0 8px; letter-spacing: 2px; }
+        .nav-right .divider { width: 1px; height: 16px; background: #ddd; }
+        .nav-right .circle { width: 18px; height: 18px; border: 2px solid #111; border-radius: 50%; position: relative; margin: 0 4px; }
+        .nav-right .circle::after { content: ""; position: absolute; width: 5px; height: 5px; border: 1.5px solid #111; border-radius: 50%; top: 3px; left: 3px; }
+
+        .avatar-wrap { position: relative; z-index: 2; margin: 8px auto 0; width: 90px; height: 90px; }
+        .avatar { width: 90px; height: 90px; border-radius: 50%; background: linear-gradient(135deg, #6e5b3a, #3a2d1e); display: flex; align-items: center; justify-content: center; font-size: 50px; color: #fff; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+        .avatar-edit { position: absolute; right: -2px; bottom: -2px; width: 28px; height: 28px; background: #ff6b1a; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; border: 2px solid #f5f5f5; cursor: pointer; }
+
+        /* 列表卡片 */
+        .card { background: #fff; border-radius: 12px; margin: 12px; overflow: hidden; }
+        .card + .card { margin-top: 0; }
+        .list-item { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; cursor: pointer; position: relative; }
+        .list-item + .list-item { border-top: 1px solid #f2f2f2; }
+        .list-item .left { font-size: 15px; color: #333; }
+        .list-item .right { display: flex; align-items: center; gap: 8px; color: #999; font-size: 14px; }
+        .list-item .arrow { color: #ccc; font-size: 16px; margin-left: 2px; }
+
+        /* 功能说明面板 */
+        .doc-panel { width: 560px; background: #fff; border-radius: 16px; box-shadow: 0 2px 20px rgba(0,0,0,.08); padding: 24px 28px; max-height: calc(100vh - 40px); overflow-y: auto; font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', Arial, sans-serif; line-height: 1.7; font-size: 14px; color: #333; }
+        .doc-panel::-webkit-scrollbar { width: 5px; }
+        .doc-panel::-webkit-scrollbar-thumb { background: #d0d5e0; border-radius: 3px; }
+        .doc-panel .doc-title { font-size: 20px; font-weight: 700; color: #1F3864; border-bottom: 2px solid #2E75B6; padding-bottom: 10px; margin-bottom: 16px; }
+        .doc-panel h3 { font-size: 16px; font-weight: 600; color: #2E75B6; margin: 16px 0 8px; }
+        .doc-panel h4 { font-size: 14px; font-weight: 600; color: #333; margin: 12px 0 6px; }
+        .doc-panel p { font-size: 13px; color: #555; margin-bottom: 6px; }
+        .doc-panel ul { padding-left: 20px; margin: 4px 0 8px; }
+        .doc-panel li { margin-bottom: 3px; font-size: 13px; color: #555; }
+
+        @media (max-width: 1100px) { .page-wrap { flex-direction: column; align-items: center; } .doc-panel { width: 100%; max-width: 430px; max-height: none; } }
+    </style>
+</head>
+<body>
+<div class="page-wrap">
+    <div class="app-container">
+        <div class="content-area">
+            <div class="top-section">
+                <div class="top-bg"></div>
+                <div class="nav-bar">
+                    <div class="nav-back" onclick="history.back()">‹</div>
+                    <div class="nav-title">个人资料</div>
+                    <div class="nav-right">
+                        <span class="dot-icon">⋯</span>
+                        <span class="divider"></span>
+                        <span class="circle"></span>
+                    </div>
+                </div>
+                <div class="avatar-wrap">
+                    <div class="avatar">🧑</div>
+                    <div class="avatar-edit">📷</div>
+                </div>
+            </div>
+
+            <!-- 基本信息卡 -->
+            <div class="card">
+                <div class="list-item" onclick="editField('username')">
+                    <span class="left">用户名</span>
+                    <div class="right"><span id="displayUsername">user_2980</span><span class="arrow">›</span></div>
+                </div>
+                <div class="list-item">
+                    <span class="left">手机号</span>
+                    <div class="right"><span>138****2980</span></div>
+                </div>
+                <div class="list-item" onclick="editField('gender')">
+                    <span class="left">性别</span>
+                    <div class="right"><span id="displayGender">未知</span><span class="arrow">›</span></div>
+                </div>
+            </div>
+
+            <!-- 协议与密码管理卡 -->
+            <div class="card">
+                <div class="list-item" onclick="location.href='密码管理.html'">
+                    <span class="left">密码管理</span>
+                    <div class="right"><span class="arrow">›</span></div>
+                </div>
+                <div class="list-item" onclick="openAgreement('user')">
+                    <span class="left">用户协议</span>
+                    <div class="right"><span class="arrow">›</span></div>
+                </div>
+                <div class="list-item" onclick="openAgreement('privacy')">
+                    <span class="left">隐私政策</span>
+                    <div class="right"><span class="arrow">›</span></div>
+                </div>
+            </div>
+
+            <!-- 退出登录卡 -->
+            <div class="card">
+                <div class="list-item" onclick="logout()">
+                    <span class="left">退出登录</span>
+                    <div class="right"><span class="arrow">›</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="doc-panel">
+        <div class="doc-title">个人资料 - 功能说明</div>
+        <div class="doc-section">
+            <h3>密码管理</h3>
+            <p>在原页面上加入「密码管理」按钮，点击进入密码管理页面可手动开启密码登录。</p>
+        </div>
+        <div class="doc-section">
+            <h3>4. 用户协议 / 隐私政策</h3>
+            <p>展示平台《用户协议》和《隐私政策》详情页，方便用户随时查阅。</p>
+        </div>
+        <div class="doc-section">
+            <h3>5. 退出登录</h3>
+            <p>点击后弹出确认框，确认后清空本地登录态并跳转至登录页。开启密码登录后，退出登录不会清空已设置的密码。</p>
+        </div>
+    </div>
+</div>
+<script>
+    function editField(name) { alert('点击了：' + (name === 'username' ? '修改用户名' : '修改性别')); }
+    function openAgreement(type) { alert('打开：' + (type === 'user' ? '《用户协议》' : '《隐私政策》')); }
+    function logout() { if (confirm('确定要退出登录吗？')) { alert('已退出登录'); } }
+    // 同步密码管理页状态
+    (function() {
+        var enabled = localStorage.getItem('pwdLoginEnabled') === '1';
+        var el = document.getElementById('pwdStatus');
+    })();
+</script>
+</body>
+</html>

@@ -161,10 +161,11 @@
     </div>
 
     <div class="section">
-        <div class="section-header">
+        <div class="section-header" style="cursor:pointer;" onclick="toggleIteration()">
             <span class="sh-label">2026.7.7 迭代</span>
+            <span id="iterToggle" style="font-size:14px;color:var(--ink-subtle);margin-left:auto;">▾ 展开</span>
         </div>
-        <div class="list">
+        <div class="list" id="iterList">
             <a class="item" href="admin/积分规则配置.html">
                 <span class="it-label">商城积分</span>
                 <span class="it-tag gray">待开发</span>
@@ -211,7 +212,7 @@
                     <a class="item" href="AI创作_v2.html" style="border-radius:8px;padding:10px 14px;margin-bottom:4px;">
                         <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
                         <span class="it-label">AI创作</span>
-                        <span class="it-tag gray">待开发</span>
+                        <span class="it-tag green">已完成</span>
                         <span class="it-arrow">›</span>
                     </a>
                     <a class="item" href="购买次数.html" style="border-radius:8px;padding:10px 14px;margin-bottom:4px;">
@@ -229,7 +230,7 @@
                     <a class="item" href="admin/研学手记配置_v2.html" style="border-radius:8px;padding:10px 14px;margin-bottom:4px;">
                         <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
                         <span class="it-label">研学手记配置（后台）</span>
-                        <span class="it-tag gray">待开发</span>
+                        <span class="it-tag green">已完成</span>
                         <span class="it-arrow">›</span>
                     </a>
                     <a class="item" href="admin/AI创作销售配置.html" style="border-radius:8px;padding:10px 14px;margin-bottom:4px;">
@@ -249,5 +250,25 @@
         </div>
     </div>
 </div>
+
+<script>
+    var iterCollapsed = true;
+
+    function toggleIteration() {
+        iterCollapsed = !iterCollapsed;
+        var list = document.getElementById('iterList');
+        var toggle = document.getElementById('iterToggle');
+        if (iterCollapsed) {
+            list.style.display = 'none';
+            toggle.textContent = '▾ 展开';
+        } else {
+            list.style.display = '';
+            toggle.textContent = '▴ 收起';
+        }
+    }
+
+    // 默认收起
+    document.getElementById('iterList').style.display = 'none';
+</script>
 </body>
 </html>

@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>研学手记配置 v3 - 管理后台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            color: #333;
+        }
+        .page-wrap { display: flex; gap: 24px; padding: 24px; max-width: 1200px; margin: 0 auto; align-items: flex-start; }
+        .left-col { flex: 1; min-width: 0; }
+        .right-col { width: 380px; flex-shrink: 0; }
+        .modal { width: 100%; background: #fff; border-radius: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); overflow: hidden; }
+        .doc-panel { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); padding: 20px 22px; position: sticky; top: 24px; font-size: 13px; line-height: 1.8; color: #555; }
+        .doc-panel .doc-title { font-size: 16px; font-weight: 700; color: #1F3864; border-bottom: 2px solid #2E75B6; padding-bottom: 8px; margin-bottom: 14px; }
+        .doc-panel h3 { font-size: 14px; font-weight: 600; color: #2E75B6; margin: 14px 0 6px; }
+        .doc-panel ul { padding-left: 18px; margin: 4px 0 8px; }
+        .doc-panel li { margin-bottom: 3px; font-size: 13px; color: #555; }
+        .doc-panel .doc-note { font-size: 12px; color: #bbb; margin-top: 8px; padding-top: 8px; border-top: 1px solid #f0f0f0; }
+
+        .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 28px; border-bottom: 1px solid #f0f0f0; background: #fafbff; }
+        .modal-header h2 { font-size: 18px; font-weight: 600; color: #1a1a1a; display: flex; align-items: center; gap: 8px; }
+        .modal-header .close-btn { width: 36px; height: 36px; border-radius: 50%; border: none; background: #f0f0f0; font-size: 20px; color: #999; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .modal-header .close-btn:hover { background: #e0e0e0; color: #333; }
+        .modal-body { padding: 28px; max-height: calc(100vh - 120px); overflow-y: auto; }
+        .modal-body::-webkit-scrollbar { width: 6px; }
+        .modal-body::-webkit-scrollbar-track { background: transparent; }
+        .modal-body::-webkit-scrollbar-thumb { background: #d0d5e0; border-radius: 3px; }
+
+        .section { margin-bottom: 32px; }
+        .section-title { font-size: 16px; font-weight: 600; color: #1a1a1a; padding-bottom: 12px; margin-bottom: 16px; border-bottom: 2px solid #0669FF; display: flex; align-items: center; gap: 8px; }
+
+        .question-card {
+            background: #fff; border: 1px solid #e0e0e0; border-radius: 12px;
+            padding: 16px 18px; margin-bottom: 12px; position: relative;
+        }
+        .question-card .qc-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+        .question-card .qc-header .qc-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .question-card .qc-header .qc-num { font-size: 12px; color: #0669FF; font-weight: 600; }
+        .question-card .qc-header .qc-type {
+            font-size: 11px; padding: 3px 10px; border-radius: 4px; cursor: pointer;
+            border: none; font-family: inherit; transition: all 0.2s;
+        }
+        .question-card .qc-header .qc-type.choice { background: #E8F0FE; color: #0669FF; }
+        .question-card .qc-header .qc-type.input { background: #F3E8FF; color: #7c3aed; }
+        .question-card .qc-header .qc-actions { display: flex; gap: 6px; }
+        .question-card .qc-header .qc-actions button {
+            width: 24px; height: 24px; border-radius: 50%; border: none;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 12px; transition: all 0.2s;
+        }
+        .question-card .qc-header .qc-move { background: #f0f0f0; color: #999; }
+        .question-card .qc-header .qc-move:hover { background: #E8F0FE; color: #0669FF; }
+        .question-card .qc-header .qc-del { background: #FFF0F0; color: #ff3b30; }
+        .question-card .qc-header .qc-del:hover { background: #ff3b30; color: #fff; }
+        .question-card .qc-field { margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .question-card .qc-field .qc-label { font-size: 12px; color: #888; min-width: 60px; flex-shrink: 0; }
+        .question-card .qc-field input[type="text"] { flex: 1; height: 32px; padding: 0 10px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 13px; color: #333; outline: none; font-family: inherit; }
+        .question-card .qc-field input[type="text"]:focus { border-color: #0669FF; }
+
+        .qc-options { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+        .qc-option-card {
+            background: #f8f9fc; border: 1px solid #eef0f5;
+            border-radius: 10px; padding: 12px 14px; position: relative;
+        }
+        .qc-option-card .oc-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+        .qc-option-card .oc-row:last-child { margin-bottom: 0; }
+        .qc-option-card .oc-row .oc-label { font-size: 11px; color: #888; min-width: 50px; flex-shrink: 0; }
+        .qc-option-card .oc-row input[type="text"] { flex: 1; height: 28px; padding: 0 8px; border: 1px solid #e0e0e0; border-radius: 5px; font-size: 12px; color: #333; outline: none; font-family: inherit; }
+        .qc-option-card .oc-row input[type="text"]:focus { border-color: #0669FF; }
+
+        .qc-option-card .oc-depends {
+            background: #FFF8E7; border: 1px dashed #FFD591; border-radius: 6px;
+            padding: 8px 10px; margin-top: 6px;
+        }
+        .qc-option-card .oc-depends .ocd-title {
+            font-size: 10px; color: #D46B08; font-weight: 600; margin-bottom: 4px;
+        }
+        .qc-option-card .oc-depends .ocd-row {
+            display: flex; align-items: center; gap: 4px; font-size: 11px; color: #555; margin-bottom: 4px;
+        }
+        .qc-option-card .oc-depends .ocd-row select { height: 24px; font-size: 11px; padding: 0 4px; }
+        .qc-option-card .oc-depends .ocd-del {
+            width: 18px; height: 18px; border-radius: 50%; border: none;
+            background: #fff; color: #ff3b30; font-size: 9px; cursor: pointer;
+        }
+        .qc-option-card .oc-depends .ocd-add {
+            font-size: 10px; color: #D46B08; cursor: pointer; border: none;
+            background: none; padding: 2px 0; font-family: inherit;
+        }
+        .qc-option-card .oc-depends .ocd-none {
+            font-size: 10px; color: #bbb; text-align: center; padding: 2px 0;
+        }
+        .qc-option-card .oc-del-top {
+            position: absolute; top: 8px; right: 8px;
+            width: 22px; height: 22px; border-radius: 50%; border: none;
+            background: #f0f0f0; color: #999; font-size: 10px; cursor: pointer;
+        }
+        .qc-option-card .oc-del-top:hover { background: #FFF0F0; color: #ff3b30; }
+
+        .add-option-btn {
+            width: 100%; height: 38px; border: 1px dashed #d9d9d9; border-radius: 10px;
+            background: transparent; font-size: 12px; color: #0669FF; cursor: pointer;
+            font-weight: 500; transition: all 0.2s; display: flex; align-items: center;
+            justify-content: center; gap: 6px; font-family: inherit; margin-top: 8px;
+        }
+        .add-option-btn:hover { background: #E8F0FE; border-color: #0669FF; }
+
+        .add-question-btn {
+            width: 100%; height: 42px; border: 1px dashed #d9d9d9; border-radius: 12px;
+            background: transparent; font-size: 13px; color: #0669FF; cursor: pointer;
+            font-weight: 500; transition: all 0.2s; display: flex; align-items: center;
+            justify-content: center; gap: 6px; font-family: inherit;
+        }
+        .add-question-btn:hover { background: #E8F0FE; border-color: #0669FF; }
+
+        .modal-footer { padding: 16px 28px; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 12px; background: #fafbff; }
+        .modal-footer .btn { padding: 10px 28px; border-radius: 8px; font-size: 14px; cursor: pointer; border: none; transition: all 0.2s; font-weight: 500; }
+        .modal-footer .btn-cancel { background: #f5f5f5; color: #666; border: 1px solid #d9d9d9; }
+        .modal-footer .btn-cancel:hover { background: #eee; }
+        .modal-footer .btn-save { background: #0669FF; color: #fff; }
+        .modal-footer .btn-save:hover { background: #0052CC; }
+
+        @media (max-width: 768px) {
+            .page-wrap { flex-direction: column; }
+            .right-col { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+<div class="page-wrap">
+    <div class="left-col">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>📝 研学手记配置 v3</h2>
+            <button class="close-btn" onclick="closeModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="section">
+                <div class="section-title">📋 视频创作问卷配置</div>
+                <div id="questionList"></div>
+                <button class="add-question-btn" onclick="addQuestion()">+ 新增题目</button>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-cancel" onclick="closeModal()">取消</button>
+            <button class="btn btn-save" onclick="saveConfig()">💾 保存配置</button>
+        </div>
+    </div>
+    </div>
+
+    <div class="right-col">
+        <div class="doc-panel">
+            <div class="doc-title">研学手记配置 v3 - 功能说明</div>
+            <h3>题目管理</h3>
+            <ul>
+                <li>每题可切换为「选择题」或「填空题」</li>
+                <li>点击题号旁的蓝色/紫色类型标签可切换</li>
+            </ul>
+            <h3>选择题选项依赖</h3>
+            <ul>
+                <li>每个选项可配置依赖条件：依赖前面题目的答案组合</li>
+                <li>只有所有依赖条件都满足时，该选项才显示给用户</li>
+            </ul>
+            <h3>填空题</h3>
+            <ul>
+                <li>填空题只有题目文字，没有选项列表</li>
+                <li>用户可直接输入文字作答</li>
+            </ul>
+            <div class="doc-note">所有配置保存至 localStorage</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var questions = [
+        { num: 'Q1', title: '我是小男生还是小女生？', type: 'choice', options: [
+            { label: '小男生', depends: [] },
+            { label: '小女生', depends: [] }
+        ]},
+        { num: 'Q2', title: '我今年多大啦？', type: 'choice', options: [
+            { label: '6-7岁', depends: [] },
+            { label: '8-10岁', depends: [] },
+            { label: '11-14岁', depends: [] }
+        ]},
+        { num: 'Q3', title: '我想演谁？', type: 'choice', options: [
+            { label: '小学织机的小男孩', depends: [{ ref: 0, label: '小男生' }, { ref: 1, label: '6-7岁' }] },
+            { label: '飞天小力士', depends: [{ ref: 0, label: '小男生' }, { ref: 1, label: '6-7岁' }] },
+            { label: '一根金色丝线', depends: [{ ref: 0, label: '小男生' }, { ref: 1, label: '6-7岁' }] },
+            { label: '小小探险家', depends: [{ ref: 0, label: '小男生' }, { ref: 1, label: '6-7岁' }] },
+            { label: '高级学徒', depends: [{ ref: 0, label: '小男生' }, { ref: 1, label: '8-10岁' }] },
+            { label: '飞天小勇士', depends: [{ ref: 0, label: '小男生' }, { ref: 1, label: '8-10岁' }] },
+            { label: '少年织工学徒', depends: [{ ref: 0, label: '小男生' }, { ref: 1, label: '11-14岁' }] },
+            { label: '运行商人少年', depends: [{ ref: 0, label: '小男生' }, { ref: 1, label: '11-14岁' }] },
+            { label: '小织女', depends: [{ ref: 0, label: '小女生' }, { ref: 1, label: '6-7岁' }] },
+            { label: '小花仙', depends: [{ ref: 0, label: '小女生' }, { ref: 1, label: '6-7岁' }] },
+            { label: '小织坊学徒', depends: [{ ref: 0, label: '小女生' }, { ref: 1, label: '8-10岁' }] },
+            { label: '飞天小仙女', depends: [{ ref: 0, label: '小女生' }, { ref: 1, label: '8-10岁' }] },
+            { label: '丝路女商', depends: [{ ref: 0, label: '小女生' }, { ref: 1, label: '11-14岁' }] },
+            { label: '织锦仙子', depends: [{ ref: 0, label: '小女生' }, { ref: 1, label: '11-14岁' }] }
+        ]},
+        { num: 'Q4', title: '穿越到哪个时空？', type: 'choice', options: [
+            { label: '花楼木织机工坊', depends: [] },
+            { label: '锦官城集市', depends: [] },
+            { label: '陵阳公梦境', depends: [] },
+            { label: '现代博物馆展厅', depends: [] }
+        ]},
+        { num: 'Q5', title: '给你的主角起个名字', type: 'input', options: [] }
+    ];
+
+    function renderQuestions() {
+        var list = document.getElementById('questionList');
+        var html = '';
+        for (var i = 0; i < questions.length; i++) {
+            var q = questions[i];
+            var isChoice = q.type === 'choice';
+            html += '<div class="question-card">'
+                + '<div class="qc-header">'
+                + '<div class="qc-left">'
+                + '<span class="qc-num">' + q.num + '</span>'
+                + '<button class="qc-type ' + (isChoice ? 'choice' : 'input') + '" onclick="toggleType(' + i + ')">'
+                + (isChoice ? '选择题' : '填空题') + '</button>'
+                + '</div>'
+                + '<div class="qc-actions">'
+                + '<button class="qc-move" onclick="moveQuestion(' + i + ',-1)">↑</button>'
+                + '<button class="qc-move" onclick="moveQuestion(' + i + ',1)">↓</button>'
+                + '<button class="qc-del" onclick="delQuestion(' + i + ')">✕</button>'
+                + '</div></div>'
+                + '<div class="qc-field"><span class="qc-label">题号</span><input type="text" value="' + q.num + '" onchange="questions[' + i + '].num=this.value"></div>'
+                + '<div class="qc-field"><span class="qc-label">题目</span><input type="text" value="' + q.title + '" onchange="questions[' + i + '].title=this.value"></div>';
+
+            if (isChoice) {
+                html += '<div style="font-size:12px;color:#999;margin-bottom:6px;">选项列表</div>'
+                    + '<div class="qc-options">';
+                for (var j = 0; j < q.options.length; j++) {
+                    html += renderOptionCard(i, j, q.options[j]);
+                }
+                html += '</div>'
+                    + '<button class="add-option-btn" onclick="addOption(' + i + ')">+ 添加选项</button>';
+            } else {
+                html += '<div style="font-size:12px;color:#999;padding:8px 0;">填空题，用户可直接输入文字作答</div>';
+            }
+            html += '</div>';
+        }
+        list.innerHTML = html;
+    }
+
+    function renderOptionCard(qi, oi, opt) {
+        var hasDep = opt.depends && opt.depends.length > 0;
+        var html = '<div class="qc-option-card">'
+            + '<button class="oc-del-top" onclick="delOption(' + qi + ',' + oi + ')" title="删除">✕</button>'
+            + '<div class="oc-row"><span class="oc-label">选项</span><input type="text" value="' + opt.label + '" onchange="questions[' + qi + '].options[' + oi + '].label=this.value"></div>';
+        if (hasDep) {
+            html += '<div class="oc-depends">'
+                + '<div class="ocd-title">📌 依赖条件（满足时才显示此选项）</div>';
+            for (var d = 0; d < opt.depends.length; d++) {
+                html += '<div class="ocd-row">'
+                    + '<span>当</span>'
+                    + '<select onchange="updateDepRef(' + qi + ',' + oi + ',' + d + ',parseInt(this.value))">'
+                    + '<option value="-1">选择题目</option>';
+                for (var r = 0; r < qi; r++) {
+                    var sel = r === opt.depends[d].ref ? ' selected' : '';
+                    html += '<option value="' + r + '"' + sel + '>' + questions[r].num + ' ' + questions[r].title + '</option>';
+                }
+                html += '</select><span>的答案为</span>'
+                    + '<select onchange="updateDepLabel(' + qi + ',' + oi + ',' + d + ',this.value)">'
+                    + '<option value="">选择</option>';
+                var refIdx = opt.depends[d].ref;
+                if (refIdx !== undefined && refIdx >= 0 && questions[refIdx] && questions[refIdx].type === 'choice') {
+                    for (var v = 0; v < questions[refIdx].options.length; v++) {
+                        var sv = questions[refIdx].options[v].label === opt.depends[d].label ? ' selected' : '';
+                        html += '<option value="' + questions[refIdx].options[v].label + '"' + sv + '>' + questions[refIdx].options[v].label + '</option>';
+                    }
+                }
+                html += '</select>'
+                    + '<button class="ocd-del" onclick="delDep(' + qi + ',' + oi + ',' + d + ')">✕</button>'
+                    + '</div>';
+            }
+            html += '<button class="ocd-add" onclick="addDep(' + qi + ',' + oi + ')">+ 添加依赖条件</button>'
+                + '</div>';
+        } else {
+            html += '<div style="margin-top:6px;"><button class="ocd-add" onclick="addDep(' + qi + ',' + oi + ')" style="font-size:11px;color:#D46B08;cursor:pointer;border:1px dashed #FFD591;border-radius:4px;background:#fff;padding:4px 10px;font-family:inherit;">📌 添加依赖条件</button></div>';
+        }
+        html += '</div>';
+        return html;
+    }
+
+    function toggleType(qi) {
+        var q = questions[qi];
+        if (q.type === 'choice') {
+            q.type = 'input';
+            q.options = [];
+        } else {
+            q.type = 'choice';
+            q.options = [{ label: '选项1', depends: [] }, { label: '选项2', depends: [] }];
+        }
+        renderQuestions();
+    }
+
+    function updateDepRef(qi, oi, di, val) {
+        if (!questions[qi].options[oi].depends) questions[qi].options[oi].depends = [];
+        questions[qi].options[oi].depends[di].ref = val;
+        questions[qi].options[oi].depends[di].label = '';
+        renderQuestions();
+    }
+
+    function updateDepLabel(qi, oi, di, val) {
+        questions[qi].options[oi].depends[di].label = val;
+        renderQuestions();
+    }
+
+    function addDep(qi, oi) {
+        if (!questions[qi].options[oi].depends) questions[qi].options[oi].depends = [];
+        questions[qi].options[oi].depends.push({ ref: -1, label: '' });
+        renderQuestions();
+    }
+
+    function delDep(qi, oi, di) {
+        questions[qi].options[oi].depends.splice(di, 1);
+        renderQuestions();
+    }
+
+    function addQuestion() {
+        questions.push({
+            num: 'Q' + (questions.length + 1), title: '新问题', type: 'choice',
+            options: [{ label: '选项1', depends: [] }, { label: '选项2', depends: [] }]
+        });
+        renderQuestions();
+    }
+
+    function delQuestion(idx) {
+        if (!confirm('确定删除该问题？')) return;
+        questions.splice(idx, 1);
+        renderQuestions();
+    }
+
+    function moveQuestion(idx, dir) {
+        var target = idx + dir;
+        if (target < 0 || target >= questions.length) return;
+        var tmp = questions[idx];
+        questions[idx] = questions[target];
+        questions[target] = tmp;
+        renderQuestions();
+    }
+
+    function addOption(qi) {
+        questions[qi].options.push({ label: '新选项', depends: [] });
+        renderQuestions();
+    }
+
+    function delOption(qi, oi) {
+        if (questions[qi].options.length <= 2) { alert('至少保留2个选项'); return; }
+        questions[qi].options.splice(oi, 1);
+        renderQuestions();
+    }
+
+    function saveConfig() {
+        localStorage.setItem('studyNoteConfigV3', JSON.stringify(JSON.parse(JSON.stringify(questions))));
+        alert('✅ 配置已保存');
+    }
+
+    function loadConfig() {
+        var saved = localStorage.getItem('studyNoteConfigV3');
+        if (!saved) return;
+        try {
+            var data = JSON.parse(saved);
+            if (data && data.length > 0) questions = data;
+        } catch(e) {}
+    }
+
+    function closeModal() { window.location.href = '../index.html'; }
+
+    loadConfig();
+    renderQuestions();
+</script>
+</body>
+</html>

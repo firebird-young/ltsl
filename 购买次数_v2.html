@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>购买点数 - 离泰数链</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 430px;
+            background: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            margin: 0 auto;
+            position: relative;
+        }
+        .content-area { flex: 1; padding: 0 16px 24px; }
+
+        .top-nav {
+            height: 50px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            border-bottom: 1px solid #f0f0f0;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .top-nav .back-btn {
+            width: 32px; height: 32px;
+            border-radius: 50%; border: none;
+            background: #f5f5f5;
+            font-size: 18px; color: #666;
+            cursor: pointer; display: flex;
+            align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .top-nav .back-btn:active { background: #e8e8e8; }
+        .top-nav .title {
+            flex: 1; text-align: center;
+            font-size: 17px; font-weight: 600; color: #333;
+            padding-right: 32px;
+        }
+        .top-nav .record-btn {
+            position: absolute;
+            right: 16px;
+            font-size: 13px;
+            color: #0669FF;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-family: inherit;
+            font-weight: 500;
+            padding: 6px 10px;
+        }
+
+        .points-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 14px;
+            padding: 20px;
+            margin: 16px 0;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+        .points-card::after {
+            content: '';
+            position: absolute;
+            top: -30px; right: -30px;
+            width: 120px; height: 120px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 50%;
+        }
+        .points-card .pc-label { font-size: 13px; opacity: 0.85; margin-bottom: 4px; }
+        .points-card .pc-value { font-size: 36px; font-weight: 700; }
+        .points-card .pc-unit { font-size: 16px; font-weight: 400; opacity: 0.8; margin-left: 4px; }
+
+        .consume-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            border: 1px solid #e8e8e8;
+        }
+        .consume-card .cc-title { font-size: 13px; font-weight: 600; color: #333; margin-bottom: 10px; }
+        .consume-card .cc-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 6px 0; font-size: 13px; color: #666;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .consume-card .cc-row:last-child { border-bottom: none; }
+        .consume-card .cc-row .cc-label { display: flex; align-items: center; gap: 6px; }
+        .consume-card .cc-row .cc-points { font-weight: 600; color: #333; }
+
+        .section-title { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 12px; }
+
+        .plan-list { display: flex; flex-direction: column; gap: 10px; }
+        .plan-card {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 18px; background: #fff;
+            border: 1.5px solid #e0e0e0; border-radius: 14px;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .plan-card:active { background: #E8F1FF; }
+        .plan-card.selected {
+            border-color: #667eea;
+            background: #F5F3FF;
+            box-shadow: 0 0 0 2px rgba(102,126,234,0.12);
+        }
+        .plan-card .pl-left { display: flex; align-items: center; gap: 14px; flex: 1; }
+        .plan-card .pl-icon {
+            width: 44px; height: 44px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; flex-shrink: 0;
+        }
+        .plan-card .pl-icon.small { background: #E8F5E9; }
+        .plan-card .pl-icon.medium { background: #E8F0FE; }
+        .plan-card .pl-icon.large { background: #FFF3E0; }
+        .plan-card .pl-icon.xlarge { background: #F3E8FF; }
+        .plan-card .pl-info { flex: 1; }
+        .plan-card .pl-info .pl-name { font-size: 15px; font-weight: 600; color: #333; }
+        .plan-card .pl-info .pl-desc { font-size: 12px; color: #999; margin-top: 2px; }
+        .plan-card .pl-info .pl-unit-price { font-size: 11px; color: #bbb; margin-top: 1px; }
+        .plan-card .pl-right { text-align: right; }
+        .plan-card .pl-right .pl-price { font-size: 20px; font-weight: 700; color: #667eea; }
+        .plan-card .pl-right .pl-tag {
+            display: inline-block; margin-top: 4px;
+            font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 500;
+        }
+        .plan-card .pl-right .pl-tag.hot { background: #FFF0F0; color: #E53935; }
+        .plan-card .pl-right .pl-tag.save { background: #E8F5E9; color: #34c759; }
+        .plan-card .pl-radio {
+            width: 20px; height: 20px; border-radius: 50%;
+            border: 2px solid #ccc;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; margin-left: 12px; transition: all 0.2s;
+        }
+        .plan-card.selected .pl-radio { border-color: #667eea; }
+        .plan-card.selected .pl-radio::after { content: ''; width: 10px; height: 10px; border-radius: 50%; background: #667eea; }
+
+        .buy-footer {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 430px;
+            display: flex;
+            gap: 12px;
+            padding: 12px 16px;
+            background: #fff;
+            border-top: 1px solid #f0f0f0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.04);
+            z-index: 10;
+        }
+        .buy-footer button {
+            flex: 1; height: 48px; border: none; border-radius: 14px;
+            font-size: 16px; font-weight: 600; cursor: pointer; font-family: inherit;
+            transition: opacity 0.2s;
+        }
+        .buy-footer button:active { opacity: 0.85; }
+        .buy-footer .bf-cancel { background: #f5f5f5; color: #666; }
+        .buy-footer .bf-pay { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; box-shadow: 0 4px 16px rgba(102,126,234,0.25); }
+
+        .content-area { flex: 1; padding: 0 16px 80px; }
+
+        @media (max-width: 430px) { .app-container { max-width: 100%; } }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="top-nav">
+        <button class="back-btn" onclick="goBack()">‹</button>
+        <div class="title">购买点数</div>
+        <button class="record-btn" onclick="goRecord()">购买记录</button>
+    </div>
+    <div class="content-area">
+        <div class="points-card">
+            <div class="pc-label">我的点数</div>
+            <div class="pc-value">128<span class="pc-unit">点</span></div>
+        </div>
+        <div class="consume-card">
+            <div class="cc-title">点数消耗说明</div>
+            <div class="cc-row"><span class="cc-label">AI视频创作（每次）</span><span class="cc-points">1 点</span></div>
+            <div class="cc-row"><span class="cc-label">AI游戏创作（每次）</span><span class="cc-points">1 点</span></div>
+        </div>
+        <div class="section-title">选择充值套餐</div>
+        <div class="plan-list" id="planList"></div>
+        <div class="buy-footer">
+            <button class="bf-cancel" onclick="goBack()">取消</button>
+            <button class="bf-pay" onclick="payBuy()">立即支付</button>
+        </div>
+    </div>
+</div>
+<script>
+    var plans = [
+        { name: '50 点', desc: '适合初次体验', icon: '🌱', iconCls: 'small', points: 50, price: 49.9, unitPrice: '1.00', tag: '', tagCls: '' },
+        { name: '150 点', desc: '适合轻度使用', icon: '🌿', iconCls: 'medium', points: 150, price: 138, unitPrice: '0.92', tag: '省¥11.7', tagCls: 'save' },
+        { name: '500 点', desc: '高性价比之选', icon: '🔥', iconCls: 'large', points: 500, price: 398, unitPrice: '0.80', tag: '热销', tagCls: 'hot' },
+        { name: '1000 点', desc: '长期使用推荐', icon: '💎', iconCls: 'xlarge', points: 1000, price: 698, unitPrice: '0.70', tag: '省¥301', tagCls: 'save' },
+    ];
+    var selectedPlan = 0;
+    function goBack() { window.location.href = 'AI创作_v2.html'; }
+    function goRecord() { window.location.href = '购买记录.html'; }
+    function renderPlans() {
+        var el = document.getElementById('planList');
+        var html = '';
+        for (var i = 0; i < plans.length; i++) {
+            var p = plans[i];
+            html += '<div class="plan-card' + (i === selectedPlan ? ' selected' : '') + '" onclick="selectPlan(' + i + ')">'
+                + '<div class="pl-left"><div class="pl-icon ' + p.iconCls + '">' + p.icon + '</div>'
+                + '<div class="pl-info"><div class="pl-name">' + p.name + '</div>'
+                + '<div class="pl-desc">' + p.desc + '</div>'
+                + '<div class="pl-unit-price">约 ¥' + p.unitPrice + '/点</div></div></div>'
+                + '<div class="pl-right"><div class="pl-price">¥' + p.price + '</div>'
+                + (p.tag ? '<div class="pl-tag ' + p.tagCls + '">' + p.tag + '</div>' : '') + '</div>'
+                + '<div class="pl-radio"></div></div>';
+        }
+        el.innerHTML = html;
+    }
+    function selectPlan(idx) { selectedPlan = idx; renderPlans(); }
+    function payBuy() {
+        var p = plans[selectedPlan];
+        alert('支付 ¥' + p.price + ' 购买 ' + p.points + ' 点');
+        var records = JSON.parse(localStorage.getItem('buyRecords') || '[]');
+        records.push({
+            id: 'PT' + new Date().getTime(), type: 'point', method: 'plan',
+            planName: p.name, quantity: p.points, total: p.price,
+            user: '13812345678', time: new Date().toLocaleString(),
+            status: 'success', refundReason: ''
+        });
+        localStorage.setItem('buyRecords', JSON.stringify(records));
+    }
+    renderPlans();
+</script>
+</body>
+</html>
