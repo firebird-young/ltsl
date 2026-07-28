@@ -7,7 +7,7 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f0f2f5; min-height: 100vh; display: flex; justify-content: center; color: #1f2937; }
-        .page-wrap { width: 100%; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; gap: 28px; padding: 20px; }
+        .page-wrap { width: 100%; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; gap: 28px; padding: 20px; position: relative; }
         .phone-frame { width: 430px; min-height: 100vh; background: #fff; position: relative; overflow: hidden; flex-shrink: 0; border-radius: 12px; box-shadow: 0 2px 20px rgba(0,0,0,.06); }
         .phone-frame::before { content: ""; position: absolute; inset: 0 0 auto; height: 330px; background: radial-gradient(circle at 50% 8%, rgba(178, 202, 246, .5), transparent 58%), linear-gradient(180deg, #e8f0ff 0%, #fff 86%); pointer-events: none; }
         .content { position: relative; z-index: 1; min-height: 100vh; padding: 0 32px; display: flex; flex-direction: column; }
@@ -49,31 +49,16 @@
         .agreement a { color: #3271d8; text-decoration: none; }
         .error-msg { min-height: 20px; text-align: center; color: #e35353; font-size: 12px; margin-top: 7px; }
         .support { margin-top: auto; padding: 30px 0 34px; text-align: center; color: #aaa; font-size: 12px; }
-        /* 右侧提示面板 */
-        .side-panel { width: 280px; flex-shrink: 0; padding-top: 60px; }
-        .side-title { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 16px; }
-        .error-card { background: #fff; border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; box-shadow: 0 1px 6px rgba(0,0,0,.06); border-left: 3px solid; display: flex; align-items: flex-start; gap: 10px; }
-        .error-card .icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
-        .error-card .text { font-size: 13px; color: #444; line-height: 1.5; }
-        .error-card .label { font-size: 11px; font-weight: 600; margin-bottom: 3px; }
-        .card-red { border-left-color: #e35353; }
-        .card-orange { border-left-color: #e67e22; }
-        .card-purple { border-left-color: #8e44ad; }
-        /* ── 功能说明浮窗 ── */
-        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 500px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
-        .f-modal.show { display: block; }
-        .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
-        .f-modal .fm-title:active { cursor: grabbing; }
-        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
-        .f-modal .fm-close:hover { background: #e8e8e8; }
-        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
-        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
-        .f-modal .fm-body h4:first-child { margin-top: 0; }
-        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
-        .f-modal .fm-body li { margin-bottom: 4px; }
-        .f-modal .fm-body .badge { display:inline-flex;width:18px;height:18px;border-radius:50%;background:#E91E63;color:#fff;font-size:11px;font-weight:700;align-items:center;justify-content:center;margin-right:6px;vertical-align:middle; }
-        .f-modal .fm-body .error-card { background: #f9fafb; border-radius: 8px; padding: 10px 14px; margin-bottom: 8px; border-left: 3px solid; }
-        @media (max-width: 768px) { .side-panel { display: none; } }
+        /* ── 功能说明面板 ── */
+        .doc-panel { width: 560px; background: #fff; border-radius: 16px; box-shadow: 0 2px 20px rgba(0,0,0,.08); padding: 24px 28px; max-height: calc(100vh - 40px); overflow-y: auto; font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', Arial, sans-serif; line-height: 1.7; font-size: 14px; color: #333; position: absolute; left: calc(50% + 235px); top: 20px; }
+        .doc-panel::-webkit-scrollbar { width: 5px; }
+        .doc-panel::-webkit-scrollbar-thumb { background: #d0d5e0; border-radius: 3px; }
+        .doc-panel .doc-title { font-size: 20px; font-weight: 700; color: #1F3864; border-bottom: 2px solid #2E75B6; padding-bottom: 10px; margin-bottom: 16px; }
+        .doc-panel h3 { font-size: 16px; font-weight: 600; color: #2E75B6; margin: 16px 0 8px; }
+        .doc-panel p { font-size: 13px; color: #555; margin-bottom: 6px; }
+        .doc-panel ul { padding-left: 20px; margin: 4px 0 8px; }
+        .doc-panel li { margin-bottom: 3px; font-size: 13px; color: #555; }
+        @media (max-width: 1200px) { .page-wrap { flex-wrap: wrap; } .doc-panel { position: static; width: 100%; max-width: 430px; max-height: none; margin-top: 20px; } }
     </style>
 </head>
 <body>
@@ -96,7 +81,7 @@
                     <div class="pwd-tip">温馨提示：为保障您的账号安全，首次登录必须通过手机号一键登录完成验证。</div>
                     <input class="field-input" id="phoneInput" type="tel" maxlength="11" placeholder="请输入手机号" oninput="onPhoneInput()">
                     <div class="pwd-wrap"><input class="field-input" id="pwdInput" type="password" placeholder="请输入密码" oninput="updateLoginBtn()"><button class="pwd-toggle" id="pwdToggle" onclick="togglePwd()">◉</button></div>
-                    <button class="login-btn" id="passwordLoginBtn" disabled onclick="handlePasswordLogin()">密码登录</button>
+                    <button class="login-btn" id="passwordLoginBtn" disabled onclick="handlePasswordLogin()">密码登录<span style="display:inline-flex;width:18px;height:18px;border-radius:50%;background:#E91E63;color:#fff;font-size:11px;font-weight:700;align-items:center;justify-content:center;margin-left:5px;vertical-align:middle;">3</span></button>
                 </div>
                 <div class="error-msg" id="errorMsg"></div>
                 <label class="agreement"><input type="checkbox" id="agreeChk"><span>我已阅读并同意 <a href="#">《用户协议》</a> 和 <a href="#">《隐私协议》</a></span><span style="display:inline-flex;width:18px;height:18px;border-radius:50%;background:#E91E63;color:#fff;font-size:11px;font-weight:700;align-items:center;justify-content:center;margin-left:4px;vertical-align:middle;">1</span></label>
@@ -104,35 +89,33 @@
             <div class="support">由艺海智能科技提供技术支持</div>
         </div>
     </div>
+</div>
+
+<div class="doc-panel">
+    <div class="doc-title">登录 - 功能说明</div>
+    <div class="doc-section">
+        <h3><span style="display:inline-flex;width:18px;height:18px;border-radius:50%;background:#E91E63;color:#fff;font-size:11px;font-weight:700;align-items:center;justify-content:center;margin-right:5px;vertical-align:middle;">1</span> 我已阅读并同意</h3>
+        <ul>
+            <li>勾选《用户协议》和《隐私协议》后方可登录，未勾选时点击任意登录按钮会弹出确认窗口提示用户先勾选协议</li>
+        </ul>
     </div>
+    <div class="doc-section">
+        <h3><span style="display:inline-flex;width:18px;height:18px;border-radius:50%;background:#E91E63;color:#fff;font-size:11px;font-weight:700;align-items:center;justify-content:center;margin-right:5px;vertical-align:middle;">2</span> 密码登录</h3>
+        <ul>
+            <li>进入「个人资料」→「密码管理」手动开启后可使用手机号+密码方式登录</li>
+            <li>首次登录必须使用手机号一键登录完成验证</li>
+            <li>密码连续输错 5 次，30 分钟内不可再使用密码登录，请使用手机号一键登录</li>
+        </ul>
     </div>
-</div>
-</div>
-
-<button onclick="toggleFuncModal()" style="position:fixed;top:12px;right:16px;z-index:99999;background:#fff;color:#666;padding:7px 16px;border-radius:20px;border:1px solid #ddd;font-size:13px;font-weight:500;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-family:inherit;display:inline-flex;align-items:center;gap:4px;">📖 说明</button>
-
-<!-- ====== 功能说明浮窗 ====== -->
-<div class="f-modal" id="funcModal">
-  <div class="fm-title">
-    <span>📖 功能说明</span>
-    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
-  </div>
-  <div class="fm-body">
-    <p style="margin:0 0 12px;color:#666">登录页面包含两种登录方式及相关安全提示。</p>
-
-    <h4>一、标注功能点</h4>
-    <ul>
-      <li><span class="badge">1</span><strong>我已阅读并同意</strong> — 勾选《用户协议》和《隐私协议》后方可登录，未勾选时点击任意登录按钮会弹出确认窗口提示用户先勾选协议</li>
-      <li><span class="badge">2</span><strong>密码登录</strong> — 进入「个人资料」→「密码管理」手动开启后可使用手机号+密码方式登录，首次登录必须使用手机号一键登录完成验证，密码连续输错 5 次将锁定 30 分钟</li>
-    </ul>
-
-    <h4>二、密码登录错误提示</h4>
-    <div class="error-card" style="border-left-color:#e35353;"><strong style="color:#e35353;">手机号或密码错误</strong> — 输入的手机号或密码不匹配，请重新输入</div>
-    <div class="error-card" style="border-left-color:#e67e22;"><strong style="color:#e67e22;">该手机号首次登录</strong> — 该手机号首次登录，请使用手机号一键登录</div>
-    <div class="error-card" style="border-left-color:#8e44ad;"><strong style="color:#8e44ad;">未设置密码登录</strong> — 该账号未开启密码登录功能，请使用手机号一键登录</div>
-    <div class="error-card" style="border-left-color:#c0392b;"><strong style="color:#c0392b;">密码锁定提示</strong> — 密码连续输错 5 次，30 分钟内不可再使用密码登录，请使用手机号一键登录</div>
-  </div>
-</div>
+    <div class="doc-section">
+        <h3><span style="display:inline-flex;width:18px;height:18px;border-radius:50%;background:#E91E63;color:#fff;font-size:11px;font-weight:700;align-items:center;justify-content:center;margin-right:5px;vertical-align:middle;">3</span> 密码登录错误提示</h3>
+        <ul>
+            <li><b>手机号或密码错误</b> — 输入的手机号或密码不匹配，请重新输入</li>
+            <li><b>该手机号首次登录</b> — 该手机号首次登录，请使用手机号一键登录</li>
+            <li><b>未设置密码登录</b> — 该账号未开启密码登录功能，请使用手机号一键登录</li>
+            <li><b>密码锁定提示</b> — 密码连续输错 5 次，30 分钟内不可再使用密码登录，请使用手机号一键登录</li>
+        </ul>
+    </div>
 </div>
 <script>
     var tabs = document.querySelectorAll('.role-tab');
@@ -153,8 +136,6 @@
     function onPhoneInput() { var input = document.getElementById('phoneInput'); input.value = input.value.replace(/\D/g, '').slice(0, 11); updateLoginBtn(); }
     function togglePwd() { var input = document.getElementById('pwdInput'); var toggle = document.getElementById('pwdToggle'); input.type = input.type === 'password' ? 'text' : 'password'; toggle.textContent = input.type === 'password' ? '◉' : '◎'; }
     function handlePasswordLogin() { if (!isAgreed()) { showModal(); return; } var btn = document.getElementById('passwordLoginBtn'); btn.disabled = true; btn.textContent = '登录中…'; setTimeout(function() { btn.disabled = false; btn.textContent = '密码登录'; showError('手机号或密码错误，请重新输入'); }, 900); }
-    function toggleFuncModal() { var el = document.getElementById('funcModal'); el.classList.toggle('show'); if (el.classList.contains('show') && !el.dataset.dragged) { el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)'; } }
-    (function() { var modal, titleBar, offX, offY, dragging = false; document.addEventListener('DOMContentLoaded', function() { modal = document.getElementById('funcModal'); titleBar = modal.querySelector('.fm-title'); titleBar.addEventListener('mousedown', startDrag); titleBar.addEventListener('touchstart', startDragTouch, {passive:true}); document.addEventListener('mousemove', onDrag); document.addEventListener('mouseup', endDrag); document.addEventListener('touchmove', onDragTouch, {passive:true}); document.addEventListener('touchend', endDrag); }); function startDrag(e) { modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; } function startDragTouch(e) { var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; } function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; } function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; } function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; } })();
 </script>
 </body>
 </html>
