@@ -412,17 +412,11 @@
         .share-popup .sp-info-label { color: #888; }
         .share-popup .sp-info-val { color: #333; font-weight: 500; }
         .share-popup .sp-info-val.green { color: #2e7d32; background: #e8f5e9; padding: 2px 10px; border-radius: 10px; }
-        .share-popup .sp-link-box { margin-top: 16px; background: #f8f9fb; border-radius: 10px; padding: 14px; }
-        .share-popup .sp-link-label { font-size: 12px; color: #888; margin-bottom: 8px; }
-        .share-popup .sp-link-row { display: flex; gap: 8px; }
-        .share-popup .sp-link-input { flex: 1; height: 38px; padding: 0 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 12px; color: #555; background: #fff; outline: none; cursor: pointer; font-family: inherit; }
-        .share-popup .sp-copy-btn { height: 38px; padding: 0 14px; border: none; border-radius: 8px; background: #0669FF; color: #fff; font-size: 12px; cursor: pointer; font-family: inherit; white-space: nowrap; }
-        .share-popup .sp-copy-btn:active { opacity: 0.85; }
-        .share-popup .sp-link-hint { font-size: 11px; color: #bbb; margin-top: 8px; }
-        .share-popup .sp-actions { padding: 0 20px 20px; }
+        .share-popup .sp-actions { padding: 0 20px 20px; display: flex; flex-direction: column; gap: 10px; }
         .share-popup .sp-btn { width: 100%; height: 44px; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; }
         .share-popup .sp-btn-primary { background: #0669FF; color: #fff; }
         .share-popup .sp-btn-primary:active { opacity: 0.85; }
+        .share-popup .sp-btn-secondary { background: transparent; color: #999; font-size: 13px; font-weight: 400; height: 36px; border: 1px dashed #ddd; border-radius: 8px; }
     </style>
 </head>
 <body>
@@ -510,25 +504,15 @@
         </div>
         <div class="sp-body">
             <div class="sp-icon-wrap">🔗</div>
-            <div class="sp-intro">生成分享链接，其他用户登录后仅可操作该页面功能</div>
-            <div class="sp-info-row">
-                <span class="sp-info-label">订单状态</span>
-                <span class="sp-info-val green">已核销</span>
-            </div>
+            <div class="sp-intro">他人通过分享链接进入页面后，仅可使用当前页面内功能。</div>
             <div class="sp-info-row">
                 <span class="sp-info-label">有效期</span>
                 <span class="sp-info-val">12小时</span>
             </div>
-            <div class="sp-link-box">
-                <div class="sp-link-label">分享链接</div>
-                <div class="sp-link-row">
-                    <input class="sp-link-input" id="shareLinkInput" readonly value="pages/operation?orderId=123&amp;shareToken=abc123xyz" onclick="this.select()">
-                    <button class="sp-copy-btn" onclick="copyShareLink()">📋 复制</button>
-                </div>
-            </div>
         </div>
         <div class="sp-actions">
-            <button class="sp-btn sp-btn-primary" onclick="regenerateShareToken()">🔄 重新生成链接</button>
+            <button class="sp-btn sp-btn-primary" onclick="showShareToast('✅ 已分享给他人')">👩‍🏫 分享给他人</button>
+            <button class="sp-btn sp-btn-secondary" onclick="regenerateShareToken()">🔄 重新生成</button>
         </div>
     </div>
 </div>
@@ -606,8 +590,7 @@
     /* ===== 分享给老师 ===== */
     function openShareModal() { document.getElementById('shareOverlay').classList.add('show'); document.body.style.overflow = 'hidden'; }
     function closeShareModal() { document.getElementById('shareOverlay').classList.remove('show'); document.body.style.overflow = ''; }
-    function copyShareLink() { var input = document.getElementById('shareLinkInput'); input.select(); document.execCommand('copy'); var btn = document.querySelector('.sp-copy-btn'); var t = btn.textContent; btn.textContent = '✅ 已复制'; setTimeout(function(){ btn.textContent = t; }, 1800); }
-    function regenerateShareToken() { var token = 'shareToken_' + Math.random().toString(36).substr(2,8); document.getElementById('shareLinkInput').value = 'pages/operation?orderId=123&' + token; showShareToast('✅ 新链接已生成'); }
+    function regenerateShareToken() { showShareToast('✅ 新分享链接已生成，旧链接已失效'); }
     function showShareToast(text) { var t = document.createElement('div'); t.textContent = text; t.style.cssText = 'position:fixed;top:30%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.78);color:#fff;padding:10px 18px;border-radius:8px;font-size:14px;z-index:999999;'; document.body.appendChild(t); setTimeout(function() { t.remove(); }, 1800); }
 
 
