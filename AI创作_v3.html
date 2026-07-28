@@ -505,12 +505,12 @@
 <div class="share-overlay" id="shareOverlay" onclick="if(event.target===this)closeShareModal()">
     <div class="share-popup">
         <div class="sp-header">
-            <span class="sp-title">👩‍🏫 分享给老师</span>
+            <span class="sp-title">👩‍🏫 分享给其他用户</span>
             <button class="sp-close" onclick="closeShareModal()">✕</button>
         </div>
         <div class="sp-body">
             <div class="sp-icon-wrap">🔗</div>
-            <div class="sp-intro">生成分享链接，老师登录后即可协助操作</div>
+            <div class="sp-intro">生成分享链接，其他用户登录后仅可操作该页面功能</div>
             <div class="sp-info-row">
                 <span class="sp-info-label">订单状态</span>
                 <span class="sp-info-val green">已核销</span>
@@ -582,6 +582,12 @@
         <li>老师A第一次点开链接并登录时，后端记录 <code>bound_teacher_id = 老师A的ID</code></li>
         <li>老师B后点开链接并登录，后端校验发现 <code>bound_teacher_id</code> 已存在，且不等于B，直接提示：<b>"该操作权限已被其他老师认领，请联系家长重新获取。"</b></li>
         <li>这样就完美解决了"群发链接导致多人抢着操作"的问题</li>
+    </ul>
+
+    <h3>🔄 链接重新生成</h3>
+    <ul>
+        <li>家长可点击"重新生成链接"按钮，后端会生成新的 <span class="tag-blue">share_token</span></li>
+        <li><b>重新生成后，老的链接即失效</b>，之前已认领的老师绑定关系也会解除</li>
     </ul>
 </div>
 
