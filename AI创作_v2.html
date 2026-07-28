@@ -150,6 +150,8 @@
             align-items: center; justify-content: center;
         }
         .done-card .dc-name { font-size: 13px; color: #333; margin-top: 8px; text-align: center; }
+        .done-card .dc-failed { position: absolute; inset: 0; background: rgba(0,0,0,0.55); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; font-size: 11px; line-height: 1.5; z-index: 2; }
+        .done-card .dc-failed .fail-icon { font-size: 22px; margin-bottom: 4px; }
         .group-title {
             font-size: 13px; color: #4285F4; font-weight: 600;
             margin: 12px 0 10px; padding-left: 8px;
@@ -368,18 +370,18 @@
             object-fit: contain;
         }
 
-        /* ── 功能说明浮窗 ── */
-        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 500px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 99999; padding: 24px; display: none; }
-        .f-modal.show { display: block; }
-        .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
-        .f-modal .fm-title:active { cursor: grabbing; }
-        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
-        .f-modal .fm-close:hover { background: #e8e8e8; }
-        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
-        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
-        .f-modal .fm-body h4:first-child { margin-top: 0; }
-        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
-        .f-modal .fm-body li { margin-bottom: 4px; }
+        /* ── 功能说明面板 ── */
+        .doc-panel { width: 560px; background: #fff; border-radius: 16px; box-shadow: 0 2px 20px rgba(0,0,0,.08); padding: 24px 28px; max-height: calc(100vh - 40px); overflow-y: auto; font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', Arial, sans-serif; line-height: 1.7; font-size: 14px; color: #333; position: absolute; left: calc(50% + 365px); top: 20px; }
+        .doc-panel::-webkit-scrollbar { width: 5px; }
+        .doc-panel::-webkit-scrollbar-thumb { background: #d0d5e0; border-radius: 3px; }
+        .doc-panel .doc-title { font-size: 20px; font-weight: 700; color: #1F3864; border-bottom: 2px solid #2E75B6; padding-bottom: 10px; margin-bottom: 16px; }
+        .doc-panel h3 { font-size: 16px; font-weight: 600; color: #2E75B6; margin: 16px 0 8px; }
+        .doc-panel h4 { font-size: 14px; font-weight: 600; color: #333; margin: 12px 0 6px; }
+        .doc-panel p { font-size: 13px; color: #555; margin-bottom: 6px; }
+        .doc-panel ul { padding-left: 20px; margin: 4px 0 8px; }
+        .doc-panel li { margin-bottom: 3px; font-size: 13px; color: #555; }
+        .doc-panel .badge { display:inline-flex;width:18px;height:18px;border-radius:50%;background:#E91E63;color:#fff;font-size:11px;font-weight:700;align-items:center;justify-content:center;margin-right:4px;vertical-align:middle; }
+        @media (max-width: 1200px) { .page-wrap { flex-wrap: wrap; } .doc-panel { position: static; width: 100%; max-width: 430px; max-height: none; margin-top: 20px; } }
     </style>
 </head>
 <body>
@@ -420,7 +422,7 @@
             <div class="group-title">AI创作视频 <span>（共2个）</span></div>
             <div class="done-grid">
                 <div class="done-card"><div class="dc-cover">📹</div><div class="dc-name">快速搭建茅屋</div><button class="dc-del" onclick="delWork(0)">🗑</button></div>
-                <div class="done-card"><div class="dc-cover">📹</div><div class="dc-name">快速搭建茅屋</div><button class="dc-del" onclick="delWork(1)">🗑</button></div>
+                <div class="done-card" style="position:relative;"><div class="dc-cover">📹<div class="dc-failed"><span class="fail-icon">⚠️</span>生成失败<br>内容可能不合规</div></div><div class="dc-name">快速搭建茅屋</div><button class="dc-del" onclick="delWork(1)">🗑</button><span style="position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:#E91E63;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;z-index:3;box-shadow:0 1px 3px rgba(0,0,0,.2);">1</span></div>
             </div>
         </div>
     </div>
@@ -461,51 +463,57 @@
     <img id="imgPreviewSrc" src="">
 </div>
 
-<button onclick="toggleFuncModal()" style="position:fixed;top:12px;right:16px;z-index:99999;background:#fff;color:#666;padding:7px 16px;border-radius:20px;border:1px solid #ddd;font-size:13px;font-weight:500;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-family:inherit;display:inline-flex;align-items:center;gap:4px;">📖 说明</button>
+<div class="doc-panel">
+    <div class="doc-title">AI创作_v2 - 功能说明</div>
 
-<!-- ====== 功能说明浮窗 ====== -->
-<div class="f-modal" id="funcModal">
-    <div class="fm-title">
-        <span>📖 功能说明</span>
-        <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+    <h3>1. 页面布局</h3>
+    <ul>
+        <li><b>成员与课程</b>：顶部显示当前创作成员信息和关联课程</li>
+        <li><b>作品区</b>：分为创作中（进度条）和已完成（双列卡片）两个区块</li>
+        <li><b>AI创作按钮</b>：底部固定「✨ AI创作」按钮，点击弹出创作浮层</li>
+    </ul>
+
+    <h3>3. 创作弹窗 - 视频/游戏Tab</h3>
+    <ul>
+        <li><b>Tab切换</b>：支持视频创作和游戏创作切换（游戏保持原样，后台直接配成不开启，等后续完善后再打开）</li>
+        <li><b>剩余次数</b>：Tab下方显示「视频创作剩余N次」，不足时显示0次并引导购买</li>
+        <li><b>购买入口</b>：次数不足时横幅显示「立即购买」按钮，跳转购买页面</li>
+    </ul>
+
+    <h3>4. 创作弹窗 - 视频内容问题填写</h3>
+    <ul>
+        <li><b>逐题选择</b>：根据后台研学手记的配置的问题，按顺序选择</li>
+        <li><b>题型</b>：选择题（点选选项）和输入题（填写名字）</li>
+        <li><b>进度条</b>：顶部显示答题进度</li>
+        <li><b>导航</b>：支持上一题/下一题，最后一题为「生成我的 Prompt」</li>
+    </ul>
+
+    <h3>5. Prompt预览与视频生成</h3>
+    <ul>
+        <li><b>Prompt预览</b>：根据选择生成专业视频Prompt，支持手动修改</li>
+        <li><b>确认Prompt</b>：点击确认后弹出标题输入框</li>
+        <li><b>生成视频</b>：输入标题后点击「生成视频」提交创作，消耗1次剩余次数</li>
+    </ul>
+
+    <h3>6. 次数不足处理</h3>
+    <ul>
+        <li><b>横幅提示</b>：弹窗Tab下方显示剩余次数</li>
+        <li><b>次数为0</b>：不展示问卷题目，直接显示购买引导页面</li>
+        <li><b>生成消耗</b>：每次成功提交创作消耗1次</li>
+    </ul>
+
+    <div style="margin-top:16px;">
+        <div style="font-size:13px;font-weight:600;color:#333;margin-bottom:8px;">视频生成流程图</div>
+        <img src="视频生成流程图.png" style="width:100%;border-radius:8px;border:1px solid #e0e0e0;cursor:pointer;" alt="视频生成流程图" onclick="openImagePreview(this.src)">
     </div>
-    <div class="fm-body">
-        <h4>一、页面布局</h4>
-        <ul>
-            <li><strong>成员与课程</strong>：顶部显示当前创作成员信息和关联课程</li>
-            <li><strong>作品区</strong>：分为创作中（进度条）和已完成（双列卡片）两个区块</li>
-            <li><strong>AI创作按钮</strong>：底部固定「✨ AI创作」按钮，点击弹出创作浮层</li>
-        </ul>
-        <h4>二、创作弹窗 - 视频/游戏Tab</h4>
-        <ul>
-            <li><strong>Tab切换</strong>：支持视频创作和游戏创作切换（游戏保持原样，后台直接配成不开启，等后续完善后再打开）</li>
-            <li><strong>剩余次数</strong>：Tab下方显示「视频创作剩余N次」，不足时显示0次并引导购买，注意这里的次数是用当前课程赠送的免费次数+用户购买的次数（用户购买的次数是不限课程的，全场通用）</li>
-            <li><strong>购买入口</strong>：次数不足时横幅显示「立即购买」按钮，跳转购买页面</li>
-        </ul>
-        <h4>三、创作弹窗 - 视频内容问题填写</h4>
-        <ul>
-            <li><strong>逐题选择</strong>根据后台研学手记的配置的问题，按顺序选择</li>
-            <li><strong>题型</strong>：选择题（点选选项）和输入题（填写名字）</li>
-            <li><strong>进度条</strong>：顶部显示答题进度</li>
-            <li><strong>导航</strong>：支持上一题/下一题，最后一题为「生成我的 Prompt」</li>
-        </ul>
-        <h4>四、Prompt预览与视频生成</h4>
-        <ul>
-            <li><strong>Prompt预览</strong>：根据选择生成专业视频Prompt，支持手动修改</li>
-            <li><strong>确认Prompt</strong>：点击确认后弹出标题输入框</li>
-            <li><strong>生成视频</strong>：输入标题后点击「生成视频」提交创作，消耗1次剩余次数</li>
-        </ul>
-        <h4>五、次数不足处理</h4>
-        <ul>
-            <li><strong>横幅提示</strong>：弹窗Tab下方显示剩余次数</li>
-            <li><strong>次数为0</strong>：不展示问卷题目，直接显示购买引导页面</li>
-            <li><strong>生成消耗</strong>：每次成功提交创作消耗1次</li>
-        </ul>
-        <div style="margin-top:16px;">
-            <div style="font-size:13px;font-weight:600;color:#333;margin-bottom:8px;">视频生成流程图</div>
-            <img src="视频生成流程图.png" style="width:100%;border-radius:8px;border:1px solid #e0e0e0;cursor:pointer;" alt="视频生成流程图" onclick="openImagePreview(this.src)">
-        </div>
-    </div>
+
+    <h3 style="margin-top:24px;"><span class="badge">1</span> 生成失败提示</h3>
+    <ul>
+        <li>AI创作视频列表中，若视频生成失败，会在视频卡片上覆盖半透明黑色蒙版</li>
+        <li>蒙版显示 <b>⚠️ 生成失败 / 内容可能不合规</b> 提示，方便用户识别</li>
+        <li>失败视频仍可删除，不影响其他正常视频</li>
+        <li>失败视频只在此处展示，研学报告里还是只有成功的视频</li>
+    </ul>
 </div>
 
 <script>
@@ -520,46 +528,7 @@
         document.body.style.overflow = '';
     }
 
-    function toggleFuncModal() {
-        var el = document.getElementById('funcModal');
-        el.classList.toggle('show');
-        if (el.classList.contains('show') && !el.dataset.dragged) {
-            el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
-        }
-    }
-    (function() {
-        var modal, titleBar, offX, offY, dragging = false;
-        document.addEventListener('DOMContentLoaded', function() {
-            modal = document.getElementById('funcModal');
-            if (!modal) return;
-            titleBar = modal.querySelector('.fm-title');
-            if (!titleBar) return;
-            titleBar.addEventListener('mousedown', startDrag);
-            titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
-            document.addEventListener('mousemove', onDrag);
-            document.addEventListener('mouseup', endDrag);
-            document.addEventListener('touchmove', onDragTouch, {passive:true});
-            document.addEventListener('touchend', endDrag);
-        });
-        function startDrag(e) {
-            if (e.target.closest('.fm-close')) return;
-            modal.dataset.dragged = '1'; modal.style.transform = '';
-            var rect = modal.getBoundingClientRect();
-            offX = e.clientX - rect.left; offY = e.clientY - rect.top;
-            dragging = true; if (titleBar) titleBar.style.cursor = 'grabbing';
-        }
-        function startDragTouch(e) {
-            if (e.target.closest('.fm-close')) return;
-            var t = e.touches[0];
-            modal.dataset.dragged = '1'; modal.style.transform = '';
-            var rect = modal.getBoundingClientRect();
-            offX = t.clientX - rect.left; offY = t.clientY - rect.top;
-            dragging = true;
-        }
-        function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
-        function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
-        function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
-    })();
+
 </script>
 </body>
 <script>
