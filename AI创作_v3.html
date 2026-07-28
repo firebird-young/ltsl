@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI创作_v3 - 离泰数链</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            background: #e8e8e8;
+        }
+        .page-wrap {
+            display: flex;
+            gap: 20px;
+            padding: 0;
+            min-height: 100vh;
+            align-items: flex-start;
+            justify-content: center;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 430px;
+            background: #f3f0fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: visible;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
+        .content-area { flex: 1; padding: 0 14px 90px; }
+
+        .status-bar {
+            height: 44px;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            font-size: 14px;
+            color: #333;
+            flex-shrink: 0;
+        }
+        .status-bar .right { display: flex; align-items: center; gap: 4px; }
+
+        .top-nav {
+            height: 44px;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            flex-shrink: 0;
+        }
+        .top-nav .back-btn {
+            width: 32px; height: 32px;
+            background: transparent; border: none;
+            font-size: 22px; color: #333;
+            cursor: pointer; display: flex;
+            align-items: center; justify-content: center;
+        }
+        .top-nav .title { font-size: 16px; font-weight: 600; color: #333; }
+        .top-nav .right-icons { display: flex; gap: 10px; }
+        .top-nav .right-icon {
+            width: 30px; height: 30px; border-radius: 50%;
+            background: rgba(255,255,255,0.6);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; color: #333; cursor: pointer;
+        }
+
+        .member-card {
+            background: rgba(255,255,255,0.6);
+            border-radius: 14px; padding: 14px 16px;
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 16px; backdrop-filter: blur(10px);
+        }
+        .member-card .mc-left { display: flex; align-items: center; gap: 12px; }
+        .member-card .mc-avatar {
+            width: 44px; height: 44px; border-radius: 50%;
+            background: linear-gradient(135deg, #4285F4, #1A73E8);
+            color: #fff; display: flex; align-items: center;
+            justify-content: center; font-size: 18px; font-weight: 600; flex-shrink: 0;
+        }
+        .member-card .mc-info .mc-name { font-size: 16px; font-weight: 600; color: #333; }
+        .member-card .mc-info .mc-hint { font-size: 12px; color: #999; margin-top: 2px; }
+        .member-card .mc-switch {
+            padding: 6px 14px; border: 1px solid #4285F4; border-radius: 16px;
+            font-size: 13px; color: #4285F4; background: rgba(255,255,255,0.6);
+            cursor: pointer; display: flex; align-items: center; gap: 4px;
+        }
+
+        .course-tag {
+            background: rgba(174, 207, 255, 0.4); border-radius: 10px;
+            padding: 12px 16px; font-size: 14px; font-weight: 500;
+            color: #1A1A1A; margin-bottom: 16px;
+        }
+
+        .creating-section, .done-section {
+            background: rgba(255,255,255,0.6); border-radius: 14px;
+            padding: 14px 16px; margin-bottom: 16px; backdrop-filter: blur(10px);
+        }
+        .section-header {
+            display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;
+        }
+        .section-header .sh-left { display: flex; align-items: center; gap: 8px; }
+        .section-header .sh-title { font-size: 15px; font-weight: 600; color: #333; }
+        .section-header .sh-count { font-size: 14px; color: #666; }
+        .section-header .sh-count strong { color: #333; }
+
+        .creating-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .creating-card {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, #f0f0f5, #e8e8f0);
+            border-radius: 10px; position: relative; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .creating-card .cc-icon { font-size: 36px; color: #b0b0c0; opacity: 0.7; }
+        .creating-card .cc-progress {
+            position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, #4285F4, #1A73E8);
+        }
+
+        .done-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .done-card {
+            background: linear-gradient(135deg, #f0f0fa, #e6e1f5);
+            border-radius: 10px; padding: 12px; position: relative; overflow: hidden;
+        }
+        .done-card .dc-cover {
+            aspect-ratio: 16 / 10;
+            background: linear-gradient(135deg, #c5b0f4, #b9b9f9);
+            border-radius: 8px; display: flex; align-items: center;
+            justify-content: center; font-size: 40px; color: rgba(255,255,255,0.8);
+            position: relative;
+        }
+        .done-card .dc-cover::after {
+            content: '▶';
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 36px; height: 36px;
+            background: rgba(0,0,0,0.35); border-radius: 50%;
+            color: #fff; display: flex; align-items: center;
+            justify-content: center; font-size: 14px;
+        }
+        .done-card .dc-del {
+            position: absolute; bottom: 12px; right: 12px;
+            width: 26px; height: 26px; border-radius: 6px; border: none;
+            background: rgba(0,0,0,0.4); color: #fff;
+            font-size: 12px; cursor: pointer; display: flex;
+            align-items: center; justify-content: center;
+        }
+        .done-card .dc-name { font-size: 13px; color: #333; margin-top: 8px; text-align: center; }
+        .group-title {
+            font-size: 13px; color: #4285F4; font-weight: 600;
+            margin: 12px 0 10px; padding-left: 8px;
+            border-left: 3px solid #4285F4;
+        }
+        .group-title span { color: #999; font-weight: 400; }
+
+        .share-btn {
+            position: absolute; top: 124px; right: 10px;
+            z-index: 9;
+            width: 36px; height: 36px;
+            border: none; border-radius: 50%;
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(6px);
+            color: #0669FF; font-size: 16px;
+            cursor: pointer; display: flex; align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+            font-family: inherit; transition: transform 100ms;
+        }
+        .share-btn:active { transform: scale(0.88); }
+        .ai-create-btn {
+            position: fixed; bottom: 16px;
+            left: 50%; transform: translateX(-50%);
+            width: calc(100% - 28px); max-width: 402px; height: 50px;
+            border: none; border-radius: 25px;
+            background: linear-gradient(135deg, #4A9EFF, #0669FF);
+            color: #fff; font-size: 16px; font-weight: 600;
+            cursor: pointer; display: flex; align-items: center;
+            justify-content: center; gap: 6px;
+            box-shadow: 0 4px 16px rgba(6,105,255,0.3); z-index: 10;
+        }
+        .ai-create-btn:active { opacity: 0.9; }
+
+        /* ===== 创作弹窗 ===== */
+        .create-overlay {
+            display: none; position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4); z-index: 9999;
+        }
+        .create-overlay.show { display: block; }
+        .create-popup {
+            display: none; position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: #fff; border-radius: 20px 20px 0 0;
+            width: 100%; max-width: 430px; margin: 0 auto;
+            z-index: 10000; flex-direction: column;
+            max-height: 90vh; animation: slideUp 0.3s ease-out;
+        }
+        .create-popup.show { display: flex; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .create-popup .cp-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 20px; border-bottom: 1px solid #f0f0f0; flex-shrink: 0;
+        }
+        .create-popup .cp-title { font-size: 16px; font-weight: 600; color: #333; }
+        .create-popup .cp-close {
+            width: 28px; height: 28px; border-radius: 50%; border: none;
+            background: #f5f5f5; color: #999; font-size: 14px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .create-popup .cp-progress {
+            display: flex; align-items: center; gap: 6px;
+            padding: 12px 20px; flex-shrink: 0;
+        }
+        .create-popup .cp-progress .cp-dot {
+            flex: 1; height: 4px; border-radius: 2px;
+            background: #e0e0e0; transition: background 0.3s;
+        }
+        .create-popup .cp-progress .cp-dot.active { background: #0669FF; }
+        .create-popup .cp-progress .cp-dot.done { background: #4A9EFF; }
+        .create-popup .cp-progress .cp-count {
+            font-size: 12px; color: #999; margin-left: 4px; flex-shrink: 0;
+        }
+
+        .create-popup .cp-body {
+            flex: 1; overflow-y: auto; padding: 20px;
+        }
+        .create-popup .cp-body::-webkit-scrollbar { width: 3px; }
+        .create-popup .cp-body::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
+
+        .create-popup .cp-q-num {
+            font-size: 12px; color: #0669FF; font-weight: 600; margin-bottom: 4px;
+        }
+        .create-popup .cp-q-title {
+            font-size: 18px; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; line-height: 1.3;
+        }
+        .create-popup .cp-q-tip {
+            font-size: 13px; color: #999; margin-bottom: 6px;
+        }
+        .create-popup .cp-q-why {
+            font-size: 13px; color: #4285F4; background: #E8F1FF;
+            padding: 10px 14px; border-radius: 8px; margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .create-popup .cp-tabs {
+            display: flex; gap: 0; flex-shrink: 0;
+            padding: 0 20px 12px;
+        }
+        .create-popup .cp-tab {
+            flex: 1; padding: 10px 0; text-align: center;
+            font-size: 14px; font-weight: 500; color: #666;
+            cursor: pointer; border: none; background: none;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s; font-family: inherit;
+        }
+        .create-popup .cp-tab.active {
+            color: #0669FF; border-bottom-color: #0669FF; font-weight: 600;
+        }
+        .create-popup .cp-q-options {
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .create-popup .cp-option {
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px 16px;
+            border: 1px solid #e8e8e8; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s;
+            background: #fafafa;
+        }
+        .create-popup .cp-option:active { background: #E8F1FF; }
+        .create-popup .cp-option.selected {
+            border-color: #0669FF; background: #E8F1FF;
+        }
+        .create-popup .cp-option .cp-opt-emoji { font-size: 24px; flex-shrink: 0; }
+        .create-popup .cp-option .cp-opt-text { flex: 1; }
+        .create-popup .cp-option .cp-opt-text .cp-opt-label { font-size: 14px; font-weight: 500; color: #333; }
+        .create-popup .cp-option .cp-opt-text .cp-opt-desc { font-size: 12px; color: #999; margin-top: 2px; }
+        .create-popup .cp-option .cp-opt-radio {
+            width: 20px; height: 20px; border-radius: 50%;
+            border: 2px solid #ddd; display: flex;
+            align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .create-popup .cp-option.selected .cp-opt-radio {
+            border-color: #0669FF;
+        }
+        .create-popup .cp-option.selected .cp-opt-radio::after {
+            content: ''; width: 10px; height: 10px;
+            border-radius: 50%; background: #0669FF;
+        }
+
+        .create-popup .cp-actions {
+            display: flex; gap: 10px;
+            padding: 16px 20px; border-top: 1px solid #f0f0f0; flex-shrink: 0;
+        }
+        .create-popup .cp-actions button {
+            flex: 1; height: 44px; border: none; border-radius: 10px;
+            font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit;
+        }
+        .create-popup .cp-prev { background: #f5f5f7; color: #666; }
+        .create-popup .cp-next { background: #0669FF; color: #fff; }
+        .create-popup .cp-next:disabled { opacity: 0.5; cursor: default; }
+
+        .create-popup .cp-name-input {
+            width: 100%; height: 44px; padding: 0 14px;
+            border: 1px solid #e0e0e0; border-radius: 10px;
+            font-size: 15px; color: #333; outline: none; font-family: inherit;
+        }
+        .create-popup .cp-name-input:focus { border-color: #0669FF; }
+        .create-popup .cp-name-suggestions {
+            display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;
+        }
+        .create-popup .cp-name-suggestions span {
+            padding: 8px 16px; border: 1px solid #e0e0e0;
+            border-radius: 20px; font-size: 13px; color: #666;
+            cursor: pointer; background: #fff;
+        }
+        .create-popup .cp-name-suggestions span:active { background: #E8F1FF; border-color: #0669FF; color: #0669FF; }
+
+        .create-popup .cp-prompt-textarea {
+            width: 100%; min-height: 180px;
+            padding: 14px; border: 1px solid #e0e0e0;
+            border-radius: 10px; font-size: 13px; color: #333;
+            resize: vertical; outline: none; font-family: inherit;
+            line-height: 1.7; background: #fafafa;
+        }
+        .create-popup .cp-prompt-textarea:focus { border-color: #0669FF; }
+
+        /* ===== 标题输入弹窗 ===== */
+        .title-overlay {
+            display: none; position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.45); z-index: 10001;
+            align-items: center; justify-content: center; padding: 20px;
+        }
+        .title-overlay.show { display: flex; }
+        .title-popup {
+            background: #fff; border-radius: 18px;
+            width: 100%; max-width: 320px; padding: 28px 24px 24px;
+            animation: popIn 0.25s;
+        }
+        @keyframes popIn { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .title-popup .tp-title {
+            font-size: 17px; font-weight: 600; color: #333;
+            text-align: center; margin-bottom: 16px;
+        }
+        .title-popup .tp-input {
+            width: 100%; height: 44px; padding: 0 14px;
+            border: 1px solid #e0e0e0; border-radius: 10px;
+            font-size: 15px; color: #333; outline: none; font-family: inherit;
+            margin-bottom: 20px;
+        }
+        .title-popup .tp-input:focus { border-color: #0669FF; }
+        .title-popup .tp-actions { display: flex; gap: 10px; }
+        .title-popup .tp-actions button {
+            flex: 1; height: 42px; border: none; border-radius: 10px;
+            font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit;
+        }
+        .title-popup .tp-cancel { background: #f5f5f7; color: #666; }
+        .title-popup .tp-confirm { background: #0669FF; color: #fff; }
+
+        .cp-ref-wrap {
+            margin-top: 12px; padding: 12px;
+            background: #f5f7fa; border-radius: 10px;
+            border: 1px dashed #d0d5e0;
+        }
+
+
+        /* ── 图片预览遮罩 ── */
+        .img-preview-overlay {
+            display: none; position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.75); z-index: 999999;
+            align-items: center; justify-content: center; padding: 40px;
+            cursor: zoom-out;
+        }
+        .img-preview-overlay.show { display: flex; }
+        .img-preview-overlay img {
+            max-width: 90%; max-height: 90%;
+            border-radius: 8px; box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+            object-fit: contain;
+        }
+
+        /* ── 功能说明面板 ── */
+        .doc-panel { width: 560px; background: #fff; border-radius: 16px; box-shadow: 0 2px 20px rgba(0,0,0,.08); padding: 24px 28px; max-height: calc(100vh - 40px); overflow-y: auto; font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', Arial, sans-serif; line-height: 1.7; font-size: 14px; color: #333; position: absolute; left: calc(50% + 365px); top: 20px; }
+        .doc-panel::-webkit-scrollbar { width: 5px; }
+        .doc-panel::-webkit-scrollbar-thumb { background: #d0d5e0; border-radius: 3px; }
+        .doc-panel .doc-title { font-size: 20px; font-weight: 700; color: #1F3864; border-bottom: 2px solid #2E75B6; padding-bottom: 10px; margin-bottom: 16px; }
+        .doc-panel h3 { font-size: 16px; font-weight: 600; color: #2E75B6; margin: 16px 0 8px; }
+        .doc-panel h4 { font-size: 14px; font-weight: 600; color: #333; margin: 12px 0 6px; }
+        .doc-panel p { font-size: 13px; color: #555; margin-bottom: 6px; }
+        .doc-panel ul { padding-left: 20px; margin: 4px 0 8px; }
+        .doc-panel li { margin-bottom: 3px; font-size: 13px; color: #555; }
+        .doc-panel .tag-blue { display: inline-block; background: #E8F1FF; color: #0669FF; padding: 1px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+        @media (max-width: 1200px) { .page-wrap { flex-wrap: wrap; } .doc-panel { position: static; width: 100%; max-width: 430px; max-height: none; margin-top: 20px; } }
+
+        /* ===== 分享弹窗 ===== */
+        .share-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.45); z-index: 99999; align-items: center; justify-content: center; padding: 20px; }
+        .share-overlay.show { display: flex; }
+        .share-popup { background: #fff; border-radius: 18px; width: 100%; max-width: 360px; max-height: 85vh; overflow-y: auto; animation: popIn 0.25s; }
+        .share-popup::-webkit-scrollbar { width: 3px; }
+        .share-popup::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
+        .share-popup .sp-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid #f0f0f0; }
+        .share-popup .sp-title { font-size: 16px; font-weight: 600; color: #333; }
+        .share-popup .sp-close { width: 28px; height: 28px; border-radius: 50%; border: none; background: #f5f5f5; color: #999; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .share-popup .sp-body { padding: 20px; }
+        .share-popup .sp-icon-wrap { width: 56px; height: 56px; border-radius: 50%; background: #E8F1FF; color: #0669FF; display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 14px; }
+        .share-popup .sp-intro { text-align: center; font-size: 14px; color: #555; margin-bottom: 18px; line-height: 1.5; }
+        .share-popup .sp-info-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f5f5f5; font-size: 13px; }
+        .share-popup .sp-info-row:last-child { border-bottom: none; }
+        .share-popup .sp-info-label { color: #888; }
+        .share-popup .sp-info-val { color: #333; font-weight: 500; }
+        .share-popup .sp-info-val.green { color: #2e7d32; background: #e8f5e9; padding: 2px 10px; border-radius: 10px; }
+        .share-popup .sp-link-box { margin-top: 16px; background: #f8f9fb; border-radius: 10px; padding: 14px; }
+        .share-popup .sp-link-label { font-size: 12px; color: #888; margin-bottom: 8px; }
+        .share-popup .sp-link-row { display: flex; gap: 8px; }
+        .share-popup .sp-link-input { flex: 1; height: 38px; padding: 0 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 12px; color: #555; background: #fff; outline: none; cursor: pointer; font-family: inherit; }
+        .share-popup .sp-copy-btn { height: 38px; padding: 0 14px; border: none; border-radius: 8px; background: #0669FF; color: #fff; font-size: 12px; cursor: pointer; font-family: inherit; white-space: nowrap; }
+        .share-popup .sp-copy-btn:active { opacity: 0.85; }
+        .share-popup .sp-link-hint { font-size: 11px; color: #bbb; margin-top: 8px; }
+        .share-popup .sp-actions { padding: 0 20px 20px; }
+        .share-popup .sp-btn { width: 100%; height: 44px; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; }
+        .share-popup .sp-btn-primary { background: #0669FF; color: #fff; }
+        .share-popup .sp-btn-primary:active { opacity: 0.85; }
+    </style>
+</head>
+<body>
+<div class="page-wrap">
+<div class="app-container">
+    <div class="status-bar">
+        <span>9:41</span>
+        <div class="right"><span>📶</span><span>📡</span><span>🔋</span></div>
+    </div>
+    <div class="top-nav">
+        <button class="back-btn" onclick="goBack()">‹</button>
+        <div class="title">AI创作</div>
+        <div class="right-icons"><div class="right-icon">⊙</div></div>
+    </div>
+    <div class="content-area">
+        <div class="member-card">
+            <div class="mc-left">
+                <div class="mc-avatar">陈</div>
+                <div class="mc-info"><div class="mc-name">陈昭君</div><div class="mc-hint">当前创作成员</div></div>
+            </div>
+            <button class="mc-switch" onclick="alert('切换成员')">切换成员 ▾</button>
+        </div>
+        <div class="course-tag">我为杜甫建茅屋</div>
+        <div class="creating-section">
+            <div class="section-header">
+                <div class="sh-left"><span class="sh-icon">⏳</span><span class="sh-title">创作中</span><span class="sh-count"><strong>2</strong></span></div>
+            </div>
+            <div class="creating-grid">
+                <div class="creating-card"><span class="cc-icon">📹</span><div class="cc-progress"></div></div>
+                <div class="creating-card"><span class="cc-icon">📹</span><div class="cc-progress"></div></div>
+                <div class="creating-card"><span class="cc-icon">🎮</span><div class="cc-progress" style="background:#ccc;"></div></div>
+            </div>
+        </div>
+        <div class="done-section">
+            <div class="section-header">
+                <div class="sh-left"><span class="sh-icon">✅</span><span class="sh-title">已完成</span><span class="sh-count"><strong>32</strong></span></div>
+            </div>
+            <div class="group-title">AI创作视频 <span>（共2个）</span></div>
+            <div class="done-grid">
+                <div class="done-card"><div class="dc-cover">📹</div><div class="dc-name">快速搭建茅屋</div><button class="dc-del" onclick="delWork(0)">🗑</button></div>
+                <div class="done-card"><div class="dc-cover">📹</div><div class="dc-name">快速搭建茅屋</div><button class="dc-del" onclick="delWork(1)">🗑</button></div>
+            </div>
+        </div>
+    </div>
+    <button class="ai-create-btn" onclick="openCreate()">✨ AI创作</button>
+    <button class="share-btn" onclick="openShareModal()">👩‍🏫</button>
+</div>
+
+    <div class="create-overlay" id="createOverlay" onclick="if(event.target===this)closeCreate()"></div>
+<div class="create-popup" id="createPopup">
+    <div class="cp-header">
+        <span class="cp-title">AI创作</span>
+        <button class="cp-close" onclick="closeCreate()">✕</button>
+    </div>
+    <div class="cp-tabs">
+        <button class="cp-tab active" onclick="switchCreateTab('video')">🎬 视频创作</button>
+        <button class="cp-tab" onclick="switchCreateTab('game')">🎮 游戏创作</button>
+    </div>
+    <div class="cp-progress" id="progressBar"></div>
+    <div class="cp-body" id="questionBody"></div>
+    <div class="cp-actions" id="actionBar"></div>
+</div>
+
+<!-- 标题输入弹窗 -->
+<div class="title-overlay" id="titleOverlay" onclick="if(event.target===this)closeTitlePopup()">
+    <div class="title-popup">
+        <div class="tp-title">给视频起个名字</div>
+        <input class="tp-input" id="videoTitleInput" placeholder="输入视频标题" maxlength="20">
+        <div class="tp-actions">
+            <button class="tp-cancel" onclick="closeTitlePopup()">取消</button>
+            <button class="tp-confirm" onclick="confirmGenerate()">✨ 生成视频</button>
+        </div>
+    </div>
+</div>
+</div>
+
+<div id="qaPanel" style="position:fixed;top:80px;left:16px;z-index:99999;background:#fff;color:#333;padding:14px 18px;border-radius:12px;border:1px solid #e0e0e0;font-size:12px;line-height:1.7;max-width:320px;box-shadow:0 4px 16px rgba(0,0,0,0.08);display:none;font-family:inherit;"></div>
+
+<!-- ====== 分享弹窗 ====== -->
+<div class="share-overlay" id="shareOverlay" onclick="if(event.target===this)closeShareModal()">
+    <div class="share-popup">
+        <div class="sp-header">
+            <span class="sp-title">👩‍🏫 分享给老师</span>
+            <button class="sp-close" onclick="closeShareModal()">✕</button>
+        </div>
+        <div class="sp-body">
+            <div class="sp-icon-wrap">🔗</div>
+            <div class="sp-intro">生成分享链接，老师登录后即可协助操作</div>
+            <div class="sp-info-row">
+                <span class="sp-info-label">订单状态</span>
+                <span class="sp-info-val green">已核销</span>
+            </div>
+            <div class="sp-info-row">
+                <span class="sp-info-label">有效期</span>
+                <span class="sp-info-val">12小时</span>
+            </div>
+            <div class="sp-link-box">
+                <div class="sp-link-label">分享链接</div>
+                <div class="sp-link-row">
+                    <input class="sp-link-input" id="shareLinkInput" readonly value="pages/operation?orderId=123&amp;shareToken=abc123xyz" onclick="this.select()">
+                    <button class="sp-copy-btn" onclick="copyShareLink()">📋 复制</button>
+                </div>
+            </div>
+        </div>
+        <div class="sp-actions">
+            <button class="sp-btn sp-btn-primary" onclick="regenerateShareToken()">🔄 重新生成链接</button>
+        </div>
+    </div>
+</div>
+
+<div class="img-preview-overlay" id="imgPreviewOverlay" onclick="closeImagePreview()">
+    <img id="imgPreviewSrc" src="">
+</div>
+
+<div class="doc-panel">
+    <div class="doc-title">AI创作_v3 - 功能说明</div>
+
+    <h3>🎯 核心架构：双重Token验证机制</h3>
+
+    <h4>1. 家长侧：生成"授权码"并分享</h4>
+    <ul>
+        <li>家长点击"分享给老师"，后端生成一个 <span class="tag-blue">share_token</span>（临时授权码），绑定该订单信息（订单状态是已核销或已过期），设置有效期 <b>12小时</b></li>
+        <li>生成链接比如：<code>pages/operation?orderId=123&shareToken=abc123</code></li>
+    </ul>
+
+    <h4>2. 老师侧：点击链接并登录</h4>
+    <ul>
+        <li>老师在自己的微信里点开链接</li>
+        <li>小程序前端检测：<b>当前老师没有登录态</b></li>
+        <li>自动跳转到登录页，<b>老师用他自己的微信手机号一键登录</b></li>
+    </ul>
+
+    <h4>3. 进入操作页面</h4>
+    <ul>
+        <li>小程序带着 <b>【老师的 session_token】</b> 和 <b>【链接里的 share_token】</b> 请求后端获取页面数据</li>
+        <li>后端校验：
+            <ul>
+                <li>校验 <code>session_token</code> 有效（确认是老师本人）</li>
+                <li>校验 <code>share_token</code> 有效（订单状态正确，且未过期）</li>
+                <li>校验通过，返回页面数据</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h4>4. 提交数据操作（反复使用）</h4>
+    <ul>
+        <li>老师点击"AI操作"等任何操作按钮</li>
+        <li>前端请求头（Header）中带上 <b>Authorization: 老师的session_token</b>，请求体中带上 <b>shareToken: abc123</b></li>
+        <li>后端双重校验（同上），全部通过后执行业务逻辑，<b>操作日志里清清楚楚记下：这笔AI创作是由"手机号138xxx"在什么时间完成的</b></li>
+    </ul>
+
+    <h3>🔒 附加验证：防止链接被转发给多个老师</h3>
+    <p>既然老师要登录，为了防止家长把链接发到群里，导致好几个老师同时尝试操作，可以增加一个 <b>"首次认领绑定"</b> 逻辑：</p>
+    <ul>
+        <li>老师A第一次点开链接并登录时，后端记录 <code>bound_teacher_id = 老师A的ID</code></li>
+        <li>老师B后点开链接并登录，后端校验发现 <code>bound_teacher_id</code> 已存在，且不等于B，直接提示：<b>"该操作权限已被其他老师认领，请联系家长重新获取。"</b></li>
+        <li>这样就完美解决了"群发链接导致多人抢着操作"的问题</li>
+    </ul>
+</div>
+
+<script>
+    function openImagePreview(src) {
+        document.getElementById('imgPreviewSrc').src = src;
+        document.getElementById('imgPreviewOverlay').classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeImagePreview() {
+        document.getElementById('imgPreviewOverlay').classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+    /* ===== 分享给老师 ===== */
+    function openShareModal() { document.getElementById('shareOverlay').classList.add('show'); document.body.style.overflow = 'hidden'; }
+    function closeShareModal() { document.getElementById('shareOverlay').classList.remove('show'); document.body.style.overflow = ''; }
+    function copyShareLink() { var input = document.getElementById('shareLinkInput'); input.select(); document.execCommand('copy'); var btn = document.querySelector('.sp-copy-btn'); var t = btn.textContent; btn.textContent = '✅ 已复制'; setTimeout(function(){ btn.textContent = t; }, 1800); }
+    function regenerateShareToken() { var token = 'shareToken_' + Math.random().toString(36).substr(2,8); document.getElementById('shareLinkInput').value = 'pages/operation?orderId=123&' + token; showShareToast('✅ 新链接已生成'); }
+    function showShareToast(text) { var t = document.createElement('div'); t.textContent = text; t.style.cssText = 'position:fixed;top:30%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.78);color:#fff;padding:10px 18px;border-radius:8px;font-size:14px;z-index:999999;'; document.body.appendChild(t); setTimeout(function() { t.remove(); }, 1800); }
+
+
+</script>
+</body>
+<script>
+    var questions = [
+        { key: 'gender', num: 'Question 01', title: '我是小男生还是小女生？', why: '选了这个，AI 才知道视频里的小主角长什么样子，出来的画面才更像你哦～', options: [
+            { emoji: '', label: '小男生', desc: 'AI 把你生成成阳光小男孩' },
+            { emoji: '', label: '小女生', desc: 'AI 把你生成成可爱小女孩' }
+        ]},
+        { key: 'age', num: 'Question 02', title: '我今年多大啦？', why: '不同年龄的小朋友说话、走路、穿衣都不一样，选对了年龄，AI 才能做出最适合你的视频～', options: [
+            { emoji: '', label: '6-7岁', desc: '低年级小朋友，天真又活泼' },
+            { emoji: '', label: '8-10岁', desc: '中年级同学，好奇心满满' },
+            { emoji: '', label: '11-14岁', desc: '高年级大哥哥大姐姐，有主见' }
+        ]},
+        { key: 'scene', num: 'Question 03', title: '穿越到哪个时空？', why: '选一个你喜欢的地方，AI 就会把视频的背景设在那里，带你"穿越"到那个时空去探险！', options: [
+            { emoji: '', label: '花楼木织机工坊', desc: '镇馆之宝：清代小花楼木织机现场' },
+            { emoji: '', label: '锦官城集市', desc: '唐代丝绸之路上的成都大集市' },
+            { emoji: '', label: '陵阳公梦境', desc: '蜀锦大师做的五彩斑斓的梦' },
+            { emoji: '', label: '现代博物馆展厅', desc: '回到现在的蜀锦博物馆' }
+        ]},
+        { key: 'hook', num: 'Question 04', title: '视频第一秒给大家看到什么？', why: '视频的开头最吸引人啦！选一个有趣的开场，让看视频的人一下子就被吸引住～', options: [
+            { emoji: '', label: '织机咔哒咔哒', desc: '一上来就直接看织机在动' },
+            { emoji: '', label: '我问大家一个问题', desc: '「你见过五彩斑斓的布吗？」' },
+            { emoji: '', label: '一个小惊喜', desc: '突然蹦出一只可爱的织锦小精灵' },
+            { emoji: '', label: '我先打个招呼', desc: '「我是锦宝，今天我带你……」' }
+        ]},
+        { key: 'style', num: 'Question 05', title: '画面什么调调？', why: '画面风格决定了视频好不好看！就像画画要选颜色一样，选一个你喜欢的风格，AI 就能画出最美的画面～', options: [
+            { emoji: '', label: '敦煌暖色', desc: '红、金、暖黄——敦煌壁画的颜色' },
+            { emoji: '', label: '国潮卡通', desc: 'Q 版、明亮、卡通可爱风' },
+            { emoji: '', label: '治愈水彩', desc: '轻软透明，像彩色水彩晕开' },
+            { emoji: '', label: '史诗大片', desc: '电影感、深色调、镜头感强' }
+        ]},
+        { key: 'rhythm', num: 'Question 06', title: '用什么节奏剪？', why: '节奏就像视频的"心跳"，快的让人兴奋，慢的让人感动。选一个你喜欢的节奏，视频看起来会更带感！', options: [
+            { emoji: '', label: '慢慢织', desc: '像真实织锦一样——治愈慢镜头' },
+            { emoji: '', label: '一镜到底', desc: '不切镜头，跟着主角走到底' },
+            { emoji: '', label: '倒叙揭秘', desc: '先出成片，再倒回去讲工艺' },
+            { emoji: '', label: '跟着织机节拍', desc: '配合织机咔哒声踩点剪辑' }
+        ]},
+        { key: 'mood', num: 'Question 07', title: '想让观众看完什么心情？', why: '一个好的视频会让看的人心里暖暖的。你想让大家看完后是什么感觉？选一个，AI 帮你实现～', options: [
+            { emoji: '', label: '震撼', desc: '让人张大嘴巴「哇塞」' },
+            { emoji: '', label: '感动', desc: '让人想哭、想鼓掌' },
+            { emoji: '', label: '好奇', desc: '让人想问「为什么」' },
+            { emoji: '', label: '开心', desc: '让人看完笑出来' }
+        ]},
+        { key: 'titleText', num: 'Question 08', title: '视频前3s加上什么文字？', why: '视频的前3秒画面加上一段文字标题，让观众一眼就知道视频的主题～', type: 'input' },
+        { key: 'name', num: 'Question 09', title: '给你的主角起个名字', why: '有了名字，主角就有了灵魂！你可以自己取一个喜欢的名字～', type: 'name' }
+    ];
+    var nameSuggestions = [];
+    var currentStep = 0;
+    var answers = {};
+    var totalSteps = questions.length + 1;
+    var remainCount = 1;
+
+    function goBack() { window.location.href = '我的.html'; }
+
+    var createTab = 'video';
+
+    function switchCreateTab(tab) {
+        createTab = tab;
+        var tabs = document.querySelectorAll('.cp-tab');
+        for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('active');
+        tabs[tab === 'video' ? 0 : 1].classList.add('active');
+        if (tab === 'game') {
+            closeCreate();
+            alert('🎮 游戏创作功能即将上线，敬请期待！');
+        }
+    }
+
+    function renderRemainBanner() {
+        var tabs = document.querySelector('.cp-tabs');
+        var existBanner = document.getElementById('remainBanner');
+        if (existBanner) existBanner.remove();
+        if (!tabs) return;
+        var banner = document.createElement('div');
+        banner.id = 'remainBanner';
+        if (remainCount <= 0) {
+            banner.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:#FFF3E0;font-size:12px;color:#E65100;flex-shrink:0;';
+            banner.innerHTML = '<span>⛔ 视频创作剩余0次</span>'
+                + '<a href="购买次数.html" style="padding:4px 12px;background:#FF9500;color:#fff;border-radius:16px;text-decoration:none;font-size:12px;font-weight:600;">立即购买</a>';
+        } else {
+            banner.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:#E8F5E9;font-size:12px;color:#2E7D32;flex-shrink:0;';
+            banner.innerHTML = '<span>🎬 视频创作剩余<strong>' + remainCount + '</strong>次</span>'
+                + '<a href="购买次数.html" style="padding:4px 12px;background:#0669FF;color:#fff;border-radius:16px;text-decoration:none;font-size:12px;font-weight:600;">购买</a>';
+        }
+        tabs.parentNode.insertBefore(banner, tabs.nextSibling);
+    }
+
+    function openCreate() {
+        currentStep = 0;
+        createTab = 'video';
+        var tabs = document.querySelectorAll('.cp-tab');
+        for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('active');
+        tabs[0].classList.add('active');
+        document.getElementById('createOverlay').classList.add('show');
+        document.getElementById('createPopup').classList.add('show');
+        document.body.style.overflow = 'hidden';
+        renderRemainBanner();
+        renderStep();
+    }
+    function closeCreate() {
+        document.getElementById('createOverlay').classList.remove('show');
+        document.getElementById('createPopup').classList.remove('show');
+        document.body.style.overflow = '';
+        var panel = document.getElementById('qaPanel');
+        if (panel) panel.style.display = 'none';
+    }
+    function delWork(idx) { if(confirm('确定删除？')) alert('已删除'); }
+
+    function getQAText() {
+        var parts = [];
+        for (var i = 0; i < questions.length; i++) {
+            var q = questions[i];
+            if (q.type === 'name' || q.type === 'input') {
+                parts.push(q.title + '：' + (answers[q.key] || '未填写'));
+            } else if (answers[q.key] !== undefined) {
+                parts.push(q.title + '：' + q.options[answers[q.key]].label);
+            }
+        }
+        return parts.join('；');
+    }
+
+    function updateQAPanel() {
+        var panel = document.getElementById('qaPanel');
+        if (!panel) return;
+        panel.textContent = getQAText();
+        panel.style.display = 'block';
+    }
+
+    function getPromptText() {
+        var gender = questions[0].options[answers['gender']].label;
+        var age = questions[1].options[answers['age']].label;
+        var scene = questions[2].options[answers['scene']].label;
+        var hook = questions[3].options[answers['hook']].label;
+        var style = questions[4].options[answers['style']].label;
+        var rhythm = questions[5].options[answers['rhythm']].label;
+        var mood = questions[6].options[answers['mood']].label;
+        var titleText = answers['titleText'] || '';
+        var name = answers['name'] || '小主角';
+        var result = '创作一个15秒竖屏AI视频。主角是' + age + '的' + gender + '，名叫' + name + '。'
+            + '场景设定在' + scene + '。'
+            + '开场方式：' + hook + '。'
+            + '视觉风格：' + style + '。'
+            + '剪辑节奏：' + rhythm + '。'
+            + '情绪基调：' + mood + '。'
+            + '配古风BGM。';
+        if (titleText) {
+            result += '视频前3秒显示文字：' + titleText + '。';
+        }
+        return result;
+    }
+
+    var DEMO_PROMPT = '整体视频时长15秒，竖屏国潮卡通画风，倒叙叙事，全程氛围轻松欢乐，主角是8到10岁小女孩小朱，首帧固定显示文字织女小精灵2026.7.15。0到3秒，画面最先出现置顶文字织女小精灵2026.7.15，小朱圆乎乎的脸蛋凑近镜头，歪着头睁大眼睛，对着屏幕好奇提问，清脆小女孩声音响起，询问观众知不知道古时候精美蜀锦是怎么制作出来的，搭配轻柔古筝铃铛背景音乐。3到7秒，画面出现柔光穿越特效，镜头闪回切换，场景跳转至古色古香的花楼木织机工坊，巨大老式提花木织机完整展现在画面里，小朱缓步走到织机旁边，伸手轻轻抚摸木质机身，耳边同步出现织布梭子滑动的细碎声响。7到11秒，镜头给到中景，五彩丝线在织机上随风飘动，小朱模仿古人的动作摆弄织机，带有陵阳公样式的蜀锦慢慢从织机中延伸出来，背景音乐切换成轻快古风鼓点，小朱惊喜感叹织机可以织出超多好看花纹。11到15秒，全景画面，小朱双手捧着织好的彩色锦缎，转过身面向镜头开心比耶，整张画面色彩明亮柔和，小朱笑着告诉大家传统蜀锦特别有意思，音乐上扬收尾，搭配清脆叮的一声音效结束视频，整体看完让人心情愉悦。';
+
+    function renderStep() {
+        var total = questions.length;
+        var isPromptStep = currentStep === total;
+
+        // 次数不足时直接显示购买提示
+        if (remainCount <= 0 && !isPromptStep) {
+            document.getElementById('progressBar').innerHTML = '';
+            var body = document.getElementById('questionBody');
+            body.innerHTML = '<div style="text-align:center;padding:30px 10px;">'
+                + '<div style="font-size:48px;margin-bottom:16px;">⛔</div>'
+                + '<div style="font-size:18px;font-weight:700;color:#333;margin-bottom:8px;">生成次数已用完</div>'
+                + '<div style="font-size:13px;color:#999;margin-bottom:20px;line-height:1.6;">您当前的 AI 视频生成次数已用完，<br>购买后即可继续创作精彩视频</div>'
+                + '<a href="购买次数.html" style="display:inline-block;padding:12px 40px;background:linear-gradient(135deg,#FF9500,#FF6B00);color:#fff;border-radius:25px;text-decoration:none;font-size:16px;font-weight:600;box-shadow:0 4px 16px rgba(255,149,0,0.3);">🔥 立即购买次数</a>'
+                + '</div>';
+            document.getElementById('actionBar').innerHTML = '';
+            return;
+        }
+
+        // Progress - prompt预览页不显示进度条
+        if (isPromptStep) {
+            document.getElementById('progressBar').innerHTML = '';
+        } else {
+            var progressHtml = '';
+            for (var i = 0; i < total; i++) {
+                var cls = i < currentStep ? 'done' : (i === currentStep ? 'active' : '');
+                progressHtml += '<div class="cp-dot ' + cls + '"></div>';
+            }
+            progressHtml += '<span class="cp-count">' + (currentStep + 1) + '/' + total + '</span>';
+            document.getElementById('progressBar').innerHTML = progressHtml;
+        }
+
+        var body = document.getElementById('questionBody');
+        var actions = document.getElementById('actionBar');
+
+        // Prompt预览页
+        if (isPromptStep) {
+            updateQAPanel();
+            var prompt = getPromptText();
+            body.innerHTML = '<div style="padding:4px 0;">'
+                + '<div class="cp-q-title" style="font-size:16px;margin-bottom:12px;">我的 Prompt</div>'
+                + '<div style="font-size:13px;color:#666;margin-bottom:10px;">以下是 AI 根据你的选择生成的视频创作指令，你可以直接使用或修改：</div>'
+                + '<textarea class="cp-prompt-textarea" id="promptPreview">' + DEMO_PROMPT + '</textarea>'
+                + '</div>';
+            actions.innerHTML = ''
+                + '<button class="cp-prev" onclick="prevStep()">← 重新选</button>'
+                + '<button class="cp-next" onclick="generateVideo()">✅ 确认 Prompt</button>';
+            return;
+        }
+
+        var q = questions[currentStep];
+        var isLast = currentStep === total - 1;
+        var isInput = q.type === 'name' || q.type === 'input';
+
+        if (isInput) {
+            var val = answers[q.key] || '';
+            var placeholder = q.type === 'name' ? '输入主角名字' : '输入视频前3s文字';
+            body.innerHTML = '<div class="cp-q-num">' + q.num + '</div>'
+                + '<div class="cp-q-title">' + q.title + '</div>'
+                + '<div class="cp-q-why">' + q.why + '</div>'
+                + '<input class="cp-name-input" id="inputField" value="' + val + '" placeholder="' + placeholder + '" maxlength="100" oninput="onInputChange(\'' + q.key + '\')" onblur="onInputBlur(\'' + q.key + '\')" autocomplete="off">';
+        } else {
+            var optsHtml = '<div class="cp-q-num">' + q.num + '</div>'
+                + '<div class="cp-q-title">' + q.title + '</div>'
+                + '<div class="cp-q-why">' + q.why + '</div>'
+                + '<div class="cp-q-options">';
+            for (var o = 0; o < q.options.length; o++) {
+                var opt = q.options[o];
+                var sel = answers[q.key] === o ? ' selected' : '';
+                optsHtml += '<div class="cp-option' + sel + '" onclick="selectOption(' + currentStep + ',' + o + ')">'
+                    + '<span class="cp-opt-emoji">' + opt.emoji + '</span>'
+                    + '<div class="cp-opt-text">'
+                    + '<div class="cp-opt-label">' + opt.label + '</div>'
+                    + '</div>'
+                    + '<div class="cp-opt-radio"></div>'
+                    + '</div>';
+            }
+            optsHtml += '</div>';
+            body.innerHTML = optsHtml;
+        }
+
+        // Actions
+        var hasAnswer = isInput ? (answers[q.key] && answers[q.key].trim()) : (answers[q.key] !== undefined);
+        var actions = document.getElementById('actionBar');
+        actions.innerHTML = ''
+            + (currentStep > 0 ? '<button class="cp-prev" onclick="prevStep()">← 上一题</button>' : '<button class="cp-prev" style="visibility:hidden">← 上一题</button>')
+            + (isLast
+                ? '<button class="cp-next" ' + (hasAnswer ? '' : 'disabled') + ' onclick="submitAll()">生成我的 Prompt</button>'
+                : '<button class="cp-next" ' + (hasAnswer ? '' : 'disabled') + ' onclick="nextStep()">下一题 →</button>');
+    }
+
+    function selectOption(step, optIdx) {
+        var q = questions[step];
+        answers[q.key] = optIdx;
+        renderStep();
+    }
+
+    function onInputChange(key) {
+        var input = document.getElementById('inputField');
+        if (input) answers[key] = input.value;
+    }
+
+    function onInputBlur(key) {
+        renderStep();
+    }
+
+    function nextStep() {
+        var total = questions.length;
+        if (currentStep < total - 1) {
+            currentStep++;
+            renderStep();
+        } else {
+            // 最后一题 -> 进入prompt预览页
+            currentStep = total;
+            renderStep();
+        }
+    }
+
+    function prevStep() {
+        if (currentStep > 0) {
+            currentStep--;
+            renderStep();
+        }
+    }
+
+    function submitAll() {
+        // 检查所有题目是否已答
+        for (var i = 0; i < questions.length; i++) {
+            var q = questions[i];
+            if (q.type === 'name' || q.type === 'input') {
+                if (!answers[q.key] || !answers[q.key].trim()) {
+                    currentStep = i;
+                    renderStep();
+                    var msg = q.type === 'name' ? '请给主角起个名字' : '请填写视频前3s文字';
+                    alert(msg);
+                    return;
+                }
+            } else {
+                if (answers[q.key] === undefined) {
+                    currentStep = i;
+                    renderStep();
+                    return;
+                }
+            }
+        }
+        // 进入prompt预览页
+        currentStep = questions.length;
+        renderStep();
+    }
+
+    function generateVideo() {
+        document.getElementById('titleOverlay').classList.add('show');
+    }
+
+    function closeTitlePopup() {
+        document.getElementById('titleOverlay').classList.remove('show');
+    }
+
+    function confirmGenerate() {
+        var title = document.getElementById('videoTitleInput').value.trim();
+        if (!title) { alert('请输入视频标题'); return; }
+        var prompt = document.getElementById('promptPreview').value;
+        remainCount = Math.max(0, remainCount - 1);
+        closeCreate();
+        closeTitlePopup();
+        alert('✅ 已提交AI创作\n\n标题：' + title + '\n\n提示词：\n' + prompt);
+    }
+</script>
+</html>
