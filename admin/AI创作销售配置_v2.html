@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI销售配置_v2 - 管理后台</title>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --accent: #0066cc;
+            --accent-hover: #0071e3;
+            --link: #0071e3;
+            --ink: #1d1d1f;
+            --ink-muted: #3f424b;
+            --ink-subtle: #86868b;
+            --border: #e0e0e0;
+            --card-bg: #ffffff;
+            --radius-sm: 9999px;
+            --radius-card: 18px;
+            --radius-pill: 9999px;
+            --shadow-card: 0 0 0 1px rgba(0,0,0,0.06);
+            --font: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font);
+            background: #f5f5f7;
+            min-height: 100vh;
+            color: var(--ink);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .header {
+            background: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header .logo { font-size: 18px; font-weight: 700; color: var(--accent); margin-right: 32px; }
+        .header .nav-list { display: flex; gap: 24px; list-style: none; }
+        .header .nav-list li { font-size: 14px; color: var(--ink-subtle); cursor: pointer; padding: 4px 0; position: relative; }
+        .header .nav-list li:hover { color: var(--accent); }
+        .header .nav-list li.active { color: var(--accent); font-weight: 600; }
+        .header .nav-list li.active::after { content: ''; position: absolute; bottom: -4px; left: 0; right: 0; height: 2px; background: var(--accent); border-radius: 1px; }
+        .header .user-area { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+        .header .user-area .avatar { width: 32px; height: 32px; border-radius: 50%; background: #E8F0FE; display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--accent); }
+        .header .user-area .name { font-size: 14px; color: var(--ink); }
+
+        .breadcrumb { padding: 16px 24px 0; font-size: 13px; color: var(--ink-subtle); }
+        .breadcrumb a { color: var(--ink-subtle); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--accent); }
+        .breadcrumb .current { color: var(--ink); font-weight: 500; }
+
+        .main { padding: 16px 24px 40px; }
+
+        .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        .page-header h2 { font-size: 20px; font-weight: 600; color: var(--ink); }
+
+        .hint-bar {
+            background: #E8F0FE;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: var(--accent);
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+
+        .config-card {
+            background: #fff;
+            border-radius: var(--radius-card);
+            padding: 24px;
+            box-shadow: var(--shadow-card);
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--accent);
+        }
+        .section-title .icon {
+            width: 20px; height: 20px;
+            border-radius: 6px;
+            background: #E8F0FE;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .form-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+        .form-row .fr-label { font-size: 13px; color: var(--ink-muted); min-width: 70px; flex-shrink: 0; }
+        .form-row input[type="number"] {
+            height: 36px;
+            padding: 0 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-pill);
+            font-size: 13px;
+            color: var(--ink);
+            outline: none;
+            transition: border-color 0.2s;
+            font-family: inherit;
+            background: #fff;
+        }
+        .form-row input[type="number"]:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,102,204,0.08); }
+        .form-row input.w-sm { width: 80px; }
+        .form-row .fr-unit { font-size: 13px; color: var(--ink-subtle); }
+
+        .switch-row { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+        .switch-row .sr-label { font-size: 14px; font-weight: 500; color: var(--ink); }
+        .switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .switch .slider {
+            position: absolute; cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #d0d5dd;
+            border-radius: 24px;
+            transition: 0.2s;
+        }
+        .switch .slider::before {
+            content: '';
+            position: absolute;
+            height: 18px; width: 18px;
+            left: 3px; bottom: 3px;
+            background: #fff;
+            border-radius: 50%;
+            transition: 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
+        .switch input:checked + .slider { background: var(--accent); }
+        .switch input:checked + .slider::before { transform: translateX(20px); }
+
+        /* 套餐卡片 */
+        .plan-card {
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px 20px;
+            margin-bottom: 12px;
+            background: #fafafc;
+            position: relative;
+        }
+        .plan-card .pc-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+        .plan-card .pc-header .pc-name { font-size: 14px; font-weight: 600; color: var(--ink); }
+        .plan-card .pc-header .pc-switch { display: flex; align-items: center; gap: 8px; }
+        .plan-card .pc-header .pc-switch span { font-size: 12px; color: var(--ink-subtle); }
+        .plan-card .pc-fields { display: flex; gap: 20px; flex-wrap: wrap; }
+        .plan-card .pc-fields .pcf-item { display: flex; align-items: center; gap: 8px; }
+        .plan-card .pc-fields .pcf-item .pcf-label { font-size: 12px; color: var(--ink-subtle); }
+        .plan-card .pc-fields .pcf-item input {
+            height: 32px; padding: 0 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-pill);
+            font-size: 13px; color: var(--ink);
+            outline: none; font-family: inherit;
+            width: 80px; background: #fff;
+        }
+        .plan-card .pc-fields .pcf-item input:focus { border-color: var(--accent); }
+        .plan-card .pc-fields .pcf-item .pcf-unit { font-size: 12px; color: var(--ink-subtle); }
+        .plan-card .pc-del {
+            position: absolute; top: 14px; right: 14px;
+            width: 24px; height: 24px; border-radius: 50%;
+            border: none; background: #FFF0F0; color: #ff3b30;
+            font-size: 12px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .add-plan-btn {
+            width: 100%; height: 42px;
+            border: 1px dashed var(--border);
+            border-radius: var(--radius-card);
+            background: transparent;
+            font-size: 13px; color: var(--accent);
+            cursor: pointer; font-family: inherit; font-weight: 500;
+            transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .add-plan-btn:hover { background: #E8F0FE; border-color: var(--accent); }
+
+        .bottom-actions { margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px; }
+        .btn {
+            height: 40px; padding: 0 32px;
+            border-radius: var(--radius-pill);
+            font-size: 14px; cursor: pointer;
+            border: none; transition: all 0.2s;
+            font-weight: 500; font-family: inherit;
+        }
+        .btn-cancel { background: transparent; color: var(--ink-subtle); border: 1px solid var(--border); }
+        .btn-cancel:hover { border-color: var(--accent); color: var(--accent); }
+        .btn-save { background: var(--accent); color: #fff; }
+        .btn-save:hover { background: var(--accent-hover); }
+
+        @media (max-width: 768px) {
+            .header { padding: 0 16px; }
+            .header .nav-list { display: none; }
+            .breadcrumb { padding: 12px 16px 0; }
+            .main { padding: 12px 16px 24px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">离泰数链</div>
+        <ul class="nav-list">
+            <li>概览</li>
+            <li>内容管理</li>
+            <li class="active">AI配置</li>
+            <li onclick="window.location.href='积分规则配置.html'" style="cursor:pointer;">积分管理</li>
+            <li onclick="window.location.href='../系统参数配置.html'" style="cursor:pointer;">系统设置</li>
+        </ul>
+        <div class="user-area">
+            <span class="avatar">管</span>
+            <span class="name">管理员</span>
+        </div>
+    </div>
+
+    <div class="breadcrumb">
+        <a href="../index.html">首页</a>
+        <span class="sep"> &gt; </span>
+        <a href="#">AI配置</a>
+        <span class="sep"> &gt; </span>
+        <span class="current">AI销售配置_v2（按点购买）</span>
+    </div>
+
+    <div class="main">
+        <div class="page-header">
+            <h2>AI销售配置_v2（按点购买）</h2>
+        </div>
+
+        <div class="hint-bar">
+            💡 本页面对应「购买点数」移动端页面。用户购买点数后，可通过点数兑换 AI 创作次数。AI 视频、游戏创作统一使用点数计算，不再区分。
+        </div>
+
+        <!-- ===== 点数消耗配置 ===== -->
+        <div class="config-card">
+            <div class="section-title">
+                <span class="icon">耗</span>
+                点数消耗配置
+            </div>
+            <div class="form-row">
+                <span class="fr-label">创造单个视频消耗</span>
+                <input type="number" class="w-sm" id="consumeMin" value="1" min="1" step="1">
+                <span class="fr-unit">-</span>
+                <input type="number" class="w-sm" id="consumeMax" value="5" min="1" step="1">
+                <span class="fr-unit">点</span>
+            </div>
+            <div style="font-size:12px;color:var(--ink-subtle);">
+                说明：创造单个视频约消耗 <span id="rangeText">1-5</span> 点，AI 视频、游戏创作统一按此区间扣除。
+            </div>
+        </div>
+
+        <!-- ===== 点数充值套餐配置 ===== -->
+        <div class="config-card">
+            <div class="section-title">
+                <span class="icon">套</span>
+                点数充值套餐配置
+            </div>
+            <div class="switch-row">
+                <span class="sr-label">启用点数充值</span>
+                <label class="switch">
+                    <input type="checkbox" id="planEnabled" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div id="planList"></div>
+            <button class="add-plan-btn" onclick="addPlan()">+ 新增充值套餐</button>
+        </div>
+
+        <div class="bottom-actions">
+            <button class="btn btn-cancel" onclick="history.back()">取消</button>
+            <button class="btn btn-save" onclick="saveConfig()">保存配置</button>
+        </div>
+    </div>
+
+    <script>
+        // 默认套餐：对应购买点数_v2 页面的4个套餐
+        var planTemplates = [
+            { name: '50 点', points: 50, price: 49.9, desc: '适合初次体验', icon: '🌱' },
+            { name: '150 点', points: 150, price: 138, desc: '适合轻度使用', icon: '🌿' },
+            { name: '500 点', points: 500, price: 398, desc: '高性价比之选', icon: '🔥' },
+            { name: '1000 点', points: 1000, price: 698, desc: '长期使用推荐', icon: '💎' },
+        ];
+        var plans = [];
+
+        function renderPlans() {
+            var list = document.getElementById('planList');
+            var html = '';
+            for (var i = 0; i < plans.length; i++) {
+                var p = plans[i];
+                html += '<div class="plan-card">'
+                    + '<div class="pc-header">'
+                    + '<span class="pc-name">' + (p.icon || '') + ' ' + p.name + '</span>'
+                    + '<div class="pc-switch">'
+                    + '<span>' + (p.enabled ? '已启用' : '已禁用') + '</span>'
+                    + '<label class="switch">'
+                    + '<input type="checkbox"' + (p.enabled ? ' checked' : '') + ' onchange="togglePlan(' + i + ')">'
+                    + '<span class="slider"></span>'
+                    + '</label>'
+                    + '</div>'
+                    + '</div>'
+                    + '<div class="pc-fields">'
+                    + '<div class="pcf-item">'
+                    + '<span class="pcf-label">套餐名称</span>'
+                    + '<input type="text" value="' + p.name + '" onchange="updatePlan(' + i + ', \'name\', this.value)" style="width:120px;">'
+                    + '</div>'
+                    + '<div class="pcf-item">'
+                    + '<span class="pcf-label">图标</span>'
+                    + '<input type="text" value="' + (p.icon || '') + '" onchange="updatePlan(' + i + ', \'icon\', this.value)" style="width:50px;">'
+                    + '</div>'
+                    + '<div class="pcf-item">'
+                    + '<span class="pcf-label">点数</span>'
+                    + '<input type="number" value="' + p.points + '" min="1" onchange="updatePlan(' + i + ', \'points\', parseInt(this.value) || 1)">'
+                    + '<span class="pcf-unit">点</span>'
+                    + '</div>'
+                    + '<div class="pcf-item">'
+                    + '<span class="pcf-label">售价</span>'
+                    + '<input type="number" value="' + p.price + '" min="0.01" step="0.01" onchange="updatePlan(' + i + ', \'price\', parseFloat(this.value) || 0)">'
+                    + '<span class="pcf-unit">元</span>'
+                    + '</div>'
+                    + '<div class="pcf-item">'
+                    + '<span class="pcf-label">描述</span>'
+                    + '<input type="text" value="' + p.desc + '" onchange="updatePlan(' + i + ', \'desc\', this.value)" style="width:160px;">'
+                    + '</div>'
+                    + '</div>'
+                    + '<button class="pc-del" onclick="delPlan(' + i + ')">✕</button>'
+                    + '</div>';
+            }
+            list.innerHTML = html;
+        }
+
+        function addPlan() {
+            var base = planTemplates[plans.length % planTemplates.length];
+            plans.push({ name: base.name, points: base.points, price: base.price, desc: base.desc, icon: base.icon, enabled: true });
+            renderPlans();
+        }
+
+        function delPlan(idx) {
+            if (!confirm('确定删除该套餐？')) return;
+            plans.splice(idx, 1);
+            renderPlans();
+        }
+
+        function togglePlan(idx) {
+            plans[idx].enabled = !plans[idx].enabled;
+            renderPlans();
+        }
+
+        function updatePlan(idx, field, value) {
+            plans[idx][field] = value;
+        }
+
+        function updateRangeText() {
+            var min = parseInt(document.getElementById('consumeMin').value) || 1;
+            var max = parseInt(document.getElementById('consumeMax').value) || 5;
+            if (min > max) { max = min; document.getElementById('consumeMax').value = min; }
+            document.getElementById('rangeText').textContent = min + '-' + max;
+        }
+        document.getElementById('consumeMin').addEventListener('input', updateRangeText);
+        document.getElementById('consumeMax').addEventListener('input', updateRangeText);
+
+        function saveConfig() {
+            var data = {
+                consumeMin: parseInt(document.getElementById('consumeMin').value) || 1,
+                consumeMax: parseInt(document.getElementById('consumeMax').value) || 5,
+                planEnabled: document.getElementById('planEnabled').checked,
+                plans: plans
+            };
+            localStorage.setItem('aiSalesConfigV2', JSON.stringify(data));
+            alert('✅ AI销售配置_v2 已保存');
+        }
+
+        function initPlans() {
+            return [
+                { name: '50 点', points: 50, price: 49.9, desc: '适合初次体验', icon: '🌱', enabled: true },
+                { name: '150 点', points: 150, price: 138, desc: '适合轻度使用', icon: '🌿', enabled: true },
+                { name: '500 点', points: 500, price: 398, desc: '高性价比之选', icon: '🔥', enabled: true },
+                { name: '1000 点', points: 1000, price: 698, desc: '长期使用推荐', icon: '💎', enabled: true },
+            ];
+        }
+
+        function loadConfig() {
+            var saved = localStorage.getItem('aiSalesConfigV2');
+            if (saved) {
+                try {
+                    var data = JSON.parse(saved);
+                    if (data.consumeMin) document.getElementById('consumeMin').value = data.consumeMin;
+                    if (data.consumeMax) document.getElementById('consumeMax').value = data.consumeMax;
+                    if (typeof data.planEnabled !== 'undefined') document.getElementById('planEnabled').checked = !!data.planEnabled;
+                    plans = data.plans && data.plans.length > 0 ? data.plans : initPlans();
+                } catch(e) {
+                    plans = initPlans();
+                }
+            } else {
+                plans = initPlans();
+            }
+            updateRangeText();
+            renderPlans();
+        }
+
+        loadConfig();
+    </script>
+</body>
+</html>
