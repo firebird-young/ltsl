@@ -195,6 +195,39 @@
         }
         .add-plan-btn:hover { background: #E8F0FE; border-color: var(--accent); }
 
+        /* 模板选择 */
+        .tm-plans { margin-bottom: 8px; }
+        .tm-plan {
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px 20px;
+            margin-bottom: 12px;
+            background: #fafafc;
+            position: relative;
+        }
+        .tm-plan .tp-del {
+            position: absolute; top: 14px; right: 14px;
+            width: 24px; height: 24px; border-radius: 50%;
+            border: none; background: #FFF0F0; color: #ff3b30;
+            font-size: 12px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .tm-plan .tp-fields { display: flex; gap: 18px; flex-wrap: wrap; }
+        .tm-plan .tp-fields .tpf-item { display: flex; align-items: center; gap: 8px; }
+        .tm-plan .tp-fields .tpf-item .tpf-label { font-size: 12px; color: var(--ink-subtle); white-space: nowrap; }
+        .tm-plan select, .tm-plan input[type="number"] {
+            height: 32px; padding: 0 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-pill);
+            font-size: 13px; color: var(--ink);
+            outline: none; font-family: inherit;
+            width: auto; background: #fff;
+        }
+        .tm-plan select { cursor: pointer; }
+        .tm-plan select:focus, .tm-plan input[type="number"]:focus { border-color: var(--accent); }
+        .tm-plan .tp-points { width: 70px; }
+        .tm-plan .tpf-unit { font-size: 12px; color: var(--ink-subtle); }
+
         .bottom-actions { margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px; }
         .btn {
             height: 40px; padding: 0 32px;
@@ -255,15 +288,25 @@
                 <span class="icon">耗</span>
                 点数消耗配置
             </div>
-            <div class="form-row">
-                <span class="fr-label">创造单个视频消耗</span>
-                <input type="number" class="w-sm" id="consumeMin" value="1" min="1" step="1">
-                <span class="fr-unit">-</span>
-                <input type="number" class="w-sm" id="consumeMax" value="5" min="1" step="1">
-                <span class="fr-unit">点</span>
+
+            <!-- 消耗说明 -->
+            <div style="margin-bottom:18px;">
+                <div style="font-size:13px;font-weight:500;color:var(--ink);margin-bottom:8px;">点数消耗说明</div>
+                <textarea id="consumeDesc" rows="3" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:13px;color:var(--ink);outline:none;font-family:inherit;resize:vertical;line-height:1.6;background:#fff;"></textarea>
             </div>
-            <div style="font-size:12px;color:var(--ink-subtle);">
-                说明：创造单个视频约消耗 <span id="rangeText">1-5</span> 点，AI 视频、游戏创作统一按此区间扣除。
+
+            <!-- 消耗类型 Tab -->
+            <div class="product-tabs" style="margin-bottom:16px;">
+                <button class="product-tab active" onclick="switchConsumeTab('video')">🎬 视频模版</button>
+                <button class="product-tab" style="opacity:0.5;cursor:not-allowed;" title="暂不可用">🎮 游戏模版</button>
+            </div>
+
+            <!-- 视频消耗模板列表 -->
+            <div class="tm-plans" id="consumePlanList"></div>
+            <button class="add-plan-btn" onclick="addConsumePlan()">+ 新增消耗模板</button>
+
+            <div style="margin-top:14px;font-size:12px;color:var(--ink-subtle);">
+                说明：根据视频模型、分辨率、视频时长配置对应的点数消耗模板，用户创作时按匹配的模板扣除点数。可新建多个模板。
             </div>
         </div>
 
@@ -367,19 +410,64 @@
             plans[idx][field] = value;
         }
 
-        function updateRangeText() {
-            var min = parseInt(document.getElementById('consumeMin').value) || 1;
-            var max = parseInt(document.getElementById('consumeMax').value) || 5;
-            if (min > max) { max = min; document.getElementById('consumeMax').value = min; }
-            document.getElementById('rangeText').textContent = min + '-' + max;
+        // 视频消耗模板
+        var modelOptions = ['Seedance-2.0-mini', 'Seedance-2.0-fast', 'Seedance-2.5'];
+        var resolutionOptions = ['480p', '720p', '1080p'];
+        var consumePlans = [];
+
+        function renderConsumePlans() {
+            var list = document.getElementById('consumePlanList');
+            var html = '';
+            for (var i = 0; i < consumePlans.length; i++) {
+                var t = consumePlans[i];
+                var modelSel = '<select onchange="updateConsumePlan(' + i + ', \'model\', this.value)">';
+                for (var m = 0; m < modelOptions.length; m++) {
+                    modelSel += '<option value="' + modelOptions[m] + '"' + (t.model === modelOptions[m] ? ' selected' : '') + '>' + modelOptions[m] + '</option>';
+                }
+                modelSel += '</select>';
+                var resSel = '<select onchange="updateConsumePlan(' + i + ', \'resolution\', this.value)">';
+                for (var r = 0; r < resolutionOptions.length; r++) {
+                    resSel += '<option value="' + resolutionOptions[r] + '"' + (t.resolution === resolutionOptions[r] ? ' selected' : '') + '>' + resolutionOptions[r] + '</option>';
+                }
+                resSel += '</select>';
+                html += '<div class="tm-plan">'
+                    + '<button class="tp-del" onclick="delConsumePlan(' + i + ')">✕</button>'
+                    + '<div class="tp-fields">'
+                    + '<div class="tpf-item"><span class="tpf-label">视频模型</span>' + modelSel + '</div>'
+                    + '<div class="tpf-item"><span class="tpf-label">分辨率</span>' + resSel + '</div>'
+                    + '<div class="tpf-item"><span class="tpf-label">视频时长</span><input type="number" class="tp-points" value="' + t.duration + '" min="1" max="30" step="1" onchange="updateConsumePlan(' + i + ', \'duration\', parseInt(this.value) || 1)"><span class="tpf-unit">秒</span></div>'
+                    + '<div class="tpf-item"><span class="tpf-label">消耗点数</span><input type="number" class="tp-points" value="' + t.points + '" min="1" step="1" onchange="updateConsumePlan(' + i + ', \'points\', parseInt(this.value) || 1)"><span class="tpf-unit">点</span></div>'
+                    + '</div>'
+                    + '</div>';
+            }
+            list.innerHTML = html;
         }
-        document.getElementById('consumeMin').addEventListener('input', updateRangeText);
-        document.getElementById('consumeMax').addEventListener('input', updateRangeText);
+
+        function addConsumePlan() {
+            consumePlans.push({ model: 'Seedance-2.0-mini', resolution: '480p', duration: 5, points: 1 });
+            renderConsumePlans();
+        }
+
+        function delConsumePlan(idx) {
+            consumePlans.splice(idx, 1);
+            renderConsumePlans();
+        }
+
+        function updateConsumePlan(idx, field, value) {
+            consumePlans[idx][field] = value;
+        }
+
+        function switchConsumeTab(type) {
+            // 游戏模版暂不可用
+            if (type !== 'video') return;
+            document.querySelectorAll('.product-tab').forEach(function(el) { el.classList.remove('active'); });
+            document.querySelector('.product-tab[onclick*="' + type + '"]').classList.add('active');
+        }
 
         function saveConfig() {
             var data = {
-                consumeMin: parseInt(document.getElementById('consumeMin').value) || 1,
-                consumeMax: parseInt(document.getElementById('consumeMax').value) || 5,
+                consumeDesc: document.getElementById('consumeDesc').value.trim(),
+                consumePlans: consumePlans,
                 planEnabled: document.getElementById('planEnabled').checked,
                 plans: plans
             };
@@ -401,17 +489,20 @@
             if (saved) {
                 try {
                     var data = JSON.parse(saved);
-                    if (data.consumeMin) document.getElementById('consumeMin').value = data.consumeMin;
-                    if (data.consumeMax) document.getElementById('consumeMax').value = data.consumeMax;
+                    consumePlans = data.consumePlans && data.consumePlans.length > 0 ? data.consumePlans : [ { model: 'Seedance-2.0-mini', resolution: '480p', duration: 5, points: 1 } ];
+                    document.getElementById('consumeDesc').value = data.consumeDesc || '';
                     if (typeof data.planEnabled !== 'undefined') document.getElementById('planEnabled').checked = !!data.planEnabled;
                     plans = data.plans && data.plans.length > 0 ? data.plans : initPlans();
                 } catch(e) {
+                    consumePlans = [ { model: 'Seedance-2.0-mini', resolution: '480p', duration: 5, points: 1 } ];
                     plans = initPlans();
                 }
             } else {
+                document.getElementById('consumeDesc').value = '点数消耗说明';
+                consumePlans = [ { model: 'Seedance-2.0-mini', resolution: '480p', duration: 5, points: 1 } ];
                 plans = initPlans();
             }
-            updateRangeText();
+            renderConsumePlans();
             renderPlans();
         }
 
