@@ -336,10 +336,10 @@
     <script>
         // 默认套餐：对应购买点数_v2 页面的4个套餐
         var planTemplates = [
-            { name: '50 点', points: 50, price: 49.9, desc: '适合初次体验', icon: '🌱' },
-            { name: '150 点', points: 150, price: 138, desc: '适合轻度使用', icon: '🌿' },
-            { name: '500 点', points: 500, price: 398, desc: '高性价比之选', icon: '🔥' },
-            { name: '1000 点', points: 1000, price: 698, desc: '长期使用推荐', icon: '💎' },
+            { name: '50 点', points: 50, price: 49.9, desc: '适合初次体验' },
+            { name: '150 点', points: 150, price: 138, desc: '适合轻度使用' },
+            { name: '500 点', points: 500, price: 398, desc: '高性价比之选' },
+            { name: '1000 点', points: 1000, price: 698, desc: '长期使用推荐' },
         ];
         var plans = [];
 
@@ -350,7 +350,7 @@
                 var p = plans[i];
                 html += '<div class="plan-card">'
                     + '<div class="pc-header">'
-                    + '<span class="pc-name">' + (p.icon || '') + ' ' + p.name + '</span>'
+                    + '<span class="pc-name">' + p.name + '</span>'
                     + '<div class="pc-switch">'
                     + '<span>' + (p.enabled ? '已启用' : '已禁用') + '</span>'
                     + '<label class="switch">'
@@ -363,10 +363,6 @@
                     + '<div class="pcf-item">'
                     + '<span class="pcf-label">套餐名称</span>'
                     + '<input type="text" value="' + p.name + '" onchange="updatePlan(' + i + ', \'name\', this.value)" style="width:120px;">'
-                    + '</div>'
-                    + '<div class="pcf-item">'
-                    + '<span class="pcf-label">图标</span>'
-                    + '<input type="text" value="' + (p.icon || '') + '" onchange="updatePlan(' + i + ', \'icon\', this.value)" style="width:50px;">'
                     + '</div>'
                     + '<div class="pcf-item">'
                     + '<span class="pcf-label">点数</span>'
@@ -391,7 +387,7 @@
 
         function addPlan() {
             var base = planTemplates[plans.length % planTemplates.length];
-            plans.push({ name: base.name, points: base.points, price: base.price, desc: base.desc, icon: base.icon, enabled: true });
+            plans.push({ name: base.name, points: base.points, price: base.price, desc: base.desc, enabled: true });
             renderPlans();
         }
 
@@ -477,10 +473,10 @@
 
         function initPlans() {
             return [
-                { name: '50 点', points: 50, price: 49.9, desc: '适合初次体验', icon: '🌱', enabled: true },
-                { name: '150 点', points: 150, price: 138, desc: '适合轻度使用', icon: '🌿', enabled: true },
-                { name: '500 点', points: 500, price: 398, desc: '高性价比之选', icon: '🔥', enabled: true },
-                { name: '1000 点', points: 1000, price: 698, desc: '长期使用推荐', icon: '💎', enabled: true },
+                { name: '50 点', points: 50, price: 49.9, desc: '适合初次体验', enabled: true },
+                { name: '150 点', points: 150, price: 138, desc: '适合轻度使用', enabled: true },
+                { name: '500 点', points: 500, price: 398, desc: '高性价比之选', enabled: true },
+                { name: '1000 点', points: 1000, price: 698, desc: '长期使用推荐', enabled: true },
             ];
         }
 
