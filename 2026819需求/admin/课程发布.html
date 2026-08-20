@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>课程发布 - 管理后台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', 'Microsoft YaHei', Arial, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            color: #333;
+            padding-bottom: 80px;
+        }
+
+        /* 顶部导航 */
+        .header {
+            background: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header .logo { font-size: 18px; font-weight: 700; color: #0669FF; margin-right: 32px; }
+        .header .nav-list { display: flex; gap: 24px; list-style: none; }
+        .header .nav-list li { font-size: 14px; color: #666; cursor: pointer; padding: 4px 0; position: relative; }
+        .header .nav-list li:hover { color: #0669FF; }
+        .header .nav-list li.active { color: #0669FF; font-weight: 600; }
+        .header .nav-list li.active::after {
+            content: ''; position: absolute; bottom: -4px; left: 0; right: 0;
+            height: 2px; background: #0669FF; border-radius: 1px;
+        }
+        .header .user-area { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+        .header .user-area .avatar {
+            width: 32px; height: 32px; border-radius: 50%; background: #E8F0FE;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; color: #0669FF;
+        }
+        .header .user-area .name { font-size: 14px; color: #333; }
+
+        .breadcrumb { padding: 16px 24px 0; font-size: 13px; color: #999; display: flex; align-items: center; gap: 6px; }
+        .breadcrumb a { color: #999; text-decoration: none; }
+        .breadcrumb a:hover { color: #0669FF; }
+        .breadcrumb .sep { color: #ccc; }
+        .breadcrumb .current { color: #333; font-weight: 500; }
+
+        .main { padding: 16px 24px 40px; max-width: 1200px; margin: 0 auto; }
+        .page-header { margin-bottom: 20px; }
+        .page-header h2 { font-size: 20px; font-weight: 600; color: #1a1a1a; }
+
+        /* 表单卡片 */
+        .form-card {
+            background: #fff; border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 16px; overflow: hidden;
+        }
+        .card-header {
+            padding: 16px 24px; border-bottom: 1px solid #f0f0f0;
+            font-size: 16px; font-weight: 600; color: #1a1a1a;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .card-header::before {
+            content: ''; width: 4px; height: 16px; border-radius: 2px; background: #0669FF;
+        }
+        .card-body { padding: 24px; }
+
+        .form-row { display: flex; align-items: flex-start; margin-bottom: 20px; }
+        .form-row:last-child { margin-bottom: 0; }
+        .form-label {
+            width: 110px; padding-top: 8px; font-size: 14px; color: #555;
+            text-align: right; margin-right: 16px; flex-shrink: 0;
+        }
+        .form-label .required { color: #ff4d4f; margin-right: 4px; }
+        .form-control { flex: 1; min-width: 0; }
+
+        /* 输入框 */
+        .input-wrap { position: relative; }
+        .form-input, .form-select, .form-textarea {
+            width: 100%; border: 1px solid #d9d9d9; border-radius: 6px;
+            font-size: 14px; color: #333; outline: none; transition: all 0.2s;
+            font-family: inherit;
+        }
+        .form-input { height: 38px; padding: 0 12px; }
+        .form-select { height: 38px; padding: 0 12px; background: #fff; appearance: none; cursor: pointer; }
+        .form-textarea { padding: 10px 12px; min-height: 80px; resize: vertical; line-height: 1.6; }
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: #0669FF; box-shadow: 0 0 0 2px rgba(6,105,255,0.08);
+        }
+        .form-input::placeholder, .form-textarea::placeholder { color: #bfbfbf; }
+        .input-count {
+            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+            font-size: 12px; color: #999;
+        }
+        .textarea-count {
+            position: absolute; right: 12px; bottom: 10px;
+            font-size: 12px; color: #999;
+        }
+
+        .input-with-count { padding-right: 50px; }
+        .textarea-with-count { padding-bottom: 28px; }
+
+        /* 地址行 */
+        .address-list { display: flex; flex-direction: column; gap: 12px; }
+        .address-row {
+            display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+        }
+        .address-tag {
+            padding: 6px 12px; border-radius: 4px; font-size: 13px; font-weight: 500; white-space: nowrap;
+        }
+        .address-tag.start { background: #E8F4FF; color: #0669FF; }
+        .address-tag.end { background: #E8F8F0; color: #2DA666; }
+        .address-row .form-input, .address-row .form-select { width: auto; flex: 1; min-width: 140px; }
+        .address-row .form-input.detail { flex: 2; min-width: 220px; }
+        .btn-icon {
+            width: 32px; height: 32px; border-radius: 50%; border: none;
+            background: #0669FF; color: #fff; font-size: 18px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .btn-icon:hover { background: #0052CC; }
+        .btn-icon.delete { background: #ff4d4f; }
+        .btn-icon.delete:hover { background: #d9363e; }
+
+        /* 上传封面 */
+        .upload-box {
+            width: 120px; height: 120px; border: 1px dashed #d9d9d9; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            background: #fafafa; color: #999; font-size: 32px; transition: all 0.2s;
+            position: relative; overflow: hidden;
+        }
+        .upload-box:hover { border-color: #0669FF; color: #0669FF; background: #f0f7ff; }
+        .upload-box img { width: 100%; height: 100%; object-fit: cover; position: absolute; }
+        .upload-box input { display: none; }
+
+        /* 标签输入 */
+        .tag-input-box {
+            display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+            min-height: 38px; padding: 4px 12px; border: 1px solid #d9d9d9;
+            border-radius: 6px; background: #fff; cursor: text;
+        }
+        .tag-input-box:focus-within { border-color: #0669FF; box-shadow: 0 0 0 2px rgba(6,105,255,0.08); }
+        .tag-item {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 2px 8px; border-radius: 4px; background: #f0f7ff;
+            color: #0669FF; font-size: 13px;
+        }
+        .tag-item .remove { cursor: pointer; font-size: 12px; }
+        .tag-input-box input {
+            border: none; outline: none; font-size: 14px; flex: 1; min-width: 80px; height: 28px;
+        }
+
+        /* 富文本编辑器 */
+        .editor-toolbar {
+            display: flex; align-items: center; gap: 4px; padding: 8px 12px;
+            border: 1px solid #d9d9d9; border-bottom: none; border-radius: 6px 6px 0 0;
+            background: #fafafa; flex-wrap: wrap;
+        }
+        .editor-toolbar button {
+            width: 28px; height: 28px; border: none; background: transparent;
+            color: #555; font-size: 13px; cursor: pointer; border-radius: 4px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .editor-toolbar button:hover { background: #e8e8e8; }
+        .editor-toolbar button.active { background: #E8F0FE; color: #0669FF; }
+        .editor-toolbar .divider { width: 1px; height: 18px; background: #e0e0e0; margin: 0 4px; }
+        .editor-content {
+            min-height: 180px; max-height: 400px; overflow-y: auto;
+            padding: 12px; border: 1px solid #d9d9d9; border-radius: 0 0 6px 6px;
+            font-size: 14px; line-height: 1.7; outline: none;
+        }
+        .editor-content:focus { border-color: #0669FF; box-shadow: 0 0 0 2px rgba(6,105,255,0.08); }
+        .editor-content p { margin-bottom: 8px; }
+        .editor-content ul, .editor-content ol { margin-left: 20px; margin-bottom: 8px; }
+
+        /* 步进器 */
+        .stepper-inline { display: inline-flex; align-items: center; gap: 10px; }
+        .stepper { display: inline-flex; align-items: center; border: 1px solid #d9d9d9; border-radius: 6px; overflow: hidden; background: #fff; }
+        .stepper button { width: 34px; height: 34px; border: none; background: #fafafa; color: #666; font-size: 16px; cursor: pointer; }
+        .stepper button:hover { color: #0669FF; background: #f0f7ff; }
+        .stepper input { width: 60px; height: 34px; border: none; border-left: 1px solid #d9d9d9; border-right: 1px solid #d9d9d9; text-align: center; font-size: 14px; outline: none; -moz-appearance: textfield; }
+        .stepper input::-webkit-outer-spin-button,
+        .stepper input::-webkit-inner-spin-button { -webkit-appearance: none; }
+        .stepper-unit { font-size: 14px; color: #666; }
+
+        /* 场次方案表格 */
+        .plan-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .table-wrapper { border: 1px solid #f0f0f0; border-radius: 8px; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 900px; }
+        table thead th { background: #fafafa; padding: 12px 14px; text-align: left; font-weight: 600; color: #555; border-bottom: 1px solid #e8e8e8; white-space: nowrap; }
+        table tbody td { padding: 14px; border-bottom: 1px solid #f0f0f0; color: #333; vertical-align: top; line-height: 1.7; }
+        table tbody tr:last-child td { border-bottom: none; }
+        .empty-state { text-align: center; padding: 40px 0; color: #999; font-size: 14px; }
+
+        .type-block { margin-bottom: 8px; }
+        .type-block:last-child { margin-bottom: 0; }
+        .type-block .type-name { color: #0669FF; font-weight: 600; margin-right: 8px; }
+        .type-block .spec-item { display: flex; align-items: center; gap: 8px; color: #555; margin-left: 4px; }
+        .type-block .spec-item .price { color: #e53935; font-weight: 600; }
+        .type-block .spec-item .meta { color: #888; font-size: 12px; }
+        .type-block .max-per-order { color: #888; font-size: 12px; margin-left: 8px; }
+        .main-type-tag {
+            display: inline-block; background: #0669FF; color: #fff;
+            padding: 1px 6px; border-radius: 3px; font-size: 11px; margin-left: 6px;
+            vertical-align: middle; line-height: 1.6;
+        }
+
+        .action-btn { padding: 5px 14px; border-radius: 4px; font-size: 12px; cursor: pointer; border: none; transition: all 0.2s; margin-right: 6px; }
+        .action-btn:last-child { margin-right: 0; }
+        .action-btn.btn-edit { background: #E8F5E9; color: #389E0D; }
+        .action-btn.btn-edit:hover { background: #D6F0D8; }
+        .action-btn.btn-delete { background: #FFF0F0; color: #D43828; }
+        .action-btn.btn-delete:hover { background: #FFE0E0; }
+
+        .btn-primary {
+            background: #0669FF; color: #fff; border: none;
+            padding: 8px 20px; border-radius: 6px; font-size: 14px;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+            transition: background 0.2s;
+        }
+        .btn-primary:hover { background: #0052CC; }
+        .btn-ghost {
+            background: #fff; color: #0669FF; border: 1px solid #0669FF;
+            padding: 7px 18px; border-radius: 6px; font-size: 14px; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;
+        }
+        .btn-ghost:hover { background: #f0f7ff; }
+
+        /* 取消政策 */
+        .policy-row td { vertical-align: middle; }
+        .policy-input {
+            width: 100%; height: 34px; padding: 0 10px; border: 1px solid #d9d9d9;
+            border-radius: 4px; font-size: 13px; outline: none;
+        }
+        .policy-input:focus { border-color: #0669FF; }
+        .fee-input-wrap { display: flex; align-items: center; gap: 6px; }
+        .fee-input-wrap input { width: 80px; text-align: center; }
+        .fee-input-wrap span { color: #999; font-size: 13px; }
+
+        /* 底部操作栏 */
+        .footer-actions {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: #fff; border-top: 1px solid #f0f0f0;
+            padding: 12px 24px; display: flex; justify-content: flex-end; gap: 12px;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.04); z-index: 90;
+        }
+        .footer-actions button { height: 40px; padding: 0 32px; border-radius: 6px; font-size: 14px; cursor: pointer; border: none; }
+        .footer-actions .btn-save { background: #f5f5f5; color: #666; border: 1px solid #d9d9d9; }
+        .footer-actions .btn-save:hover { border-color: #0669FF; color: #0669FF; }
+        .footer-actions .btn-publish { background: #0669FF; color: #fff; }
+        .footer-actions .btn-publish:hover { background: #0052CC; }
+
+        /* ============ 弹窗（复用场次方案） ============ */
+        .modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+            z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal.show { display: flex; }
+        .modal-content {
+            background: #fff; width: 100%; max-width: 900px;
+            max-height: 92vh; border-radius: 12px; overflow: hidden;
+            display: flex; flex-direction: column;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.16);
+        }
+        .modal-header {
+            padding: 18px 28px; border-bottom: 1px solid #f0f0f0;
+            display: flex; align-items: center; justify-content: space-between; background: #fafbff;
+        }
+        .modal-header .title-wrap { display: flex; align-items: center; gap: 10px; }
+        .modal-header .title-bar { width: 4px; height: 18px; border-radius: 2px; background: #0669FF; }
+        .modal-header h3 { font-size: 17px; font-weight: 600; color: #1a1a1a; }
+        .modal-header .close { font-size: 22px; color: #999; cursor: pointer; border: none; background: transparent; line-height: 1; padding: 4px; }
+        .modal-header .close:hover { color: #333; }
+        .modal-body { padding: 24px 28px; overflow-y: auto; }
+        .modal-footer {
+            padding: 16px 28px; border-top: 1px solid #f0f0f0;
+            display: flex; justify-content: flex-end; gap: 12px; background: #fff;
+        }
+        .modal-footer button { height: 38px; padding: 0 28px; border-radius: 6px; font-size: 14px; cursor: pointer; border: none; }
+        .modal-footer .btn-cancel { background: #fff; color: #666; border: 1px solid #d9d9d9; }
+        .modal-footer .btn-cancel:hover { border-color: #0669FF; color: #0669FF; }
+        .modal-footer .btn-ok { background: #0669FF; color: #fff; }
+        .modal-footer .btn-ok:hover { background: #0052CC; }
+
+        .section { margin-bottom: 28px; }
+        .section:last-of-type { margin-bottom: 0; }
+        .section-head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+        .section-num { width: 22px; height: 22px; border-radius: 50%; background: #0669FF; color: #fff; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .section-title { font-size: 15px; font-weight: 600; color: #1a1a1a; }
+        .section-desc { font-size: 12px; color: #999; margin-left: 2px; }
+        .section-box { background: #fafbff; border: 1px solid #e8f0fb; border-radius: 10px; padding: 20px 24px; }
+
+        .modal-form-row { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+        .modal-form-row:last-child { margin-bottom: 0; }
+        .modal-form-label { font-size: 14px; color: #555; white-space: nowrap; min-width: 76px; text-align: right; }
+        .modal-form-label .required { color: #ff4d4f; margin-right: 4px; }
+        .modal-form-input {
+            height: 38px; padding: 0 12px; border: 1px solid #d9d9d9;
+            border-radius: 6px; font-size: 14px; color: #333; outline: none;
+            flex: 1; font-family: inherit; background: #fff;
+        }
+        .modal-form-input:focus { border-color: #0669FF; box-shadow: 0 0 0 2px rgba(6,105,255,0.08); }
+        .modal-input-count { font-size: 12px; color: #999; margin-left: 6px; white-space: nowrap; }
+
+        .date-trigger {
+            height: 38px; padding: 0 12px; border: 1px solid #d9d9d9;
+            border-radius: 6px; font-size: 14px; color: #333; outline: none;
+            flex: 1; font-family: inherit; background: #fff;
+            display: flex; align-items: center; gap: 8px; cursor: pointer;
+            min-width: 220px; max-width: 360px;
+        }
+        .date-trigger:hover { border-color: #0669FF; }
+        .date-trigger.active { border-color: #0669FF; box-shadow: 0 0 0 2px rgba(6,105,255,0.08); }
+        .date-trigger .icon { color: #999; font-size: 16px; }
+        .date-trigger .text { flex: 1; color: #333; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .date-trigger .text.placeholder { color: #bfbfbf; }
+
+        .rule-row { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 14px; margin-bottom: 18px; }
+        .rule-row:last-child { margin-bottom: 0; }
+        .rule-label { font-size: 14px; color: #333; min-width: 76px; text-align: right; }
+        .rule-text { font-size: 14px; color: #555; white-space: nowrap; }
+        .rule-hint { font-size: 12px; color: #999; }
+
+        .warning-tip {
+            display: flex; align-items: flex-start; gap: 8px;
+            background: #fffbe6; border: 1px solid #ffe58f;
+            border-radius: 6px; padding: 10px 12px;
+            color: #d48806; font-size: 13px; line-height: 1.6;
+        }
+        .warning-tip .icon {
+            flex-shrink: 0; width: 18px; height: 18px; border-radius: 50%;
+            border: 1px solid #d48806; color: #d48806; font-size: 12px;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* 类型 / 规格 */
+        .type-box { border: 1px solid #e4e7f0; border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; background: #fff; }
+        .type-box:last-child { margin-bottom: 0; }
+        .type-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; padding-bottom: 14px; border-bottom: 1px dashed #e8e8e8; }
+        .type-tag { display: inline-block; background: #0669FF; color: #fff; padding: 3px 12px; border-radius: 4px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+        .type-tag.sub { background: #f0f0f0; color: #666; }
+        .type-name-input { height: 34px; padding: 0 12px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 14px; outline: none; width: 220px; background: #fff; }
+        .type-name-input:focus { border-color: #0669FF; box-shadow: 0 0 0 2px rgba(6,105,255,0.08); }
+        .type-name-input::placeholder { color: #bfbfbf; }
+        .type-right { margin-left: auto; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+        .type-max-order { display: flex; align-items: center; gap: 8px; }
+        .type-max-order .label { font-size: 13px; color: #555; white-space: nowrap; }
+        .type-remove { font-size: 13px; color: #D43828; cursor: pointer; border: none; background: transparent; white-space: nowrap; }
+
+        .spec-card { border: 1px solid #eef0f5; border-radius: 8px; padding: 16px 18px; margin-bottom: 12px; background: #fafbff; }
+        .spec-card:last-child { margin-bottom: 0; }
+        .spec-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+        .spec-tag { display: inline-block; background: #E8F0FE; color: #0669FF; padding: 3px 10px; border-radius: 4px; font-size: 13px; font-weight: 600; }
+        .spec-remove { font-size: 13px; color: #D43828; cursor: pointer; border: none; background: transparent; }
+        .spec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 28px; }
+        .spec-field { display: flex; align-items: center; gap: 8px; }
+        .spec-field label { font-size: 14px; color: #333; min-width: 70px; text-align: right; white-space: nowrap; }
+        .spec-field label .required { color: #ff4d4f; margin-right: 4px; }
+        .spec-input { height: 36px; padding: 0 12px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 14px; outline: none; flex: 1; min-width: 0; }
+        .spec-input:focus { border-color: #0669FF; box-shadow: 0 0 0 2px rgba(6,105,255,0.08); }
+        .spec-input::placeholder { color: #bfbfbf; }
+
+        .age-limit-box { background: #fff; border: 1px solid #eef0f5; border-radius: 8px; padding: 14px 16px; margin-top: 14px; }
+        .age-limit-head { display: flex; align-items: center; justify-content: space-between; }
+        .age-limit-title { font-size: 14px; font-weight: 600; color: #333; }
+        .age-range { display: flex; align-items: center; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+        .age-range .input-group { display: flex; align-items: center; border: 1px solid #d9d9d9; border-radius: 6px; overflow: hidden; background: #fff; }
+        .age-range .input-group input { width: 90px; height: 34px; border: none; outline: none; text-align: center; font-size: 14px; -moz-appearance: textfield; }
+        .age-range .input-group input::-webkit-outer-spin-button,
+        .age-range .input-group input::-webkit-inner-spin-button { -webkit-appearance: none; }
+        .age-range .input-group .unit { padding: 0 10px; font-size: 13px; color: #666; background: #fafafa; border-left: 1px solid #d9d9d9; }
+        .age-range .sep { color: #999; font-size: 14px; }
+
+        .toggle { display: inline-flex; border: 1px solid #d9d9d9; border-radius: 6px; overflow: hidden; }
+        .toggle button { height: 30px; padding: 0 14px; border: none; background: #fff; color: #666; font-size: 13px; cursor: pointer; }
+        .toggle button.active { background: #0669FF; color: #fff; }
+
+        .add-spec-btn { width: 100%; height: 40px; border: 1.5px dashed #9db9e8; border-radius: 8px; background: #f8fbff; color: #0669FF; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+        .add-spec-btn:hover { background: #f0f7ff; border-color: #0669FF; }
+        .add-type-btn { width: 100%; height: 46px; border: 1.5px dashed #9db9e8; border-radius: 10px; background: #fff; color: #0669FF; font-size: 14px; font-weight: 500; cursor: pointer; margin-top: 16px; transition: all 0.2s; }
+        .add-type-btn:hover { background: #f0f7ff; border-color: #0669FF; }
+
+        /* 日期弹窗 */
+        .date-modal { z-index: 300; }
+        .date-modal .modal-content { max-width: 420px; }
+        .calendar-box { padding: 16px 20px; }
+        .calendar-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .calendar-header .month-switch { display: flex; align-items: center; gap: 12px; }
+        .calendar-header .arrow {
+            width: 28px; height: 28px; border: 1px solid #d9d9d9; border-radius: 6px;
+            background: #fff; color: #666; cursor: pointer; font-size: 14px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .calendar-header .arrow:hover { border-color: #0669FF; color: #0669FF; }
+        .calendar-header .ym { font-size: 16px; font-weight: 600; color: #333; min-width: 110px; text-align: center; }
+        .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 8px; }
+        .weekdays div { text-align: center; font-size: 13px; color: #999; padding: 6px 0; }
+        .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+        .days-grid .day {
+            aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; font-size: 14px; color: #333; cursor: pointer;
+            border: 1.5px solid transparent; transition: all 0.15s;
+        }
+        .days-grid .day:hover { background: #f0f7ff; }
+        .days-grid .day.other { color: #ccc; cursor: default; }
+        .days-grid .day.other:hover { background: transparent; }
+        .days-grid .day.selected { background: #0669FF; color: #fff; border-color: #0669FF; }
+        .days-grid .day.today { border-color: #0669FF; color: #0669FF; }
+        .days-grid .day.today.selected { color: #fff; }
+        .calendar-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; padding-top: 14px; border-top: 1px solid #f0f0f0; }
+        .calendar-footer button { height: 34px; padding: 0 18px; border-radius: 6px; font-size: 13px; cursor: pointer; border: none; }
+        .calendar-footer .btn-cancel { background: #fff; color: #666; border: 1px solid #d9d9d9; }
+        .calendar-footer .btn-ok { background: #0669FF; color: #fff; }
+
+        @media (max-width: 768px) {
+            .header { padding: 0 16px; }
+            .header .nav-list { display: none; }
+            .main { padding: 12px 16px 24px; }
+            .form-row { flex-direction: column; }
+            .form-label { width: auto; text-align: left; margin-bottom: 6px; padding-top: 0; }
+            .address-row .form-input, .address-row .form-select { width: 100%; }
+            .spec-grid { grid-template-columns: 1fr; }
+            .date-modal .modal-content { margin: 16px; }
+            .footer-actions { padding: 12px 16px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">离泰数链</div>
+        <ul class="nav-list">
+            <li>首页</li>
+            <li class="active">课程管理</li>
+            <li>场次方案</li>
+            <li>订单管理</li>
+            <li>用户管理</li>
+        </ul>
+        <div class="user-area">
+            <div class="avatar">管</div>
+            <div class="name">管理员</div>
+        </div>
+    </div>
+
+    <div class="breadcrumb">
+        <a href="#">首页</a>
+        <span class="sep">/</span>
+        <a href="#">课程管理</a>
+        <span class="sep">/</span>
+        <span class="current">课程发布</span>
+    </div>
+
+    <div class="main">
+        <div class="page-header">
+            <h2>课程发布</h2>
+        </div>
+
+        <form id="courseForm">
+            <!-- 基本信息 -->
+            <div class="form-card">
+                <div class="card-header">基本信息</div>
+                <div class="card-body">
+                    <div class="form-row">
+                        <label class="form-label"><span class="required">*</span>课程名称：</label>
+                        <div class="form-control">
+                            <div class="input-wrap">
+                                <input type="text" class="form-input input-with-count" id="courseName" maxlength="40" placeholder="请输入课程名称">
+                                <span class="input-count"><span id="nameCount">0</span>/40</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label"><span class="required">*</span>地址：</label>
+                        <div class="form-control">
+                            <div class="address-list" id="addressList">
+                                <div class="address-row" data-index="0">
+                                    <span class="address-tag start">集合地点（必填）</span>
+                                    <select class="form-select"><option>请选择</option><option>北京市</option><option>上海市</option><option>杭州市</option></select>
+                                    <input type="text" class="form-input detail" placeholder="请输入详细地址">
+                                    <button type="button" class="btn-icon" onclick="addAddress()" title="添加地址">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label"><span class="required">*</span>课程分类：</label>
+                        <div class="form-control">
+                            <select class="form-select" id="courseCategory" multiple size="1" style="height:auto; min-height:38px; padding:6px 12px;">
+                                <option>请选择课程分类（多选）</option>
+                                <option value="自然科学">自然科学</option>
+                                <option value="人文历史">人文历史</option>
+                                <option value="艺术创作">艺术创作</option>
+                                <option value="户外探险">户外探险</option>
+                                <option value="亲子互动">亲子互动</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label"><span class="required">*</span>核验机构：</label>
+                        <div class="form-control">
+                            <select class="form-select" id="orgInstitution">
+                                <option>请选择核验机构</option>
+                                <option>组织 A</option>
+                                <option>组织 B</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label class="form-label"><span class="required">*</span>执行机构：</label>
+                        <div class="form-control">
+                            <select class="form-select" id="execInstitution">
+                                <option>请选择执行机构</option>
+                                <option>机构 A</option>
+                                <option>机构 B</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label"><span class="required">*</span>课程封面：</label>
+                        <div class="form-control">
+                            <div class="upload-box" onclick="document.getElementById('coverInput').click()">
+                                <span>+</span>
+                                <img id="coverPreview" style="display:none;">
+                                <input type="file" id="coverInput" accept="image/*" onchange="previewCover(this)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label">课程时间：</label>
+                        <div class="form-control">
+                            <div class="input-wrap">
+                                <input type="text" class="form-input input-with-count" id="courseTime" maxlength="50" placeholder="请输入课程时间">
+                                <span class="input-count"><span id="timeCount">0</span>/50</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label">简介：</label>
+                        <div class="form-control">
+                            <div class="input-wrap">
+                                <textarea class="form-textarea textarea-with-count" id="courseIntro" maxlength="200" placeholder="请输入课程简介"></textarea>
+                                <span class="textarea-count"><span id="introCount">0</span>/200</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label">适用人群：</label>
+                        <div class="form-control">
+                            <div class="input-wrap">
+                                <input type="text" class="form-input input-with-count" id="targetUser" maxlength="20" placeholder="请输入适用人群">
+                                <span class="input-count"><span id="userCount">0</span>/20</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label"><span class="required">*</span>自定义标签：</label>
+                        <div class="form-control">
+                            <div class="tag-input-box" onclick="this.querySelector('input').focus()">
+                                <input type="text" id="tagInput" placeholder="添加标签" onkeydown="handleTagInput(event)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label"><span class="required">*</span>详情：</label>
+                        <div class="form-control">
+                            <div class="editor-toolbar" data-target="detailEditor">
+                                <button type="button" onclick="execCmd('bold', 'detailEditor')" title="加粗"><b>B</b></button>
+                                <button type="button" onclick="execCmd('italic', 'detailEditor')" title="斜体"><i>I</i></button>
+                                <button type="button" onclick="execCmd('underline', 'detailEditor')" title="下划线"><u>U</u></button>
+                                <button type="button" onclick="execCmd('strikeThrough', 'detailEditor')" title="删除线"><s>S</s></button>
+                                <span class="divider"></span>
+                                <button type="button" onclick="execCmd('formatBlock', 'detailEditor', 'H1')" title="标题1">H1</button>
+                                <button type="button" onclick="execCmd('formatBlock', 'detailEditor', 'H2')" title="标题2">H2</button>
+                                <span class="divider"></span>
+                                <button type="button" onclick="execCmd('insertUnorderedList', 'detailEditor')" title="无序列表">☰</button>
+                                <button type="button" onclick="execCmd('insertOrderedList', 'detailEditor')" title="有序列表">#</button>
+                                <span class="divider"></span>
+                                <button type="button" onclick="execCmd('justifyLeft', 'detailEditor')" title="左对齐">≡</button>
+                                <button type="button" onclick="execCmd('justifyCenter', 'detailEditor')" title="居中">≡</button>
+                                <button type="button" onclick="execCmd('justifyRight', 'detailEditor')" title="右对齐">≡</button>
+                            </div>
+                            <div class="editor-content" id="detailEditor" contenteditable="true" placeholder="请输入内容"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 报名设置 -->
+            <div class="form-card">
+                <div class="card-header">销售设置</div>
+                <div class="card-body">
+                    <div class="form-row">
+                        <label class="form-label"><span class="required">*</span>提前预定时间：</label>
+                        <div class="form-control">
+                            <div class="stepper-inline">
+                                <span>课程开始前</span>
+                                <div class="stepper"><button type="button" onclick="changeDay('advanceDay', -1)">-</button><input type="number" id="advanceDay" value="1" min="0"><button type="button" onclick="changeDay('advanceDay', 1)">+</button></div>
+                                <span class="stepper-unit">天</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label"><span class="required">*</span>最晚预定时间：</label>
+                        <div class="form-control">
+                            <div class="stepper-inline">
+                                <span>课程开始前</span>
+                                <div class="stepper"><button type="button" onclick="changeDay('latestDay', -1)">-</button><input type="number" id="latestDay" value="1" min="0"><button type="button" onclick="changeDay('latestDay', 1)">+</button></div>
+                                <span class="stepper-unit">天</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label"><span class="required">*</span>自助核销开启时间：</label>
+                        <div class="form-control">
+                            <div class="stepper-inline">
+                                <span>课程开始前</span>
+                                <div class="stepper"><button type="button" onclick="changeDay('verifyDay', -1)">-</button><input type="number" id="verifyDay" value="1" min="0"><button type="button" onclick="changeDay('verifyDay', 1)">+</button></div>
+                                <span class="stepper-unit">天</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label"><span class="required">*</span>场次方案：</label>
+                        <div class="form-control">
+                            <div class="plan-section-header">
+                                <span></span>
+                                <button type="button" class="btn-primary" onclick="openPlanModal()">+ 新增场次</button>
+                            </div>
+                            <div class="table-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>场次名称</th>
+                                            <th>时间</th>
+                                            <th>成团规则</th>
+                                            <th>规格和价格</th>
+                                            <th style="width:160px;">操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="planTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label"><span class="required">*</span>费用包含：</label>
+                        <div class="form-control">
+                            <div class="editor-toolbar" data-target="feeIncludeEditor">
+                                <button type="button" onclick="execCmd('bold', 'feeIncludeEditor')"><b>B</b></button>
+                                <button type="button" onclick="execCmd('italic', 'feeIncludeEditor')"><i>I</i></button>
+                                <button type="button" onclick="execCmd('underline', 'feeIncludeEditor')"><u>U</u></button>
+                                <button type="button" onclick="execCmd('strikeThrough', 'feeIncludeEditor')"><s>S</s></button>
+                                <span class="divider"></span>
+                                <button type="button" onclick="execCmd('formatBlock', 'feeIncludeEditor', 'H1')">H1</button>
+                                <button type="button" onclick="execCmd('formatBlock', 'feeIncludeEditor', 'H2')">H2</button>
+                                <span class="divider"></span>
+                                <button type="button" onclick="execCmd('insertUnorderedList', 'feeIncludeEditor')">☰</button>
+                                <button type="button" onclick="execCmd('insertOrderedList', 'feeIncludeEditor')">#</button>
+                                <span class="divider"></span>
+                                <button type="button" onclick="execCmd('justifyLeft', 'feeIncludeEditor')">≡</button>
+                                <button type="button" onclick="execCmd('justifyCenter', 'feeIncludeEditor')">≡</button>
+                                <button type="button" onclick="execCmd('justifyRight', 'feeIncludeEditor')">≡</button>
+                            </div>
+                            <div class="editor-content" id="feeIncludeEditor" contenteditable="true" placeholder="请输入内容"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label"><span class="required">*</span>费用不包含：</label>
+                        <div class="form-control">
+                            <div class="editor-toolbar" data-target="prepareEditor">
+                                <button type="button" onclick="execCmd('bold', 'prepareEditor')"><b>B</b></button>
+                                <button type="button" onclick="execCmd('italic', 'prepareEditor')"><i>I</i></button>
+                                <button type="button" onclick="execCmd('underline', 'prepareEditor')"><u>U</u></button>
+                                <button type="button" onclick="execCmd('strikeThrough', 'prepareEditor')"><s>S</s></button>
+                                <span class="divider"></span>
+                                <button type="button" onclick="execCmd('formatBlock', 'prepareEditor', 'H1')">H1</button>
+                                <button type="button" onclick="execCmd('formatBlock', 'prepareEditor', 'H2')">H2</button>
+                                <span class="divider"></span>
+                                <button type="button" onclick="execCmd('insertUnorderedList', 'prepareEditor')">☰</button>
+                                <button type="button" onclick="execCmd('insertOrderedList', 'prepareEditor')">#</button>
+                                <span class="divider"></span>
+                                <button type="button" onclick="execCmd('justifyLeft', 'prepareEditor')">≡</button>
+                                <button type="button" onclick="execCmd('justifyCenter', 'prepareEditor')">≡</button>
+                                <button type="button" onclick="execCmd('justifyRight', 'prepareEditor')">≡</button>
+                            </div>
+                            <div class="editor-content" id="prepareEditor" contenteditable="true" placeholder="请输入内容"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label"><span class="required">*</span>预定须知：</label>
+                        <div class="form-control">
+                            <div class="editor-toolbar" data-target="noticeEditor">
+                                <button type="button" onclick="execCmd('bold', 'noticeEditor')"><b>B</b></button>
+                                <button type="button" onclick="execCmd('italic', 'noticeEditor')"><i>I</i></button>
+                                <button type="button" onclick="execCmd('underline', 'noticeEditor')"><u>U</u></button>
+                                <button type="button" onclick="execCmd('strikeThrough', 'noticeEditor')"><s>S</s></button>
+                                <span class="divider"></span>
+                                <button type="button" onclick="execCmd('formatBlock', 'noticeEditor', 'H1')">H1</button>
+                                <button type="button" onclick="execCmd('formatBlock', 'noticeEditor', 'H2')">H2</button>
+                                <span class="divider"></span>
+                                <button type="button" onclick="execCmd('insertUnorderedList', 'noticeEditor')">☰</button>
+                                <button type="button" onclick="execCmd('insertOrderedList', 'noticeEditor')">#</button>
+                                <span class="divider"></span>
+                                <button type="button" onclick="execCmd('justifyLeft', 'noticeEditor')">≡</button>
+                                <button type="button" onclick="execCmd('justifyCenter', 'noticeEditor')">≡</button>
+                                <button type="button" onclick="execCmd('justifyRight', 'noticeEditor')">≡</button>
+                            </div>
+                            <div class="editor-content" id="noticeEditor" contenteditable="true" placeholder="请输入内容"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label"><span class="required">*</span>取消政策：</label>
+                        <div class="form-control">
+                            <div class="plan-section-header">
+                                <span></span>
+                                <button type="button" class="btn-primary" onclick="addPolicy()">+ 添加规则</button>
+                            </div>
+                            <div class="table-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th style="width:45%;">取消阶段</th>
+                                            <th style="width:35%;">退还课程费用</th>
+                                            <th style="width:20%;">操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="policyTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- 退款规则弹窗 -->
+    <div class="modal" id="policyModal">
+        <div class="modal-content" style="max-width:520px;">
+            <div class="modal-header">
+                <div class="title-wrap">
+                    <span class="title-bar"></span>
+                    <h3 id="policyModalTitle">新增退款规则</h3>
+                </div>
+                <button type="button" class="close" onclick="closePolicyModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="section" style="margin-bottom:0;">
+                    <div class="modal-form-row" style="align-items:flex-start;">
+                        <label class="modal-form-label">取消阶段</label>
+                        <div style="flex:1;" id="policyStageStatic"></div>
+                    </div>
+                    <div class="modal-form-row" id="policyStageRangeRow">
+                        <label class="modal-form-label"></label>
+                        <div style="flex:1; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                            <span>课程前</span>
+                            <div class="stepper"><button type="button" onclick="changePolicyDay('policyStartDay', -1)">-</button><input type="number" id="policyStartDay" value="5" min="0"><button type="button" onclick="changePolicyDay('policyStartDay', 1)">+</button></div>
+                            <span style="color:#999;">—</span>
+                            <div class="stepper"><button type="button" onclick="changePolicyDay('policyEndDay', -1)">-</button><input type="number" id="policyEndDay" value="1" min="0"><button type="button" onclick="changePolicyDay('policyEndDay', 1)">+</button></div>
+                            <span>天</span>
+                        </div>
+                    </div>
+                    <div class="modal-form-row" style="margin-bottom:0;">
+                        <label class="modal-form-label">退还课程费用</label>
+                        <div style="flex:1; display:flex; align-items:center; gap:10px;">
+                            <div class="stepper"><button type="button" onclick="changePolicyFee(-1)">-</button><input type="number" id="policyFee" value="50" min="0" max="100"><button type="button" onclick="changePolicyFee(1)">+</button></div>
+                            <span>%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="closePolicyModal()">取消</button>
+                <button type="button" class="btn-ok" onclick="savePolicyModal()">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部操作栏 -->
+    <div class="footer-actions">
+        <button type="button" class="btn-save" onclick="saveDraft()">暂存</button>
+        <button type="button" class="btn-publish" onclick="publishCourse()">发布</button>
+    </div>
+
+    <!-- 场次方案弹窗 -->
+    <div class="modal" id="planModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="title-wrap">
+                    <span class="title-bar"></span>
+                    <h3 id="modalTitle">新增场次</h3>
+                </div>
+                <button type="button" class="close" onclick="closePlanModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="section">
+                    <div class="section-head">
+                        <span class="section-num">1</span>
+                        <span class="section-title">基础信息</span>
+                        <span class="section-desc">点击选择日期，支持多选、可离散选择</span>
+                    </div>
+                    <div class="section-box">
+                        <div class="modal-form-row">
+                            <label class="modal-form-label"><span class="required">*</span>场次名称</label>
+                            <input type="text" class="modal-form-input" id="planName" placeholder="请输入场次名称" maxlength="20">
+                            <span class="modal-input-count"><span id="planNameCount">0</span>/20</span>
+                        </div>
+                        <div class="modal-form-row">
+                            <label class="modal-form-label"><span class="required">*</span>时间</label>
+                            <div style="flex:1;">
+                                <div class="date-trigger" id="dateTrigger" onclick="openDatePicker()">
+                                    <span class="icon">&#128197;</span>
+                                    <span class="text placeholder" id="dateTriggerText">请选择日期</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-head">
+                        <span class="section-num">2</span>
+                        <span class="section-title">规格设置</span>
+                        <span class="section-desc">主类型默认存在，其他类型按需添加</span>
+                    </div>
+                    <div id="typeContainer"></div>
+                    <button type="button" class="add-type-btn" onclick="addType()">+ 添加其他类型</button>
+                </div>
+
+                <div class="section">
+                    <div class="section-head">
+                        <span class="section-num">3</span>
+                        <span class="section-title">成团规则</span>
+                        <span class="section-desc">按主类型所有规格购买数量合计计算</span>
+                    </div>
+                    <div class="section-box">
+                        <div class="rule-row">
+                            <span class="rule-label">成团数量</span>
+                            <span class="rule-text">主类型合计满</span>
+                            <div class="stepper"><button type="button" onclick="changeNum('minOrder',-1)">-</button><input type="number" id="minOrder" value="1" min="1"><button type="button" onclick="changeNum('minOrder',1)">+</button></div>
+                            <span class="stepper-unit">人成团</span>
+                            <span class="rule-text">最高</span>
+                            <div class="stepper"><button type="button" onclick="changeNum('maxOrder',-1)">-</button><input type="number" id="maxOrder" value="1" min="1"><button type="button" onclick="changeNum('maxOrder',1)">+</button></div>
+                            <span class="stepper-unit">人</span>
+                        </div>
+                        <div class="rule-row">
+                            <span class="rule-label"></span>
+                            <span class="rule-hint">主类型下所有规格购买数量合计达到最低人数即成团，达到最高人数后不可再购买。</span>
+                        </div>
+                        <div class="rule-row" style="margin-bottom:0;">
+                            <span class="rule-label">确认时间</span>
+                            <span class="rule-text">活动开始前最晚确认</span>
+                            <div class="stepper"><button type="button" onclick="changeNum('confirmDays',-1)">-</button><input type="number" id="confirmDays" value="1" min="0"><button type="button" onclick="changeNum('confirmDays',1)">+</button></div>
+                            <span class="stepper-unit">天</span>
+                        </div>
+                        <div class="warning-tip" style="margin-top:18px;">
+                            <span class="icon">i</span>
+                            <span>所有场次的拼团确认截止时间，必须设置在课程上线当天 0 点之前。</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="closePlanModal()">取消</button>
+                <button type="button" class="btn-ok" onclick="savePlan()">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 日期选择弹窗 -->
+    <div class="modal date-modal" id="dateModal" onclick="closeDateModalByOverlay(event)">
+        <div class="modal-content" style="max-width:420px;" onclick="event.stopPropagation()">
+            <div class="calendar-box">
+                <div class="calendar-header">
+                    <div class="month-switch">
+                        <button type="button" class="arrow" onclick="changeCalendarMonth(-1)">‹</button>
+                        <div class="ym" id="calendarYM"></div>
+                        <button type="button" class="arrow" onclick="changeCalendarMonth(1)">›</button>
+                    </div>
+                </div>
+                <div class="weekdays">
+                    <div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div>
+                </div>
+                <div class="days-grid" id="calendarDays"></div>
+                <div class="calendar-footer">
+                    <button type="button" class="btn-cancel" onclick="closeDatePicker(false)">取消</button>
+                    <button type="button" class="btn-ok" onclick="closeDatePicker(true)">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    /* ================= 通用表单交互 ================= */
+    function countInput(inputId, countId, max) {
+        var el = document.getElementById(inputId);
+        var count = document.getElementById(countId);
+        if (!el || !count) return;
+        el.addEventListener('input', function() {
+            count.textContent = el.value.length;
+        });
+        count.textContent = el.value.length;
+    }
+    countInput('courseName', 'nameCount', 40);
+    countInput('courseTime', 'timeCount', 50);
+    countInput('courseIntro', 'introCount', 200);
+    countInput('targetUser', 'userCount', 20);
+
+    function previewCover(input) {
+        var file = input.files[0];
+        var preview = document.getElementById('coverPreview');
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    /* 地址 */
+    var addressCount = 1;
+    function addAddress() {
+        var list = document.getElementById('addressList');
+        var row = document.createElement('div');
+        row.className = 'address-row';
+        row.dataset.index = addressCount;
+        row.innerHTML = '<span class="address-tag end">其他地点（可不填）</span>'
+            + '<select class="form-select"><option>请选择</option><option>北京市</option><option>上海市</option><option>杭州市</option></select>'
+            + '<input type="text" class="form-input detail" placeholder="请输入详细地址（可不填）">'
+            + '<button type="button" class="btn-icon delete" onclick="removeAddress(' + addressCount + ')" title="删除">×</button>';
+        list.appendChild(row);
+        addressCount++;
+    }
+    function removeAddress(index) {
+        var row = document.querySelector('.address-row[data-index="' + index + '"]');
+        if (row) row.remove();
+    }
+
+    /* 标签 */
+    var tags = [];
+    function handleTagInput(e) {
+        var input = document.getElementById('tagInput');
+        if (e.key === 'Enter' || e.key === ',') {
+            e.preventDefault();
+            var val = input.value.trim().replace(/,/g, '');
+            if (val && tags.indexOf(val) === -1) {
+                tags.push(val);
+                renderTags();
+            }
+            input.value = '';
+        }
+    }
+    function removeTag(tag) {
+        tags = tags.filter(function(t) { return t !== tag; });
+        renderTags();
+    }
+    function renderTags() {
+        var box = document.querySelector('.tag-input-box');
+        var input = document.getElementById('tagInput');
+        var html = '';
+        tags.forEach(function(tag) {
+            html += '<span class="tag-item">' + tag + '<span class="remove" onclick="removeTag(\'' + tag + '\')">×</span></span>';
+        });
+        box.innerHTML = html;
+        box.appendChild(input);
+        input.focus();
+    }
+
+    /* 富文本 */
+    function execCmd(command, editorId, value) {
+        var editor = document.getElementById(editorId);
+        editor.focus();
+        document.execCommand(command, false, value || null);
+    }
+
+    function changeDay(id, delta) {
+        var input = document.getElementById(id);
+        var v = parseInt(input.value || 0, 10) + delta;
+        if (v < 0) v = 0;
+        input.value = v;
+    }
+
+    /* ================= 取消政策 ================= */
+    // fixed=true 表示默认规则，阶段文本固定为“课程开始当日及之后”
+    var policies = [
+        { id: 'policy_default', stage: '课程开始当日及之后', fee: '', fixed: true }
+    ];
+    var editPolicyId = null;
+
+    function policyStageText(p) {
+        if (p.fixed) return '课程开始当日及之后';
+        if (p.startDay !== undefined && p.endDay !== undefined) {
+            return '课程开始前' + p.startDay + '-' + p.endDay + '天';
+        }
+        return p.stage || '';
+    }
+
+    function renderPolicies() {
+        var tbody = document.getElementById('policyTableBody');
+        if (policies.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" class="empty-state">暂无取消政策</td></tr>';
+            return;
+        }
+        var html = '';
+        policies.forEach(function(p) {
+            var feeText = p.fee !== '' && p.fee !== undefined ? p.fee + '%' : '/%';
+            html += '<tr class="policy-row">'
+                + '<td>' + esc(policyStageText(p)) + '</td>'
+                + '<td>' + feeText + '</td>'
+                + '<td>'
+                + '<button type="button" class="action-btn btn-edit" onclick="openPolicyModal(\'' + p.id + '\')">编辑</button>'
+                + '<button type="button" class="action-btn btn-delete" onclick="deletePolicy(\'' + p.id + '\')">删除</button>'
+                + '</td></tr>';
+        });
+        tbody.innerHTML = html;
+    }
+
+    function addPolicy() { openPolicyModal(null); }
+
+    function deletePolicy(id) {
+        if (!confirm('确定删除该规则吗？')) return;
+        policies = policies.filter(function(x) { return x.id !== id; });
+        renderPolicies();
+    }
+
+    function openPolicyModal(id) {
+        editPolicyId = id;
+        var p = id ? policies.find(function(x) { return x.id === id; }) : null;
+        document.getElementById('policyModalTitle').textContent = id ? '编辑退款规则' : '新增退款规则';
+        var staticEl = document.getElementById('policyStageStatic');
+        var rangeRow = document.getElementById('policyStageRangeRow');
+        if (p && p.fixed) {
+            staticEl.textContent = '课程开始当日及之后';
+            staticEl.style.display = 'block';
+            rangeRow.style.display = 'none';
+            document.getElementById('policyFee').value = p.fee !== '' && p.fee !== undefined ? p.fee : 0;
+        } else {
+            staticEl.style.display = 'none';
+            rangeRow.style.display = 'flex';
+            document.getElementById('policyStartDay').value = p ? (p.startDay !== undefined ? p.startDay : 5) : 5;
+            document.getElementById('policyEndDay').value = p ? (p.endDay !== undefined ? p.endDay : 1) : 1;
+            document.getElementById('policyFee').value = p ? (p.fee !== '' && p.fee !== undefined ? p.fee : 50) : 50;
+        }
+        document.getElementById('policyModal').classList.add('show');
+    }
+    function closePolicyModal() { document.getElementById('policyModal').classList.remove('show'); editPolicyId = null; }
+    function changePolicyDay(id, delta) {
+        var input = document.getElementById(id);
+        var v = parseInt(input.value || 0, 10) + delta;
+        if (v < 0) v = 0;
+        input.value = v;
+    }
+    function changePolicyFee(delta) {
+        var input = document.getElementById('policyFee');
+        var v = parseInt(input.value || 0, 10) + delta;
+        if (v < 0) v = 0;
+        if (v > 100) v = 100;
+        input.value = v;
+    }
+    function savePolicyModal() {
+        var fee = document.getElementById('policyFee').value;
+        if (editPolicyId) {
+            var p = policies.find(function(x) { return x.id === editPolicyId; });
+            if (!p) return;
+            if (p.fixed) {
+                p.fee = fee;
+            } else {
+                p.startDay = parseInt(document.getElementById('policyStartDay').value, 10) || 0;
+                p.endDay = parseInt(document.getElementById('policyEndDay').value, 10) || 0;
+                p.fee = fee;
+            }
+        } else {
+            policies.push({
+                id: 'policy_' + Date.now(),
+                startDay: parseInt(document.getElementById('policyStartDay').value, 10) || 0,
+                endDay: parseInt(document.getElementById('policyEndDay').value, 10) || 0,
+                fee: fee,
+                fixed: false
+            });
+        }
+        closePolicyModal();
+        renderPolicies();
+    }
+    renderPolicies();
+
+    /* ================= 场次方案（复用） ================= */
+    var sessionPlans = [];
+    var editPlanId = null;
+    var selectedDates = [];
+    var tempSelectedDates = [];
+    var calendarDate = new Date();
+    var planTypes = [];
+
+    function renderPlanTable() {
+        var tbody = document.getElementById('planTableBody');
+        if (sessionPlans.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="empty-state">暂无场次方案，请点击右上角新增</td></tr>';
+            return;
+        }
+        var html = '';
+        sessionPlans.forEach(function(p) {
+            var dates = p.dates.join('<br>');
+            var rule = '主类型满 ' + p.minOrder + ' 人成团<br>购买上限 ' + p.maxOrder + ' 人<br>拼团确定时间为活动开始前 ' + p.confirmDays + ' 天';
+            var specHtml = '';
+            p.types.forEach(function(ty) {
+                var nameHtml = ty.isMain
+                    ? '<span class="type-name">' + ty.name + '</span><span class="main-type-tag">主类型</span>'
+                    : '<span class="type-name">【' + ty.name + '】</span>';
+                specHtml += '<div class="type-block">' + nameHtml
+                    + (!ty.isMain && ty.maxPerOrder ? '<span class="max-per-order">单笔限购 ' + ty.maxPerOrder + ' 人</span>' : '');
+                ty.specs.forEach(function(s) {
+                    var ageTxt = s.ageLimit ? '，' + s.ageStart + '-' + s.ageEnd + '岁' : '';
+                    specHtml += '<div class="spec-item"><span>' + s.name + '</span><span class="price">' + s.price + '元</span><span class="meta">' + ageTxt + '</span></div>';
+                });
+                specHtml += '</div>';
+            });
+            html += '<tr>'
+                + '<td>' + p.name + '</td>'
+                + '<td>' + dates + '</td>'
+                + '<td>' + rule + '</td>'
+                + '<td>' + specHtml + '</td>'
+                + '<td>'
+                + '<button type="button" class="action-btn btn-edit" onclick="editSessionPlan(\'' + p.id + '\')">修改</button>'
+                + '<button type="button" class="action-btn btn-delete" onclick="deleteSessionPlan(\'' + p.id + '\')">删除</button>'
+                + '</td></tr>';
+        });
+        tbody.innerHTML = html;
+    }
+
+    function createSpec() {
+        return { name: '', price: 0, ageLimit: false, ageStart: 0, ageEnd: 0 };
+    }
+    function createType(isMain) {
+        return { isMain: isMain, name: '', maxPerOrder: 1, specs: [createSpec()] };
+    }
+
+    function openPlanModal() {
+        editPlanId = null;
+        selectedDates = [];
+        planTypes = [createType(true)];
+        document.getElementById('modalTitle').textContent = '新增场次';
+        document.getElementById('planName').value = '';
+        document.getElementById('minOrder').value = 1;
+        document.getElementById('maxOrder').value = 1;
+        document.getElementById('confirmDays').value = 1;
+        document.getElementById('planNameCount').textContent = '0';
+        updateDateTrigger();
+        renderPlanTypes();
+        document.getElementById('planModal').classList.add('show');
+    }
+    function closePlanModal() { document.getElementById('planModal').classList.remove('show'); }
+
+    document.getElementById('planName').addEventListener('input', function() {
+        document.getElementById('planNameCount').textContent = this.value.length;
+    });
+
+    function changeNum(id, delta) {
+        var input = document.getElementById(id);
+        var v = parseInt(input.value || 0, 10) + delta;
+        if (v < 0) v = 0;
+        input.value = v;
+    }
+
+    /* 日期选择器 */
+    function updateDateTrigger() {
+        var text = document.getElementById('dateTriggerText');
+        if (selectedDates.length === 0) {
+            text.textContent = '请选择日期';
+            text.classList.add('placeholder');
+        } else {
+            text.textContent = selectedDates.join('，');
+            text.classList.remove('placeholder');
+        }
+    }
+    function openDatePicker() {
+        tempSelectedDates = selectedDates.slice();
+        if (tempSelectedDates.length > 0) {
+            var first = new Date(tempSelectedDates[0]);
+            calendarDate = new Date(first.getFullYear(), first.getMonth(), 1);
+        } else {
+            calendarDate = new Date();
+        }
+        renderCalendar();
+        document.getElementById('dateModal').classList.add('show');
+    }
+    function closeDateModalByOverlay(e) { if (e.target === document.getElementById('dateModal')) closeDatePicker(false); }
+    function closeDatePicker(confirm) {
+        if (confirm) selectedDates = tempSelectedDates.slice().sort();
+        document.getElementById('dateModal').classList.remove('show');
+        updateDateTrigger();
+    }
+    function changeCalendarMonth(delta) {
+        calendarDate.setMonth(calendarDate.getMonth() + delta);
+        renderCalendar();
+    }
+    function formatDateStr(y, m, d) {
+        return y + '-' + (m < 10 ? '0' + m : m) + '-' + (d < 10 ? '0' + d : d);
+    }
+    function renderCalendar() {
+        var y = calendarDate.getFullYear();
+        var m = calendarDate.getMonth();
+        document.getElementById('calendarYM').textContent = y + ' 年 ' + (m + 1) + ' 月';
+
+        var firstDay = new Date(y, m, 1).getDay();
+        var daysInMonth = new Date(y, m + 1, 0).getDate();
+        var daysPrev = new Date(y, m, 0).getDate();
+        var html = '';
+        var todayStr = formatDateStr(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate());
+
+        for (var i = firstDay - 1; i >= 0; i--) {
+            html += '<div class="day other">' + (daysPrev - i) + '</div>';
+        }
+        for (var d = 1; d <= daysInMonth; d++) {
+            var dateStr = formatDateStr(y, m + 1, d);
+            var cls = 'day';
+            if (tempSelectedDates.indexOf(dateStr) !== -1) cls += ' selected';
+            else if (dateStr === todayStr) cls += ' today';
+            html += '<div class="' + cls + '" onclick="toggleCalendarDate(\'' + dateStr + '\')">' + d + '</div>';
+        }
+        var totalCells = firstDay + daysInMonth;
+        var nextCells = (Math.ceil(totalCells / 7) * 7) - totalCells;
+        for (var n = 1; n <= nextCells; n++) {
+            html += '<div class="day other">' + n + '</div>';
+        }
+        document.getElementById('calendarDays').innerHTML = html;
+    }
+    function toggleCalendarDate(dateStr) {
+        var idx = tempSelectedDates.indexOf(dateStr);
+        if (idx === -1) tempSelectedDates.push(dateStr);
+        else tempSelectedDates.splice(idx, 1);
+        renderCalendar();
+    }
+
+    /* 类型 & 规格 */
+    function addType() { planTypes.push(createType(false)); renderPlanTypes(); }
+    function removeType(ti) { if (planTypes[ti].isMain) return; planTypes.splice(ti, 1); renderPlanTypes(); }
+    function setTypeName(ti, val) { planTypes[ti].name = val; }
+    function setTypeMax(ti, val) { planTypes[ti].maxPerOrder = Math.max(0, parseInt(val) || 0); }
+    function changeTypeMax(ti, delta) {
+        planTypes[ti].maxPerOrder = Math.max(0, (parseInt(planTypes[ti].maxPerOrder) || 0) + delta);
+        renderPlanTypes();
+    }
+
+    function addSpec(ti) { planTypes[ti].specs.push(createSpec()); renderPlanTypes(); }
+    function removeSpec(ti, si) { if (planTypes[ti].specs.length <= 1) return; planTypes[ti].specs.splice(si, 1); renderPlanTypes(); }
+    function setSpecName(ti, si, val) { planTypes[ti].specs[si].name = val; }
+    function setSpecPrice(ti, si, val) { planTypes[ti].specs[si].price = Math.max(0, parseFloat(val) || 0); }
+    function changeSpecPrice(ti, si, delta) {
+        planTypes[ti].specs[si].price = Math.max(0, (parseFloat(planTypes[ti].specs[si].price) || 0) + delta);
+        renderPlanTypes();
+    }
+    function setAgeStart(ti, si, val) { planTypes[ti].specs[si].ageStart = Math.max(0, parseInt(val) || 0); }
+    function setAgeEnd(ti, si, val) { planTypes[ti].specs[si].ageEnd = Math.max(0, parseInt(val) || 0); }
+    function toggleAgeLimit(ti, si, enabled) { planTypes[ti].specs[si].ageLimit = enabled; renderPlanTypes(); }
+
+    function esc(s) { return String(s || '').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
+
+    function renderPlanTypes() {
+        var container = document.getElementById('typeContainer');
+        var html = '';
+        for (var t = 0; t < planTypes.length; t++) {
+            var ty = planTypes[t];
+            var tagHtml = ty.isMain
+                ? '<span class="type-tag">主类型</span><input type="text" class="type-name-input" placeholder="请输入主类型名称（如：学生）" maxlength="10" value="' + esc(ty.name) + '" oninput="setTypeName(' + t + ', this.value)">'
+                : '<span class="type-tag sub">类型 ' + t + '</span><input type="text" class="type-name-input" placeholder="请输入类型名称（如：家长）" maxlength="10" value="' + esc(ty.name) + '" oninput="setTypeName(' + t + ', this.value)">';
+            var rightHtml = '';
+            if (!ty.isMain) {
+                rightHtml += '<div class="type-max-order"><span class="label">一单最大购买人数</span>'
+                    + '<div class="stepper"><button type="button" onclick="changeTypeMax(' + t + ',-1)">-</button><input type="number" value="' + ty.maxPerOrder + '" min="0" onchange="setTypeMax(' + t + ', this.value)"><button type="button" onclick="changeTypeMax(' + t + ',1)">+</button></div>'
+                    + '<span class="stepper-unit">人</span></div>'
+                    + '<button type="button" class="type-remove" onclick="removeType(' + t + ')">删除类型</button>';
+            }
+            html += '<div class="type-box">'
+                + '<div class="type-header">' + tagHtml + '<div class="type-right">' + rightHtml + '</div></div>';
+            for (var s = 0; s < ty.specs.length; s++) {
+                var sp = ty.specs[s];
+                html += '<div class="spec-card">'
+                    + '<div class="spec-header"><span class="spec-tag">规格 ' + (s + 1) + '</span>' + (ty.specs.length > 1 ? '<button type="button" class="spec-remove" onclick="removeSpec(' + t + ',' + s + ')">删除</button>' : '') + '</div>'
+                    + '<div class="spec-grid">'
+                    + '<div class="spec-field"><label><span class="required">*</span>规格名称</label><input type="text" class="spec-input" placeholder="请输入规格名称" maxlength="10" value="' + esc(sp.name) + '" oninput="setSpecName(' + t + ',' + s + ', this.value)"><span class="modal-input-count">' + (sp.name || '').length + '/10</span></div>'
+                    + '<div class="spec-field"><label>价格</label><div class="stepper"><button type="button" onclick="changeSpecPrice(' + t + ',' + s + ',-1)">-</button><input type="number" value="' + sp.price + '" min="0" onchange="setSpecPrice(' + t + ',' + s + ', this.value)"><button type="button" onclick="changeSpecPrice(' + t + ',' + s + ',1)">+</button></div><span class="stepper-unit">元/人</span></div>'
+                    + '</div>'
+                    + '<div class="age-limit-box">'
+                    + '<div class="age-limit-head"><span class="age-limit-title">年龄限制规则</span>'
+                    + '<div class="toggle"><button type="button" class="' + (sp.ageLimit ? '' : 'active') + '" onclick="toggleAgeLimit(' + t + ',' + s + ', false)">不启用</button><button type="button" class="' + (sp.ageLimit ? 'active' : '') + '" onclick="toggleAgeLimit(' + t + ',' + s + ', true)">启用</button></div></div>'
+                    + (sp.ageLimit
+                        ? '<div class="age-range">'
+                            + '<div class="input-group"><input type="number" value="' + sp.ageStart + '" min="0" placeholder="起始年龄" onchange="setAgeStart(' + t + ',' + s + ', this.value)"><span class="unit">岁</span></div>'
+                            + '<span class="sep">至</span>'
+                            + '<div class="input-group"><input type="number" value="' + sp.ageEnd + '" min="0" placeholder="结束年龄" onchange="setAgeEnd(' + t + ',' + s + ', this.value)"><span class="unit">岁</span></div>'
+                            + '</div>'
+                        : '')
+                    + '</div>'
+                    + '</div>';
+            }
+            html += '<button type="button" class="add-spec-btn" onclick="addSpec(' + t + ')">+ 新增规格（' + (ty.isMain ? '主类型' : '该类型') + '）</button>';
+            html += '</div>';
+        }
+        container.innerHTML = html;
+    }
+
+    function validatePlan() {
+        var name = document.getElementById('planName').value.trim();
+        if (!name) { alert('请输入场次名称'); return false; }
+        if (selectedDates.length === 0) { alert('请至少选择一个日期'); return false; }
+        var min = parseInt(document.getElementById('minOrder').value, 10) || 1;
+        var max = parseInt(document.getElementById('maxOrder').value, 10) || 1;
+        if (max < min) { alert('最高购买人数不能低于成团人数'); return false; }
+        for (var t = 0; t < planTypes.length; t++) {
+            var ty = planTypes[t];
+            if (!ty.name.trim()) { alert('请填写' + (ty.isMain ? '主类型' : '类型 ' + t) + '的名称'); return false; }
+            for (var s = 0; s < ty.specs.length; s++) {
+                if (!ty.specs[s].name.trim()) { alert('请填写' + (ty.isMain ? '主类型' : ty.name) + '下规格 ' + (s + 1) + ' 的名称'); return false; }
+                if (ty.specs[s].ageLimit && ty.specs[s].ageEnd < ty.specs[s].ageStart) { alert('结束年龄不能小于起始年龄'); return false; }
+            }
+        }
+        return true;
+    }
+
+    function savePlan() {
+        if (!validatePlan()) return;
+        var plan = {
+            id: editPlanId || 'plan_' + Date.now(),
+            name: document.getElementById('planName').value.trim(),
+            dates: selectedDates.slice(),
+            minOrder: parseInt(document.getElementById('minOrder').value, 10) || 1,
+            maxOrder: parseInt(document.getElementById('maxOrder').value, 10) || 1,
+            confirmDays: parseInt(document.getElementById('confirmDays').value, 10) || 1,
+            types: planTypes.map(function(ty) {
+                return {
+                    isMain: ty.isMain, name: ty.name, maxPerOrder: ty.maxPerOrder || 1,
+                    specs: ty.specs.map(function(s) {
+                        return { name: s.name, price: s.price, ageLimit: s.ageLimit, ageStart: s.ageStart, ageEnd: s.ageEnd };
+                    })
+                };
+            })
+        };
+        if (editPlanId) {
+            for (var i = 0; i < sessionPlans.length; i++) { if (sessionPlans[i].id === editPlanId) { sessionPlans[i] = plan; break; } }
+        } else { sessionPlans.push(plan); }
+        closePlanModal();
+        renderPlanTable();
+    }
+
+    function editSessionPlan(id) {
+        var p = sessionPlans.find(function(x) { return x.id === id; });
+        if (!p) return;
+        editPlanId = id;
+        selectedDates = p.dates.slice();
+        planTypes = p.types.map(function(ty) {
+            return {
+                isMain: ty.isMain, name: ty.name, maxPerOrder: ty.maxPerOrder || 1,
+                specs: ty.specs.map(function(s) {
+                    return { name: s.name, price: s.price, ageLimit: s.ageLimit, ageStart: s.ageStart || 0, ageEnd: s.ageEnd || 0 };
+                })
+            };
+        });
+        document.getElementById('modalTitle').textContent = '编辑场次';
+        document.getElementById('planName').value = p.name;
+        document.getElementById('minOrder').value = p.minOrder;
+        document.getElementById('maxOrder').value = p.maxOrder;
+        document.getElementById('confirmDays').value = p.confirmDays;
+        document.getElementById('planNameCount').textContent = p.name.length;
+        updateDateTrigger();
+        renderPlanTypes();
+        document.getElementById('planModal').classList.add('show');
+    }
+
+    function deleteSessionPlan(id) {
+        if (!confirm('确定删除该场次方案吗？')) return;
+        sessionPlans = sessionPlans.filter(function(p) { return p.id !== id; });
+        renderPlanTable();
+    }
+
+    /* ================= 提交 ================= */
+    function getEditorHtml(id) {
+        return document.getElementById(id).innerHTML;
+    }
+
+    function validateCourse() {
+        if (!document.getElementById('courseName').value.trim()) { alert('请输入课程名称'); return false; }
+        var category = document.getElementById('courseCategory');
+        if (!category.value) { alert('请选择课程分类'); return false; }
+        if (!document.getElementById('orgInstitution').value) { alert('请选择核验机构'); return false; }
+        if (!document.getElementById('execInstitution').value) { alert('请选择执行机构'); return false; }
+        if (!document.getElementById('coverPreview').src) { alert('请上传课程封面'); return false; }
+        if (tags.length === 0) { alert('请至少添加一个自定义标签'); return false; }
+        if (!getEditorHtml('detailEditor').replace(/<[^>]*>/g, '').trim()) { alert('请输入课程详情'); return false; }
+        if (sessionPlans.length === 0) { alert('请至少添加一个场次方案'); return false; }
+        if (!getEditorHtml('feeIncludeEditor').replace(/<[^>]*>/g, '').trim()) { alert('请输入费用包含'); return false; }
+        if (!getEditorHtml('prepareEditor').replace(/<[^>]*>/g, '').trim()) { alert('请输入需要准备'); return false; }
+        if (!getEditorHtml('noticeEditor').replace(/<[^>]*>/g, '').trim()) { alert('请输入预定须知'); return false; }
+        var editingPolicy = policies.find(function(p) { return p.editing; });
+        if (editingPolicy) { alert('请先保存取消政策'); return false; }
+        return true;
+    }
+
+    function collectForm() {
+        return {
+            name: document.getElementById('courseName').value.trim(),
+            addresses: Array.from(document.querySelectorAll('.address-row')).map(function(row) {
+                return {
+                    type: row.querySelector('.address-tag').textContent,
+                    city: row.querySelector('select').value,
+                    detail: row.querySelector('.form-input.detail').value
+                };
+            }),
+            category: Array.from(document.getElementById('courseCategory').selectedOptions).map(function(o) { return o.value; }),
+            org: document.getElementById('orgInstitution').value,
+            exec: document.getElementById('execInstitution').value,
+            cover: document.getElementById('coverPreview').src,
+            courseTime: document.getElementById('courseTime').value.trim(),
+            intro: document.getElementById('courseIntro').value.trim(),
+            targetUser: document.getElementById('targetUser').value.trim(),
+            tags: tags,
+            detail: getEditorHtml('detailEditor'),
+            advanceDay: parseInt(document.getElementById('advanceDay').value, 10) || 0,
+            latestDay: parseInt(document.getElementById('latestDay').value, 10) || 0,
+            verifyDay: parseInt(document.getElementById('verifyDay').value, 10) || 0,
+            sessionPlans: sessionPlans,
+            feeInclude: getEditorHtml('feeIncludeEditor'),
+            prepare: getEditorHtml('prepareEditor'),
+            notice: getEditorHtml('noticeEditor'),
+            policies: policies.map(function(p) { return { stage: p.stage, fee: p.fee }; })
+        };
+    }
+
+    function saveDraft() {
+        var data = collectForm();
+        localStorage.setItem('courseDraft', JSON.stringify(data));
+        alert('已暂存为草稿');
+    }
+
+    function publishCourse() {
+        if (!validateCourse()) return;
+        var data = collectForm();
+        console.log('发布课程：', data);
+        alert('课程发布成功！');
+    }
+
+    /* 初始化 */
+    renderPlanTable();
+</script>
+</body>
+</html>

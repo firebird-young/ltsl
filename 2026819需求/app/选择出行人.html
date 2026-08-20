@@ -212,6 +212,179 @@
         .btn-confirm:active {
             opacity: 0.9;
         }
+
+        /* 弹窗遮罩 */
+        .modal-mask {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 430px;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+        .modal-mask.active {
+            display: flex;
+        }
+        .modal {
+            width: 85%;
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .photo-upload {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .photo-circle {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: 2px dashed #ddd;
+            background: #f9f9f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .photo-circle .photo-icon {
+            font-size: 28px;
+            color: #bbb;
+        }
+        .photo-circle .photo-btn {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 28px;
+            background: var(--theme);
+            color: #fff;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .photo-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-label {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .form-label .required {
+            color: #ff4d4f;
+            margin-left: 2px;
+        }
+        .form-input {
+            width: 100%;
+            height: 44px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 0 14px;
+            font-size: 14px;
+            color: #333;
+            background: #fff;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .form-input:focus {
+            border-color: var(--theme);
+        }
+        .form-input.error {
+            border-color: #ff4d4f;
+        }
+
+        /* 性别选择 */
+        .gender-options {
+            display: flex;
+            gap: 12px;
+        }
+        .gender-option {
+            flex: 1;
+            height: 44px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #fff;
+        }
+        .gender-option.selected {
+            border-color: var(--theme);
+            background: #f0f7ff;
+            color: var(--theme);
+            font-weight: 500;
+        }
+        .gender-option.error {
+            border-color: #ff4d4f;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        .btn-cancel {
+            flex: 1;
+            height: 46px;
+            border: 1px solid #e0e0e0;
+            border-radius: 23px;
+            background: #fff;
+            color: #666;
+            font-size: 15px;
+            cursor: pointer;
+        }
+        .btn-submit {
+            flex: 2;
+            height: 46px;
+            border: none;
+            border-radius: 23px;
+            background: linear-gradient(135deg, #4d8fff, #0066FF);
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-submit:active {
+            opacity: 0.9;
+        }
+
+        .error-msg {
+            color: #ff4d4f;
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+        .error-msg.show {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -242,13 +415,55 @@
     </div>
 </div>
 
+<!-- 新增出行人弹窗 -->
+<div class="modal-mask" id="addModal">
+    <div class="modal">
+        <div class="modal-title">新增出行人</div>
+        
+        <div class="photo-upload">
+            <div class="photo-circle" onclick="uploadPhoto()">
+                <span class="photo-icon">相</span>
+                <div class="photo-btn">上传照片</div>
+                <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="handlePhotoChange(event)">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">姓名<span class="required">*</span></label>
+            <input type="text" class="form-input" id="inputName" placeholder="请输入姓名" oninput="clearError('name')">
+            <div class="error-msg" id="errorName">请输入姓名</div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">性别<span class="required">*</span></label>
+            <div class="gender-options">
+                <div class="gender-option" data-gender="男" onclick="selectGender('男')">男</div>
+                <div class="gender-option" data-gender="女" onclick="selectGender('女')">女</div>
+            </div>
+            <div class="error-msg" id="errorGender">请选择性别</div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">身份证号<span class="required">*</span></label>
+            <input type="text" class="form-input" id="inputId" placeholder="请输入身份证号" maxlength="18" oninput="clearError('id')">
+            <div class="error-msg" id="errorId">请输入正确的身份证号</div>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeModal()">取消</button>
+            <button class="btn-submit" onclick="submitTraveler()">确定</button>
+        </div>
+    </div>
+</div>
+
 <script>
     var travelers = [
-        { name: '媛姐', id: '51162119891027672X' },
-        { name: '小明', id: '110101201801011234' },
-        { name: '朵朵', id: '110101202001011234' }
+        { name: '媛姐', id: '51162119891027672X', gender: '女' },
+        { name: '小明', id: '110101201801011234', gender: '男' },
+        { name: '朵朵', id: '110101202001011234', gender: '女' }
     ];
     var selectedIndices = [];
+    var newTraveler = { name: '', gender: '', id: '', photo: '' };
 
     function getSpecId() {
         return localStorage.getItem('travelerSelectSpec');
@@ -288,7 +503,7 @@
         if (pos === -1) {
             selectedIndices.push(idx);
         } else {
-            return; // 已选择的不可取消，避免重复选择
+            return;
         }
         renderList();
     }
@@ -297,7 +512,105 @@
         alert('编辑：' + travelers[idx].name);
     }
     function addTraveler() {
-        alert('新增出行人');
+        resetModal();
+        document.getElementById('addModal').classList.add('active');
+    }
+    function closeModal() {
+        document.getElementById('addModal').classList.remove('active');
+    }
+    function resetModal() {
+        newTraveler = { name: '', gender: '', id: '', photo: '' };
+        document.getElementById('inputName').value = '';
+        document.getElementById('inputId').value = '';
+        document.querySelectorAll('.gender-option').forEach(function(el) {
+            el.classList.remove('selected');
+        });
+        var photoCircle = document.querySelector('.photo-circle');
+        photoCircle.innerHTML = '<span class="photo-icon">相</span><div class="photo-btn">上传照片</div><input type="file" id="photoInput" accept="image/*" style="display:none" onchange="handlePhotoChange(event)">';
+        clearAllErrors();
+    }
+    function selectGender(gender) {
+        newTraveler.gender = gender;
+        document.querySelectorAll('.gender-option').forEach(function(el) {
+            if (el.dataset.gender === gender) {
+                el.classList.add('selected');
+            } else {
+                el.classList.remove('selected');
+            }
+        });
+        clearError('gender');
+    }
+    function uploadPhoto() {
+        document.getElementById('photoInput').click();
+    }
+    function handlePhotoChange(e) {
+        var file = e.target.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function(ev) {
+            newTraveler.photo = ev.target.result;
+            var photoCircle = document.querySelector('.photo-circle');
+            photoCircle.innerHTML = '<img src="' + ev.target.result + '" alt="照片"><div class="photo-btn">更换照片</div><input type="file" id="photoInput" accept="image/*" style="display:none" onchange="handlePhotoChange(event)">';
+        };
+        reader.readAsDataURL(file);
+    }
+    function clearError(field) {
+        if (field === 'name') {
+            document.getElementById('errorName').classList.remove('show');
+            document.getElementById('inputName').classList.remove('error');
+        } else if (field === 'gender') {
+            document.getElementById('errorGender').classList.remove('show');
+            document.querySelectorAll('.gender-option').forEach(function(el) {
+                el.classList.remove('error');
+            });
+        } else if (field === 'id') {
+            document.getElementById('errorId').classList.remove('show');
+            document.getElementById('inputId').classList.remove('error');
+        }
+    }
+    function clearAllErrors() {
+        clearError('name');
+        clearError('gender');
+        clearError('id');
+    }
+    function validateIdCard(id) {
+        var reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
+        return reg.test(id);
+    }
+    function submitTraveler() {
+        var isValid = true;
+        var name = document.getElementById('inputName').value.trim();
+        var id = document.getElementById('inputId').value.trim();
+
+        if (!name) {
+            document.getElementById('errorName').classList.add('show');
+            document.getElementById('inputName').classList.add('error');
+            isValid = false;
+        }
+        if (!newTraveler.gender) {
+            document.getElementById('errorGender').classList.add('show');
+            document.querySelectorAll('.gender-option').forEach(function(el) {
+                el.classList.add('error');
+            });
+            isValid = false;
+        }
+        if (!id || !validateIdCard(id)) {
+            document.getElementById('errorId').classList.add('show');
+            document.getElementById('inputId').classList.add('error');
+            isValid = false;
+        }
+
+        if (!isValid) return;
+
+        travelers.push({
+            name: name,
+            gender: newTraveler.gender,
+            id: id,
+            photo: newTraveler.photo
+        });
+
+        closeModal();
+        renderList();
     }
     function confirmSelect() {
         if (selectedIndices.length === 0) {
