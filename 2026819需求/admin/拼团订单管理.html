@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>拼团订单管理 - 管理后台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', 'Microsoft YaHei', Arial, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* 顶部导航 */
+        .header {
+            background: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header .logo { font-size: 18px; font-weight: 700; color: #0669FF; margin-right: 32px; }
+        .header .nav-list { display: flex; gap: 24px; list-style: none; }
+        .header .nav-list li { font-size: 14px; color: #666; cursor: pointer; padding: 4px 0; position: relative; }
+        .header .nav-list li:hover { color: #0669FF; }
+        .header .nav-list li.active { color: #0669FF; font-weight: 600; }
+        .header .nav-list li.active::after {
+            content: ''; position: absolute; bottom: -4px; left: 0; right: 0;
+            height: 2px; background: #0669FF; border-radius: 1px;
+        }
+        .header .user-area { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+        .header .user-area .avatar {
+            width: 32px; height: 32px; border-radius: 50%; background: #E8F0FE;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; color: #0669FF;
+        }
+        .header .user-area .name { font-size: 14px; color: #333; }
+
+        .breadcrumb { padding: 16px 24px 0; font-size: 13px; color: #999; display: flex; align-items: center; gap: 6px; }
+        .breadcrumb a { color: #999; text-decoration: none; }
+        .breadcrumb a:hover { color: #0669FF; }
+        .breadcrumb .sep { color: #ccc; }
+        .breadcrumb .current { color: #333; font-weight: 500; }
+
+        .main { padding: 16px 24px 40px; }
+        .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        .page-header h2 { font-size: 20px; font-weight: 600; color: #1a1a1a; }
+        .page-header .desc { font-size: 13px; color: #999; margin-top: 4px; }
+
+        /* Tab 状态切换 */
+        .tab-bar {
+            display: flex; align-items: center; gap: 6px;
+            background: #fff; padding: 6px; border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            margin-bottom: 16px; flex-wrap: wrap;
+        }
+        .tab-bar .tab {
+            padding: 8px 18px; border-radius: 6px;
+            font-size: 14px; color: #666; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 6px;
+            transition: all 0.2s;
+        }
+        .tab-bar .tab:hover { color: #0669FF; }
+        .tab-bar .tab.active { background: #0669FF; color: #fff; font-weight: 500; }
+        .tab-bar .tab .badge {
+            background: #f0f0f0; color: #666; font-size: 12px;
+            padding: 1px 7px; border-radius: 10px; min-width: 20px; text-align: center;
+        }
+        .tab-bar .tab.active .badge { background: rgba(255,255,255,0.25); color: #fff; }
+
+        /* 筛选区 */
+        .form-card {
+            background: #fff; border-radius: 8px; padding: 16px 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 16px;
+            display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+        }
+        .form-card label { font-size: 14px; color: #333; font-weight: 500; white-space: nowrap; }
+        .form-card input,
+        .form-card select {
+            height: 34px; padding: 0 12px; border: 1px solid #d9d9d9;
+            border-radius: 6px; font-size: 13px; outline: none; background: #fff;
+        }
+        .form-card input { flex: 0 0 220px; }
+        .form-card select { flex: 0 0 160px; }
+        .form-card input:focus, .form-card select:focus {
+            border-color: #0669FF; box-shadow: 0 0 0 2px rgba(6,105,255,0.08);
+        }
+        .btn-primary {
+            background: #0669FF; color: #fff; border: none;
+            padding: 8px 20px; border-radius: 6px; font-size: 14px;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .btn-primary:hover { background: #0052CC; }
+        .btn-ghost {
+            background: #fff; color: #0669FF; border: 1px solid #0669FF;
+            padding: 7px 18px; border-radius: 6px; font-size: 14px; cursor: pointer;
+        }
+        .btn-ghost:hover { background: #f0f7ff; }
+
+        /* 表格 */
+        .table-wrapper { background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 1100px; }
+        table thead th { background: #fafafa; padding: 12px 14px; text-align: left; font-weight: 600; color: #555; border-bottom: 1px solid #e8e8e8; white-space: nowrap; }
+        table tbody td { padding: 14px; border-bottom: 1px solid #f0f0f0; color: #333; vertical-align: middle; }
+        table tbody tr:last-child td { border-bottom: none; }
+        table tbody tr:hover { background: #FAFBFF; }
+
+        /* 状态标签 */
+        .status-tag {
+            display: inline-block; padding: 3px 10px; border-radius: 4px;
+            font-size: 12px; font-weight: 500; line-height: 1.6;
+        }
+        .status-wait { background: #FFF7E6; color: #D48806; border: 1px solid #FFD591; }
+        .status-fail { background: #FFF1F0; color: #CF1322; border: 1px solid #FFA39E; }
+        .status-active { background: #E6F7FF; color: #096DD9; border: 1px solid #91D5FF; }
+        .status-done { background: #F6FFED; color: #389E0D; border: 1px solid #B7EB8F; }
+
+        /* 进度条 */
+        .progress { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+        .progress .bar {
+            flex: 1; height: 6px; background: #f0f0f0; border-radius: 3px; overflow: hidden;
+            min-width: 60px;
+        }
+        .progress .fill { height: 100%; background: #0669FF; border-radius: 3px; }
+        .progress .text { color: #666; white-space: nowrap; }
+        .progress .text strong { color: #0669FF; }
+
+        /* 操作 */
+        .action-btn { padding: 4px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; border: none; transition: all 0.2s; margin-right: 4px; }
+        .action-btn:last-child { margin-right: 0; }
+        .action-btn.btn-view { background: #E8F0FE; color: #0669FF; }
+        .action-btn.btn-view:hover { background: #D6E8FF; }
+        .action-btn.btn-finish { background: #F6FFED; color: #389E0D; }
+        .action-btn.btn-finish:hover { background: #D9F0BE; }
+        .action-btn.btn-remind { background: #FFF7E6; color: #D48806; }
+        .action-btn.btn-remind:hover { background: #FFE7BA; }
+
+        .empty-state { text-align: center; padding: 60px 0; color: #999; font-size: 14px; }
+        .price { color: #E53935; font-weight: 600; }
+
+        /* 详情弹窗 */
+        .modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+            z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal.show { display: flex; }
+        .modal-content {
+            background: #fff; width: 100%; max-width: 960px;
+            max-height: 92vh; border-radius: 12px; overflow: hidden;
+            display: flex; flex-direction: column;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.16);
+        }
+        .modal-header {
+            padding: 18px 24px; border-bottom: 1px solid #f0f0f0;
+            display: flex; align-items: center; justify-content: space-between; background: #fafbff;
+        }
+        .modal-header .title-wrap { display: flex; align-items: center; gap: 10px; }
+        .modal-header .title-bar { width: 4px; height: 18px; border-radius: 2px; background: #0669FF; }
+        .modal-header h3 { font-size: 17px; font-weight: 600; color: #1a1a1a; }
+        .modal-header .close { font-size: 22px; color: #999; cursor: pointer; border: none; background: transparent; }
+        .modal-header .close:hover { color: #333; }
+        .modal-body { padding: 20px 24px; overflow-y: auto; }
+        .modal-footer {
+            padding: 14px 24px; border-top: 1px solid #f0f0f0;
+            display: flex; justify-content: flex-end; gap: 12px;
+        }
+        .modal-footer button { height: 36px; padding: 0 22px; border-radius: 6px; font-size: 14px; cursor: pointer; border: none; }
+        .modal-footer .btn-cancel { background: #fff; color: #666; border: 1px solid #d9d9d9; }
+        .modal-footer .btn-ok { background: #0669FF; color: #fff; }
+        .modal-footer .btn-ok:hover { background: #0052CC; }
+
+        .detail-section { margin-bottom: 20px; }
+        .detail-section:last-child { margin-bottom: 0; }
+        .detail-section .sec-title {
+            font-size: 14px; font-weight: 600; color: #333;
+            padding-left: 8px; border-left: 3px solid #0669FF; margin-bottom: 12px;
+        }
+        .detail-row { display: flex; padding: 8px 0; font-size: 14px; }
+        .detail-row .label { width: 120px; color: #888; }
+        .detail-row .value { flex: 1; color: #333; }
+
+        .member-list { border: 1px solid #f0f0f0; border-radius: 8px; overflow: hidden; }
+        .member-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 14px; border-bottom: 1px solid #f5f5f5; font-size: 13px;
+        }
+        .member-item:last-child { border-bottom: none; }
+        .member-item .who { display: flex; flex-direction: column; gap: 2px; }
+        .member-item .who .name { font-weight: 500; color: #333; }
+        .member-item .who .phone { color: #888; font-size: 12px; }
+        .member-item .tag { font-size: 12px; color: #0669FF; background: #f0f7ff; padding: 2px 8px; border-radius: 4px; }
+        .member-item .tag.leader { background: #FFF7E6; color: #D48806; }
+
+        /* 已拼订单列表 */
+        .order-table-wrap { border: 1px solid #f0f0f0; border-radius: 8px; overflow: hidden; }
+        .order-table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
+        .order-table thead th { background: #fafafa; padding: 10px 12px; text-align: left; font-weight: 600; color: #555; border-bottom: 1px solid #e8e8e8; }
+        .order-table thead th:nth-child(1) { width: 15%; }
+        .order-table thead th:nth-child(2) { width: 15%; }
+        .order-table thead th:nth-child(3) { width: 13%; }
+        .order-table thead th:nth-child(4) { width: 30%; }
+        .order-table thead th:nth-child(5) { width: 12%; }
+        .order-table thead th:nth-child(6) { width: 15%; }
+        .order-table tbody td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; color: #333; vertical-align: middle; word-break: break-all; }
+        .order-table tbody tr:last-child td { border-bottom: none; }
+        .order-table tbody tr:hover { background: #FAFBFF; }
+        .traveler-list { display: flex; flex-direction: column; gap: 6px; }
+        .traveler-list .tv { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .traveler-list .tv .tv-name { font-weight: 500; color: #333; }
+        .traveler-list .tv .type-tag {
+            display: inline-block; font-size: 11px; padding: 1px 6px; border-radius: 3px;
+            line-height: 1.5; white-space: nowrap; font-weight: 500;
+        }
+        .traveler-list .tv .type-tag.student { background: #E8F5E9; color: #389E0D; border: 1px solid #B7EB8F; }
+        .traveler-list .tv .type-tag.parent { background: #FFF7E6; color: #D48806; border: 1px solid #FFD591; }
+        .traveler-list .tv .tv-meta { font-size: 12px; color: #666; }
+        .traveler-list .tv .tv-idcard { font-size: 12px; color: #999; }
+
+        /* 企微群上传 */
+        .upload-area {
+            border: 1.5px dashed #d9d9d9; border-radius: 8px;
+            padding: 40px 20px; cursor: pointer; transition: all 0.2s;
+        }
+        .upload-area:hover { border-color: #0669FF; background: #f8fbff; }
+        .upload-icon {
+            width: 48px; height: 48px; border-radius: 50%;
+            background: #E8F0FE; color: #0669FF; font-size: 28px;
+            display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;
+        }
+        .upload-text { font-size: 14px; color: #999; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">离泰数链</div>
+        <ul class="nav-list">
+            <li>首页</li>
+            <li>课程管理</li>
+            <li>场次方案</li>
+            <li class="active">订单管理</li>
+            <li>用户管理</li>
+        </ul>
+        <div class="user-area">
+            <div class="avatar">管</div>
+            <div class="name">管理员</div>
+        </div>
+    </div>
+
+    <div class="breadcrumb">
+        <a href="#">首页</a>
+        <span class="sep">/</span>
+        <a href="#">订单管理</a>
+        <span class="sep">/</span>
+        <span class="current">拼团订单管理</span>
+    </div>
+
+    <div class="main">
+        <div class="page-header">
+            <div>
+                <h2>拼团订单管理</h2>
+                <div class="desc">以拼团为单位的订单管理，跟踪待成团、待出行、已完成等状态</div>
+            </div>
+        </div>
+
+        <!-- 状态 Tab -->
+        <div class="tab-bar" id="tabBar">
+            <div class="tab active" data-status="all" onclick="switchTab(this)">全部 <span class="badge" id="badgeAll">0</span></div>
+            <div class="tab" data-status="wait" onclick="switchTab(this)">待成团 <span class="badge" id="badgeWait">0</span></div>
+            <div class="tab" data-status="fail" onclick="switchTab(this)">拼团失败 <span class="badge" id="badgeFail">0</span></div>
+            <div class="tab" data-status="active" onclick="switchTab(this)">待出行 <span class="badge" id="badgeActive">0</span></div>
+            <div class="tab" data-status="done" onclick="switchTab(this)">已完成 <span class="badge" id="badgeDone">0</span></div>
+        </div>
+
+        <!-- 筛选 -->
+        <div class="form-card">
+            <label>拼团编号</label>
+            <input type="text" id="filterId" placeholder="请输入拼团编号">
+            <label>课程名称</label>
+            <input type="text" id="filterCourse" placeholder="请输入课程名称">
+            <label>场次时间</label>
+            <input type="date" id="filterDate">
+            <button class="btn-primary" onclick="renderTable()">查询</button>
+            <button class="btn-ghost" onclick="resetFilter()">重置</button>
+            <button class="btn-ghost" onclick="exportGroups()">导出</button>
+        </div>
+
+        <!-- 表格 -->
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>拼团编号</th>
+                        <th>课程 / 场次</th>
+                        <th>核验机构</th>
+                        <th>执行机构</th>
+                        <th>成团人数要求</th>
+                        <th>拼团进度</th>
+                        <th>其他成员数</th>
+                        <th>总成员数</th>
+                        <th>实付总额</th>
+                        <th>拼团状态</th>
+                        <th>成团时间</th>
+                        <th>下单时间</th>
+                        <th style="width:240px;">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="groupTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 详情弹窗 -->
+    <div class="modal" id="detailModal" onclick="closeModalByOverlay(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div class="title-wrap">
+                    <span class="title-bar"></span>
+                    <h3>拼团订单详情</h3>
+                </div>
+                <button class="close" onclick="closeDetailModal()">×</button>
+            </div>
+            <div class="modal-body" id="detailBody"></div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeDetailModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 企微群上传弹窗 -->
+    <div class="modal" id="qrModal" onclick="closeQrModalByOverlay(event)">
+        <div class="modal-content" onclick="event.stopPropagation()" style="max-width:480px;">
+            <div class="modal-header">
+                <div class="title-wrap">
+                    <span class="title-bar"></span>
+                    <h3>添加企微群</h3>
+                </div>
+                <button class="close" onclick="closeQrModal()">×</button>
+            </div>
+            <div class="modal-body" style="text-align:center;">
+                <div class="upload-area" id="qrUploadArea" onclick="document.getElementById('qrFileInput').click()">
+                    <div class="upload-hint" id="qrUploadHint">
+                        <div class="upload-icon">+</div>
+                        <div class="upload-text">点击上传企微群二维码图片</div>
+                    </div>
+                    <img id="qrPreview" style="display:none; max-width:100%; max-height:280px; border-radius:8px;">
+                </div>
+                <input type="file" id="qrFileInput" accept="image/*" style="display:none;" onchange="previewQr(this)">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeQrModal()">取消</button>
+                <button class="btn-ok" onclick="saveQr()">保存</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    /* 状态机：待成团 / 拼团失败 / 待出行 / 已完成 */
+    var groups = [
+        {
+            id: 'P260820036767001', courseNo: 'C1001', course: '研學内测', session: '2026-08-25 内测', courseTime: '2026-08-25',
+            verifyInstitution: '浙江省文旅集团', execInstitution: '杭州研学旅行社',
+            minOrder: 5, maxOrder: 10, mainOrder: 2, otherOrder: 1, confirmDate: '2026-08-23 18:00',
+            status: 'wait', createTime: '2026-08-20 10:12:47', amount: 1499.00, groupTime: '',
+            orders: [
+                { orderId: 'U260820036767002', buyTime: '2026-08-20 10:12:47', phone: '13851872980', travelers: [{ name: '媛姐', type: 'main', gender: '女', age: 12, idCard: '51162120140312002X' }], amount: 0.01, status: '待成团' },
+                { orderId: 'U260820036767003', buyTime: '2026-08-20 10:20:00', phone: '13900139001', travelers: [{ name: '小明', type: 'main', gender: '男', age: 10, idCard: '330102201512230045' }, { name: '小明爸', type: 'other', gender: '男', age: 38, idCard: '330102198604120012' }], amount: 398.00, status: '待成团' },
+                { orderId: 'U260820036767004', buyTime: '2026-08-20 10:35:00', phone: '13700137001', travelers: [{ name: '小红', type: 'main', gender: '女', age: 9, idCard: '440305201601150028' }], amount: 199.00, status: '待成团' }
+            ]
+        },
+        {
+            id: 'P260820036767002', courseNo: 'C1002', course: '杜甫草堂研学', session: '2026-08-30 上午场', courseTime: '2026-08-30',
+            verifyInstitution: '浙江省文旅集团', execInstitution: '成都研学机构',
+            minOrder: 10, maxOrder: 20, mainOrder: 3, otherOrder: 1, confirmDate: '2026-08-28 18:00',
+            status: 'fail', createTime: '2026-08-15 09:00:00', amount: 1990.00, groupTime: '',
+            orders: [
+                { orderId: 'U260820036767011', buyTime: '2026-08-15 09:00:00', phone: '13900139001', travelers: [{ name: '王小明', type: 'main', gender: '男', age: 11, idCard: '510108201410180025' }], amount: 199.00, status: '退款中' },
+                { orderId: 'U260820036767012', buyTime: '2026-08-15 09:05:00', phone: '13800138001', travelers: [{ name: '赵小红', type: 'main', gender: '女', age: 10, idCard: '330102201509220045' }], amount: 199.00, status: '退款中' },
+                { orderId: 'U260820036767013', buyTime: '2026-08-15 09:12:00', phone: '13500135001', travelers: [{ name: '陈小华', type: 'main', gender: '男', age: 12, idCard: '350103201404050067' }, { name: '陈小华家长', type: 'other', gender: '女', age: 40, idCard: '350103198606090089' }], amount: 398.00, status: '退款中' }
+            ],
+            failReason: '已超过拼团确认时间，未达到最低成团人数'
+        },
+        {
+            id: 'P260820036767003', courseNo: 'C1003', course: '李白故里探索', session: '2026-09-01 下午场', courseTime: '2026-09-01',
+            verifyInstitution: '安徽省文旅集团', execInstitution: '马鞍山研学社',
+            minOrder: 6, maxOrder: 12, mainOrder: 5, otherOrder: 1, confirmDate: '2026-08-30 18:00',
+            status: 'active', createTime: '2026-08-18 14:30:00', amount: 1194.00, groupTime: '2026-08-18 16:00:00',
+            orders: [
+                { orderId: 'U260820036767021', buyTime: '2026-08-18 14:30:00', phone: '13300133001', travelers: [{ name: '陈小军', type: 'main', gender: '男', age: 11, idCard: '440305201504120012' }], amount: 199.00, status: '待出行' },
+                { orderId: 'U260820036767022', buyTime: '2026-08-18 14:32:00', phone: '13200132001', travelers: [{ name: '黄小芳', type: 'main', gender: '女', age: 10, idCard: '330102201510150045' }, { name: '黄小芳家长', type: 'other', gender: '女', age: 39, idCard: '330102198511200067' }], amount: 398.00, status: '待出行' },
+                { orderId: 'U260820036767023', buyTime: '2026-08-18 14:40:00', phone: '13100131001', travelers: [{ name: '李大明', type: 'main', gender: '男', age: 12, idCard: '350103201408160089' }], amount: 199.00, status: '待出行' },
+                { orderId: 'U260820036767024', buyTime: '2026-08-18 14:45:00', phone: '13000130001', travelers: [{ name: '赵小丽', type: 'main', gender: '女', age: 9, idCard: '420106201701180023' }], amount: 199.00, status: '待出行' },
+                { orderId: 'U260820036767025', buyTime: '2026-08-18 14:50:00', phone: '18900189001', travelers: [{ name: '钱小强', type: 'main', gender: '男', age: 11, idCard: '510108201501120034' }], amount: 199.00, status: '待出行' }
+            ]
+        },
+        {
+            id: 'P260820036767004', courseNo: 'C1004', course: '博物馆奇妙日', session: '2026-08-10 上午场', courseTime: '2026-08-10',
+            verifyInstitution: '江苏省文旅集团', execInstitution: '南京研学基地',
+            minOrder: 8, maxOrder: 15, mainOrder: 8, otherOrder: 2, confirmDate: '2026-08-08 18:00',
+            status: 'done', createTime: '2026-08-01 10:00:00', amount: 1990.00, groupTime: '2026-08-02 10:30:00',
+            orders: [
+                { orderId: 'U260820036767031', buyTime: '2026-08-01 10:00:00', phone: '15000150001', travelers: [{ name: '张小明', type: 'main', gender: '男', age: 11, idCard: '330102201511120045' }, { name: '张小明家长', type: 'other', gender: '男', age: 40, idCard: '330102198602200067' }], amount: 398.00, status: '已核销' },
+                { orderId: 'U260820036767032', buyTime: '2026-08-01 10:03:00', phone: '15100151001', travelers: [{ name: '家长A小孩', type: 'main', gender: '女', age: 10, idCard: '350103201601050089' }], amount: 199.00, status: '已核销' },
+                { orderId: 'U260820036767033', buyTime: '2026-08-01 10:08:00', phone: '15200152001', travelers: [{ name: '家长B小孩', type: 'main', gender: '男', age: 9, idCard: '420106201703200012' }], amount: 199.00, status: '已核销' },
+                { orderId: 'U260820036767034', buyTime: '2026-08-01 10:12:00', phone: '15300153001', travelers: [{ name: '家长C小孩', type: 'main', gender: '女', age: 12, idCard: '510108201404180034' }, { name: '家长C', type: 'other', gender: '女', age: 38, idCard: '510108198608120056' }], amount: 398.00, status: '已核销' },
+                { orderId: 'U260820036767035', buyTime: '2026-08-01 10:15:00', phone: '15400154001', travelers: [{ name: '家长D小孩', type: 'main', gender: '男', age: 11, idCard: '440305201503150078' }], amount: 199.00, status: '已核销' },
+                { orderId: 'U260820036767036', buyTime: '2026-08-01 10:20:00', phone: '15500155001', travelers: [{ name: '家长E小孩', type: 'main', gender: '女', age: 10, idCard: '330102201601200090' }], amount: 199.00, status: '已核销' },
+                { orderId: 'U260820036767037', buyTime: '2026-08-01 10:25:00', phone: '15600156001', travelers: [{ name: '家长F小孩', type: 'main', gender: '男', age: 9, idCard: '350103201702010011' }], amount: 199.00, status: '已核销' },
+                { orderId: 'U260820036767038', buyTime: '2026-08-01 10:30:00', phone: '15700157001', travelers: [{ name: '家长G小孩', type: 'main', gender: '女', age: 12, idCard: '420106201408220022' }], amount: 199.00, status: '已核销' }
+            ]
+        }
+    ];
+
+    var currentTab = 'all';
+
+    var statusMap = {
+        wait: { label: '待成团', cls: 'status-wait' },
+        fail: { label: '拼团失败', cls: 'status-fail' },
+        active: { label: '待出行', cls: 'status-active' },
+        done: { label: '已完成', cls: 'status-done' }
+    };
+
+    function esc(s) { return String(s || '').replace(/</g, '&lt;'); }
+
+    function updateBadges() {
+        var counts = { all: groups.length, wait: 0, fail: 0, active: 0, done: 0 };
+        groups.forEach(function(g) { counts[g.status] = (counts[g.status] || 0) + 1; });
+        for (var k in counts) {
+            var el = document.getElementById('badge' + k.charAt(0).toUpperCase() + k.slice(1));
+            if (el) el.textContent = counts[k];
+        }
+    }
+
+    function switchTab(el) {
+        document.querySelectorAll('#tabBar .tab').forEach(function(t) { t.classList.remove('active'); });
+        el.classList.add('active');
+        currentTab = el.dataset.status;
+        renderTable();
+    }
+
+    function renderTable() {
+        var tbody = document.getElementById('groupTableBody');
+        var fId = document.getElementById('filterId').value.trim();
+        var fCourse = document.getElementById('filterCourse').value.trim();
+        var fDate = document.getElementById('filterDate').value;
+        var list = groups.filter(function(g) {
+            if (currentTab !== 'all' && g.status !== currentTab) return false;
+            if (fId && g.id.indexOf(fId) === -1) return false;
+            if (fCourse && g.course.indexOf(fCourse) === -1) return false;
+            if (fDate && g.courseTime !== fDate) return false;
+            return true;
+        });
+        if (list.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="13" class="empty-state">暂无拼团订单</td></tr>';
+            return;
+        }
+        var html = '';
+        list.forEach(function(g) {
+            var s = statusMap[g.status];
+            var percent = Math.min(100, (g.mainOrder / g.minOrder) * 100);
+            var totalCount = g.mainOrder + g.otherOrder;
+            var groupTimeTxt = g.groupTime || '—';
+            html += '<tr>'
+                + '<td><a href="javascript:;" onclick="showDetail(\'' + g.id + '\')" style="color:#0669FF;text-decoration:none;">' + g.id + '</a></td>'
+                + '<td><div style="font-weight:500;">' + esc(g.course) + '</div><div style="font-size:12px;color:#888;margin-top:2px;">' + esc(g.courseNo) + ' / ' + esc(g.session) + '</div></td>'
+                + '<td>' + esc(g.verifyInstitution) + '</td>'
+                + '<td>' + esc(g.execInstitution) + '</td>'
+                + '<td>最低 ' + g.minOrder + ' 人 / 最高 ' + g.maxOrder + ' 人</td>'
+                + '<td><div class="progress"><div class="bar"><div class="fill" style="width:' + percent + '%;"></div></div><div class="text"><strong>' + g.mainOrder + '</strong>/' + g.minOrder + ' 人</div></div></td>'
+                + '<td>' + g.otherOrder + ' 人</td>'
+                + '<td>' + totalCount + ' 人</td>'
+                + '<td class="price">¥' + g.amount.toFixed(2) + '</td>'
+                + '<td><span class="status-tag ' + s.cls + '">' + s.label + '</span></td>'
+                + '<td>' + groupTimeTxt + '</td>'
+                + '<td>' + g.createTime + '</td>'
+                + '<td>' + buildActions(g) + '</td></tr>';
+        });
+        tbody.innerHTML = html;
+    }
+
+    function buildActions(g) {
+        var html = '<button class="action-btn btn-view" onclick="showDetail(\'' + g.id + '\')">查看</button>';
+        if (g.status === 'wait') {
+            html += '<button class="action-btn btn-finish" onclick="finishGroup(\'' + g.id + '\')">手动完成</button>';
+        } else if (g.status === 'active') {
+            html += '<button class="action-btn btn-remind" onclick="sendRemind(\'' + g.id + '\')">发送提醒</button>';
+            html += '<button class="action-btn btn-view" onclick="reportManage(\'' + g.id + '\')">研学报告管理</button>';
+        } else if (g.status === 'done') {
+            html += '<button class="action-btn btn-view" onclick="reportManage(\'' + g.id + '\')">研学报告管理</button>';
+        }
+        html += '<button class="action-btn btn-verify" onclick="openQrModal(\'' + g.id + '\')">企微群</button>';
+        return html;
+    }
+
+    function sendRemind(id) {
+        if (!confirm('确定向该拼团发送出行提醒吗？')) return;
+        alert('已发送出行提醒');
+    }
+    function finishGroup(id) {
+        if (!confirm('确定手动完成该拼团？')) return;
+        var g = groups.find(function(x) { return x.id === id; });
+        if (g) { g.status = 'done'; g.groupTime = new Date().toLocaleString('zh-CN', { hour12: false }); updateBadges(); renderTable(); }
+        alert('拼团已标记为完成');
+    }
+    function reportManage(id) {
+        alert('打开研学报告管理：' + id);
+    }
+
+    function showDetail(id) {
+        var g = groups.find(function(x) { return x.id === id; });
+        if (!g) return;
+        var s = statusMap[g.status];
+
+        // 已拼订单列表
+        var orderHtml = '';
+        g.orders.forEach(function(o) {
+            var travelerHtml = o.travelers.map(function(t) {
+                var isStudent = t.type === 'main';
+                var meta = '';
+                if (t.gender) meta += ' ' + esc(t.gender);
+                if (t.age !== undefined && t.age !== null) meta += ' ' + t.age + '岁';
+                var idCard = t.idCard || '';
+                return '<div class="tv"><span class="tv-name">' + esc(t.name) + '</span><span class="type-tag ' + (isStudent ? 'student' : 'parent') + '">' + (isStudent ? '学生' : '家长') + '</span>'
+                    + '<span class="tv-meta">' + meta + '</span><span class="tv-idcard">' + esc(idCard) + '</span></div>';
+            }).join('');
+            orderHtml += '<tr>'
+                + '<td>' + esc(o.orderId) + '</td>'
+                + '<td>' + esc(o.buyTime) + '</td>'
+                + '<td>' + esc(o.phone) + '</td>'
+                + '<td><div class="traveler-list">' + travelerHtml + '</div></td>'
+                + '<td class="price">¥' + o.amount.toFixed(2) + '</td>'
+                + '<td>' + esc(o.status) + '</td></tr>';
+        });
+
+        document.getElementById('detailBody').innerHTML =
+            '<div class="detail-section">'
+            + '<div class="sec-title">拼团信息</div>'
+            + '<div class="detail-row"><span class="label">拼团编号</span><span class="value">' + g.id + '</span></div>'
+            + '<div class="detail-row"><span class="label">拼团状态</span><span class="value"><span class="status-tag ' + s.cls + '">' + s.label + '</span></span></div>'
+            + '<div class="detail-row"><span class="label">成团人数要求</span><span class="value">最低 ' + g.minOrder + ' 人 / 最高 ' + g.maxOrder + ' 人</span></div>'
+            + '<div class="detail-row"><span class="label">拼团进度</span><span class="value">' + g.mainOrder + ' / ' + g.minOrder + ' 人</span></div>'
+            + '<div class="detail-row"><span class="label">其他成员数</span><span class="value">' + g.otherOrder + ' 人</span></div>'
+            + '<div class="detail-row"><span class="label">总成员数</span><span class="value">' + (g.mainOrder + g.otherOrder) + ' 人</span></div>'
+            + '<div class="detail-row"><span class="label">成团时间</span><span class="value">' + (g.groupTime || '—') + '</span></div>'
+            + '<div class="detail-row"><span class="label">拼团确认时间</span><span class="value">' + g.confirmDate + '</span></div>'
+            + (g.failReason ? '<div class="detail-row"><span class="label">失败原因</span><span class="value" style="color:#CF1322;">' + esc(g.failReason) + '</span></div>' : '')
+            + '</div>'
+            + '<div class="detail-section">'
+            + '<div class="sec-title">课程信息</div>'
+            + '<div class="detail-row"><span class="label">课程编号</span><span class="value">' + esc(g.courseNo) + '</span></div>'
+            + '<div class="detail-row"><span class="label">课程名称</span><span class="value">' + esc(g.course) + '</span></div>'
+            + '<div class="detail-row"><span class="label">场次时间</span><span class="value">' + esc(g.session) + '</span></div>'
+            + '<div class="detail-row"><span class="label">核验机构</span><span class="value">' + esc(g.verifyInstitution) + '</span></div>'
+            + '<div class="detail-row"><span class="label">执行机构</span><span class="value">' + esc(g.execInstitution) + '</span></div>'
+            + '</div>'
+            + '<div class="detail-section">'
+            + '<div class="sec-title">已拼订单（' + g.orders.length + '）</div>'
+            + '<div class="order-table-wrap"><table class="order-table"><thead><tr>'
+            + '<th>订单编号</th><th>购买时间</th><th>购买手机号</th><th>出行人员</th><th>付款金额</th><th>状态</th>'
+            + '</tr></thead><tbody>' + orderHtml + '</tbody></table></div>'
+            + '</div>';
+        document.getElementById('detailModal').classList.add('show');
+    }
+    function closeDetailModal() { document.getElementById('detailModal').classList.remove('show'); }
+    function closeModalByOverlay(e) { if (e.target === document.getElementById('detailModal')) closeDetailModal(); }
+
+    function resetFilter() {
+        document.getElementById('filterId').value = '';
+        document.getElementById('filterCourse').value = '';
+        document.getElementById('filterDate').value = '';
+        renderTable();
+    }
+
+    function exportGroups() {
+        var list = groups.filter(function(g) { return currentTab === 'all' || g.status === currentTab; });
+        if (list.length === 0) { alert('暂无数据可导出'); return; }
+        var header = ['拼团编号', '课程编号', '课程名称', '场次', '核验机构', '执行机构', '最低成团人数', '最高成团人数', '拼团进度(主类型)', '其他成员数', '总成员数', '实付总额', '拼团状态', '成团时间', '拼团确认时间', '下单时间'];
+        var rows = list.map(function(g) {
+            return [g.id, g.courseNo, g.course, g.session, g.verifyInstitution, g.execInstitution, g.minOrder, g.maxOrder, g.mainOrder, g.otherOrder, (g.mainOrder + g.otherOrder), g.amount, statusMap[g.status].label, g.groupTime || '', g.confirmDate, g.createTime];
+        });
+        downloadCsv('拼团订单管理.csv', header, rows);
+    }
+
+    function downloadCsv(filename, header, rows) {
+        var lines = [header.join(',')];
+        rows.forEach(function(r) {
+            lines.push(r.map(function(c) {
+                c = String(c == null ? '' : c);
+                return '"' + c.replace(/"/g, '""') + '"';
+            }).join(','));
+        });
+        var blob = new Blob(['\uFEFF' + lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
+    /* 企微群上传 */
+    var currentQrGroupId = null;
+    function openQrModal(id) {
+        currentQrGroupId = id;
+        document.getElementById('qrPreview').style.display = 'none';
+        document.getElementById('qrUploadHint').style.display = 'block';
+        document.getElementById('qrFileInput').value = '';
+        var g = groups.find(function(x) { return x.id === id; });
+        if (g && g.qrImage) {
+            document.getElementById('qrPreview').src = g.qrImage;
+            document.getElementById('qrPreview').style.display = 'block';
+            document.getElementById('qrUploadHint').style.display = 'none';
+        }
+        document.getElementById('qrModal').classList.add('show');
+    }
+    function closeQrModal() { document.getElementById('qrModal').classList.remove('show'); currentQrGroupId = null; }
+    function closeQrModalByOverlay(e) { if (e.target === document.getElementById('qrModal')) closeQrModal(); }
+    function previewQr(input) {
+        var file = input.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('qrPreview').src = e.target.result;
+            document.getElementById('qrPreview').style.display = 'block';
+            document.getElementById('qrUploadHint').style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+    }
+    function saveQr() {
+        var g = groups.find(function(x) { return x.id === currentQrGroupId; });
+        var preview = document.getElementById('qrPreview');
+        if (preview.style.display !== 'none' && preview.src) {
+            if (g) g.qrImage = preview.src;
+        }
+        closeQrModal();
+        alert('企微群图片已保存');
+    }
+
+    updateBadges();
+    renderTable();
+</script>
+</body>
+</html>

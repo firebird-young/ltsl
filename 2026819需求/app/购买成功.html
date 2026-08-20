@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>团购成功</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            background: #F7F3EE;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 430px;
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            background: linear-gradient(180deg, #F7F3EE 0%, #F7F3EE 60%, #EDE7E0 100%);
+            overflow: hidden;
+        }
+
+        /* 状态栏 */
+        .status-bar {
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 0 16px;
+            color: #333;
+        }
+        .status-bar .time { position: absolute; left: 20px; font-size: 15px; font-weight: 600; }
+        .status-bar .icons { position: absolute; right: 16px; display: flex; gap: 4px; align-items: center; font-size: 14px; }
+
+        /* 顶部导航 */
+        .top-nav {
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 0 16px;
+        }
+        .top-nav .back-btn { position: absolute; left: 12px; font-size: 26px; color: #333; cursor: pointer; }
+        .top-nav .title { font-size: 18px; font-weight: 600; color: #333; }
+        .top-nav .right-actions { position: absolute; right: 16px; display: flex; gap: 12px; align-items: center; }
+        .top-nav .right-actions span { font-size: 20px; color: #333; cursor: pointer; }
+
+        /* 成功主图 */
+        .success-hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px 20px 20px;
+            position: relative;
+        }
+        .success-hero .hero-img {
+            width: 220px; height: auto;
+            max-width: 80%;
+        }
+        .success-subtitle { margin-top: 16px; font-size: 15px; color: #8B6B57; }
+
+        /* 进度步骤 */
+        .steps {
+            display: flex; align-items: center; justify-content: center;
+            gap: 12px; padding: 0 40px; margin-top: 8px;
+        }
+        .step { display: flex; align-items: center; gap: 8px; }
+        .step .icon {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: #D9CFC4; color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+        }
+        .step.active .icon { background: #8B5A3C; }
+        .step .line { width: 60px; height: 2px; background: #D9CFC4; }
+        .step:last-child .line { display: none; }
+
+        /* 内容卡片 */
+        .content-card {
+            background: #fff;
+            border-radius: 16px 16px 0 0;
+            padding: 24px 20px 40px;
+            margin-top: 24px;
+            min-height: 300px;
+        }
+        .order-info { margin-bottom: 20px; }
+        .order-info .title { font-size: 16px; font-weight: 600; color: #333; margin-bottom: 16px; }
+        .info-item { display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; color: #666; }
+        .info-item .value { color: #333; font-weight: 500; }
+        .btns { display: flex; gap: 12px; margin-top: 24px; }
+        .btns button { flex: 1; height: 44px; border-radius: 8px; font-size: 15px; cursor: pointer; border: none; }
+        .btns .btn-primary { background: #8B5A3C; color: #fff; }
+        .btns .btn-ghost { background: #fff; color: #8B5A3C; border: 1px solid #8B5A3C; }
+
+        /* 弹层遮罩 */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+            z-index: 1000; display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+            padding: 20px;
+        }
+        .modal-overlay.show { opacity: 1; pointer-events: auto; }
+        .modal-card {
+            width: 100%; max-width: 360px;
+            background: linear-gradient(180deg, #FFFBF6 0%, #fff 100%);
+            border-radius: 20px;
+            padding: 28px 24px 32px;
+            transform: scale(0.92);
+            transition: transform 0.3s ease-out;
+            position: relative;
+            margin: 0 auto;
+        }
+        .modal-overlay.show .modal-card { transform: scale(1); }
+        .modal-bell {
+            position: absolute; top: -34px; right: 28px;
+            width: 68px; height: 68px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .modal-bell .bell-inner {
+            width: 54px; height: 54px; border-radius: 50%;
+            background: linear-gradient(135deg, #F0E6DC 0%, #E6D6C6 100%);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 26px; color: #8B5A3C;
+        }
+        .modal-title { font-size: 22px; font-weight: 800; color: #3E2723; margin-bottom: 12px; }
+        .modal-title .small { font-size: 14px; font-weight: normal; color: #8B6B57; margin-left: 6px; }
+        .modal-desc { font-size: 14px; color: #8B6B57; line-height: 1.7; margin-bottom: 20px; }
+
+        /* 消息提醒列表 */
+        .notice-list { margin-bottom: 24px; }
+        .notice-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 16px; margin-bottom: 10px;
+            background: #FAF6F1; border-radius: 12px;
+            border: 1px solid transparent; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .notice-item:hover { border-color: #D9CFC4; }
+        .notice-item.selected { background: #F7EDE3; border-color: #C9A88A; }
+        .notice-item .left { display: flex; flex-direction: column; gap: 4px; }
+        .notice-item .name { font-size: 15px; font-weight: 600; color: #3E2723; }
+        .notice-item .desc { font-size: 12px; color: #8B6B57; }
+        .notice-item .checkbox {
+            width: 22px; height: 22px; border-radius: 50%;
+            border: 2px solid #C9A88A; background: #fff;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .notice-item.selected .checkbox { background: #8B5A3C; border-color: #8B5A3C; color: #fff; font-size: 13px; }
+
+        .btn-notify {
+            width: 100%; height: 48px; border-radius: 8px; border: none;
+            background: #8B5A3C; color: #fff; font-size: 16px; font-weight: 600;
+            cursor: pointer; margin-bottom: 14px;
+        }
+        .btn-notify:disabled { background: #C9A88A; }
+        .btn-skip {
+            width: 100%; text-align: center; font-size: 14px; color: #8B6B57;
+            background: transparent; border: none; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="status-bar">
+            <span class="time">9:41</span>
+            <div class="icons">
+                <span>📶</span>
+                <span>📡</span>
+                <span>🔋</span>
+            </div>
+        </div>
+
+        <div class="top-nav">
+            <span class="back-btn">‹</span>
+            <span class="title">团购成功</span>
+            <div class="right-actions">
+                <span>•••</span>
+                <span>◉</span>
+            </div>
+        </div>
+
+        <div class="success-hero">
+            <img src="../../asset/购买成功.png" class="hero-img" alt="购买成功">
+            <div class="success-subtitle">您的订单已生成，期待研学之旅</div>
+        </div>
+
+        <div class="steps">
+            <div class="step active">
+                <div class="icon">🚩</div>
+                <div class="line"></div>
+            </div>
+            <div class="step active">
+                <div class="icon">✓</div>
+                <div class="line"></div>
+            </div>
+            <div class="step">
+                <div class="icon">✉</div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div class="order-info">
+                <div class="title">订单信息</div>
+                <div class="info-item"><span>课程名称</span><span class="value">研学内测</span></div>
+                <div class="info-item"><span>场次时间</span><span class="value">2026-08-25</span></div>
+                <div class="info-item"><span>出行人</span><span class="value">媛姐 等 1 人</span></div>
+                <div class="info-item"><span>实付款</span><span class="value" style="color:#E53935;">¥0.01</span></div>
+            </div>
+            <div class="btns">
+                <button class="btn-ghost" onclick="goOrder()">查看订单</button>
+                <button class="btn-primary" onclick="goHome()">返回首页</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 消息通知弹层 -->
+    <div class="modal-overlay show" id="noticeModal">
+        <div class="modal-card">
+            <div class="modal-bell"><div class="bell-inner">🔔</div></div>
+            <div class="modal-title">开启消息通知<span class="small">不错过重要信息</span></div>
+            <div class="modal-desc">为了及时获取订单动态，建议您开启以下消息提醒：</div>
+
+            <div class="notice-list" id="noticeList">
+                <div class="notice-item" data-key="group" onclick="toggleNotice(this)">
+                    <div class="left">
+                        <span class="name">拼团结果通知</span>
+                        <span class="desc">成团/失败时第一时间通知您</span>
+                    </div>
+                    <div class="checkbox">✓</div>
+                </div>
+                <div class="notice-item" data-key="trip" onclick="toggleNotice(this)">
+                    <div class="left">
+                        <span class="name">出行前提醒</span>
+                        <span class="desc">活动开始前提醒您准备出行</span>
+                    </div>
+                    <div class="checkbox">✓</div>
+                </div>
+            </div>
+
+            <button class="btn-notify" id="btnNotify" onclick="confirmNotice()">去开启通知</button>
+            <button class="btn-skip" onclick="closeNotice()">暂不开启</button>
+        </div>
+    </div>
+
+<script>
+    var selectedNotices = { group: false, trip: false };
+
+    function toggleNotice(el) {
+        var key = el.dataset.key;
+        selectedNotices[key] = !selectedNotices[key];
+        el.classList.toggle('selected', selectedNotices[key]);
+        updateNotifyButton();
+    }
+
+    function updateNotifyButton() {
+        var hasSelected = Object.values(selectedNotices).some(function(v) { return v; });
+        var btn = document.getElementById('btnNotify');
+        btn.disabled = !hasSelected;
+        btn.textContent = hasSelected ? '去开启通知' : '请至少选择一项';
+    }
+
+    function confirmNotice() {
+        var keys = [];
+        for (var k in selectedNotices) {
+            if (selectedNotices[k]) keys.push(k);
+        }
+        console.log('开启通知：', keys);
+        alert('已开启：' + (keys.indexOf('group') !== -1 ? '拼团结果通知 ' : '') + (keys.indexOf('trip') !== -1 ? '出行前提醒' : ''));
+        closeNotice();
+    }
+
+    function closeNotice() {
+        document.getElementById('noticeModal').classList.remove('show');
+    }
+
+    function goOrder() { alert('跳转订单详情'); }
+    function goHome() { alert('跳转首页'); }
+
+    updateNotifyButton();
+</script>
+</body>
+</html>

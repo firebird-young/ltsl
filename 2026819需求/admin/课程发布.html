@@ -622,12 +622,18 @@
                     </div>
 
                     <div class="form-row">
-                        <label class="form-label"><span class="required">*</span>自助核销开启时间：</label>
+                        <label class="form-label">自助核销：</label>
                         <div class="form-control">
                             <div class="stepper-inline">
-                                <span>课程开始前</span>
-                                <div class="stepper"><button type="button" onclick="changeDay('verifyDay', -1)">-</button><input type="number" id="verifyDay" value="1" min="0"><button type="button" onclick="changeDay('verifyDay', 1)">+</button></div>
-                                <span class="stepper-unit">天</span>
+                                <div class="toggle" id="verifyToggle">
+                                    <button type="button" id="verifyOffBtn" class="active" onclick="setVerify(false)">不开启</button>
+                                    <button type="button" id="verifyOnBtn" onclick="setVerify(true)">开启</button>
+                                </div>
+                                <div id="verifyTimeWrap" style="display:none; align-items:center; gap:8px; flex-wrap:wrap;">
+                                    <span class="stepper-unit" style="font-size:14px; color:#555;">课程开始前</span>
+                                    <div class="stepper"><button type="button" onclick="changeDay('verifyDay', -1)">-</button><input type="number" id="verifyDay" value="1" min="0"><button type="button" onclick="changeDay('verifyDay', 1)">+</button></div>
+                                    <span class="stepper-unit">天</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -997,6 +1003,16 @@
         var v = parseInt(input.value || 0, 10) + delta;
         if (v < 0) v = 0;
         input.value = v;
+    }
+
+    /* 自助核销开关 */
+    var verifyEnabled = false;
+    function setVerify(enabled) {
+        verifyEnabled = enabled;
+        document.getElementById('verifyOffBtn').classList.toggle('active', !enabled);
+        document.getElementById('verifyOnBtn').classList.toggle('active', enabled);
+        var wrap = document.getElementById('verifyTimeWrap');
+        wrap.style.display = enabled ? 'flex' : 'none';
     }
 
     /* ================= 取消政策 ================= */
@@ -1435,7 +1451,8 @@
             detail: getEditorHtml('detailEditor'),
             advanceDay: parseInt(document.getElementById('advanceDay').value, 10) || 0,
             latestDay: parseInt(document.getElementById('latestDay').value, 10) || 0,
-            verifyDay: parseInt(document.getElementById('verifyDay').value, 10) || 0,
+            verifyEnabled: verifyEnabled,
+            verifyDay: verifyEnabled ? (parseInt(document.getElementById('verifyDay').value, 10) || 0) : null,
             sessionPlans: sessionPlans,
             feeInclude: getEditorHtml('feeIncludeEditor'),
             prepare: getEditorHtml('prepareEditor'),
