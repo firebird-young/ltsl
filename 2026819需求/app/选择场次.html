@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>购买信息 - 离泰数链</title>
+    <title>选择场次 - 离泰数链</title>
     <style>
         :root { --theme: #0066FF; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -514,7 +514,7 @@
             alert('请选择场次');
             return;
         }
-        alert('已选择 ' + currentYear + '年' + (currentMonth + 1) + '月' + selectedDate + '日，进入下一步');
+        location.href = '填写购买信息.html';
     }
     renderCalendar();
     updateBtnState();
