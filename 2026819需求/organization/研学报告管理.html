@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>研学报告管理</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f6f8;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 430px;
+            min-height: 100vh;
+            background: #f5f6f8;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            padding-bottom: 110px;
+        }
+        .status-bar {
+            height: 44px; background: #fff;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; padding: 0 16px;
+        }
+        .status-bar .time { position: absolute; left: 20px; font-size: 15px; font-weight: 600; color: #333; }
+        .status-bar .icons { position: absolute; right: 16px; display: flex; gap: 4px; align-items: center; font-size: 14px; color: #333; }
+        .top-nav {
+            height: 50px; background: #fff;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; padding: 0 16px; border-bottom: 1px solid #f5f5f5;
+        }
+        .top-nav .back-btn { position: absolute; left: 12px; font-size: 26px; color: #333; cursor: pointer; }
+        .top-nav .title { font-size: 17px; font-weight: 600; color: #333; }
+        .top-nav .right-actions { position: absolute; right: 16px; display: flex; gap: 12px; align-items: center; }
+        .top-nav .right-actions span { font-size: 20px; color: #333; cursor: pointer; }
+        .content { padding: 12px 12px; }
+
+        /* 课程卡片 */
+        .course-card {
+            background: #fff; border-radius: 12px; padding: 14px 16px;
+            margin-bottom: 10px; display: flex; align-items: center; gap: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .course-card .cover {
+            width: 64px; height: 64px; border-radius: 8px; overflow: hidden;
+            background: #1a2a3a; color: #fff; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 600; text-align: center; line-height: 1.3;
+        }
+        .course-card .info { flex: 1; min-width: 0; }
+        .course-card .info .name { font-size: 15px; font-weight: 600; color: #222; margin-bottom: 3px; }
+        .course-card .info .detail { font-size: 12px; color: #888; }
+        .course-card .status-badge {
+            flex-shrink: 0; font-size: 11px; padding: 3px 10px; border-radius: 10px; font-weight: 500;
+        }
+        .status-travel { background: #E8F5E9; color: #389E0D; }
+
+        .section-card {
+            background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .section-title {
+            font-size: 15px; font-weight: 600; color: #222;
+            margin-bottom: 14px; display: flex; align-items: center; gap: 6px;
+        }
+
+        /* ===== 研学信息 - 输入态 ===== */
+        .field-label {
+            font-size: 13px; font-weight: 600; color: #555; margin-bottom: 8px;
+            display: flex; align-items: center; gap: 4px;
+        }
+        .field-input {
+            width: 100%; padding: 12px; border: 1px solid #E3E8F0; border-radius: 10px;
+            font-size: 14px; outline: none; background: #FAFBFF; color: #333;
+        }
+        .field-input:focus { border-color: #0669FF; background: #fff; }
+        .field-input::placeholder { color: #C0C8D8; }
+        .field-textarea {
+            width: 100%; height: 140px; padding: 12px; border: 1px solid #E3E8F0; border-radius: 10px;
+            font-size: 14px; outline: none; background: #FAFBFF; color: #333;
+            resize: none; font-family: inherit; line-height: 1.6;
+        }
+        .field-textarea:focus { border-color: #0669FF; background: #fff; }
+        .field-textarea::placeholder { color: #C0C8D8; }
+        .var-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+        .var-row .var-label { font-size: 11px; color: #888; }
+        .var-chip {
+            font-size: 11px; color: #0669FF; background: #F0F6FF; border: 1px solid #D6E6FF;
+            border-radius: 6px; padding: 3px 8px; cursor: pointer; user-select: none;
+        }
+        .var-chip:active { background: #E1EEFF; }
+
+        /* ===== 研学信息 - 结果态 ===== */
+        .info-display { background: #fafafa; border-radius: 10px; padding: 12px; }
+        .info-display + .info-display { margin-top: 10px; }
+        .info-display .display-header { font-size: 12px; font-weight: 600; color: #0669FF; margin-bottom: 6px; }
+        .info-display .display-duration { font-size: 15px; font-weight: 600; color: #222; }
+        .info-display .display-body {
+            font-size: 13px; color: #444; line-height: 1.7; white-space: pre-wrap;
+            outline: none; min-height: 60px;
+        }
+        .info-display .display-body:focus { background: #fff; border-radius: 6px; }
+        .info-display .display-body[contenteditable="true"] { border: 1px dashed #D6E6FF; padding: 6px; border-radius: 6px; }
+        .info-edit-tip { font-size: 11px; color: #999; margin-top: 6px; }
+
+        /* ===== 研学现场 入口 ===== */
+        .scene-desc { font-size: 12px; color: #999; margin-bottom: 12px; }
+        .scene-entry {
+            display: flex; align-items: center; justify-content: space-between;
+            background: #F7FAFF; border: 1px solid #E3ECFF; border-radius: 12px;
+            padding: 14px; cursor: pointer;
+        }
+        .scene-entry:active { background: #EFF5FF; }
+        .scene-entry-left { display: flex; align-items: center; gap: 10px; }
+        .scene-entry-icon {
+            width: 40px; height: 40px; border-radius: 10px; background: #0669FF; color: #fff;
+            display: flex; align-items: center; justify-content: center; font-size: 18px;
+        }
+        .scene-entry-title { font-size: 14px; font-weight: 600; color: #222; }
+        .scene-entry-sub { font-size: 11px; color: #999; margin-top: 2px; }
+        .scene-entry-arrow { font-size: 22px; color: #B0BACB; }
+
+        /* ===== 生成弹窗 ===== */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+            z-index: 1000; display: flex; align-items: center; justify-content: center;
+            padding: 24px;
+        }
+        .gen-modal {
+            width: 100%; max-width: 320px;
+            background: #fff; border-radius: 16px; padding: 28px 24px;
+            text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.16);
+        }
+        .gen-modal .gen-icon { font-size: 40px; margin-bottom: 12px; }
+        .gen-modal .gen-title { font-size: 16px; font-weight: 600; color: #222; margin-bottom: 16px; }
+        .gen-modal .gen-progress-text { font-size: 12px; color: #888; margin-bottom: 10px; }
+        .gen-modal .gen-progress-bar { width: 100%; height: 6px; background: #eee; border-radius: 3px; overflow: hidden; }
+        .gen-modal .gen-progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #0669FF, #4A9EFF); border-radius: 3px; transition: width 0.3s; }
+
+        /* ===== 底部按钮 ===== */
+        .bottom-bar {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 430px; background: #fff;
+            padding: 12px 16px 24px; border-top: 1px solid #f0f0f0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.04);
+        }
+        .btn-primary {
+            width: 100%; height: 48px; border: none; border-radius: 24px;
+            background: linear-gradient(90deg, #0669FF, #3D8BFF); color: #fff; font-size: 16px; font-weight: 600; cursor: pointer;
+        }
+        .btn-primary:active { opacity: 0.85; }
+        .bottom-two { display: flex; gap: 12px; }
+        .btn-ghost { flex: 1; height: 48px; border: 1px solid #0669FF; border-radius: 24px; background: #fff; color: #0669FF; font-size: 15px; cursor: pointer; }
+        .btn-submit { flex: 1; height: 48px; border: none; border-radius: 24px; background: #D4A84B; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; }
+
+        /* ===== Toast ===== */
+        .toast {
+            position: fixed; left: 50%; transform: translateX(-50%);
+            top: 50%; background: rgba(17, 24, 39, 0.85); color: #fff;
+            padding: 10px 20px; border-radius: 20px; font-size: 13px;
+            z-index: 999; opacity: 0; transition: opacity .25s; pointer-events: none;
+        }
+        .toast.show { opacity: 1; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="status-bar">
+            <span class="time">14:18</span>
+            <div class="icons"><span>5G</span><span>◉</span><span>🔋</span></div>
+        </div>
+        <div class="top-nav">
+            <span class="back-btn" onclick="history.back()">‹</span>
+            <span class="title">研学报告管理</span>
+            <div class="right-actions"><span>•••</span><span>◉</span></div>
+        </div>
+
+        <div class="content">
+            <!-- 课程卡片 -->
+            <div class="course-card">
+                <div class="cover">省博探秘<br>AI赋活</div>
+                <div class="info">
+                    <div class="name">省博探秘 · AI赋活</div>
+                    <div class="detail">2026年08月18日 · 上午场</div>
+                </div>
+                <span class="status-badge status-travel">待出行</span>
+            </div>
+
+            <!-- 研学现场（入口） -->
+            <div class="section-card">
+                <div class="section-title">📷 研学现场</div>
+                <div class="scene-desc">研学现场是所有参与人都可以看到</div>
+                <div class="scene-entry" onclick="location.href='研学现场.html'">
+                    <div class="scene-entry-left">
+                        <div class="scene-entry-icon">📷</div>
+                        <div>
+                            <div class="scene-entry-title">进入研学现场</div>
+                            <div class="scene-entry-sub">上传视频 / 图片，展示研学实况</div>
+                        </div>
+                    </div>
+                    <div class="scene-entry-arrow">›</div>
+                </div>
+            </div>
+
+            <!-- 研学信息 -->
+            <div class="section-card">
+                <div class="section-title">📄 研学信息</div>
+
+                <!-- 输入态 -->
+                <div id="inputView">
+                    <div class="field-label">⏱️ 研学时长</div>
+                    <input type="text" class="field-input" id="durationInput" placeholder="如：2小时、半天、全天..." maxlength="20">
+
+                    <div class="field-label" style="margin-top:14px;">📌 研学内容提示词</div>
+                    <textarea class="field-textarea" id="promptInput" placeholder="请输入提示词，如：请根据本次课程安排，生成一份包含学习目标与收获的研学信息..."></textarea>
+                    <div class="var-row">
+                        <span class="var-label">插入变量：</span>
+                        <span class="var-chip" onclick="insertVar('course')">{课程名称}</span>
+                        <span class="var-chip" onclick="insertVar('time')">{课程时间}</span>
+                    </div>
+                </div>
+
+                <!-- 结果态 -->
+                <div id="resultView" style="display:none;">
+                    <div class="info-display">
+                        <div class="display-header">⏱️ 研学时长</div>
+                        <div class="display-duration" id="durationText"></div>
+                    </div>
+                    <div class="info-display">
+                        <div class="display-header">📄 研学内容</div>
+                        <div class="display-body" id="infoContent" contenteditable="true"></div>
+                        <div class="info-edit-tip" id="editTip">点击内容区域可直接编辑</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部按钮 -->
+        <div class="bottom-bar">
+            <div id="genBar">
+                <button class="btn-primary" onclick="startGenerate()">✨ 生成研学信息</button>
+            </div>
+            <div id="resultBar" class="bottom-two" style="display:none;">
+                <button class="btn-ghost" onclick="regenerate()">🔄 重新生成</button>
+                <button class="btn-submit" onclick="saveInfo()">💾 保存信息</button>
+            </div>
+            <div id="savedBar" class="bottom-two" style="display:none;">
+                <button class="btn-ghost" onclick="regenerate()">🔄 重新生成</button>
+                <button class="btn-ghost" onclick="editInfo()">✏️ 编辑</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 生成弹窗 -->
+    <div class="modal-overlay" id="genModal" style="display:none;">
+        <div class="gen-modal">
+            <div class="gen-icon">🤖</div>
+            <div class="gen-title">AI正在生成研学信息</div>
+            <div class="gen-progress-text" id="genProgressText">正在分析课程信息...</div>
+            <div class="gen-progress-bar"><div class="gen-progress-fill" id="genProgressFill"></div></div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        var COURSE_NAME = '省博探秘 · AI赋活';
+        var COURSE_TIME = '2026年08月18日 上午场';
+        var generated = false;
+        var submitted = false;
+
+        function esc(s) { return String(s || '').replace(/</g, '&lt;'); }
+
+        function showToast(msg) {
+            var t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            clearTimeout(t._timer);
+            t._timer = setTimeout(function() { t.classList.remove('show'); }, 2000);
+        }
+
+        /* 插入变量 */
+        function insertVar(kind) {
+            var ta = document.getElementById('promptInput');
+            var val = kind === 'course' ? COURSE_NAME : COURSE_TIME;
+            var pos = ta.selectionStart || ta.value.length;
+            var end = ta.selectionEnd || pos;
+            ta.value = ta.value.slice(0, pos) + val + ta.value.slice(end);
+            ta.focus();
+            ta.selectionStart = ta.selectionEnd = pos + val.length;
+        }
+
+        /* 生成（弹窗模拟进度） */
+        function startGenerate() {
+            var duration = document.getElementById('durationInput').value.trim();
+            if (!duration) { showToast('请先填写研学时长'); return; }
+            document.getElementById('genModal').style.display = 'flex';
+            var fill = document.getElementById('genProgressFill');
+            var ptext = document.getElementById('genProgressText');
+            fill.style.width = '0%';
+            ptext.textContent = '正在分析课程信息...';
+            var p = 0;
+            var timer = setInterval(function() {
+                p += Math.random() * 18 + 8;
+                if (p > 100) p = 100;
+                fill.style.width = p + '%';
+                if (p < 50) ptext.textContent = '正在分析课程信息...';
+                else if (p < 80) ptext.textContent = '正在生成研学内容...';
+                else ptext.textContent = '即将完成...';
+                if (p >= 100) {
+                    clearInterval(timer);
+                    setTimeout(function() {
+                        document.getElementById('genModal').style.display = 'none';
+                        showInfoResult();
+                    }, 400);
+                }
+            }, 250);
+        }
+
+        /* 生成结果内容 */
+        function buildContent() {
+            var prompt = document.getElementById('promptInput').value.trim();
+            if (!prompt) {
+                return '本次研学围绕「' + COURSE_NAME + '」展开，于' + COURSE_TIME + '进行。\n\n'
+                    + '▸ 历史探索：深入了解馆藏文物背后的历史故事，丰富人文素养。\n'
+                    + '▸ 动手实践：分组协作完成研学任务，锻炼实际操作能力。\n'
+                    + '▸ 团队协作：成员分工明确，配合默契，共同完成挑战。\n\n'
+                    + '总体：本次研学活动内容丰富，学生参与度高，收获满满。';
+            }
+            return prompt
+                .replace(/\{课程名称\}/g, COURSE_NAME)
+                .replace(/\{课程时间\}/g, COURSE_TIME);
+        }
+
+        /* 切换到结果态 */
+        function showInfoResult() {
+            generated = true;
+            submitted = false;
+            document.getElementById('inputView').style.display = 'none';
+            document.getElementById('resultView').style.display = 'block';
+            document.getElementById('durationText').textContent = document.getElementById('durationInput').value.trim();
+            var content = document.getElementById('infoContent');
+            content.innerHTML = esc(buildContent());
+            content.contentEditable = 'true';
+            document.getElementById('editTip').textContent = '点击内容区域可直接编辑';
+            switchBars();
+        }
+
+        /* 底部状态栏切换 */
+        function switchBars() {
+            document.getElementById('genBar').style.display = (!generated) ? 'block' : 'none';
+            document.getElementById('resultBar').style.display = (generated && !submitted) ? 'flex' : 'none';
+            document.getElementById('savedBar').style.display = (generated && submitted) ? 'flex' : 'none';
+        }
+
+        /* 保存信息 */
+        function saveInfo() {
+            var content = document.getElementById('infoContent').innerText.trim();
+            if (!content) { showToast('研学内容不能为空'); return; }
+            submitted = true;
+            document.getElementById('infoContent').contentEditable = 'false';
+            document.getElementById('editTip').textContent = '已保存，研学信息将同步展示给参与人';
+            switchBars();
+            showToast('✅ 研学信息已保存');
+        }
+
+        /* 编辑 */
+        function editInfo() {
+            submitted = false;
+            document.getElementById('infoContent').contentEditable = 'true';
+            document.getElementById('editTip').textContent = '点击内容区域可直接编辑';
+            switchBars();
+        }
+
+        /* 重新生成：回到输入态（保留提示词） */
+        function regenerate() {
+            generated = false;
+            submitted = false;
+            document.getElementById('inputView').style.display = 'block';
+            document.getElementById('resultView').style.display = 'none';
+            switchBars();
+        }
+    </script>
+</body>
+</html>

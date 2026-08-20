@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>研学评价</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f6f8;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 430px;
+            min-height: 100vh;
+            background: #f5f6f8;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            padding-bottom: 100px;
+        }
+
+        .status-bar {
+            height: 44px; background: #fff;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; padding: 0 16px;
+        }
+        .status-bar .time { position: absolute; left: 20px; font-size: 15px; font-weight: 600; color: #333; }
+        .status-bar .icons { position: absolute; right: 16px; display: flex; gap: 4px; align-items: center; font-size: 14px; color: #333; }
+
+        .top-nav {
+            height: 50px; background: #fff;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; padding: 0 16px; border-bottom: 1px solid #f5f5f5;
+        }
+        .top-nav .back-btn { position: absolute; left: 12px; font-size: 26px; color: #333; cursor: pointer; }
+        .top-nav .title { font-size: 17px; font-weight: 600; color: #333; }
+        .top-nav .right-actions { position: absolute; right: 16px; display: flex; gap: 12px; align-items: center; }
+        .top-nav .right-actions span { font-size: 20px; color: #333; cursor: pointer; }
+
+        .content { padding: 12px 12px; }
+
+        .user-bar {
+            background: #fff; border-radius: 12px; padding: 14px 16px;
+            margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;
+        }
+        .user-bar .left { display: flex; align-items: center; gap: 8px; }
+        .user-bar .user-name { font-size: 16px; font-weight: 600; color: #222; }
+        .type-tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 500; }
+        .type-tag.student { background: #E8F5E9; color: #389E0D; }
+
+        .entry-grid { display: flex; gap: 10px; margin-bottom: 10px; }
+        .entry-btn {
+            flex: 1; height: 48px; border-radius: 12px; border: none; background: #fff;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            font-size: 14px; color: #333; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .entry-btn:active { background: #f0f7ff; }
+        .entry-btn .e-icon { font-size: 18px; }
+
+        .section-card {
+            background: #fff; border-radius: 12px; padding: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .section-title { font-size: 15px; font-weight: 600; color: #222; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; }
+
+        .field-label { font-size: 13px; font-weight: 600; color: #555; margin-bottom: 8px; }
+        .field-label .sub { font-size: 12px; font-weight: 400; color: #999; margin-left: 4px; }
+        .eval-textarea {
+            width: 100%; padding: 12px; border: 1px solid #e5e5e5; border-radius: 10px;
+            font-size: 14px; line-height: 1.6; outline: none; resize: none; font-family: inherit;
+            min-height: 240px; background: #fafafa;
+        }
+        .eval-textarea:focus { border-color: #0669FF; background: #fff; box-shadow: 0 0 0 2px rgba(6,105,255,0.08); }
+        .var-row { display: flex; align-items: center; gap: 8px; margin: 10px 0 0; flex-wrap: wrap; }
+        .var-row .var-label { font-size: 12px; color: #999; flex-shrink: 0; }
+        .var-chip {
+            padding: 4px 12px; border-radius: 14px; border: 1px solid #0669FF;
+            background: #E8F0FE; font-size: 12px; color: #0669FF; cursor: pointer; font-weight: 500;
+        }
+        .var-chip:active { background: #D6E8FF; }
+
+        /* 生成结果视图 */
+        .result-label { font-size: 13px; font-weight: 600; color: #333; margin-bottom: 10px; }
+        .result-content {
+            background: #fafafa; border: 1px solid #eee; border-radius: 10px;
+            padding: 14px; font-size: 14px; color: #444; line-height: 1.8;
+            white-space: pre-wrap; min-height: 320px; outline: none;
+        }
+
+        /* 页面内评星区 */
+        .rate-stars { display: flex; gap: 12px; margin-bottom: 8px; }
+        .rate-stars .star {
+            font-size: 34px; color: #e5e5e5; cursor: pointer; line-height: 1;
+            transition: transform 0.1s;
+        }
+        .rate-stars .star.active { color: #FFB400; }
+        .rate-stars .star:active { transform: scale(1.2); }
+        .rate-text { font-size: 13px; color: #999; }
+
+        /* 底部固定按钮 */
+        .bottom-bar {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 430px; background: #fff;
+            padding: 12px 16px 24px; border-top: 1px solid #f0f0f0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.04);
+        }
+        .btn-gen {
+            width: 100%; height: 48px; border: none; border-radius: 24px;
+            background: #0669FF; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer;
+        }
+        .btn-gen:active { opacity: 0.85; }
+        .bottom-two { display: flex; gap: 12px; }
+        .btn-ghost { flex: 1; height: 48px; border: 1px solid #0669FF; border-radius: 24px; background: #fff; color: #0669FF; font-size: 15px; cursor: pointer; }
+        .btn-submit { flex: 1; height: 48px; border: none; border-radius: 24px; background: #D4A84B; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; }
+
+        /* 生成过程弹窗 */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+            z-index: 1000; display: flex; align-items: center; justify-content: center;
+            padding: 24px;
+        }
+        .gen-modal {
+            width: 100%; max-width: 320px;
+            background: #fff; border-radius: 16px;
+            padding: 28px 24px; text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.16);
+        }
+        .gen-modal .gen-icon { font-size: 40px; margin-bottom: 12px; }
+        .gen-modal .gen-title { font-size: 16px; font-weight: 600; color: #222; margin-bottom: 16px; }
+        .gen-modal .gen-progress-text { font-size: 12px; color: #888; margin-bottom: 10px; }
+        .gen-modal .gen-progress-bar {
+            width: 100%; height: 6px; background: #eee; border-radius: 3px; overflow: hidden;
+        }
+        .gen-modal .gen-progress-fill {
+            height: 100%; width: 0%; background: linear-gradient(90deg, #0669FF, #4A9EFF);
+            border-radius: 3px; transition: width 0.3s;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="status-bar">
+            <span class="time">14:18</span>
+            <div class="icons"><span>5G</span><span>◉</span><span>🔋</span></div>
+        </div>
+
+        <div class="top-nav">
+            <span class="back-btn" onclick="history.back()">‹</span>
+            <span class="title">研学评价</span>
+            <div class="right-actions"><span>•••</span><span>◉</span></div>
+        </div>
+
+        <div class="content">
+            <div class="user-bar">
+                <div class="left">
+                    <span class="user-name" id="userName">学生</span>
+                    <span class="type-tag student">学生</span>
+                </div>
+            </div>
+
+            <!-- 两个子页面入口 -->
+            <div class="entry-grid">
+                <button class="entry-btn" onclick="goAi()">
+                    <span class="e-icon">🎬</span>
+                    <span>AI创作</span>
+                </button>
+                <button class="entry-btn" onclick="goScene()">
+                    <span class="e-icon">🌟</span>
+                    <span>专属精彩</span>
+                </button>
+            </div>
+
+            <!-- 提示词输入视图 -->
+            <div id="inputView">
+                <div class="section-card">
+                    <div class="section-title">⭐ 撰写评价</div>
+                    <div class="field-label">评价提示词<span class="sub">输入提示词，AI自动生成评价</span></div>
+                    <textarea class="eval-textarea" id="evalInput" placeholder="请输入评价提示词..."></textarea>
+                    <div class="var-row">
+                        <span class="var-label">插入变量：</span>
+                        <span class="var-chip" onclick="insertVar('{用户姓名}')">{用户姓名}</span>
+                        <span class="var-chip" onclick="insertVar('{课程名称}')">{课程名称}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 评价结果视图 -->
+            <div id="resultView" style="display:none;">
+                <div class="section-card">
+                    <div class="result-label">📄 评价内容</div>
+                    <div class="result-content" id="resultContent" contenteditable="true"></div>
+                </div>
+                <!-- 评星区 -->
+                <div class="section-card" id="rateSection">
+                    <div class="result-label">⭐ 评分</div>
+                    <div class="rate-stars" id="rateStarRow">
+                        <span class="star" data-val="1" onclick="rate(1)">★</span>
+                        <span class="star" data-val="2" onclick="rate(2)">★</span>
+                        <span class="star" data-val="3" onclick="rate(3)">★</span>
+                        <span class="star" data-val="4" onclick="rate(4)">★</span>
+                        <span class="star" data-val="5" onclick="rate(5)">★</span>
+                    </div>
+                    <div class="rate-text" id="rateText">点击星星评分</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部固定按钮 -->
+        <div class="bottom-bar">
+            <div id="genBar">
+                <button class="btn-gen" onclick="startGenerate()">✨ 生成评价</button>
+            </div>
+            <div id="resultBar" class="bottom-two" style="display:none;">
+                <button class="btn-ghost" onclick="regenerate()">🔄 重新生成</button>
+                <button class="btn-submit" onclick="submitEval()">💾 提交评价</button>
+            </div>
+            <div id="rateBar" class="bottom-two" style="display:none;">
+                <button class="btn-ghost" onclick="regenerate()">🔄 重新生成</button>
+                <button class="btn-submit" onclick="editEval()">✏️ 编辑</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 生成过程弹窗 -->
+    <div class="modal-overlay" id="genModal" style="display:none;">
+        <div class="gen-modal">
+            <div class="gen-icon">🤖</div>
+            <div class="gen-title">AI正在生成评价</div>
+            <div class="gen-progress-text" id="genProgressText">正在分析...</div>
+            <div class="gen-progress-bar"><div class="gen-progress-fill" id="genProgressFill"></div></div>
+        </div>
+    </div>
+
+    <script>
+        var currentName = '';
+        var currentRating = 0;
+        var generated = false;
+        var submitted = false;
+
+        function esc(s) { return String(s || '').replace(/</g, '&lt;'); }
+
+        function init() {
+            var params = new URLSearchParams(window.location.search);
+            currentName = params.get('name') || '学生';
+            document.getElementById('userName').textContent = currentName;
+        }
+
+        function goAi() {
+            location.href = 'AI创作.html?name=' + encodeURIComponent(currentName);
+        }
+        function goScene() {
+            location.href = '专属精彩.html?name=' + encodeURIComponent(currentName);
+        }
+
+        function insertVar(v) {
+            var input = document.getElementById('evalInput');
+            var cur = input.value;
+            var start = input.selectionStart;
+            var end = input.selectionEnd;
+            input.value = cur.substring(0, start) + v + cur.substring(end);
+            input.focus();
+            input.selectionStart = input.selectionEnd = start + v.length;
+        }
+
+        function startGenerate() {
+            var text = document.getElementById('evalInput').value.trim();
+            if (!text) { alert('请输入评价提示词'); return; }
+            // 显示生成弹窗
+            document.getElementById('genModal').style.display = 'flex';
+            var fill = document.getElementById('genProgressFill');
+            var ptext = document.getElementById('genProgressText');
+            fill.style.width = '0%';
+            var p = 0;
+            var timer = setInterval(function() {
+                p += Math.random() * 18 + 8;
+                if (p > 100) p = 100;
+                fill.style.width = p + '%';
+                if (p < 50) ptext.textContent = '正在分析...';
+                else if (p < 80) ptext.textContent = '正在生成评价内容...';
+                else ptext.textContent = '即将完成...';
+                if (p >= 100) {
+                    clearInterval(timer);
+                    setTimeout(function() {
+                        document.getElementById('genModal').style.display = 'none';
+                        // 切换为结果视图
+                        document.getElementById('resultContent').textContent = buildResult(text);
+                        document.getElementById('resultContent').setAttribute('contenteditable', 'true');
+                        document.getElementById('inputView').style.display = 'none';
+                        document.getElementById('resultView').style.display = 'block';
+                        document.getElementById('genBar').style.display = 'none';
+                        document.getElementById('resultBar').style.display = 'flex';
+                        generated = true;
+                        submitted = false;
+                        currentRating = 0;
+                        document.getElementById('rateText').textContent = '点击星星评分';
+                        var stars = document.querySelectorAll('#rateStarRow .star');
+                        for (var i = 0; i < stars.length; i++) stars[i].classList.remove('active');
+                    }, 400);
+                }
+            }, 250);
+        }
+
+        function regenerate() {
+            // 回到输入视图，保留提示词
+            submitted = false;
+            document.getElementById('resultView').style.display = 'none';
+            document.getElementById('inputView').style.display = 'block';
+            document.getElementById('genBar').style.display = 'block';
+            document.getElementById('resultBar').style.display = 'none';
+            document.getElementById('rateBar').style.display = 'none';
+            generated = false;
+            currentRating = 0;
+            document.getElementById('rateText').textContent = '点击星星评分';
+            var stars = document.querySelectorAll('#rateStarRow .star');
+            for (var i = 0; i < stars.length; i++) stars[i].classList.remove('active');
+        }
+
+        function buildResult(text) {
+            var name = currentName;
+            var result = '【' + name + '】研学评价\n\n';
+            var kws = text.split(/[、，,]/).filter(function(k) { return k.trim(); });
+            kws.forEach(function(k) {
+                var kw = k.trim().replace(/\{用户姓名\}/g, name).replace(/\{课程名称\}/g, '省博探秘 · AI赋活');
+                if (kw.indexOf('专注') !== -1) result += '▸ ' + name + '在课程中非常专注，认真听取讲解并积极参与互动。\n';
+                else if (kw.indexOf('团队') !== -1) result += '▸ ' + name + '与同学配合默契，主动帮助他人。\n';
+                else if (kw.indexOf('动手') !== -1) result += '▸ ' + name + '动手能力出色，在实践环节中表现出色。\n';
+                else if (kw.indexOf('互动') !== -1) result += '▸ ' + name + '课堂互动积极，勇于提问和表达想法。\n';
+                else result += '▸ ' + name + '在本次研学中表现良好，值得肯定。\n';
+            });
+            result += '\n总体评价：' + name + '在本次课程中表现优秀，积极参与各个环节，收获丰富。';
+            return result;
+        }
+
+        function rate(val) {
+            if (submitted) return; // 提交后只读
+            currentRating = val;
+            var stars = document.querySelectorAll('#rateStarRow .star');
+            for (var i = 0; i < stars.length; i++) {
+                if (i < val) stars[i].classList.add('active');
+                else stars[i].classList.remove('active');
+            }
+            var textMap = { 1: '非常差', 2: '较差', 3: '一般', 4: '满意', 5: '非常满意' };
+            document.getElementById('rateText').textContent = val + '星 · ' + (textMap[val] || '');
+        }
+
+        function submitEval() {
+            if (!generated) { alert('请先生成评价'); return; }
+            if (currentRating === 0) { alert('请先点击星星评分'); return; }
+            // 停留在本页面，评星和内容变只读，底部按钮变为重新生成 + 编辑
+            submitted = true;
+            var textMap = { 1: '非常差', 2: '较差', 3: '一般', 4: '满意', 5: '非常满意' };
+            document.getElementById('rateText').textContent = '已评分：' + currentRating + '星 · ' + (textMap[currentRating] || '');
+            document.getElementById('resultContent').setAttribute('contenteditable', 'false');
+            document.getElementById('resultBar').style.display = 'none';
+            document.getElementById('rateBar').style.display = 'flex';
+        }
+
+        function editEval() {
+            // 让评星和内容重新可编辑，底部按钮变为重新生成 + 提交评价
+            submitted = false;
+            document.getElementById('resultContent').setAttribute('contenteditable', 'true');
+            var textMap = { 1: '非常差', 2: '较差', 3: '一般', 4: '满意', 5: '非常满意' };
+            document.getElementById('rateText').textContent = currentRating > 0 ? currentRating + '星 · ' + (textMap[currentRating] || '') : '点击星星评分';
+            document.getElementById('rateBar').style.display = 'none';
+            document.getElementById('resultBar').style.display = 'flex';
+        }
+
+        init();
+    </script>
+</body>
+</html>

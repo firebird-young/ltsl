@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>专属精彩</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f6f8;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 430px;
+            min-height: 100vh;
+            background: #f5f6f8;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            padding-bottom: 100px;
+        }
+        .status-bar {
+            height: 44px; background: #fff;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; padding: 0 16px;
+        }
+        .status-bar .time { position: absolute; left: 20px; font-size: 15px; font-weight: 600; color: #333; }
+        .status-bar .icons { position: absolute; right: 16px; display: flex; gap: 4px; align-items: center; font-size: 14px; color: #333; }
+        .top-nav {
+            height: 50px; background: #fff;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; padding: 0 16px; border-bottom: 1px solid #f5f5f5;
+        }
+        .top-nav .back-btn { position: absolute; left: 12px; font-size: 26px; color: #333; cursor: pointer; }
+        .top-nav .title { font-size: 17px; font-weight: 600; color: #333; }
+        .top-nav .right-actions { position: absolute; right: 16px; display: flex; gap: 12px; align-items: center; }
+        .top-nav .right-actions span { font-size: 20px; color: #333; cursor: pointer; }
+        .content { padding: 12px 12px; }
+
+        .user-bar {
+            background: #fff; border-radius: 12px; padding: 14px 16px;
+            margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;
+        }
+        .user-bar .left { display: flex; align-items: center; gap: 8px; }
+        .user-bar .user-name { font-size: 16px; font-weight: 600; color: #222; }
+        .type-tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 500; }
+        .type-tag.student { background: #E8F5E9; color: #389E0D; }
+
+        .section-card {
+            background: #fff; border-radius: 12px; padding: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .section-title { font-size: 15px; font-weight: 600; color: #222; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; }
+
+        .row-label { font-size: 13px; font-weight: 600; color: #555; margin: 6px 0 10px; display: flex; align-items: center; gap: 4px; }
+        .row-label:first-child { margin-top: 0; }
+
+        /* 移动端上传：网格预览 + 添加块 */
+        .upload-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+        }
+        .ug-item {
+            position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden;
+            background: #f0f0f0;
+        }
+        .ug-item img, .ug-item video { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .ug-item .ug-video-tag {
+            position: absolute; top: 4px; left: 4px;
+            background: rgba(0,0,0,0.55); color: #fff; font-size: 10px;
+            padding: 2px 6px; border-radius: 4px;
+        }
+        .ug-item .ug-del {
+            position: absolute; top: 4px; right: 4px;
+            width: 22px; height: 22px; border-radius: 50%;
+            background: rgba(0,0,0,0.5); color: #fff; font-size: 12px; border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .ug-add {
+            aspect-ratio: 1; border-radius: 10px;
+            border: 1.5px dashed #d0d5e0; background: #fafbfc;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 4px; cursor: pointer; color: #999;
+        }
+        .ug-add:active { border-color: #0669FF; background: #F0F6FF; }
+        .ug-add .plus { font-size: 30px; line-height: 1; }
+        .ug-add .txt { font-size: 12px; }
+        .ug-add input { display: none; }
+        .upload-hint { font-size: 11px; color: #bbb; margin-top: 8px; }
+
+        .bottom-bar {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 430px; background: #fff;
+            padding: 12px 16px 24px; border-top: 1px solid #f0f0f0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.04);
+        }
+        .save-btn {
+            width: 100%; height: 48px; border: none; border-radius: 24px;
+            background: #D4A84B; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer;
+        }
+        .save-btn:active { opacity: 0.85; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="status-bar">
+            <span class="time">14:18</span>
+            <div class="icons"><span>5G</span><span>◉</span><span>🔋</span></div>
+        </div>
+        <div class="top-nav">
+            <span class="back-btn" onclick="history.back()">‹</span>
+            <span class="title">专属精彩</span>
+            <div class="right-actions"><span>•••</span><span>◉</span></div>
+        </div>
+        <div class="content">
+            <div class="user-bar">
+                <div class="left">
+                    <span class="user-name" id="userName">学生</span>
+                    <span class="type-tag student">学生</span>
+                </div>
+            </div>
+
+            <div class="section-card">
+                <div class="section-title">🌟 上传专属精彩</div>
+
+                <div class="row-label">🎬 视频</div>
+                <div class="upload-grid" id="videoGrid">
+                    <div class="ug-add" onclick="document.getElementById('videoInput').click()">
+                        <span class="plus">+</span>
+                        <span class="txt">上传视频</span>
+                    </div>
+                    <input type="file" id="videoInput" accept="video/*" multiple onchange="handleVideo(this.files)" style="display:none;">
+                </div>
+                <div class="upload-hint">支持 mp4，单文件最大 100MB</div>
+
+                <div class="row-label" style="margin-top:16px;">🖼️ 图片</div>
+                <div class="upload-grid" id="imageGrid">
+                    <div class="ug-add" onclick="document.getElementById('imageInput').click()">
+                        <span class="plus">+</span>
+                        <span class="txt">上传图片</span>
+                    </div>
+                    <input type="file" id="imageInput" accept="image/*" multiple onchange="handleImage(this.files)" style="display:none;">
+                </div>
+                <div class="upload-hint">支持 jpg/png，单文件最大 20MB</div>
+            </div>
+        </div>
+
+        <div class="bottom-bar">
+            <button class="save-btn" onclick="saveScene()">💾 保存专属精彩</button>
+        </div>
+    </div>
+
+    <script>
+        var currentName = '';
+        var videoFiles = [];
+        var imageFiles = [];
+        function esc(s) { return String(s || '').replace(/</g, '&lt;'); }
+
+        function init() {
+            var params = new URLSearchParams(window.location.search);
+            currentName = params.get('name') || '学生';
+            document.getElementById('userName').textContent = currentName;
+            renderVideo();
+            renderImage();
+        }
+
+        function handleVideo(fileList) { addFiles(fileList, videoFiles, 'video'); }
+        function handleImage(fileList) { addFiles(fileList, imageFiles, 'image'); }
+
+        function addFiles(fileList, targetArr, kind) {
+            for (var i = 0; i < fileList.length; i++) {
+                var f = fileList[i];
+                if (targetArr.some(function(x) { return x.name === f.name && x.size === f.size; })) continue;
+                (function(file) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        targetArr.push({ name: file.name, type: file.type, size: file.size, dataUrl: e.target.result });
+                        if (kind === 'video') renderVideo(); else renderImage();
+                    };
+                    reader.readAsDataURL(file);
+                })(f);
+            }
+        }
+
+        function renderVideo() {
+            var grid = document.getElementById('videoGrid');
+            var html = '';
+            for (var i = 0; i < videoFiles.length; i++) {
+                var item = videoFiles[i];
+                html += '<div class="ug-item">'
+                    + '<span class="ug-video-tag">▶ 视频</span>'
+                    + '<video src="' + item.dataUrl + '"></video>'
+                    + '<button class="ug-del" onclick="removeFile(\'video\',' + i + ')">×</button>'
+                    + '</div>';
+            }
+            html += '<div class="ug-add" onclick="document.getElementById(\'videoInput\').click()"><span class="plus">+</span><span class="txt">上传视频</span></div>';
+            grid.innerHTML = html;
+        }
+        function renderImage() {
+            var grid = document.getElementById('imageGrid');
+            var html = '';
+            for (var i = 0; i < imageFiles.length; i++) {
+                var item = imageFiles[i];
+                html += '<div class="ug-item">'
+                    + '<img src="' + item.dataUrl + '" alt="' + esc(item.name) + '">'
+                    + '<button class="ug-del" onclick="removeFile(\'image\',' + i + ')">×</button>'
+                    + '</div>';
+            }
+            html += '<div class="ug-add" onclick="document.getElementById(\'imageInput\').click()"><span class="plus">+</span><span class="txt">上传图片</span></div>';
+            grid.innerHTML = html;
+        }
+        function removeFile(kind, idx) {
+            if (kind === 'video') { videoFiles.splice(idx, 1); renderVideo(); }
+            else { imageFiles.splice(idx, 1); renderImage(); }
+        }
+        function saveScene() {
+            if (videoFiles.length === 0 && imageFiles.length === 0) { alert('请先上传视频或图片'); return; }
+            alert('✅ 专属精彩保存成功！');
+        }
+
+        init();
+    </script>
+</body>
+</html>
