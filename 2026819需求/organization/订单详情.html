@@ -276,6 +276,45 @@
             color: #B8860B;
         }
         .traveler-row .action-btn:active { opacity: 0.8; }
+
+        /* ===== 注释说明框 ===== */
+        .note-card {
+            position: fixed;
+            z-index: 9999;
+            width: 290px;
+            background: #fff;
+            border: 1.5px dashed #B8860B;
+            border-radius: 12px;
+            padding: 12px 14px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+            font-size: 13px;
+            line-height: 1.65;
+            color: #555;
+            pointer-events: none;
+        }
+        .note-card .note-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #B8860B;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .note-card .note-text { margin-bottom: 8px; }
+        .note-card .note-text:last-child { margin-bottom: 0; }
+        .note-card .note-highlight {
+            background: #FFFBE8;
+            border-radius: 8px;
+            padding: 8px 10px;
+            color: #8a6d00;
+        }
+        .note-card .note-highlight strong { color: #B8860B; }
+        .note-line {
+            position: fixed;
+            z-index: 9998;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -316,6 +355,14 @@
 
         <div class="group-list" id="groupList"></div>
     </div>
+
+    <!-- 注释说明框 -->
+    <div class="note-card" id="noteCard" style="display:none;">
+        <div class="note-title">✏️ 产品说明</div>
+        <div class="note-text">同用户小程序里AI创作页面，原用户小程序分享功能继续保留。</div>
+        <div class="note-text note-highlight">改动：AI创作页面成员只展示<strong>主类型</strong>的成员；研学报告页只针对<strong>主类型</strong>成员。</div>
+    </div>
+    <svg class="note-line" id="noteLine" style="display:none;"></svg>
 
     <script>
         // 每个订单下有多条用户（出行人）数据
@@ -406,7 +453,57 @@
             location.href = '研学报告管理.html';
         }
 
+        /* ===== 注释线：从 AI创作 按钮引出到说明框 ===== */
+        function drawAnnotation() {
+            var btn = document.querySelector('.btn-ai');
+            var note = document.getElementById('noteCard');
+            var line = document.getElementById('noteLine');
+            if (!btn) { note.style.display = 'none'; line.style.display = 'none'; return; }
+
+            var br = btn.getBoundingClientRect();
+            var cardW = 290;
+            var margin = 16;
+
+            // 说明框放在右侧（屏幕窄时自动内收）
+            var cardX = Math.min(br.right + 24, window.innerWidth - cardW - margin);
+            cardX = Math.max(margin, cardX);
+            var cardTop = Math.max(20, br.top - 70);
+
+            note.style.display = 'block';
+            note.style.left = cardX + 'px';
+            note.style.top = cardTop + 'px';
+
+            // 锚点：按钮右中 / 说明框左中
+            var ax = br.right, ay = br.top + br.height / 2;
+            var cx = cardX, cy = cardTop + note.offsetHeight / 2;
+            var midX = (ax + cx) / 2;
+            var pts = [[ax, ay], [midX, ay], [midX, cy], [cx, cy]];
+
+            var xs = pts.map(function(p) { return p[0]; });
+            var ys = pts.map(function(p) { return p[1]; });
+            var minX = Math.min.apply(null, xs) - 6;
+            var maxX = Math.max.apply(null, xs) + 6;
+            var minY = Math.min.apply(null, ys) - 6;
+            var maxY = Math.max.apply(null, ys) + 6;
+
+            line.style.display = 'block';
+            line.style.left = minX + 'px';
+            line.style.top = minY + 'px';
+            line.style.width = (maxX - minX) + 'px';
+            line.style.height = (maxY - minY) + 'px';
+            line.setAttribute('viewBox', '0 0 ' + (maxX - minX) + ' ' + (maxY - minY));
+
+            var points = pts.map(function(p) {
+                return (p[0] - minX) + ',' + (p[1] - minY);
+            }).join(' ');
+            line.innerHTML = '<polyline points="' + points + '" fill="none" stroke="#B8860B" stroke-width="1.5" stroke-dasharray="5,4" stroke-linecap="round"/>'
+                + '<circle cx="' + (ax - minX) + '" cy="' + (ay - minY) + '" r="4" fill="#B8860B"/>';
+        }
+
         renderGroups();
+        drawAnnotation();
+        window.addEventListener('scroll', drawAnnotation);
+        window.addEventListener('resize', drawAnnotation);
     </script>
 </body>
 </html>
