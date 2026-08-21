@@ -20,7 +20,7 @@
             background: #f5f6f8;
             position: relative;
             box-shadow: 0 0 20px rgba(0,0,0,0.05);
-            padding-bottom: 100px;
+            padding-bottom: 24px;
         }
         .status-bar {
             height: 44px; background: #fff;
@@ -48,6 +48,15 @@
         .user-bar .user-name { font-size: 16px; font-weight: 600; color: #222; }
         .type-tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 500; }
         .type-tag.student { background: #E8F5E9; color: #389E0D; }
+
+        .entry-grid { display: flex; gap: 10px; margin-bottom: 10px; }
+        .entry-btn {
+            flex: 1; height: 48px; border-radius: 12px; border: none; background: #fff;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            font-size: 14px; color: #333; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .entry-btn:active { background: #f0f7ff; }
+        .entry-btn .e-icon { font-size: 18px; }
 
         .section-card {
             background: #fff; border-radius: 12px; padding: 16px;
@@ -90,17 +99,34 @@
         .ug-add input { display: none; }
         .upload-hint { font-size: 11px; color: #bbb; margin-top: 8px; }
 
-        .bottom-bar {
+        /* 拍照/相册选择面板 */
+        .sheet-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.45); z-index: 9999;
+        }
+        .sheet-overlay.show { display: block; }
+        .action-sheet {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
             width: 100%; max-width: 430px; background: #fff;
-            padding: 12px 16px 24px; border-top: 1px solid #f0f0f0;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.04);
+            border-radius: 16px 16px 0 0; z-index: 10000;
+            display: none; flex-direction: column;
+            animation: sheetUp 0.25s ease-out;
         }
-        .save-btn {
-            width: 100%; height: 48px; border: none; border-radius: 24px;
-            background: #D4A84B; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer;
+        .action-sheet.show { display: flex; }
+        @keyframes sheetUp { from { transform: translate(-50%, 100%); } to { transform: translate(-50%, 0); } }
+        .action-sheet .as-item {
+            height: 54px; display: flex; align-items: center; justify-content: center;
+            font-size: 16px; color: #333; cursor: pointer; border: none;
+            background: #fff; border-bottom: 1px solid #f0f0f0; font-family: inherit;
         }
-        .save-btn:active { opacity: 0.85; }
+        .action-sheet .as-item:active { background: #f5f5f5; }
+        .action-sheet .as-item.primary { color: #0669FF; font-weight: 600; }
+        .action-sheet .as-cancel {
+            height: 54px; display: flex; align-items: center; justify-content: center;
+            font-size: 16px; color: #999; cursor: pointer; border: none;
+            background: #f8f8f8; margin-top: 8px; border-radius: 0 0 16px 16px; font-family: inherit;
+        }
+        .action-sheet .as-cancel:active { background: #f0f0f0; }
     </style>
 </head>
 <body>
@@ -122,41 +148,93 @@
                 </div>
             </div>
 
+            <div class="entry-grid">
+                <button class="entry-btn" onclick="goAiWorks()">
+                    <span class="e-icon">🎬</span>
+                    <span>AI作品</span>
+                </button>
+                <button class="entry-btn" onclick="goEval()">
+                    <span class="e-icon">⭐</span>
+                    <span>研学评价</span>
+                </button>
+            </div>
+
             <div class="section-card">
                 <div class="section-title">🌟 上传专属精彩</div>
 
                 <div class="row-label">🎬 视频</div>
                 <div class="upload-grid" id="videoGrid">
-                    <div class="ug-add" onclick="document.getElementById('videoInput').click()">
+                    <div class="ug-add" onclick="showUploadSheet('video')">
                         <span class="plus">+</span>
                         <span class="txt">上传视频</span>
                     </div>
-                    <input type="file" id="videoInput" accept="video/*" multiple onchange="handleVideo(this.files)" style="display:none;">
+                    <input type="file" id="videoInput" accept="video/*" multiple onchange="handleVideo(this.files); this.value='';" style="display:none;">
+                    <input type="file" id="videoCamera" accept="video/*" capture="environment" onchange="handleVideo(this.files); this.value='';" style="display:none;">
                 </div>
                 <div class="upload-hint">支持 mp4，单文件最大 100MB</div>
 
                 <div class="row-label" style="margin-top:16px;">🖼️ 图片</div>
                 <div class="upload-grid" id="imageGrid">
-                    <div class="ug-add" onclick="document.getElementById('imageInput').click()">
+                    <div class="ug-add" onclick="showUploadSheet('image')">
                         <span class="plus">+</span>
                         <span class="txt">上传图片</span>
                     </div>
-                    <input type="file" id="imageInput" accept="image/*" multiple onchange="handleImage(this.files)" style="display:none;">
+                    <input type="file" id="imageInput" accept="image/*" multiple onchange="handleImage(this.files); this.value='';" style="display:none;">
+                    <input type="file" id="imageCamera" accept="image/*" capture="environment" onchange="handleImage(this.files); this.value='';" style="display:none;">
                 </div>
                 <div class="upload-hint">支持 jpg/png，单文件最大 20MB</div>
             </div>
         </div>
+    </div>
 
-        <div class="bottom-bar">
-            <button class="save-btn" onclick="saveScene()">💾 保存专属精彩</button>
-        </div>
+    <!-- 拍照/相册选择面板 -->
+    <div class="sheet-overlay" id="sheetOverlay" onclick="closeUploadSheet()"></div>
+    <div class="action-sheet" id="actionSheet">
+        <button class="as-item primary" onclick="chooseCamera()">📷 拍照/录像</button>
+        <button class="as-item" onclick="chooseAlbum()">🖼️ 从相册选择</button>
+        <button class="as-cancel" onclick="closeUploadSheet()">取消</button>
     </div>
 
     <script>
         var currentName = '';
         var videoFiles = [];
         var imageFiles = [];
+        var currentUploadType = '';
         function esc(s) { return String(s || '').replace(/</g, '&lt;'); }
+
+        function goAiWorks() {
+            location.href = 'AI创作.html?name=' + encodeURIComponent(currentName);
+        }
+        function goEval() {
+            location.href = '研学用户评价.html?name=' + encodeURIComponent(currentName);
+        }
+
+        /* 拍照/相册选择 */
+        function showUploadSheet(type) {
+            currentUploadType = type;
+            document.getElementById('sheetOverlay').classList.add('show');
+            document.getElementById('actionSheet').classList.add('show');
+        }
+        function closeUploadSheet() {
+            document.getElementById('sheetOverlay').classList.remove('show');
+            document.getElementById('actionSheet').classList.remove('show');
+        }
+        function chooseCamera() {
+            closeUploadSheet();
+            if (currentUploadType === 'video') {
+                document.getElementById('videoCamera').click();
+            } else {
+                document.getElementById('imageCamera').click();
+            }
+        }
+        function chooseAlbum() {
+            closeUploadSheet();
+            if (currentUploadType === 'video') {
+                document.getElementById('videoInput').click();
+            } else {
+                document.getElementById('imageInput').click();
+            }
+        }
 
         function init() {
             var params = new URLSearchParams(window.location.search);
@@ -195,7 +273,7 @@
                     + '<button class="ug-del" onclick="removeFile(\'video\',' + i + ')">×</button>'
                     + '</div>';
             }
-            html += '<div class="ug-add" onclick="document.getElementById(\'videoInput\').click()"><span class="plus">+</span><span class="txt">上传视频</span></div>';
+            html += '<div class="ug-add" onclick="showUploadSheet(\'video\')"><span class="plus">+</span><span class="txt">上传视频</span></div>';
             grid.innerHTML = html;
         }
         function renderImage() {
@@ -208,16 +286,12 @@
                     + '<button class="ug-del" onclick="removeFile(\'image\',' + i + ')">×</button>'
                     + '</div>';
             }
-            html += '<div class="ug-add" onclick="document.getElementById(\'imageInput\').click()"><span class="plus">+</span><span class="txt">上传图片</span></div>';
+            html += '<div class="ug-add" onclick="showUploadSheet(\'image\')"><span class="plus">+</span><span class="txt">上传图片</span></div>';
             grid.innerHTML = html;
         }
         function removeFile(kind, idx) {
             if (kind === 'video') { videoFiles.splice(idx, 1); renderVideo(); }
             else { imageFiles.splice(idx, 1); renderImage(); }
-        }
-        function saveScene() {
-            if (videoFiles.length === 0 && imageFiles.length === 0) { alert('请先上传视频或图片'); return; }
-            alert('✅ 专属精彩保存成功！');
         }
 
         init();

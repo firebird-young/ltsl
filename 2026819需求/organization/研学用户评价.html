@@ -52,15 +52,6 @@
         .type-tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 500; }
         .type-tag.student { background: #E8F5E9; color: #389E0D; }
 
-        .entry-grid { display: flex; gap: 10px; margin-bottom: 10px; }
-        .entry-btn {
-            flex: 1; height: 48px; border-radius: 12px; border: none; background: #fff;
-            display: flex; align-items: center; justify-content: center; gap: 6px;
-            font-size: 14px; color: #333; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-        }
-        .entry-btn:active { background: #f0f7ff; }
-        .entry-btn .e-icon { font-size: 18px; }
-
         .section-card {
             background: #fff; border-radius: 12px; padding: 16px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.04);
@@ -163,18 +154,6 @@
                 </div>
             </div>
 
-            <!-- 两个子页面入口 -->
-            <div class="entry-grid">
-                <button class="entry-btn" onclick="goAi()">
-                    <span class="e-icon">🎬</span>
-                    <span>AI创作</span>
-                </button>
-                <button class="entry-btn" onclick="goScene()">
-                    <span class="e-icon">🌟</span>
-                    <span>专属精彩</span>
-                </button>
-            </div>
-
             <!-- 提示词输入视图 -->
             <div id="inputView">
                 <div class="section-card">
@@ -248,13 +227,6 @@
             var params = new URLSearchParams(window.location.search);
             currentName = params.get('name') || '学生';
             document.getElementById('userName').textContent = currentName;
-        }
-
-        function goAi() {
-            location.href = 'AI创作.html?name=' + encodeURIComponent(currentName);
-        }
-        function goScene() {
-            location.href = '专属精彩.html?name=' + encodeURIComponent(currentName);
         }
 
         function insertVar(v) {

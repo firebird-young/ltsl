@@ -202,6 +202,12 @@
         .info-row .label { font-size: 14px; color: #666; }
         .info-row .value { font-size: 14px; color: #333; font-weight: 500; }
         .info-row .price { color: #E53935; }
+        .info-row .pay-detail {
+            display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+            font-weight: 400; font-size: 13px; color: #555;
+        }
+        .info-row .pay-detail i { font-style: normal; color: #333; font-weight: 500; }
+        .pay-detail-row { align-items: flex-start; }
 
         /* 出行人 */
         .traveler-card {
@@ -222,7 +228,8 @@
         .traveler-item .name { font-size: 15px; color: #333; font-weight: 500; }
         .traveler-item .name .gender { font-size: 12px; color: #999; margin-left: 6px; font-weight: normal; }
         .traveler-item .id-card { font-size: 13px; color: #999; }
-        .traveler-item .tag { font-size: 12px; color: #0669FF; background: #f0f7ff; padding: 3px 8px; border-radius: 4px; }
+        .traveler-item .tag { font-size: 12px; color: #0669FF; background: #f0f7ff; padding: 3px 8px; border-radius: 4px; flex-shrink: 0; }
+        .traveler-item .tag.tag-parent { color: #FF8F1F; background: #FFF7E6; }
 
         /* 悬浮首页 */
         .home-float {
@@ -232,6 +239,30 @@
             font-weight: 600; box-shadow: 0 2px 10px rgba(229,57,53,0.4);
             display: inline-flex; align-items: center; gap: 5px;
         }
+
+        /* ── 功能说明面板（始终位于手机框右侧）── */
+        .doc-panel {
+            position: fixed;
+            left: 50%;
+            top: 24px;
+            margin-left: 235px;
+            width: 560px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 20px rgba(0,0,0,.08);
+            padding: 24px 28px;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', Arial, sans-serif;
+            line-height: 1.7; font-size: 14px; color: #333;
+        }
+        .doc-panel::-webkit-scrollbar { width: 5px; }
+        .doc-panel::-webkit-scrollbar-thumb { background: #d0d5e0; border-radius: 3px; }
+        .doc-panel .doc-title { font-size: 20px; font-weight: 700; color: #1F3864; border-bottom: 2px solid #2E75B6; padding-bottom: 10px; margin-bottom: 16px; }
+        .doc-panel h3 { font-size: 16px; font-weight: 600; color: #2E75B6; margin: 16px 0 8px; }
+        .doc-panel p { font-size: 13px; color: #555; margin-bottom: 6px; }
+        .doc-panel ul { padding-left: 20px; margin: 4px 0 8px; }
+        .doc-panel li { margin-bottom: 3px; font-size: 13px; color: #555; }
     </style>
 </head>
 <body>
@@ -273,12 +304,11 @@
                     <div class="name">研學内测</div>
                     <div class="meta">时间：2026-08-25</div>
                     <div class="meta">场次：内测</div>
-                    <div class="tag">青少年</div>
                 </div>
                 <div class="right-col">
                     <span class="status-tag">待出行</span>
                     <span class="count">x1</span>
-                    <span class="price">实付款 ¥<strong>0.01</strong></span>
+                    <span class="price">实付款 ¥<strong>199</strong></span>
                 </div>
             </div>
 
@@ -302,11 +332,18 @@
             <div class="info-card">
                 <div class="info-row">
                     <span class="label">总金额</span>
-                    <span class="value">¥ 0.01</span>
+                    <span class="value">¥ 199</span>
+                </div>
+                <div class="info-row pay-detail-row">
+                    <span class="label">付款明细</span>
+                    <span class="value pay-detail">
+                        <span>学生 <i>¥149</i> ×1</span>
+                        <span>家长 <i>¥50</i> ×1</span>
+                    </span>
                 </div>
                 <div class="info-row">
                     <span class="label">实付款</span>
-                    <span class="value price">¥ 0.01</span>
+                    <span class="value price">¥ 199</span>
                 </div>
                 <div class="info-row">
                     <span class="label">订单编号</span>
@@ -334,13 +371,60 @@
                         <div class="name">媛姐 <span class="gender">女</span></div>
                         <div class="id-card">511621***********2X</div>
                     </div>
-                    <span class="tag">出行人</span>
+                    <span class="tag">学生</span>
+                </div>
+                <div class="traveler-item">
+                    <div class="left">
+                        <div class="name">李建国 <span class="gender">男</span></div>
+                        <div class="id-card">320102***********15</div>
+                    </div>
+                    <span class="tag tag-parent">家长</span>
                 </div>
             </div>
         </div>
     </div>
 
     <a href="AI创作和研学报告.html" class="home-float">🏠 首页</a>
+
+<!-- 功能说明面板 -->
+<div class="doc-panel">
+    <div class="doc-title">订单详情（待核销）· 功能说明</div>
+
+    <h3>1. 页面用途</h3>
+    <p>订单详情（待核销）页用于展示<b>待出行</b>的订单信息。</p>
+
+    <h3>2. 顶部状态提醒</h3>
+    <ul>
+        <li>拼团成功横幅：绿色醒目提示"恭喜你，拼团成功"，副文案分为两种情况：
+            <ul>
+                <li><b>已开启自主核销</b>：出行前 x 天开放自主核销，用户通过此页滑动核销后进入研学企微群，入群可向老师咨询活动详情。</li>
+                <li><b>未开启自主核销</b>：请按照活动时间准时到场参与，祝您活动愉快！</li>
+            </ul>
+        </li>
+        <li>课程信息卡片：展示课程封面、名称（研学内测）、活动时间、场次；右侧显示<b>待出行</b>状态、数量 x1 及<b>实付款金额</b>。</li>
+    </ul>
+
+    <h3>3. 核销二维码</h3>
+    <ul>
+        <li><b>二维码</b>：展示本次订单专属核销码，核销后失效。</li>
+        <li><b>滑动核销</b>：必须是开启了自主核销，且已经达到设置的自主核销开放时间才进行展示。</li>
+    </ul>
+
+    <h3>4. 订单信息</h3>
+    <ul>
+        <li><b>总金额</b>：订单总价（学生 ¥149×1 + 家长 ¥50×1）。</li>
+        <li><b>付款明细</b>：分规格展示单价与数量（学生 ¥149 ×1、家长 ¥50 ×1）。</li>
+        <li><b>实付款</b>：实际支付金额（¥199）。</li>
+        <li>订单编号 / 创建时间 / 拼团订单编号 / 联系手机号。</li>
+    </ul>
+    <p>注：其他状态的订单也采用相同的订单信息结构。</p>
+
+    <h3>5. 出行人</h3>
+    <ul>
+        <li>展示出行人<b>姓名 + 性别 + 身份证号</b>，右侧带类型标签：<b>学生</b> / <b>家长</b>，便于核对订单人员组成。</li>
+        <li>标签配色：<b>主类型</b>一个颜色（学生-蓝），<b>其他类型</b>一个颜色（家长-橙）。</li>
+    </ul>
+</div>
 
 <script>
     (function() {

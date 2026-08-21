@@ -55,6 +55,12 @@
             background: #FAFBFF; color: var(--theme); font-size: 13px; font-weight: 600;
             padding: 8px 16px;
         }
+        .send-tag {
+            font-size: 11px; font-weight: 500; border-radius: 4px;
+            padding: 1px 8px; margin-left: 8px; white-space: nowrap;
+        }
+        .send-tag.auto { color: #389E0D; background: #EAF8EE; }
+        .send-tag.manual { color: #D48806; background: #FFF7E6; }
         /* 场景+条件 */
         .scene-cell { display: flex; flex-direction: column; gap: 5px; }
         .scene-name { font-weight: 600; color: #222; white-space: nowrap; }
@@ -92,7 +98,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="group-row"><td colspan="2">拼团结果短信（3 条）</td></tr>
+                    <tr class="group-row"><td colspan="2">拼团结果短信（3 条）<span class="send-tag auto">系统自动发送</span></td></tr>
                     <tr>
                         <td>
                             <div class="scene-cell">
@@ -120,7 +126,7 @@
                         </td>
                         <td class="sms-content">【离泰数链】温馨提醒：您报名的研学活动「省博探秘・AI 赋活」「2026.08.18」「上午场」已成团。请按照活动时间准时到场参与，祝您活动愉快！</td>
                     </tr>
-                    <tr class="group-row"><td colspan="2">活动前短信（2 条）</td></tr>
+                    <tr class="group-row"><td colspan="2">活动前短信（2 条）<span class="send-tag manual">后台管理员手动触发</span></td></tr>
                     <tr>
                         <td>
                             <div class="scene-cell">
@@ -154,7 +160,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="group-row"><td colspan="2">拼团结果通知（3 条）</td></tr>
+                    <tr class="group-row"><td colspan="2">拼团结果通知（3 条）<span class="send-tag auto">系统自动发送</span></td></tr>
                     <tr>
                         <td>
                             <div class="scene-cell">
@@ -194,7 +200,7 @@
                             <div class="kv-row"><span class="kv-key">备注：</span><span class="kv-val">请按照活动时间准时到场参与，祝您活动愉快！</span></div>
                         </td>
                     </tr>
-                    <tr class="group-row"><td colspan="2">活动前提醒（2 条）</td></tr>
+                    <tr class="group-row"><td colspan="2">活动前提醒（2 条）<span class="send-tag manual">后台管理员手动触发</span></td></tr>
                     <tr>
                         <td>
                             <div class="scene-cell">

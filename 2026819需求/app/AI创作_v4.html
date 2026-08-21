@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI创作_v4 - 离泰数链</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            background: #e8e8e8;
+        }
+        .page-wrap {
+            display: flex;
+            gap: 20px;
+            padding: 0;
+            min-height: 100vh;
+            align-items: flex-start;
+            justify-content: center;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 430px;
+            background: #f3f0fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: visible;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
+        .content-area { flex: 1; padding: 0 14px 90px; }
+
+        .status-bar {
+            height: 44px;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            font-size: 14px;
+            color: #333;
+            flex-shrink: 0;
+        }
+        .status-bar .right { display: flex; align-items: center; gap: 4px; }
+
+        .top-nav {
+            height: 44px;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            flex-shrink: 0;
+        }
+        .top-nav .back-btn {
+            width: 32px; height: 32px;
+            background: transparent; border: none;
+            font-size: 22px; color: #333;
+            cursor: pointer; display: flex;
+            align-items: center; justify-content: center;
+        }
+        .top-nav .title { font-size: 16px; font-weight: 600; color: #333; }
+        .top-nav .right-icons { display: flex; gap: 10px; }
+        .top-nav .right-icon {
+            width: 30px; height: 30px; border-radius: 50%;
+            background: rgba(255,255,255,0.6);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; color: #333; cursor: pointer;
+        }
+
+        .member-card {
+            background: rgba(255,255,255,0.6);
+            border-radius: 14px; padding: 14px 16px;
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 16px; backdrop-filter: blur(10px);
+        }
+        .member-card .mc-left { display: flex; align-items: center; gap: 12px; }
+        .member-card .mc-avatar {
+            width: 44px; height: 44px; border-radius: 50%;
+            background: linear-gradient(135deg, #4285F4, #1A73E8);
+            color: #fff; display: flex; align-items: center;
+            justify-content: center; font-size: 18px; font-weight: 600; flex-shrink: 0;
+        }
+        .member-card .mc-info .mc-name { font-size: 16px; font-weight: 600; color: #333; }
+        .member-card .mc-info .mc-hint { font-size: 12px; color: #999; margin-top: 2px; }
+        .member-card .mc-switch {
+            padding: 6px 14px; border: 1px solid #4285F4; border-radius: 16px;
+            font-size: 13px; color: #4285F4; background: rgba(255,255,255,0.6);
+            cursor: pointer; display: flex; align-items: center; gap: 4px;
+        }
+
+        .course-tag {
+            background: rgba(174, 207, 255, 0.4); border-radius: 10px;
+            padding: 12px 16px; font-size: 14px; font-weight: 500;
+            color: #1A1A1A; margin-bottom: 16px;
+        }
+
+        .creating-section, .done-section {
+            background: rgba(255,255,255,0.6); border-radius: 14px;
+            padding: 14px 16px; margin-bottom: 16px; backdrop-filter: blur(10px);
+        }
+        .section-header {
+            display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;
+        }
+        .section-header .sh-left { display: flex; align-items: center; gap: 8px; }
+        .section-header .sh-title { font-size: 15px; font-weight: 600; color: #333; }
+        .section-header .sh-count { font-size: 14px; color: #666; }
+        .section-header .sh-count strong { color: #333; }
+
+        .creating-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .creating-card {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, #f0f0f5, #e8e8f0);
+            border-radius: 10px; position: relative; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .creating-card .cc-icon { font-size: 36px; color: #b0b0c0; opacity: 0.7; }
+        .creating-card .cc-progress {
+            position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, #4285F4, #1A73E8);
+        }
+
+        .done-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .done-card {
+            background: linear-gradient(135deg, #f0f0fa, #e6e1f5);
+            border-radius: 10px; padding: 12px; position: relative; overflow: hidden;
+        }
+        .done-card .dc-cover {
+            aspect-ratio: 16 / 10;
+            background: linear-gradient(135deg, #c5b0f4, #b9b9f9);
+            border-radius: 8px; display: flex; align-items: center;
+            justify-content: center; font-size: 40px; color: rgba(255,255,255,0.8);
+            position: relative;
+        }
+        .done-card .dc-cover::after {
+            content: '▶';
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 36px; height: 36px;
+            background: rgba(0,0,0,0.35); border-radius: 50%;
+            color: #fff; display: flex; align-items: center;
+            justify-content: center; font-size: 14px;
+        }
+        .done-card .dc-del {
+            position: absolute; bottom: 12px; right: 12px;
+            width: 26px; height: 26px; border-radius: 6px; border: none;
+            background: rgba(0,0,0,0.4); color: #fff;
+            font-size: 12px; cursor: pointer; display: flex;
+            align-items: center; justify-content: center;
+        }
+        .done-card .dc-name { font-size: 13px; color: #333; margin-top: 8px; text-align: center; }
+        .group-title {
+            font-size: 13px; color: #4285F4; font-weight: 600;
+            margin: 12px 0 10px; padding-left: 8px;
+            border-left: 3px solid #4285F4;
+        }
+        .group-title span { color: #999; font-weight: 400; }
+
+        .share-btn {
+            position: absolute; top: 124px; right: 10px;
+            z-index: 9;
+            width: 36px; height: 36px;
+            border: none; border-radius: 50%;
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(6px);
+            color: #0669FF; font-size: 16px;
+            cursor: pointer; display: flex; align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+            font-family: inherit; transition: transform 100ms;
+        }
+        .share-btn:active { transform: scale(0.88); }
+        .ai-create-btn {
+            position: fixed; bottom: 16px;
+            left: 50%; transform: translateX(-50%);
+            width: calc(100% - 28px); max-width: 402px; height: 50px;
+            border: none; border-radius: 25px;
+            background: linear-gradient(135deg, #4A9EFF, #0669FF);
+            color: #fff; font-size: 16px; font-weight: 600;
+            cursor: pointer; display: flex; align-items: center;
+            justify-content: center; gap: 6px;
+            box-shadow: 0 4px 16px rgba(6,105,255,0.3); z-index: 10;
+        }
+        .ai-create-btn:active { opacity: 0.9; }
+
+        /* ===== 创作弹窗 ===== */
+        .create-overlay {
+            display: none; position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4); z-index: 9999;
+        }
+        .create-overlay.show { display: block; }
+        .create-popup {
+            display: none; position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: #fff; border-radius: 20px 20px 0 0;
+            width: 100%; max-width: 430px; margin: 0 auto;
+            z-index: 10000; flex-direction: column;
+            max-height: 90vh; animation: slideUp 0.3s ease-out;
+        }
+        .create-popup.show { display: flex; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .create-popup .cp-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 20px; border-bottom: 1px solid #f0f0f0; flex-shrink: 0;
+        }
+        .create-popup .cp-title { font-size: 16px; font-weight: 600; color: #333; }
+        .create-popup .cp-close {
+            width: 28px; height: 28px; border-radius: 50%; border: none;
+            background: #f5f5f5; color: #999; font-size: 14px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .create-popup .cp-progress {
+            display: flex; align-items: center; gap: 6px;
+            padding: 12px 20px; flex-shrink: 0;
+        }
+        .create-popup .cp-progress .cp-dot {
+            flex: 1; height: 4px; border-radius: 2px;
+            background: #e0e0e0; transition: background 0.3s;
+        }
+        .create-popup .cp-progress .cp-dot.active { background: #0669FF; }
+        .create-popup .cp-progress .cp-dot.done { background: #4A9EFF; }
+        .create-popup .cp-progress .cp-count {
+            font-size: 12px; color: #999; margin-left: 4px; flex-shrink: 0;
+        }
+
+        .create-popup .cp-body {
+            flex: 1; overflow-y: auto; padding: 20px;
+        }
+        .create-popup .cp-body::-webkit-scrollbar { width: 3px; }
+        .create-popup .cp-body::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
+
+        .create-popup .cp-q-num {
+            font-size: 12px; color: #0669FF; font-weight: 600; margin-bottom: 4px;
+        }
+        .create-popup .cp-q-title {
+            font-size: 18px; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; line-height: 1.3;
+        }
+        .create-popup .cp-q-tip {
+            font-size: 13px; color: #999; margin-bottom: 6px;
+        }
+        .create-popup .cp-q-why {
+            font-size: 13px; color: #4285F4; background: #E8F1FF;
+            padding: 10px 14px; border-radius: 8px; margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .create-popup .cp-tabs {
+            display: flex; gap: 0; flex-shrink: 0;
+            padding: 0 20px 12px;
+        }
+        .create-popup .cp-tab {
+            flex: 1; padding: 10px 0; text-align: center;
+            font-size: 14px; font-weight: 500; color: #666;
+            cursor: pointer; border: none; background: none;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s; font-family: inherit;
+        }
+        .create-popup .cp-tab.active {
+            color: #0669FF; border-bottom-color: #0669FF; font-weight: 600;
+        }
+        .create-popup .cp-q-options {
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .create-popup .cp-option {
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px 16px;
+            border: 1px solid #e8e8e8; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s;
+            background: #fafafa;
+        }
+        .create-popup .cp-option:active { background: #E8F1FF; }
+        .create-popup .cp-option.selected {
+            border-color: #0669FF; background: #E8F1FF;
+        }
+        .create-popup .cp-option .cp-opt-emoji { font-size: 24px; flex-shrink: 0; }
+        .create-popup .cp-option .cp-opt-text { flex: 1; }
+        .create-popup .cp-option .cp-opt-text .cp-opt-label { font-size: 14px; font-weight: 500; color: #333; }
+        .create-popup .cp-option .cp-opt-text .cp-opt-desc { font-size: 12px; color: #999; margin-top: 2px; }
+        .create-popup .cp-option .cp-opt-radio {
+            width: 20px; height: 20px; border-radius: 50%;
+            border: 2px solid #ddd; display: flex;
+            align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .create-popup .cp-option.selected .cp-opt-radio {
+            border-color: #0669FF;
+        }
+        .create-popup .cp-option.selected .cp-opt-radio::after {
+            content: ''; width: 10px; height: 10px;
+            border-radius: 50%; background: #0669FF;
+        }
+
+        .create-popup .cp-actions {
+            display: flex; gap: 10px;
+            padding: 16px 20px; border-top: 1px solid #f0f0f0; flex-shrink: 0;
+            justify-content: center;
+        }
+        .create-popup .cp-actions .voice-press-btn {
+            flex: 1; height: 64px;
+        }
+        .create-popup .cp-actions button {
+            flex: 1; height: 44px; border: none; border-radius: 10px;
+            font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit;
+        }
+        .create-popup .cp-prev { background: #f5f5f7; color: #666; }
+        .create-popup .cp-next { background: #0669FF; color: #fff; }
+        .create-popup .cp-next:disabled { opacity: 0.5; cursor: default; }
+
+        .create-popup .cp-name-input {
+            width: 100%; height: 44px; padding: 0 14px;
+            border: 1px solid #e0e0e0; border-radius: 10px;
+            font-size: 15px; color: #333; outline: none; font-family: inherit;
+        }
+        .create-popup .cp-name-input:focus { border-color: #0669FF; }
+        .create-popup .cp-name-suggestions {
+            display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;
+        }
+        .create-popup .cp-name-suggestions span {
+            padding: 8px 16px; border: 1px solid #e0e0e0;
+            border-radius: 20px; font-size: 13px; color: #666;
+            cursor: pointer; background: #fff;
+        }
+        .create-popup .cp-name-suggestions span:active { background: #E8F1FF; border-color: #0669FF; color: #0669FF; }
+
+        .create-popup .cp-prompt-textarea {
+            width: 100%; min-height: 180px;
+            padding: 14px; border: 1px solid #e0e0e0;
+            border-radius: 10px; font-size: 13px; color: #333;
+            resize: vertical; outline: none; font-family: inherit;
+            line-height: 1.7; background: #fafafa;
+        }
+        .create-popup .cp-prompt-textarea:focus { border-color: #0669FF; }
+
+        /* ===== 创作模式选择 ===== */
+        .mode-select { padding: 8px 0; }
+        .mode-card {
+            display: flex; align-items: center; gap: 14px;
+            padding: 18px 16px; margin-bottom: 12px;
+            border: 2px solid #f0f0f0; border-radius: 14px;
+            cursor: pointer; background: #fafafa; transition: all 0.2s;
+        }
+        .mode-card:active { border-color: #0669FF; background: #E8F1FF; }
+        .mode-card .mc-icon {
+            width: 52px; height: 52px; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 26px; flex-shrink: 0;
+        }
+        .mode-card .mc-icon.qa { background: #E8F1FF; color: #0669FF; }
+        .mode-card .mc-icon.voice { background: #FFF3E0; color: #FF9500; }
+        .mode-card .mc-icon.photo { background: #E8F5E9; color: #4CAF50; }
+        .mode-card .mc-info { flex: 1; }
+        .mode-card .mc-title { font-size: 16px; font-weight: 600; color: #333; margin-bottom: 3px; }
+        .mode-card .mc-desc { font-size: 13px; color: #999; line-height: 1.4; }
+        .mode-card .mc-arrow { font-size: 18px; color: #ccc; }
+
+        /* ===== 语音录制 ===== */
+        .voice-area { padding: 20px 0; text-align: center; }
+        .voice-hint-top { font-size: 14px; color: #999; margin-bottom: 24px; line-height: 1.5; }
+        .voice-press-btn {
+            width: 100%; height: 64px; border: 2px solid #0669FF; border-radius: 32px;
+            background: #E8F1FF; color: #0669FF; font-size: 17px; font-weight: 600;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+            font-family: inherit; user-select: none; -webkit-user-select: none; transition: all 0.15s;
+            letter-spacing: 2px;
+        }
+        .voice-press-btn:active { background: #0669FF; color: #fff; }
+
+        /* 录音浮层 - 微信风格 */
+        .rec-overlay {
+            display: none; position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.65); z-index: 10002;
+            flex-direction: column; align-items: center; justify-content: center;
+            user-select: none; -webkit-user-select: none;
+            overflow: hidden;
+        }
+        .rec-overlay.show { display: flex; animation: recFadeIn 0.15s; }
+        @keyframes recFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* 中心麦克风 + 波形区 */
+        .rec-main {
+            display: flex; flex-direction: column; align-items: center;
+        }
+        /* 麦克风图标 */
+        .rec-mic {
+            position: relative; width: 80px; height: 80px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 20px;
+        }
+        .rec-mic-icon {
+            width: 64px; height: 64px; border-radius: 50%;
+            background: linear-gradient(135deg, #07C160, #06AD56);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px; color: #fff; z-index: 2;
+            box-shadow: 0 4px 16px rgba(7,193,96,0.4);
+        }
+        .rec-overlay.cancel-mode .rec-mic-icon {
+            background: linear-gradient(135deg, #FF6B6B, #EE0A3A);
+            box-shadow: 0 4px 16px rgba(238,10,58,0.4);
+        }
+        /* 声波扩散环 */
+        .rec-mic-ring {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border: 2px solid rgba(7,193,96,0.5);
+            animation: recRing 1.6s infinite ease-out;
+        }
+        .rec-mic-ring.r2 { animation-delay: 0.5s; }
+        .rec-mic-ring.r3 { animation-delay: 1.0s; }
+        @keyframes recRing {
+            0% { width: 64px; height: 64px; opacity: 0.8; }
+            100% { width: 140px; height: 140px; opacity: 0; }
+        }
+        .rec-overlay.cancel-mode .rec-mic-ring { border-color: rgba(238,10,58,0.5); }
+
+        /* 绿色气泡波形 */
+        .rec-bubble {
+            position: relative;
+            background: #07C160;
+            border-radius: 16px;
+            padding: 18px 20px;
+            min-width: 220px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 20px rgba(7,193,96,0.3);
+        }
+        .rec-bubble::after {
+            content: ''; position: absolute; top: -8px; left: 50%;
+            transform: translateX(-50%);
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 8px solid #07C160;
+        }
+        .rec-overlay.cancel-mode .rec-bubble {
+            background: #EE0A3A;
+            box-shadow: 0 4px 20px rgba(238,10,58,0.3);
+        }
+        .rec-overlay.cancel-mode .rec-bubble::after { border-bottom-color: #EE0A3A; }
+
+        .rec-wave {
+            display: flex; align-items: center; justify-content: center; gap: 3px;
+            height: 32px;
+        }
+        .rec-wave .rw-bar {
+            width: 4px; min-height: 4px; border-radius: 2px; background: rgba(255,255,255,0.85);
+            transition: height 0.08s ease;
+        }
+
+        /* 计时器 */
+        .rec-timer {
+            font-size: 28px; font-weight: 700; color: #fff;
+            font-variant-numeric: tabular-nums; margin-bottom: 4px;
+        }
+
+        /* 提示文字 */
+        .rec-hint {
+            font-size: 13px; color: rgba(255,255,255,0.55);
+            padding: 6px 14px; border-radius: 8px;
+            background: rgba(255,255,255,0.08);
+            transition: all 0.2s;
+        }
+        .rec-overlay.cancel-mode .rec-hint {
+            background: rgba(238,10,58,0.2);
+            color: #FF9AA0;
+        }
+
+        /* 底部操作栏 - 单个取消按钮居中 */
+        .rec-bottom-bar {
+            position: absolute; bottom: 60px; left: 0; right: 0;
+            display: flex; justify-content: center;
+        }
+        .rec-pill {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 12px 18px; border-radius: 12px;
+            background: rgba(255,255,255,0.1);
+            border: 1.5px solid rgba(255,255,255,0.15);
+            transition: all 0.2s;
+            min-width: 90px;
+        }
+        .rec-pill .rp-icon { font-size: 22px; margin-bottom: 2px; }
+        .rec-pill .rp-text { font-size: 12px; color: rgba(255,255,255,0.7); }
+
+        /* 居中取消按钮（拖拽目标） */
+        .rec-pill.action-target {
+            /* 默认状态 */
+        }
+        .rec-overlay.cancel-mode .rec-pill.action-target {
+            background: rgba(238,10,58,0.25);
+            border-color: rgba(238,10,58,0.5);
+            transform: scale(1.12);
+        }
+        .rec-overlay.cancel-mode .rec-pill.action-target .rp-text {
+            color: #FF9AA0;
+        }
+
+        /* 动画标签 */
+        .rec-status-label {
+            position: absolute; top: 15%;
+            font-size: 13px; color: rgba(255,255,255,0.8);
+            padding: 6px 16px; border-radius: 8px;
+            background: rgba(0,0,0,0.4);
+        }
+
+        /* 状态切换时的气泡过渡 */
+        .rec-overlay .rec-main,
+        .rec-overlay .rec-bottom-bar { transition: all 0.25s ease; }
+        .rec-overlay.cancel-mode .rec-main { transform: scale(0.95); }
+
+        /* ===== 拍照识别 ===== */
+        .photo-area { padding: 20px 0; text-align: center; }
+        .photo-upload-zone {
+            border: 2px dashed #d0d5e0; border-radius: 16px;
+            padding: 40px 20px; margin-bottom: 16px; cursor: pointer;
+            transition: all 0.2s; background: #fafafa;
+        }
+        .photo-upload-zone:active { border-color: #0669FF; background: #E8F1FF; }
+        .photo-upload-zone .puz-icon { font-size: 48px; margin-bottom: 12px; }
+        .photo-upload-zone .puz-text { font-size: 15px; color: #666; }
+        .photo-upload-zone .puz-hint { font-size: 12px; color: #bbb; margin-top: 6px; }
+        .photo-preview {
+            width: 100%; max-height: 240px; object-fit: contain;
+            border-radius: 14px; margin-bottom: 16px;
+        }
+        .photo-analysis {
+            text-align: left; background: #f5f7fa; border-radius: 10px;
+            padding: 14px 16px; font-size: 13px; color: #555;
+            line-height: 1.7; margin-bottom: 4px;
+        }
+
+        /* ===== AI 生成中 ===== */
+        .ai-loading { text-align: center; padding: 40px 20px; }
+        .ai-loading .al-spinner {
+            width: 56px; height: 56px; border-radius: 50%;
+            border: 4px solid #f0f0f0; border-top-color: #0669FF;
+            margin: 0 auto 20px; animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .ai-loading .al-text { font-size: 15px; color: #666; margin-bottom: 6px; }
+        .ai-loading .al-sub { font-size: 13px; color: #bbb; }
+
+        /* 脚本来源标签 */
+        .prompt-source-tag {
+            display: inline-block; padding: 4px 12px;
+            border-radius: 20px; font-size: 12px; font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .prompt-source-tag.qa { background: #E8F1FF; color: #0669FF; }
+        .prompt-source-tag.voice { background: #FFF3E0; color: #FF9500; }
+        .prompt-source-tag.photo { background: #E8F5E9; color: #4CAF50; }
+
+        /* ===== 标题输入弹窗 ===== */
+        .title-overlay {
+            display: none; position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.45); z-index: 10001;
+            align-items: center; justify-content: center; padding: 20px;
+        }
+        .title-overlay.show { display: flex; }
+        .title-popup {
+            background: #fff; border-radius: 18px;
+            width: 100%; max-width: 320px; padding: 28px 24px 24px;
+            animation: popIn 0.25s;
+        }
+        @keyframes popIn { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .title-popup .tp-title {
+            font-size: 17px; font-weight: 600; color: #333;
+            text-align: center; margin-bottom: 16px;
+        }
+        .title-popup .tp-input {
+            width: 100%; height: 44px; padding: 0 14px;
+            border: 1px solid #e0e0e0; border-radius: 10px;
+            font-size: 15px; color: #333; outline: none; font-family: inherit;
+            margin-bottom: 20px;
+        }
+        .title-popup .tp-input:focus { border-color: #0669FF; }
+        .title-popup .tp-actions { display: flex; gap: 10px; }
+        .title-popup .tp-actions button {
+            flex: 1; height: 42px; border: none; border-radius: 10px;
+            font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit;
+        }
+        .title-popup .tp-cancel { background: #f5f5f7; color: #666; }
+        .title-popup .tp-confirm { background: #0669FF; color: #fff; }
+
+        .cp-ref-wrap {
+            margin-top: 12px; padding: 12px;
+            background: #f5f7fa; border-radius: 10px;
+            border: 1px dashed #d0d5e0;
+        }
+
+
+        /* ── 图片预览遮罩 ── */
+        .img-preview-overlay {
+            display: none; position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.75); z-index: 999999;
+            align-items: center; justify-content: center; padding: 40px;
+            cursor: zoom-out;
+        }
+        .img-preview-overlay.show { display: flex; }
+        .img-preview-overlay img {
+            max-width: 90%; max-height: 90%;
+            border-radius: 8px; box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+            object-fit: contain;
+        }
+
+        /* ===== 分享弹窗 ===== */
+        .share-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.45); z-index: 99999; align-items: center; justify-content: center; padding: 20px; }
+        .share-overlay.show { display: flex; }
+        .share-popup { background: #fff; border-radius: 18px; width: 100%; max-width: 360px; max-height: 85vh; overflow-y: auto; animation: popIn 0.25s; }
+        .share-popup::-webkit-scrollbar { width: 3px; }
+        .share-popup::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
+        .share-popup .sp-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid #f0f0f0; }
+        .share-popup .sp-title { font-size: 16px; font-weight: 600; color: #333; }
+        .share-popup .sp-close { width: 28px; height: 28px; border-radius: 50%; border: none; background: #f5f5f5; color: #999; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .share-popup .sp-body { padding: 20px; }
+        .share-popup .sp-icon-wrap { width: 56px; height: 56px; border-radius: 50%; background: #E8F1FF; color: #0669FF; display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 14px; }
+        .share-popup .sp-intro { text-align: center; font-size: 14px; color: #555; margin-bottom: 18px; line-height: 1.5; }
+        .share-popup .sp-info-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f5f5f5; font-size: 13px; }
+        .share-popup .sp-info-row:last-child { border-bottom: none; }
+        .share-popup .sp-info-label { color: #888; }
+        .share-popup .sp-info-val { color: #333; font-weight: 500; }
+        .share-popup .sp-info-val.green { color: #2e7d32; background: #e8f5e9; padding: 2px 10px; border-radius: 10px; }
+        .share-popup .sp-actions { padding: 0 20px 20px; display: flex; flex-direction: column; gap: 10px; }
+        .share-popup .sp-btn { width: 100%; height: 44px; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; }
+        .share-popup .sp-btn-primary { background: #0669FF; color: #fff; }
+        .share-popup .sp-btn-primary:active { opacity: 0.85; }
+        .share-popup .sp-btn-secondary { background: transparent; color: #999; font-size: 13px; font-weight: 400; height: 36px; border: 1px dashed #ddd; border-radius: 8px; }
+    </style>
+</head>
+<body>
+<div class="page-wrap">
+<div class="app-container">
+    <div class="status-bar">
+        <span>9:41</span>
+        <div class="right"><span>📶</span><span>📡</span><span>🔋</span></div>
+    </div>
+    <div class="top-nav">
+        <button class="back-btn" onclick="goBack()">‹</button>
+        <div class="title">AI创作</div>
+        <div class="right-icons"><div class="right-icon">⊙</div></div>
+    </div>
+    <div class="content-area">
+        <div class="member-card">
+            <div class="mc-left">
+                <div class="mc-avatar">陈</div>
+                <div class="mc-info"><div class="mc-name">陈昭君</div><div class="mc-hint">当前创作成员</div></div>
+            </div>
+            <button class="mc-switch" onclick="alert('切换成员')">切换成员 ▾</button>
+        </div>
+        <div class="course-tag">我为杜甫建茅屋</div>
+        <div class="creating-section">
+            <div class="section-header">
+                <div class="sh-left"><span class="sh-icon">⏳</span><span class="sh-title">创作中</span><span class="sh-count"><strong>2</strong></span></div>
+            </div>
+            <div class="creating-grid">
+                <div class="creating-card"><span class="cc-icon">📹</span><div class="cc-progress"></div></div>
+                <div class="creating-card"><span class="cc-icon">📹</span><div class="cc-progress"></div></div>
+                <div class="creating-card"><span class="cc-icon">🎮</span><div class="cc-progress" style="background:#ccc;"></div></div>
+            </div>
+        </div>
+        <div class="done-section">
+            <div class="section-header">
+                <div class="sh-left"><span class="sh-icon">✅</span><span class="sh-title">已完成</span><span class="sh-count"><strong>32</strong></span></div>
+            </div>
+            <div class="group-title">AI创作视频 <span>（共2个）</span></div>
+            <div class="done-grid">
+                <div class="done-card"><div class="dc-cover">📹</div><div class="dc-name">快速搭建茅屋</div><button class="dc-del" onclick="delWork(0)">🗑</button></div>
+                <div class="done-card"><div class="dc-cover">📹</div><div class="dc-name">快速搭建茅屋</div><button class="dc-del" onclick="delWork(1)">🗑</button></div>
+            </div>
+        </div>
+    </div>
+    <button class="ai-create-btn" onclick="openCreate()">✨ AI创作</button>
+    <button class="share-btn" onclick="openShareModal()">👩‍🏫</button>
+</div>
+
+    <div class="create-overlay" id="createOverlay" onclick="if(event.target===this)closeCreate()"></div>
+<div class="create-popup" id="createPopup">
+    <div class="cp-header">
+        <span class="cp-title">AI创作</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+            <button class="cp-close" id="backToSelectBtn" onclick="backToModeSelect()" style="font-size:12px;width:auto;padding:4px 12px;border-radius:14px;" title="返回选择">选择模式</button>
+            <button class="cp-close" onclick="closeCreate()">✕</button>
+        </div>
+    </div>
+    <div class="cp-tabs">
+        <button class="cp-tab active" onclick="switchCreateTab('video')">🎬 视频创作</button>
+        <button class="cp-tab" onclick="switchCreateTab('game')">🎮 游戏创作</button>
+    </div>
+    <div class="cp-progress" id="progressBar"></div>
+    <div class="cp-body" id="questionBody"></div>
+    <div class="cp-actions" id="actionBar"></div>
+</div>
+<input type="file" id="photoFileInput" accept="image/*" capture="environment" onchange="handlePhotoSelect(this)" style="display:none;">
+
+<!-- 标题输入弹窗 -->
+<div class="title-overlay" id="titleOverlay" onclick="if(event.target===this)closeTitlePopup()">
+    <div class="title-popup">
+        <div class="tp-title">给视频起个名字</div>
+        <input class="tp-input" id="videoTitleInput" placeholder="输入视频标题" maxlength="20">
+        <div class="tp-actions">
+            <button class="tp-cancel" onclick="closeTitlePopup()">取消</button>
+            <button class="tp-confirm" onclick="confirmGenerate()">✨ 生成视频</button>
+        </div>
+    </div>
+</div>
+<!-- 录音浮层 - 微信风格 -->
+<div class="rec-overlay" id="recOverlay">
+    <div class="rec-main" id="recMain">
+        <div class="rec-mic">
+            <div class="rec-mic-ring"></div>
+            <div class="rec-mic-ring r2"></div>
+            <div class="rec-mic-ring r3"></div>
+            <div class="rec-mic-icon">🎤</div>
+        </div>
+        <div class="rec-bubble">
+            <div class="rec-wave" id="recWave"></div>
+        </div>
+        <div class="rec-timer" id="recTimer">00:00</div>
+        <div class="rec-hint" id="recHint">松手 发送语音</div>
+    </div>
+    <div class="rec-bottom-bar">
+        <div class="rec-pill action-target" id="recActionTarget">
+            <div class="rp-icon" id="recTargetIcon">✕</div>
+            <div class="rp-text" id="recTargetText">滑到这里取消</div>
+        </div>
+    </div>
+</div>
+</div>
+
+<div id="qaPanel" style="position:fixed;top:80px;left:16px;z-index:99999;background:#fff;color:#333;padding:14px 18px;border-radius:12px;border:1px solid #e0e0e0;font-size:12px;line-height:1.7;max-width:320px;box-shadow:0 4px 16px rgba(0,0,0,0.08);display:none;font-family:inherit;"></div>
+
+<!-- ====== 分享弹窗 ====== -->
+<div class="share-overlay" id="shareOverlay" onclick="if(event.target===this)closeShareModal()">
+    <div class="share-popup">
+        <div class="sp-header">
+            <span class="sp-title">👩‍🏫 分享给其他用户</span>
+            <button class="sp-close" onclick="closeShareModal()">✕</button>
+        </div>
+        <div class="sp-body">
+            <div class="sp-icon-wrap">🔗</div>
+            <div class="sp-intro">他人通过分享链接进入页面后，仅可使用当前页面内功能。</div>
+            <div class="sp-info-row">
+                <span class="sp-info-label">有效期</span>
+                <span class="sp-info-val">24小时</span>
+            </div>
+        </div>
+        <div class="sp-actions">
+            <button class="sp-btn sp-btn-primary" onclick="showShareToast('✅ 已分享给他人')">👩‍🏫 分享给他人</button>
+            <button class="sp-btn sp-btn-secondary" onclick="regenerateShareToken()">🔄 重新生成</button>
+        </div>
+    </div>
+</div>
+
+<div class="img-preview-overlay" id="imgPreviewOverlay" onclick="closeImagePreview()">
+    <img id="imgPreviewSrc" src="">
+</div>
+
+<script>
+    function openImagePreview(src) {
+        document.getElementById('imgPreviewSrc').src = src;
+        document.getElementById('imgPreviewOverlay').classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeImagePreview() {
+        document.getElementById('imgPreviewOverlay').classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+    /* ===== 分享给老师 ===== */
+    function openShareModal() { document.getElementById('shareOverlay').classList.add('show'); document.body.style.overflow = 'hidden'; }
+    function closeShareModal() { document.getElementById('shareOverlay').classList.remove('show'); document.body.style.overflow = ''; }
+    function regenerateShareToken() { showShareToast('✅ 新分享链接已生成，旧链接已失效'); }
+    function showShareToast(text) { var t = document.createElement('div'); t.textContent = text; t.style.cssText = 'position:fixed;top:30%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.78);color:#fff;padding:10px 18px;border-radius:8px;font-size:14px;z-index:999999;'; document.body.appendChild(t); setTimeout(function() { t.remove(); }, 1800); }
+
+
+</script>
+</body>
+<script>
+    /* ===== 数据 ===== */
+    var questions = [
+        { key: 'gender', num: 'Question 01', title: '我是小男生还是小女生？', why: '选了这个，AI 才知道视频里的小主角长什么样子，出来的画面才更像你哦～', options: [
+            { emoji: '', label: '小男生', desc: 'AI 把你生成成阳光小男孩' },
+            { emoji: '', label: '小女生', desc: 'AI 把你生成成可爱小女孩' }
+        ]},
+        { key: 'age', num: 'Question 02', title: '我今年多大啦？', why: '不同年龄的小朋友说话、走路、穿衣都不一样，选对了年龄，AI 才能做出最适合你的视频～', options: [
+            { emoji: '', label: '6-7岁', desc: '低年级小朋友，天真又活泼' },
+            { emoji: '', label: '8-10岁', desc: '中年级同学，好奇心满满' },
+            { emoji: '', label: '11-14岁', desc: '高年级大哥哥大姐姐，有主见' }
+        ]},
+        { key: 'scene', num: 'Question 03', title: '穿越到哪个时空？', why: '选一个你喜欢的地方，AI 就会把视频的背景设在那里，带你"穿越"到那个时空去探险！', options: [
+            { emoji: '', label: '花楼木织机工坊', desc: '镇馆之宝：清代小花楼木织机现场' },
+            { emoji: '', label: '锦官城集市', desc: '唐代丝绸之路上的成都大集市' },
+            { emoji: '', label: '陵阳公梦境', desc: '蜀锦大师做的五彩斑斓的梦' },
+            { emoji: '', label: '现代博物馆展厅', desc: '回到现在的蜀锦博物馆' }
+        ]},
+        { key: 'hook', num: 'Question 04', title: '视频第一秒给大家看到什么？', why: '视频的开头最吸引人啦！选一个有趣的开场，让看视频的人一下子就被吸引住～', options: [
+            { emoji: '', label: '织机咔哒咔哒', desc: '一上来就直接看织机在动' },
+            { emoji: '', label: '我问大家一个问题', desc: '「你见过五彩斑斓的布吗？」' },
+            { emoji: '', label: '一个小惊喜', desc: '突然蹦出一只可爱的织锦小精灵' },
+            { emoji: '', label: '我先打个招呼', desc: '「我是锦宝，今天我带你……」' }
+        ]},
+        { key: 'style', num: 'Question 05', title: '画面什么调调？', why: '画面风格决定了视频好不好看！就像画画要选颜色一样，选一个你喜欢的风格，AI 就能画出最美的画面～', options: [
+            { emoji: '', label: '敦煌暖色', desc: '红、金、暖黄——敦煌壁画的颜色' },
+            { emoji: '', label: '国潮卡通', desc: 'Q 版、明亮、卡通可爱风' },
+            { emoji: '', label: '治愈水彩', desc: '轻软透明，像彩色水彩晕开' },
+            { emoji: '', label: '史诗大片', desc: '电影感、深色调、镜头感强' }
+        ]},
+        { key: 'rhythm', num: 'Question 06', title: '用什么节奏剪？', why: '节奏就像视频的"心跳"，快的让人兴奋，慢的让人感动。选一个你喜欢的节奏，视频看起来会更带感！', options: [
+            { emoji: '', label: '慢慢织', desc: '像真实织锦一样——治愈慢镜头' },
+            { emoji: '', label: '一镜到底', desc: '不切镜头，跟着主角走到底' },
+            { emoji: '', label: '倒叙揭秘', desc: '先出成片，再倒回去讲工艺' },
+            { emoji: '', label: '跟着织机节拍', desc: '配合织机咔哒声踩点剪辑' }
+        ]},
+        { key: 'mood', num: 'Question 07', title: '想让观众看完什么心情？', why: '一个好的视频会让看的人心里暖暖的。你想让大家看完后是什么感觉？选一个，AI 帮你实现～', options: [
+            { emoji: '', label: '震撼', desc: '让人张大嘴巴「哇塞」' },
+            { emoji: '', label: '感动', desc: '让人想哭、想鼓掌' },
+            { emoji: '', label: '好奇', desc: '让人想问「为什么」' },
+            { emoji: '', label: '开心', desc: '让人看完笑出来' }
+        ]},
+        { key: 'titleText', num: 'Question 08', title: '视频前3s加上什么文字？', why: '视频的前3秒画面加上一段文字标题，让观众一眼就知道视频的主题～', type: 'input' },
+        { key: 'name', num: 'Question 09', title: '给你的主角起个名字', why: '有了名字，主角就有了灵魂！你可以自己取一个喜欢的名字～', type: 'name' }
+    ];
+    var nameSuggestions = [];
+    var currentStep = 0;
+    var answers = {};
+    var totalSteps = questions.length + 1;
+    var remainCount = 1;
+
+    /* ===== 创作模式状态 ===== */
+    var createMode = 'select';   // 'select' | 'qa' | 'voice' | 'photo'
+    var voiceStep = 'idle';      // 'idle' | 'transcript' | 'prompt'
+    var photoStep = 'upload';    // 'upload' | 'confirm' | 'analyzing' | 'result' | 'generating' | 'prompt'
+    var voiceTranscript = '';
+    var isRecording = false;
+    var recordTimer = 0;
+    var timerInterval = null;
+    var photoDataUrl = '';
+    var isAILoading = false;
+
+    /* ===== Demo 数据 ===== */
+    var DEMO_PROMPT = '整体视频时长15秒，竖屏国潮卡通画风，倒叙叙事，全程氛围轻松欢乐，主角是8到10岁小女孩小朱，首帧固定显示文字织女小精灵2026.7.15。0到3秒，画面最先出现置顶文字织女小精灵2026.7.15，小朱圆乎乎的脸蛋凑近镜头，歪着头睁大眼睛，对着屏幕好奇提问，清脆小女孩声音响起，询问观众知不知道古时候精美蜀锦是怎么制作出来的，搭配轻柔古筝铃铛背景音乐。3到7秒，画面出现柔光穿越特效，镜头闪回切换，场景跳转至古色古香的花楼木织机工坊，巨大老式提花木织机完整展现在画面里，小朱缓步走到织机旁边，伸手轻轻抚摸木质机身，耳边同步出现织布梭子滑动的细碎声响。7到11秒，镜头给到中景，五彩丝线在织机上随风飘动，小朱模仿古人的动作摆弄织机，带有陵阳公样式的蜀锦慢慢从织机中延伸出来，背景音乐切换成轻快古风鼓点，小朱惊喜感叹织机可以织出超多好看花纹。11到15秒，全景画面，小朱双手捧着织好的彩色锦缎，转过身面向镜头开心比耶，整张画面色彩明亮柔和，小朱笑着告诉大家传统蜀锦特别有意思，音乐上扬收尾，搭配清脆叮的一声音效结束视频，整体看完让人心情愉悦。';
+
+    var VOICE_TRANSCRIPT_DEMO = '我想做一个视频，讲一个小女孩在博物馆里看到古代织布机，然后穿越回古代，亲眼看到织女是怎么织出漂亮蜀锦的。画面要卡通可爱一点，节奏欢快一些，让人看完觉得特别开心。';
+
+    var VOICE_PROMPT_DEMO = '整体视频时长15秒，竖屏国潮卡通画风，穿越叙事，全程氛围欢快开心，主角是8到10岁小女孩小锦。0到3秒，小锦在博物馆展厅里好奇地东张西望，目光被一台巨大的古代花楼木织机吸引，她凑近织机仔细观察，轻声惊叹好厉害呀，背景音乐轻柔欢快，配古筝和铃铛声。3到7秒，小锦伸手触摸织机，画面出现柔光穿越特效，场景跳转至古代织锦工坊，五彩丝线在织机上闪烁，织女正在熟练地操作织机，小锦在一旁目不转睛地观看，背景音乐变得轻快活泼。7到11秒，镜头特写织女的手部动作，丝线在织机上交织成美丽的蜀锦图案，小锦兴奋地拍手，告诉观众原来蜀锦是这样织出来的，背景音乐节奏加快，配上织机咔哒声踩点。11到15秒，一幅完整的彩色蜀锦在画面中展开，小锦开心地面对镜头比心，笑着说古代人真的太聪明了，音乐欢快上扬收尾，搭配清脆叮的一声音效，整体看完让人心情愉悦开心。';
+
+    var PHOTO_ANALYSIS_DEMO = 'AI 图片识别结果：\n• 主体：古代花楼木织机（清代）\n• 场景：博物馆展厅\n• 色彩：暖色调，木质纹理，彩色丝线\n• 氛围：历史感、工艺感';
+
+    var PHOTO_PROMPT_DEMO = '整体视频时长15秒，竖屏史诗大片画风，纪实叙事，全程氛围震撼好奇，主角是10岁小男孩小匠。0到3秒，画面从博物馆展厅的织机照片开始，镜头缓缓推进，小匠出现在画面中，站在巨大的花楼木织机前仰头凝视，背景音乐庄重神秘，配低沉鼓点。3到7秒，织机上的丝线开始发光，画面切换到织机运转特写，木齿轮咔哒转动，梭子穿梭飞舞，小匠惊叹地看着五彩丝线在织机上交织，背景音乐节奏加快，配古风弦乐。7到11秒，镜头拉远展现整个工坊全貌，小匠模仿织女动作尝试操作织机，蜀锦图案在织机上逐渐成形，画面色彩从暗调转为明亮暖色，背景音乐加入清脆铃铛声。11到15秒，完整的彩色蜀锦在画面中展开，金光闪闪，小匠面对镜头竖起大拇指，感叹传统工艺太震撼了，背景音乐达到高潮后收尾，让人感受到传统工艺的震撼与精美。';
+
+    function goBack() { window.location.href = '我的.html'; }
+
+    var createTab = 'video';
+
+    function switchCreateTab(tab) {
+        if (tab === 'game') {
+            closeCreate();
+            alert('🎮 游戏创作功能即将上线，敬请期待！');
+            return;
+        }
+        createTab = 'video';
+        createMode = 'select';
+        var tabs = document.querySelectorAll('.cp-tab');
+        for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('active');
+        tabs[0].classList.add('active');
+        renderCreate();
+    }
+
+    function renderRemainBanner() {
+        var tabs = document.querySelector('.cp-tabs');
+        var existBanner = document.getElementById('remainBanner');
+        if (existBanner) existBanner.remove();
+        if (!tabs) return;
+        var banner = document.createElement('div');
+        banner.id = 'remainBanner';
+        if (remainCount <= 0) {
+            banner.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:#FFF3E0;font-size:12px;color:#E65100;flex-shrink:0;';
+            banner.innerHTML = '<span>⛔ 视频创作剩余0次</span>'
+                + '<a href="购买次数.html" style="padding:4px 12px;background:#FF9500;color:#fff;border-radius:16px;text-decoration:none;font-size:12px;font-weight:600;">立即购买</a>';
+        } else {
+            banner.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:#E8F5E9;font-size:12px;color:#2E7D32;flex-shrink:0;';
+            banner.innerHTML = '<span>🎬 视频创作剩余<strong>' + remainCount + '</strong>次</span>'
+                + '<a href="购买次数.html" style="padding:4px 12px;background:#0669FF;color:#fff;border-radius:16px;text-decoration:none;font-size:12px;font-weight:600;">购买</a>';
+        }
+        tabs.parentNode.insertBefore(banner, tabs.nextSibling);
+    }
+
+    function openCreate() {
+        currentStep = 0;
+        createTab = 'video';
+        createMode = 'select';
+        answers = {};
+        voiceTranscript = '';
+        voiceStep = 'idle';
+        photoDataUrl = '';
+        photoStep = 'upload';
+        isRecording = false;
+        recordTimer = 0;
+        isAILoading = false;
+        stopTimer();
+        var tabs = document.querySelectorAll('.cp-tab');
+        for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('active');
+        tabs[0].classList.add('active');
+        document.getElementById('createOverlay').classList.add('show');
+        document.getElementById('createPopup').classList.add('show');
+        document.body.style.overflow = 'hidden';
+        renderRemainBanner();
+        renderCreate();
+    }
+
+    function closeCreate() {
+        stopTimer();
+        stopWaveAnim();
+        cleanupRecListeners();
+        isRecording = false;
+        isAILoading = false;
+        document.getElementById('createOverlay').classList.remove('show');
+        document.getElementById('createPopup').classList.remove('show');
+        document.body.style.overflow = '';
+        var panel = document.getElementById('qaPanel');
+        if (panel) panel.style.display = 'none';
+    }
+
+    function delWork(idx) { if(confirm('确定删除？')) alert('已删除'); }
+
+    /* ===== 渲染分发 ===== */
+    function renderCreate() {
+        var progress = document.getElementById('progressBar');
+        var backBtn = document.getElementById('backToSelectBtn');
+        if (createMode === 'select') {
+            if (progress) progress.style.display = 'none';
+            if (backBtn) backBtn.style.display = 'none';
+            renderModeSelect();
+        } else if (createMode === 'qa') {
+            if (progress) progress.style.display = 'flex';
+            if (backBtn) backBtn.style.display = '';
+            renderStep();
+        } else if (createMode === 'voice') {
+            if (progress) progress.style.display = 'none';
+            if (backBtn) backBtn.style.display = '';
+            renderVoiceStep();
+        } else if (createMode === 'photo') {
+            if (progress) progress.style.display = 'none';
+            if (backBtn) backBtn.style.display = '';
+            renderPhotoStep();
+        }
+    }
+
+    /* ===== 模式选择 ===== */
+    function renderModeSelect() {
+        var body = document.getElementById('questionBody');
+        body.innerHTML = '<div class="mode-select">'
+            + '<div class="mode-card" onclick="selectMode(\'qa\')">'
+            +   '<div class="mc-icon qa">📝</div>'
+            +   '<div class="mc-info"><div class="mc-title">问答创作</div><div class="mc-desc">回答几个小问题，AI 帮你生成视频脚本</div></div>'
+            +   '<div class="mc-arrow">›</div>'
+            + '</div>'
+            + '<div class="mode-card" onclick="selectMode(\'voice\')">'
+            +   '<div class="mc-icon voice">🎤</div>'
+            +   '<div class="mc-info"><div class="mc-title">语音输入</div><div class="mc-desc">说出你的创意，AI 自动转换为视频脚本</div></div>'
+            +   '<div class="mc-arrow">›</div>'
+            + '</div>'
+            + '<div class="mode-card" onclick="selectMode(\'photo\')">'
+            +   '<div class="mc-icon photo">📷</div>'
+            +   '<div class="mc-info"><div class="mc-title">拍照识别</div><div class="mc-desc">拍一张照片，AI 识别内容并生成视频脚本</div></div>'
+            +   '<div class="mc-arrow">›</div>'
+            + '</div>'
+            + '</div>';
+        document.getElementById('actionBar').innerHTML = '';
+    }
+
+    function selectMode(mode) {
+        if (remainCount <= 0) {
+            renderCreate(); // 会触发次数不足提示
+            return;
+        }
+        createMode = mode;
+        if (mode === 'qa') {
+            currentStep = 0;
+            answers = {};
+        } else if (mode === 'voice') {
+            voiceStep = 'idle';
+            voiceTranscript = '';
+            isRecording = false;
+            recordTimer = 0;
+        } else if (mode === 'photo') {
+            photoStep = 'upload';
+            photoDataUrl = '';
+        }
+        renderCreate();
+    }
+
+    function backToModeSelect() {
+        stopTimer();
+        stopWaveAnim();
+        cleanupRecListeners();
+        isRecording = false;
+        isAILoading = false;
+        createMode = 'select';
+        renderCreate();
+    }
+
+    /* ===== 语音输入流程 ===== */
+    function renderVoiceStep() {
+        var body = document.getElementById('questionBody');
+        var actions = document.getElementById('actionBar');
+
+        if (remainCount <= 0) { renderNoQuota(); return; }
+        if (isAILoading) {
+            renderAILoading('AI 正在分析语音内容', '正在将你的语音转换为视频脚本...');
+            return;
+        }
+
+        if (voiceStep === 'idle') {
+            body.innerHTML = '<div class="voice-area">'
+                + '<div class="voice-hint-top">🎤 按住下方按钮说话<br>松开手指自动发送，滑到右侧取消</div>'
+                + '</div>';
+            actions.innerHTML = '<button class="voice-press-btn" id="pressBtn" onmousedown="startRec(event)" ontouchstart="startRec(event)">🎤 按住说话</button>';
+        } else if (voiceStep === 'transcript') {
+            body.innerHTML = '<div style="padding:4px 0;">'
+                + '<div class="cp-q-title" style="font-size:16px;margin-bottom:8px;">🎤 语音识别结果</div>'
+                + '<div style="font-size:13px;color:#999;margin-bottom:12px;">你可以编辑识别结果，确认后 AI 将生成视频脚本：</div>'
+                + '<textarea class="cp-prompt-textarea" id="voiceTranscript" placeholder="语音识别的文字将显示在这里..." style="min-height:140px;">' + (voiceTranscript || VOICE_TRANSCRIPT_DEMO) + '</textarea>'
+                + '</div>';
+            actions.innerHTML = '<button class="cp-prev" onclick="voiceStep=\'idle\'; renderVoiceStep()">← 重新录音</button>'
+                + '<button class="cp-next" onclick="generateFromVoice()">✨ AI 生成脚本</button>';
+        } else if (voiceStep === 'prompt') {
+            renderPromptPreview('voice');
+        }
+    }
+
+    /* ===== 按住说话录音（微信风格） ===== */
+    var waveAnimId = null;
+    var recCancelMode = false;
+    var recPointerId = null;
+
+    function startRec(e) {
+        if (e) e.preventDefault();
+        if (isRecording) return;
+        isRecording = true;
+        recCancelMode = false;
+        recordTimer = 0;
+
+        var overlay = document.getElementById('recOverlay');
+        overlay.classList.remove('cancel-mode');
+        overlay.classList.add('show');
+        document.getElementById('recTimer').textContent = formatTime(0);
+        document.getElementById('recHint').textContent = '松手 发送语音';
+
+        timerInterval = setInterval(function() {
+            recordTimer++;
+            if (recordTimer >= 60) { endRecSend(); return; }
+            document.getElementById('recTimer').textContent = formatTime(recordTimer);
+        }, 1000);
+
+        startWaveAnim();
+
+        // 全局 mousemove / mouseup 监听
+        document.addEventListener('mousemove', onRecMove);
+        document.addEventListener('mouseup', onRecEnd);
+        document.addEventListener('touchmove', onRecTouchMove, { passive: false });
+        document.addEventListener('touchend', onRecEndTouch);
+    }
+
+    function onRecMove(e) {
+        if (!isRecording) return;
+        var target = document.getElementById('recActionTarget');
+        if (!target) return;
+        var rect = target.getBoundingClientRect();
+        var inCancel = e.clientX >= rect.left && e.clientX <= rect.right
+            && e.clientY >= rect.top && e.clientY <= rect.bottom;
+        if (inCancel !== recCancelMode) {
+            recCancelMode = inCancel;
+            updateRecCancelUI();
+        }
+    }
+
+    function onRecTouchMove(e) {
+        if (!isRecording) return;
+        if (e.touches && e.touches[0]) {
+            var t = e.touches[0];
+            var target = document.getElementById('recActionTarget');
+            if (!target) return;
+            var rect = target.getBoundingClientRect();
+            var inCancel = t.clientX >= rect.left && t.clientX <= rect.right
+                && t.clientY >= rect.top && t.clientY <= rect.bottom;
+            if (inCancel !== recCancelMode) {
+                recCancelMode = inCancel;
+                updateRecCancelUI();
+            }
+        }
+        e.preventDefault();
+    }
+
+    function updateRecCancelUI() {
+        var overlay = document.getElementById('recOverlay');
+        var hint = document.getElementById('recHint');
+        var targetText = document.getElementById('recTargetText');
+        var targetIcon = document.getElementById('recTargetIcon');
+        if (recCancelMode) {
+            overlay.classList.add('cancel-mode');
+            hint.textContent = '松开手指 取消发送';
+            targetText.textContent = '松开手指 取消';
+            targetIcon.textContent = '✕';
+        } else {
+            overlay.classList.remove('cancel-mode');
+            hint.textContent = '松手 发送语音';
+            targetText.textContent = '滑到这里 转文字';
+            targetIcon.textContent = '🔤';
+        }
+    }
+
+    function onRecEnd(e) {
+        cleanupRecListeners();
+        if (!isRecording) return;
+        if (recCancelMode) {
+            endRecCancel();
+        } else {
+            endRecSend();
+        }
+    }
+
+    function onRecEndTouch(e) {
+        cleanupRecListeners();
+        if (!isRecording) return;
+        if (recCancelMode) {
+            endRecCancel();
+        } else {
+            endRecSend();
+        }
+    }
+
+    function cleanupRecListeners() {
+        document.removeEventListener('mousemove', onRecMove);
+        document.removeEventListener('mouseup', onRecEnd);
+        document.removeEventListener('touchmove', onRecTouchMove);
+        document.removeEventListener('touchend', onRecEndTouch);
+    }
+
+    function endRecSend() {
+        if (!isRecording) return;
+        isRecording = false;
+        recCancelMode = false;
+        stopTimer();
+        stopWaveAnim();
+        cleanupRecListeners();
+        var overlay = document.getElementById('recOverlay');
+        overlay.classList.remove('show', 'cancel-mode');
+        voiceTranscript = VOICE_TRANSCRIPT_DEMO;
+        voiceStep = 'transcript';
+        renderVoiceStep();
+    }
+
+    function endRecCancel() {
+        if (!isRecording) return;
+        isRecording = false;
+        recCancelMode = false;
+        stopTimer();
+        stopWaveAnim();
+        cleanupRecListeners();
+        var overlay = document.getElementById('recOverlay');
+        overlay.classList.remove('show', 'cancel-mode');
+    }
+
+    /* 模拟实时波形 */
+    function startWaveAnim() {
+        var wave = document.getElementById('recWave');
+        wave.innerHTML = renderRecWaveBars();
+        waveAnimId = setInterval(function() {
+            var bars = wave.querySelectorAll('.rw-bar');
+            for (var i = 0; i < bars.length; i++) {
+                var h = 4 + Math.random() * 32;
+                bars[i].style.height = h + 'px';
+            }
+        }, 100);
+    }
+
+    function stopWaveAnim() {
+        if (waveAnimId) { clearInterval(waveAnimId); waveAnimId = null; }
+    }
+
+    function stopTimer() {
+        if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    }
+
+    function formatTime(sec) {
+        var m = Math.floor(sec / 60);
+        var s = sec % 60;
+        return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+    }
+
+    function renderRecWaveBars() {
+        var html = '';
+        for (var i = 0; i < 22; i++) {
+            html += '<div class="rw-bar" style="height:4px;"></div>';
+        }
+        return html;
+    }
+
+    function generateFromVoice() {
+        var ta = document.getElementById('voiceTranscript');
+        if (ta) voiceTranscript = ta.value;
+        if (!voiceTranscript || !voiceTranscript.trim()) { alert('请先录音或输入文字'); return; }
+        isAILoading = true;
+        renderVoiceStep();
+        setTimeout(function() {
+            isAILoading = false;
+            voiceStep = 'prompt';
+            renderVoiceStep();
+        }, 2000);
+    }
+
+    /* ===== 拍照识别流程 ===== */
+    function renderPhotoStep() {
+        var body = document.getElementById('questionBody');
+        var actions = document.getElementById('actionBar');
+
+        if (remainCount <= 0) { renderNoQuota(); return; }
+
+        if (photoStep === 'upload') {
+            if (photoDataUrl) {
+                photoStep = 'confirm';
+                renderPhotoStep();
+                return;
+            }
+            body.innerHTML = '<div class="photo-area">'
+                + '<div class="photo-upload-zone" onclick="document.getElementById(\'photoFileInput\').click()">'
+                +   '<div class="puz-icon">📷</div>'
+                +   '<div class="puz-text">点击拍照或上传图片</div>'
+                +   '<div class="puz-hint">AI 将识别图片内容，自动生成视频脚本</div>'
+                + '</div>'
+                + '</div>';
+            actions.innerHTML = '<div style="flex:1"></div><div style="flex:1"></div>';
+
+        } else if (photoStep === 'confirm') {
+            body.innerHTML = '<div class="photo-area">'
+                + '<img class="photo-preview" src="' + photoDataUrl + '">'
+                + '<div style="font-size:13px;color:#999;margin-top:4px;">确认上传这张照片进行 AI 识别？</div>'
+                + '</div>';
+            actions.innerHTML = '<button class="cp-prev" onclick="photoDataUrl=\'\'; photoStep=\'upload\'; renderPhotoStep()">← 重新选择</button>'
+                + '<button class="cp-next" onclick="startPhotoAnalysis()">✅ 确认识别</button>';
+
+        } else if (photoStep === 'analyzing') {
+            renderAILoading('AI 正在识别图片', '分析图片中的主体、场景、色彩...');
+            actions.innerHTML = '';
+
+        } else if (photoStep === 'result') {
+            body.innerHTML = '<div style="padding:4px 0;">'
+                + '<img class="photo-preview" src="' + photoDataUrl + '" style="max-height:160px;">'
+                + '<div class="cp-q-title" style="font-size:16px;margin:12px 0 8px;">🔍 AI 识别结果</div>'
+                + '<div style="font-size:13px;color:#999;margin-bottom:12px;">你可以修改识别结果，确认后提交给 AI 生成视频脚本：</div>'
+                + '<textarea class="cp-prompt-textarea" id="photoAnalysis" style="min-height:140px;">' + PHOTO_ANALYSIS_DEMO + '</textarea>'
+                + '</div>';
+            actions.innerHTML = '<button class="cp-prev" onclick="photoStep=\'confirm\'; renderPhotoStep()">← 重新识别</button>'
+                + '<button class="cp-next" onclick="generateFromPhoto()">✨ 提交给 AI 生成脚本</button>';
+
+        } else if (photoStep === 'generating') {
+            renderAILoading('AI 正在生成视频脚本', '根据图片识别结果创作视频脚本...');
+            actions.innerHTML = '';
+
+        } else if (photoStep === 'prompt') {
+            renderPromptPreview('photo');
+        }
+    }
+
+    function handlePhotoSelect(input) {
+        var file = input.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            photoDataUrl = e.target.result;
+            renderPhotoStep();
+        };
+        reader.readAsDataURL(file);
+        input.value = '';
+    }
+
+    function startPhotoAnalysis() {
+        photoStep = 'analyzing';
+        renderPhotoStep();
+        setTimeout(function() {
+            photoStep = 'result';
+            renderPhotoStep();
+        }, 2000);
+    }
+
+    function generateFromPhoto() {
+        photoStep = 'generating';
+        renderPhotoStep();
+        setTimeout(function() {
+            photoStep = 'prompt';
+            renderPhotoStep();
+        }, 2000);
+    }
+
+    /* ===== AI 加载动画 ===== */
+    function renderAILoading(mainText, subText) {
+        document.getElementById('questionBody').innerHTML = '<div class="ai-loading">'
+            + '<div class="al-spinner"></div>'
+            + '<div class="al-text">' + mainText + '</div>'
+            + '<div class="al-sub">' + subText + '</div>'
+            + '</div>';
+        document.getElementById('actionBar').innerHTML = '';
+    }
+
+    /* ===== 次数不足提示 ===== */
+    function renderNoQuota() {
+        document.getElementById('progressBar').innerHTML = '';
+        document.getElementById('questionBody').innerHTML = '<div style="text-align:center;padding:30px 10px;">'
+            + '<div style="font-size:48px;margin-bottom:16px;">⛔</div>'
+            + '<div style="font-size:18px;font-weight:700;color:#333;margin-bottom:8px;">生成次数已用完</div>'
+            + '<div style="font-size:13px;color:#999;margin-bottom:20px;line-height:1.6;">您当前的 AI 视频生成次数已用完，<br>购买后即可继续创作精彩视频</div>'
+            + '<a href="购买次数.html" style="display:inline-block;padding:12px 40px;background:linear-gradient(135deg,#FF9500,#FF6B00);color:#fff;border-radius:25px;text-decoration:none;font-size:16px;font-weight:600;box-shadow:0 4px 16px rgba(255,149,0,0.3);">🔥 立即购买次数</a>'
+            + '</div>';
+        document.getElementById('actionBar').innerHTML = '';
+    }
+
+    /* ===== 脚本预览（三种模式共用） ===== */
+    function renderPromptPreview(mode) {
+        var body = document.getElementById('questionBody');
+        var actions = document.getElementById('actionBar');
+
+        var tagHtml = mode === 'qa'
+            ? '<span class="prompt-source-tag qa">📝 问答创作</span>'
+            : mode === 'voice'
+            ? '<span class="prompt-source-tag voice">🎤 语音输入</span>'
+            : '<span class="prompt-source-tag photo">📷 拍照识别</span>';
+
+        var promptText = mode === 'qa' ? DEMO_PROMPT
+            : mode === 'voice' ? VOICE_PROMPT_DEMO
+            : PHOTO_PROMPT_DEMO;
+
+        body.innerHTML = '<div style="padding:4px 0;">'
+            + tagHtml
+            + '<div class="cp-q-title" style="font-size:16px;margin-bottom:12px;">🎬 我的视频脚本</div>'
+            + '<div style="font-size:13px;color:#666;margin-bottom:10px;">以下是 AI 根据你的输入生成的视频脚本，你可以直接使用或修改：</div>'
+            + '<textarea class="cp-prompt-textarea" id="promptPreview">' + promptText + '</textarea>'
+            + '</div>';
+
+        var backFn = mode === 'qa' ? 'prevStep()'
+            : mode === 'voice' ? 'voiceStep=\'transcript\'; renderVoiceStep()'
+            : 'photoStep=\'result\'; renderPhotoStep()';
+
+        actions.innerHTML = '<button class="cp-prev" onclick="' + backFn + '">← 修改输入</button>'
+            + '<button class="cp-next" onclick="generateVideo()">✅ 确认脚本</button>';
+    }
+
+    /* ===== QA 模式 ===== */
+    function getQAText() {
+        var parts = [];
+        for (var i = 0; i < questions.length; i++) {
+            var q = questions[i];
+            if (q.type === 'name' || q.type === 'input') {
+                parts.push(q.title + '：' + (answers[q.key] || '未填写'));
+            } else if (answers[q.key] !== undefined) {
+                parts.push(q.title + '：' + q.options[answers[q.key]].label);
+            }
+        }
+        return parts.join('；');
+    }
+
+    function updateQAPanel() {
+        var panel = document.getElementById('qaPanel');
+        if (!panel) return;
+        panel.textContent = getQAText();
+        panel.style.display = 'block';
+    }
+
+    function getPromptText() {
+        var gender = questions[0].options[answers['gender']].label;
+        var age = questions[1].options[answers['age']].label;
+        var scene = questions[2].options[answers['scene']].label;
+        var hook = questions[3].options[answers['hook']].label;
+        var style = questions[4].options[answers['style']].label;
+        var rhythm = questions[5].options[answers['rhythm']].label;
+        var mood = questions[6].options[answers['mood']].label;
+        var titleText = answers['titleText'] || '';
+        var name = answers['name'] || '小主角';
+        var result = '创作一个15秒竖屏AI视频。主角是' + age + '的' + gender + '，名叫' + name + '。'
+            + '场景设定在' + scene + '。'
+            + '开场方式：' + hook + '。'
+            + '视觉风格：' + style + '。'
+            + '剪辑节奏：' + rhythm + '。'
+            + '情绪基调：' + mood + '。'
+            + '配古风BGM。';
+        if (titleText) { result += '视频前3秒显示文字：' + titleText + '。'; }
+        return result;
+    }
+
+    function renderStep() {
+        var total = questions.length;
+        var isPromptStep = currentStep === total;
+
+        if (remainCount <= 0 && !isPromptStep) {
+            renderNoQuota();
+            return;
+        }
+
+        if (isPromptStep) {
+            updateQAPanel();
+            renderPromptPreview('qa');
+            return;
+        }
+
+        var progressHtml = '';
+        for (var i = 0; i < total; i++) {
+            var cls = i < currentStep ? 'done' : (i === currentStep ? 'active' : '');
+            progressHtml += '<div class="cp-dot ' + cls + '"></div>';
+        }
+        progressHtml += '<span class="cp-count">' + (currentStep + 1) + '/' + total + '</span>';
+        document.getElementById('progressBar').innerHTML = progressHtml;
+
+        var body = document.getElementById('questionBody');
+        var actions = document.getElementById('actionBar');
+        var q = questions[currentStep];
+        var isLast = currentStep === total - 1;
+        var isInput = q.type === 'name' || q.type === 'input';
+
+        if (isInput) {
+            var val = answers[q.key] || '';
+            var placeholder = q.type === 'name' ? '输入主角名字' : '输入视频前3s文字';
+            body.innerHTML = '<div class="cp-q-num">' + q.num + '</div>'
+                + '<div class="cp-q-title">' + q.title + '</div>'
+                + '<div class="cp-q-why">' + q.why + '</div>'
+                + '<input class="cp-name-input" id="inputField" value="' + val + '" placeholder="' + placeholder + '" maxlength="100" oninput="onInputChange(\'' + q.key + '\')" onblur="onInputBlur(\'' + q.key + '\')" autocomplete="off">';
+        } else {
+            var optsHtml = '<div class="cp-q-num">' + q.num + '</div>'
+                + '<div class="cp-q-title">' + q.title + '</div>'
+                + '<div class="cp-q-why">' + q.why + '</div>'
+                + '<div class="cp-q-options">';
+            for (var o = 0; o < q.options.length; o++) {
+                var opt = q.options[o];
+                var sel = answers[q.key] === o ? ' selected' : '';
+                optsHtml += '<div class="cp-option' + sel + '" onclick="selectOption(' + currentStep + ',' + o + ')">'
+                    + '<span class="cp-opt-emoji">' + opt.emoji + '</span>'
+                    + '<div class="cp-opt-text">'
+                    + '<div class="cp-opt-label">' + opt.label + '</div>'
+                    + '</div>'
+                    + '<div class="cp-opt-radio"></div>'
+                    + '</div>';
+            }
+            optsHtml += '</div>';
+            body.innerHTML = optsHtml;
+        }
+
+        var hasAnswer = isInput ? (answers[q.key] && answers[q.key].trim()) : (answers[q.key] !== undefined);
+        actions.innerHTML = ''
+            + (currentStep > 0 ? '<button class="cp-prev" onclick="prevStep()">← 上一题</button>' : '<div style="flex:1"></div>')
+            + (isLast
+                ? '<button class="cp-next" ' + (hasAnswer ? '' : 'disabled') + ' onclick="submitAll()">生成我的脚本</button>'
+                : '<button class="cp-next" ' + (hasAnswer ? '' : 'disabled') + ' onclick="nextStep()">下一题 →</button>');
+    }
+
+    function selectOption(step, optIdx) {
+        var q = questions[step];
+        answers[q.key] = optIdx;
+        renderStep();
+    }
+
+    function onInputChange(key) {
+        var input = document.getElementById('inputField');
+        if (input) answers[key] = input.value;
+    }
+
+    function onInputBlur(key) { renderStep(); }
+
+    function nextStep() {
+        var total = questions.length;
+        if (currentStep < total - 1) { currentStep++; renderStep(); }
+        else { currentStep = total; renderStep(); }
+    }
+
+    function prevStep() {
+        if (currentStep > 0) { currentStep--; renderStep(); }
+    }
+
+    function submitAll() {
+        for (var i = 0; i < questions.length; i++) {
+            var q = questions[i];
+            if (q.type === 'name' || q.type === 'input') {
+                if (!answers[q.key] || !answers[q.key].trim()) {
+                    currentStep = i; renderStep();
+                    var msg = q.type === 'name' ? '请给主角起个名字' : '请填写视频前3s文字';
+                    alert(msg); return;
+                }
+            } else {
+                if (answers[q.key] === undefined) { currentStep = i; renderStep(); return; }
+            }
+        }
+        currentStep = questions.length;
+        renderStep();
+    }
+
+    /* ===== 生成视频（三种模式共用） ===== */
+    function generateVideo() {
+        document.getElementById('titleOverlay').classList.add('show');
+    }
+
+    function closeTitlePopup() {
+        document.getElementById('titleOverlay').classList.remove('show');
+    }
+
+    function confirmGenerate() {
+        var title = document.getElementById('videoTitleInput').value.trim();
+        if (!title) { alert('请输入视频标题'); return; }
+        var prompt = document.getElementById('promptPreview').value;
+        remainCount = Math.max(0, remainCount - 1);
+        closeCreate();
+        closeTitlePopup();
+        alert('✅ 已提交AI创作\n\n标题：' + title + '\n\n脚本：\n' + prompt);
+    }
+</script>
+</html>

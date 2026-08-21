@@ -419,7 +419,7 @@
                     var actionsHtml = '';
                     if (isStudent && (g.status === 'verified' || g.status === 'expired')) {
                         actionsHtml = '<div class="tr-actions">'
-                            + '<button class="action-btn btn-eval" onclick="doEvaluate(\'' + esc(t.name) + '\')">评价</button>'
+                            + '<button class="action-btn btn-eval" onclick="goArchive(\'' + esc(t.name) + '\')">档案</button>'
                             + '<button class="action-btn btn-ai" onclick="doAiCreate(\'' + esc(t.name) + '\')">AI创作</button>'
                             + '</div>';
                     }
@@ -443,8 +443,8 @@
             list.innerHTML = html;
         }
 
-        function doEvaluate(name) {
-            location.href = '研学用户评价.html?name=' + encodeURIComponent(name);
+        function goArchive(name) {
+            location.href = '专属精彩.html?name=' + encodeURIComponent(name);
         }
         function doAiCreate(name) {
             location.href = '../../AI创作_v3.html?name=' + encodeURIComponent(name);
