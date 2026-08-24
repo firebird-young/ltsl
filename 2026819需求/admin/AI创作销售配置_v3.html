@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI销售配置 - 管理后台</title>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --accent: #0066cc;
+            --accent-hover: #0071e3;
+            --link: #0071e3;
+            --ink: #1d1d1f;
+            --ink-muted: #3f424b;
+            --ink-subtle: #86868b;
+            --border: #e0e0e0;
+            --card-bg: #ffffff;
+            --radius-sm: 9999px;
+            --radius-card: 18px;
+            --radius-pill: 9999px;
+            --shadow-card: 0 0 0 1px rgba(0,0,0,0.06);
+            --font: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font);
+            background: #f5f5f7;
+            min-height: 100vh;
+            color: var(--ink);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .header {
+            background: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header .logo { font-size: 18px; font-weight: 700; color: var(--accent); margin-right: 32px; }
+        .header .nav-list { display: flex; gap: 24px; list-style: none; }
+        .header .nav-list li { font-size: 14px; color: var(--ink-subtle); cursor: pointer; padding: 4px 0; position: relative; }
+        .header .nav-list li:hover { color: var(--accent); }
+        .header .nav-list li.active { color: var(--accent); font-weight: 600; }
+        .header .nav-list li.active::after { content: ''; position: absolute; bottom: -4px; left: 0; right: 0; height: 2px; background: var(--accent); border-radius: 1px; }
+        .header .user-area { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+        .header .user-area .avatar { width: 32px; height: 32px; border-radius: 50%; background: #E8F0FE; display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--accent); }
+        .header .user-area .name { font-size: 14px; color: var(--ink); }
+
+        .breadcrumb { padding: 16px 24px 0; font-size: 13px; color: var(--ink-subtle); }
+        .breadcrumb a { color: var(--ink-subtle); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--accent); }
+        .breadcrumb .current { color: var(--ink); font-weight: 500; }
+
+        .main { padding: 16px 24px 40px; }
+
+        .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        .page-header h2 { font-size: 20px; font-weight: 600; color: var(--ink); }
+
+        .hint-bar {
+            background: #E8F0FE;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: var(--accent);
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+
+        .config-card {
+            background: #fff;
+            border-radius: var(--radius-card);
+            padding: 24px;
+            box-shadow: var(--shadow-card);
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--accent);
+        }
+        .section-title .icon {
+            width: 20px; height: 20px;
+            border-radius: 6px;
+            background: #E8F0FE;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .form-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+        .form-row .fr-label { font-size: 13px; color: var(--ink-muted); min-width: 70px; flex-shrink: 0; }
+        .form-row input[type="number"] {
+            height: 36px;
+            padding: 0 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-pill);
+            font-size: 13px;
+            color: var(--ink);
+            outline: none;
+            transition: border-color 0.2s;
+            font-family: inherit;
+            background: #fff;
+        }
+        .form-row input[type="number"]:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,102,204,0.08); }
+        .form-row input.w-sm { width: 80px; }
+        .form-row .fr-unit { font-size: 13px; color: var(--ink-subtle); }
+
+        .switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .switch .slider {
+            position: absolute; cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #d0d5dd;
+            border-radius: 24px;
+            transition: 0.2s;
+        }
+        .switch .slider::before {
+            content: '';
+            position: absolute;
+            height: 18px; width: 18px;
+            left: 3px; bottom: 3px;
+            background: #fff;
+            border-radius: 50%;
+            transition: 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
+        .switch input:checked + .slider { background: var(--accent); }
+        .switch input:checked + .slider::before { transform: translateX(20px); }
+
+        .add-plan-btn {
+            width: 100%; height: 42px;
+            border: 1px dashed var(--border);
+            border-radius: var(--radius-card);
+            background: transparent;
+            font-size: 13px; color: var(--accent);
+            cursor: pointer; font-family: inherit; font-weight: 500;
+            transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .add-plan-btn:hover { background: #E8F0FE; border-color: var(--accent); }
+
+        /* 模板选择 */
+        .tm-plans { margin-bottom: 8px; }
+        .tm-plan {
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px 20px;
+            margin-bottom: 12px;
+            background: #fafafc;
+            position: relative;
+        }
+        .tm-plan .tp-del {
+            position: absolute; top: 14px; right: 14px;
+            width: 24px; height: 24px; border-radius: 50%;
+            border: none; background: #FFF0F0; color: #ff3b30;
+            font-size: 12px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .tm-plan .tp-fields { display: flex; gap: 18px; flex-wrap: wrap; }
+        .tm-plan .tp-fields .tpf-item { display: flex; align-items: center; gap: 8px; }
+        .tm-plan .tp-fields .tpf-item .tpf-label { font-size: 12px; color: var(--ink-subtle); white-space: nowrap; }
+        .tm-plan select, .tm-plan input[type="number"] {
+            height: 32px; padding: 0 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-pill);
+            font-size: 13px; color: var(--ink);
+            outline: none; font-family: inherit;
+            width: auto; background: #fff;
+        }
+        .tm-plan select { cursor: pointer; }
+        .tm-plan select:focus, .tm-plan input[type="number"]:focus { border-color: var(--accent); }
+        .tm-plan .tp-points { width: 70px; }
+        .tm-plan .tpf-unit { font-size: 12px; color: var(--ink-subtle); }
+
+        /* 消耗类型 Tab */
+        .product-tabs {
+            display: inline-flex;
+            gap: 4px;
+            padding: 4px;
+            background: #F2F3F7;
+            border-radius: var(--radius-pill);
+        }
+        .product-tab {
+            padding: 7px 18px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--ink-subtle);
+            background: transparent;
+            border: none;
+            border-radius: var(--radius-pill);
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .product-tab:hover { color: var(--ink); }
+        .product-tab.active {
+            background: #fff;
+            color: var(--accent);
+            font-weight: 600;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+        }
+
+        .bottom-actions { margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px; }
+        .btn {
+            height: 40px; padding: 0 32px;
+            border-radius: var(--radius-pill);
+            font-size: 14px; cursor: pointer;
+            border: none; transition: all 0.2s;
+            font-weight: 500; font-family: inherit;
+        }
+        .btn-cancel { background: transparent; color: var(--ink-subtle); border: 1px solid var(--border); }
+        .btn-cancel:hover { border-color: var(--accent); color: var(--accent); }
+        .btn-save { background: var(--accent); color: #fff; }
+        .btn-save:hover { background: var(--accent-hover); }
+
+        @media (max-width: 768px) {
+            .header { padding: 0 16px; }
+            .header .nav-list { display: none; }
+            .breadcrumb { padding: 12px 16px 0; }
+            .main { padding: 12px 16px 24px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">离泰数链</div>
+        <ul class="nav-list">
+            <li>概览</li>
+            <li>内容管理</li>
+            <li class="active">AI配置</li>
+            <li onclick="window.location.href='积分规则配置.html'" style="cursor:pointer;">积分管理</li>
+            <li onclick="window.location.href='../系统参数配置.html'" style="cursor:pointer;">系统设置</li>
+        </ul>
+        <div class="user-area">
+            <span class="avatar">管</span>
+            <span class="name">管理员</span>
+        </div>
+    </div>
+
+    <div class="breadcrumb">
+        <a href="../index.html">首页</a>
+        <span class="sep"> &gt; </span>
+        <a href="#">AI配置</a>
+        <span class="sep"> &gt; </span>
+        <span class="current">AI销售配置（按点购买）</span>
+    </div>
+
+    <div class="main">
+        <div class="page-header">
+            <h2>AI销售配置（按点购买）</h2>
+        </div>
+
+        <div class="hint-bar">
+            💡 本页面对应「购买点数」移动端页面。用户购买点数后，可通过点数兑换 AI 创作次数。AI 视频、图片创作统一使用点数计算，不再区分。
+        </div>
+
+        <!-- ===== 点数消耗配置 ===== -->
+        <div class="config-card">
+            <div class="section-title">
+                <span class="icon">耗</span>
+                点数消耗配置
+            </div>
+
+            <!-- 消耗说明 -->
+            <div style="margin-bottom:18px;">
+                <div style="font-size:13px;font-weight:500;color:var(--ink);margin-bottom:8px;">点数消耗说明</div>
+                <textarea id="consumeDesc" rows="3" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:13px;color:var(--ink);outline:none;font-family:inherit;resize:vertical;line-height:1.6;background:#fff;"></textarea>
+            </div>
+
+            <!-- 消耗类型 Tab -->
+            <div class="product-tabs" style="margin-bottom:16px;">
+                <button class="product-tab active" id="tabVideo" onclick="switchConsumeTab('video')">🎬 视频模版</button>
+                <button class="product-tab" id="tabImage" onclick="switchConsumeTab('image')">🖼️ 图片模版</button>
+            </div>
+
+            <!-- 视频消耗模板列表 -->
+            <div id="videoPlanWrap">
+                <div class="tm-plans" id="consumePlanList"></div>
+                <button class="add-plan-btn" onclick="addConsumePlan()">+ 新增消耗模板</button>
+                <div style="margin-top:14px;font-size:12px;color:var(--ink-subtle);">
+                    说明：根据视频模型、分辨率、视频时长配置对应的点数消耗模板，用户创作时按匹配的模板扣除点数。可新建多个模板。
+                </div>
+            </div>
+
+            <!-- 图片消耗模板列表 -->
+            <div id="imagePlanWrap" style="display:none;">
+                <div class="tm-plans" id="imagePlanList"></div>
+                <button class="add-plan-btn" onclick="addImageConsumePlan()">+ 新增消耗模板</button>
+                <div style="margin-top:14px;font-size:12px;color:var(--ink-subtle);">
+                    说明：根据图片模型配置对应的点数消耗模板，用户创作时按匹配的模板扣除点数。可新建多个模板。
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-actions">
+            <button class="btn btn-cancel" onclick="history.back()">取消</button>
+            <button class="btn btn-save" onclick="saveConfig()">保存配置</button>
+        </div>
+    </div>
+
+    <script>
+        // 视频消耗模板
+        var modelOptions = ['Seedance-2.0-mini', 'Seedance-2.0-fast', 'Seedance-2.5'];
+        var resolutionOptions = ['480p', '720p', '1080p'];
+        var consumePlans = [];
+
+        function renderConsumePlans() {
+            var list = document.getElementById('consumePlanList');
+            var html = '';
+            for (var i = 0; i < consumePlans.length; i++) {
+                var t = consumePlans[i];
+                var modelSel = '<select onchange="updateConsumePlan(' + i + ', \'model\', this.value)">';
+                for (var m = 0; m < modelOptions.length; m++) {
+                    modelSel += '<option value="' + modelOptions[m] + '"' + (t.model === modelOptions[m] ? ' selected' : '') + '>' + modelOptions[m] + '</option>';
+                }
+                modelSel += '</select>';
+                var resSel = '<select onchange="updateConsumePlan(' + i + ', \'resolution\', this.value)">';
+                for (var r = 0; r < resolutionOptions.length; r++) {
+                    resSel += '<option value="' + resolutionOptions[r] + '"' + (t.resolution === resolutionOptions[r] ? ' selected' : '') + '>' + resolutionOptions[r] + '</option>';
+                }
+                resSel += '</select>';
+                html += '<div class="tm-plan">'
+                    + '<button class="tp-del" onclick="delConsumePlan(' + i + ')">✕</button>'
+                    + '<div class="tp-fields">'
+                    + '<div class="tpf-item"><span class="tpf-label">视频模型</span>' + modelSel + '</div>'
+                    + '<div class="tpf-item"><span class="tpf-label">分辨率</span>' + resSel + '</div>'
+                    + '<div class="tpf-item"><span class="tpf-label">视频时长</span><input type="number" class="tp-points" value="' + t.duration + '" min="1" max="30" step="1" onchange="updateConsumePlan(' + i + ', \'duration\', parseInt(this.value) || 1)"><span class="tpf-unit">秒</span></div>'
+                    + '<div class="tpf-item"><span class="tpf-label">消耗点数</span><input type="number" class="tp-points" value="' + t.points + '" min="1" step="1" onchange="updateConsumePlan(' + i + ', \'points\', parseInt(this.value) || 1)"><span class="tpf-unit">点</span></div>'
+                    + '</div>'
+                    + '</div>';
+            }
+            list.innerHTML = html;
+        }
+
+        function addConsumePlan() {
+            consumePlans.push({ model: 'Seedance-2.0-mini', resolution: '480p', duration: 5, points: 1 });
+            renderConsumePlans();
+        }
+
+        function delConsumePlan(idx) {
+            consumePlans.splice(idx, 1);
+            renderConsumePlans();
+        }
+
+        function updateConsumePlan(idx, field, value) {
+            consumePlans[idx][field] = value;
+        }
+
+        // 图片消耗模板
+        var imageModelOptions = ['doubao-seedream-4.0', 'doubao-seedream-4.5', 'doubao-seedream-5.0-lite', 'doubao-seedream-5.0-pro'];
+        var imageConsumePlans = [];
+
+        function renderImageConsumePlans() {
+            var list = document.getElementById('imagePlanList');
+            var html = '';
+            for (var i = 0; i < imageConsumePlans.length; i++) {
+                var t = imageConsumePlans[i];
+                var modelSel = '<select onchange="updateImageConsumePlan(' + i + ', \'model\', this.value)">';
+                for (var m = 0; m < imageModelOptions.length; m++) {
+                    modelSel += '<option value="' + imageModelOptions[m] + '"' + (t.model === imageModelOptions[m] ? ' selected' : '') + '>' + imageModelOptions[m] + '</option>';
+                }
+                modelSel += '</select>';
+                html += '<div class="tm-plan">'
+                    + '<button class="tp-del" onclick="delImageConsumePlan(' + i + ')">✕</button>'
+                    + '<div class="tp-fields">'
+                    + '<div class="tpf-item"><span class="tpf-label">图片模型</span>' + modelSel + '</div>'
+                    + '<div class="tpf-item"><span class="tpf-label">消耗点数</span><input type="number" class="tp-points" value="' + t.points + '" min="1" step="1" onchange="updateImageConsumePlan(' + i + ', \'points\', parseInt(this.value) || 1)"><span class="tpf-unit">点</span></div>'
+                    + '</div>'
+                    + '</div>';
+            }
+            list.innerHTML = html;
+        }
+
+        function addImageConsumePlan() {
+            imageConsumePlans.push({ model: 'doubao-seedream-4.0', points: 1 });
+            renderImageConsumePlans();
+        }
+
+        function delImageConsumePlan(idx) {
+            imageConsumePlans.splice(idx, 1);
+            renderImageConsumePlans();
+        }
+
+        function updateImageConsumePlan(idx, field, value) {
+            imageConsumePlans[idx][field] = value;
+        }
+
+        function switchConsumeTab(type) {
+            document.querySelectorAll('.product-tab').forEach(function(el) { el.classList.remove('active'); });
+            document.getElementById(type === 'image' ? 'tabImage' : 'tabVideo').classList.add('active');
+            document.getElementById('videoPlanWrap').style.display = type === 'video' ? '' : 'none';
+            document.getElementById('imagePlanWrap').style.display = type === 'image' ? '' : 'none';
+        }
+
+        function saveConfig() {
+            var data = {
+                consumeDesc: document.getElementById('consumeDesc').value.trim(),
+                consumePlans: consumePlans,
+                imageConsumePlans: imageConsumePlans
+            };
+            localStorage.setItem('aiSalesConfigV2', JSON.stringify(data));
+            alert('✅ AI销售配置 已保存');
+        }
+
+        function loadConfig() {
+            var saved = localStorage.getItem('aiSalesConfigV2');
+            if (saved) {
+                try {
+                    var data = JSON.parse(saved);
+                    consumePlans = data.consumePlans && data.consumePlans.length > 0 ? data.consumePlans : [ { model: 'Seedance-2.0-mini', resolution: '480p', duration: 5, points: 1 } ];
+                    imageConsumePlans = data.imageConsumePlans && data.imageConsumePlans.length > 0 ? data.imageConsumePlans : [ { model: 'doubao-seedream-4.0', points: 1 } ];
+                    document.getElementById('consumeDesc').value = data.consumeDesc || '';
+                } catch(e) {
+                    consumePlans = [ { model: 'Seedance-2.0-mini', resolution: '480p', duration: 5, points: 1 } ];
+                    imageConsumePlans = [ { model: 'doubao-seedream-4.0', points: 1 } ];
+                }
+            } else {
+                document.getElementById('consumeDesc').value = '点数消耗说明';
+                consumePlans = [ { model: 'Seedance-2.0-mini', resolution: '480p', duration: 5, points: 1 } ];
+                imageConsumePlans = [ { model: 'doubao-seedream-4.0', points: 1 } ];
+            }
+            renderConsumePlans();
+            renderImageConsumePlans();
+        }
+
+        loadConfig();
+    </script>
+</body>
+</html>

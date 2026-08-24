@@ -743,13 +743,13 @@
         .share-popup .sp-btn-primary:active { opacity: 0.85; }
         .share-popup .sp-btn-secondary { background: transparent; color: #999; font-size: 13px; font-weight: 400; height: 36px; border: 1px dashed #ddd; border-radius: 8px; }
 
-        /* ── 功能说明面板（始终位于手机框右侧）── */
+        /* ── 功能说明面板（固定于页面右侧，不遮挡手机框）── */
         .doc-panel {
             position: fixed;
-            left: 50%;
+            right: 24px;
             top: 24px;
-            margin-left: 235px;
-            width: 560px;
+            width: min(560px, calc(50vw - 240px));
+            min-width: 300px;
             background: #fff;
             border-radius: 12px;
             box-shadow: 0 6px 24px rgba(0,0,0,.12);

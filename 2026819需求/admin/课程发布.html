@@ -347,6 +347,10 @@
         .type-right { margin-left: auto; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
         .type-max-order { display: flex; align-items: center; gap: 8px; }
         .type-max-order .label { font-size: 13px; color: #555; white-space: nowrap; }
+        .range-input { width: 60px; height: 34px; border: 1px solid #d9d9d9; border-radius: 6px; text-align: center; font-size: 14px; outline: none; background: #fff; -moz-appearance: textfield; }
+        .range-input::-webkit-outer-spin-button,
+        .range-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+        .range-dash { font-size: 14px; color: #666; }
         .type-remove { font-size: 13px; color: #D43828; cursor: pointer; border: none; background: transparent; white-space: nowrap; }
 
         .spec-card { border: 1px solid #eef0f5; border-radius: 8px; padding: 16px 18px; margin-bottom: 12px; background: #fafbff; }
@@ -1158,7 +1162,7 @@
                     ? '<span class="type-name">' + ty.name + '</span><span class="main-type-tag">主类型</span>'
                     : '<span class="type-name">【' + ty.name + '】</span>';
                 specHtml += '<div class="type-block">' + nameHtml
-                    + (!ty.isMain && ty.maxPerOrder ? '<span class="max-per-order">单笔限购 ' + ty.maxPerOrder + ' 人</span>' : '');
+                    + (!ty.isMain && (ty.minPerOrder || ty.maxPerOrder) ? '<span class="max-per-order">每单 ' + (ty.minPerOrder || 1) + '-' + (ty.maxPerOrder || 1) + ' 人</span>' : '');
                 ty.specs.forEach(function(s) {
                     var ageTxt = s.ageLimit ? '，' + s.ageStart + '-' + s.ageEnd + '岁' : '';
                     specHtml += '<div class="spec-item"><span>' + s.name + '</span><span class="price">' + s.price + '元</span><span class="meta">' + ageTxt + '</span></div>';
@@ -1182,7 +1186,7 @@
         return { name: '', price: 0, ageLimit: false, ageStart: 0, ageEnd: 0 };
     }
     function createType(isMain) {
-        return { isMain: isMain, name: '', maxPerOrder: 1, specs: [createSpec()] };
+        return { isMain: isMain, name: '', minPerOrder: 1, maxPerOrder: 1, specs: [createSpec()] };
     }
 
     function openPlanModal() {
@@ -1286,10 +1290,13 @@
     function addType() { planTypes.push(createType(false)); renderPlanTypes(); }
     function removeType(ti) { if (planTypes[ti].isMain) return; planTypes.splice(ti, 1); renderPlanTypes(); }
     function setTypeName(ti, val) { planTypes[ti].name = val; }
-    function setTypeMax(ti, val) { planTypes[ti].maxPerOrder = Math.max(0, parseInt(val) || 0); }
-    function changeTypeMax(ti, delta) {
-        planTypes[ti].maxPerOrder = Math.max(0, (parseInt(planTypes[ti].maxPerOrder) || 0) + delta);
-        renderPlanTypes();
+    function setTypeMin(ti, val) {
+        planTypes[ti].minPerOrder = Math.max(0, parseInt(val) || 0);
+        if (planTypes[ti].minPerOrder > planTypes[ti].maxPerOrder) { planTypes[ti].maxPerOrder = planTypes[ti].minPerOrder; renderPlanTypes(); }
+    }
+    function setTypeMax(ti, val) {
+        planTypes[ti].maxPerOrder = Math.max(0, parseInt(val) || 0);
+        if (planTypes[ti].maxPerOrder < planTypes[ti].minPerOrder) { planTypes[ti].minPerOrder = planTypes[ti].maxPerOrder; renderPlanTypes(); }
     }
 
     function addSpec(ti) { planTypes[ti].specs.push(createSpec()); renderPlanTypes(); }
@@ -1316,8 +1323,10 @@
                 : '<span class="type-tag sub">类型 ' + t + '</span><input type="text" class="type-name-input" placeholder="请输入类型名称（如：家长）" maxlength="10" value="' + esc(ty.name) + '" oninput="setTypeName(' + t + ', this.value)">';
             var rightHtml = '';
             if (!ty.isMain) {
-                rightHtml += '<div class="type-max-order"><span class="label">一单最大购买人数</span>'
-                    + '<div class="stepper"><button type="button" onclick="changeTypeMax(' + t + ',-1)">-</button><input type="number" value="' + ty.maxPerOrder + '" min="0" onchange="setTypeMax(' + t + ', this.value)"><button type="button" onclick="changeTypeMax(' + t + ',1)">+</button></div>'
+                rightHtml += '<div class="type-max-order"><span class="label">每单购买人数</span>'
+                    + '<input type="number" class="range-input" value="' + ty.minPerOrder + '" min="0" onchange="setTypeMin(' + t + ', this.value)">'
+                    + '<span class="range-dash">-</span>'
+                    + '<input type="number" class="range-input" value="' + ty.maxPerOrder + '" min="0" onchange="setTypeMax(' + t + ', this.value)">'
                     + '<span class="stepper-unit">人</span></div>'
                     + '<button type="button" class="type-remove" onclick="removeType(' + t + ')">删除类型</button>';
             }
@@ -1379,7 +1388,7 @@
             confirmDays: parseInt(document.getElementById('confirmDays').value, 10) || 1,
             types: planTypes.map(function(ty) {
                 return {
-                    isMain: ty.isMain, name: ty.name, maxPerOrder: ty.maxPerOrder || 1,
+                    isMain: ty.isMain, name: ty.name, minPerOrder: ty.minPerOrder || 1, maxPerOrder: ty.maxPerOrder || 1,
                     specs: ty.specs.map(function(s) {
                         return { name: s.name, price: s.price, ageLimit: s.ageLimit, ageStart: s.ageStart, ageEnd: s.ageEnd };
                     })
@@ -1400,7 +1409,7 @@
         selectedDates = p.dates.slice();
         planTypes = p.types.map(function(ty) {
             return {
-                isMain: ty.isMain, name: ty.name, maxPerOrder: ty.maxPerOrder || 1,
+                isMain: ty.isMain, name: ty.name, minPerOrder: ty.minPerOrder || 1, maxPerOrder: ty.maxPerOrder || 1,
                 specs: ty.specs.map(function(s) {
                     return { name: s.name, price: s.price, ageLimit: s.ageLimit, ageStart: s.ageStart || 0, ageEnd: s.ageEnd || 0 };
                 })
