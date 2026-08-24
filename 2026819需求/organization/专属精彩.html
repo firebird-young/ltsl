@@ -11,6 +11,9 @@
             background: #f5f6f8;
             display: flex;
             justify-content: center;
+            align-items: flex-start;
+            gap: 24px;
+            padding: 20px 0;
             min-height: 100vh;
         }
         .app-container {
@@ -127,6 +130,27 @@
             background: #f8f8f8; margin-top: 8px; border-radius: 0 0 16px 16px; font-family: inherit;
         }
         .action-sheet .as-cancel:active { background: #f0f0f0; }
+
+        /* ── 功能说明面板 ── */
+        .doc-panel {
+            width: 560px; background: #fff; border-radius: 16px;
+            box-shadow: 0 2px 20px rgba(0,0,0,.08);
+            padding: 24px 28px;
+            max-height: calc(100vh - 40px); overflow-y: auto;
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', Arial, sans-serif;
+            line-height: 1.7; font-size: 14px; color: #333;
+        }
+        .doc-panel::-webkit-scrollbar { width: 5px; }
+        .doc-panel::-webkit-scrollbar-thumb { background: #d0d5e0; border-radius: 3px; }
+        .doc-panel .doc-title { font-size: 20px; font-weight: 700; color: #1F3864; border-bottom: 2px solid #2E75B6; padding-bottom: 10px; margin-bottom: 16px; }
+        .doc-panel h3 { font-size: 16px; font-weight: 600; color: #2E75B6; margin: 16px 0 8px; }
+        .doc-panel p { font-size: 13px; color: #555; margin-bottom: 6px; }
+        .doc-panel ul { padding-left: 20px; margin: 4px 0 8px; }
+        .doc-panel li { margin-bottom: 3px; font-size: 13px; color: #555; }
+        @media (max-width: 1100px) {
+            body { flex-direction: column; align-items: center; padding: 12px 0; }
+            .doc-panel { width: 100%; max-width: 430px; max-height: none; }
+        }
     </style>
 </head>
 <body>
@@ -193,6 +217,38 @@
         <button class="as-item primary" onclick="chooseCamera()">📷 拍照/录像</button>
         <button class="as-item" onclick="chooseAlbum()">🖼️ 从相册选择</button>
         <button class="as-cancel" onclick="closeUploadSheet()">取消</button>
+    </div>
+
+    <!-- 功能说明面板 -->
+    <div class="doc-panel">
+        <div class="doc-title">专属精彩 - 功能说明</div>
+        <div class="doc-section">
+            <h3>1. 页面用途</h3>
+            <p>「专属精彩」是学生的研学成果素材中心，用于查看和上传本次研学活动的专属视频与图片，并可通过顶部快捷入口跳转到「AI作品」和「研学评价」页面。</p>
+        </div>
+        <div class="doc-section">
+            <h3>2. 快捷入口</h3>
+            <ul>
+                <li><b>AI作品</b>：点击跳转 AI 创作页，进入后继续使用该学生的 AI 创作功能。</li>
+                <li><b>研学评价</b>：点击跳转研学评价页，为该学生撰写研学评价。</li>
+            </ul>
+        </div>
+        <div class="doc-section">
+            <h3>3. 上传专属精彩</h3>
+            <ul>
+                <li><b>视频上传</b>：点击「上传视频」块，支持从相册选择或直接录像，可多选；仅支持 mp4 格式，单文件最大 100MB。</li>
+                <li><b>图片上传</b>：点击「上传图片」块，支持从相册选择或直接拍照，可多选；仅支持 jpg/png 格式，单文件最大 20MB。</li>
+                <li><b>上传方式</b>：点击上传块会弹出底部选择面板，提供「📷 拍照/录像」和「🖼️ 从相册选择」两个选项。</li>
+            </ul>
+        </div>
+        <div class="doc-section">
+            <h3>4. 素材管理与预览</h3>
+            <ul>
+                <li><b>网格预览</b>：上传后的视频、图片以三列网格展示，视频缩略图带「▶ 视频」角标。</li>
+                <li><b>删除素材</b>：每个素材右上角有 × 按钮，点击可单独删除。</li>
+                <li><b>自动去重</b>：重复选择同一文件（同名且同大小）时自动忽略，不会重复上传。</li>
+            </ul>
+        </div>
     </div>
 
     <script>

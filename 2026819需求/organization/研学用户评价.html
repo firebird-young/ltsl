@@ -11,6 +11,9 @@
             background: #f5f6f8;
             display: flex;
             justify-content: center;
+            align-items: flex-start;
+            gap: 24px;
+            padding: 20px 0;
             min-height: 100vh;
         }
         .app-container {
@@ -131,6 +134,27 @@
             border-radius: 3px; transition: width 0.3s;
         }
 
+        /* ── 功能说明面板 ── */
+        .doc-panel {
+            width: 560px; background: #fff; border-radius: 16px;
+            box-shadow: 0 2px 20px rgba(0,0,0,.08);
+            padding: 24px 28px;
+            max-height: calc(100vh - 40px); overflow-y: auto;
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', Arial, sans-serif;
+            line-height: 1.7; font-size: 14px; color: #333;
+        }
+        .doc-panel::-webkit-scrollbar { width: 5px; }
+        .doc-panel::-webkit-scrollbar-thumb { background: #d0d5e0; border-radius: 3px; }
+        .doc-panel .doc-title { font-size: 20px; font-weight: 700; color: #1F3864; border-bottom: 2px solid #2E75B6; padding-bottom: 10px; margin-bottom: 16px; }
+        .doc-panel h3 { font-size: 16px; font-weight: 600; color: #2E75B6; margin: 16px 0 8px; }
+        .doc-panel p { font-size: 13px; color: #555; margin-bottom: 6px; }
+        .doc-panel ul { padding-left: 20px; margin: 4px 0 8px; }
+        .doc-panel li { margin-bottom: 3px; font-size: 13px; color: #555; }
+        @media (max-width: 1100px) {
+            body { flex-direction: column; align-items: center; padding: 12px 0; }
+            .doc-panel { width: 100%; max-width: 430px; max-height: none; }
+        }
+
     </style>
 </head>
 <body>
@@ -212,6 +236,38 @@
             <div class="gen-title">AI正在生成评价</div>
             <div class="gen-progress-text" id="genProgressText">正在分析...</div>
             <div class="gen-progress-bar"><div class="gen-progress-fill" id="genProgressFill"></div></div>
+        </div>
+    </div>
+
+    <!-- 功能说明面板 -->
+    <div class="doc-panel">
+        <div class="doc-title">研学用户评价 - 功能说明</div>
+        <div class="doc-section">
+            <h3>1. 页面用途</h3>
+            <p>研学课程结束后，机构人员为学生撰写研学评价。页面顶部显示学生姓名，整个流程包含「输入提示词 → AI 生成评价 → 评星提交」三步。</p>
+        </div>
+        <div class="doc-section">
+            <h3>2. 撰写评价</h3>
+            <ul>
+                <li><b>评价提示词</b>：在输入框填写提示词，作为 AI 生成评价的依据。</li>
+                <li><b>插入变量</b>：提供 {用户姓名}、{课程名称} 两个变量快捷按钮，点击后在光标处插入，生成时自动替换为实际姓名和课程名称。</li>
+                <li><b>生成评价</b>：点击底部「✨ 生成评价」按钮，弹出 AI 生成进度弹窗（正在分析 → 生成评价内容 → 即将完成），完成后自动切换到评价结果视图。</li>
+            </ul>
+        </div>
+        <div class="doc-section">
+            <h3>3. 评价结果</h3>
+            <ul>
+                <li><b>评价内容</b>：AI 根据提示词中的关键词自动生成对应维度的评价句子，结果区域支持直接点击编辑修改。</li>
+                <li><b>评分</b>：点击 1-5 星为本次评价打分，同步显示文字描述。</li>
+            </ul>
+        </div>
+        <div class="doc-section">
+            <h3>4. 提交与编辑</h3>
+            <ul>
+                <li><b>提交评价</b>：完成评星后点击「💾 提交评价」，评价内容与评星变为只读，底部切换为「重新生成 + 编辑」。</li>
+                <li><b>重新生成</b>：返回输入视图并保留原提示词，可调整后重新生成。</li>
+                <li><b>编辑</b>：提交后可点击「✏️ 编辑」恢复评价内容和评星的可编辑状态，修改后再次提交。</li>
+            </ul>
         </div>
     </div>
 

@@ -11,6 +11,9 @@
             background: #f5f6f8;
             display: flex;
             justify-content: center;
+            align-items: flex-start;
+            gap: 24px;
+            padding: 20px 0;
             min-height: 100vh;
         }
         .app-container {
@@ -166,6 +169,27 @@
             z-index: 999; opacity: 0; transition: opacity .25s; pointer-events: none;
         }
         .toast.show { opacity: 1; }
+
+        /* ── 功能说明面板 ── */
+        .doc-panel {
+            width: 560px; background: #fff; border-radius: 16px;
+            box-shadow: 0 2px 20px rgba(0,0,0,.08);
+            padding: 24px 28px;
+            max-height: calc(100vh - 40px); overflow-y: auto;
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', Arial, sans-serif;
+            line-height: 1.7; font-size: 14px; color: #333;
+        }
+        .doc-panel::-webkit-scrollbar { width: 5px; }
+        .doc-panel::-webkit-scrollbar-thumb { background: #d0d5e0; border-radius: 3px; }
+        .doc-panel .doc-title { font-size: 20px; font-weight: 700; color: #1F3864; border-bottom: 2px solid #2E75B6; padding-bottom: 10px; margin-bottom: 16px; }
+        .doc-panel h3 { font-size: 16px; font-weight: 600; color: #2E75B6; margin: 16px 0 8px; }
+        .doc-panel p { font-size: 13px; color: #555; margin-bottom: 6px; }
+        .doc-panel ul { padding-left: 20px; margin: 4px 0 8px; }
+        .doc-panel li { margin-bottom: 3px; font-size: 13px; color: #555; }
+        @media (max-width: 1100px) {
+            body { flex-direction: column; align-items: center; padding: 12px 0; }
+            .doc-panel { width: 100%; max-width: 430px; max-height: none; }
+        }
     </style>
 </head>
 <body>
@@ -242,6 +266,39 @@
 
     <!-- Toast -->
     <div class="toast" id="toast"></div>
+
+    <!-- 功能说明面板 -->
+    <div class="doc-panel">
+        <div class="doc-title">研学信息 - 功能说明</div>
+        <div class="doc-section">
+            <h3>1. 页面用途</h3>
+            <p>教师填写研学时长与研学内容提示词，由 AI 生成本次课程的研学信息，展示给参与人查看。</p>
+        </div>
+        <div class="doc-section">
+            <h3>2. 研学信息填写</h3>
+            <ul>
+                <li><b>研学时长</b>：文本输入，如「2小时」「半天」「全天」等。</li>
+                <li><b>研学内容提示词</b>：多行文本输入，描述希望 AI 生成的内容方向。</li>
+                <li><b>插入变量</b>：一键插入 <code>{课程名称}</code>、<code>{课程时间}</code>，生成时会替换为当前课程实际信息。</li>
+            </ul>
+        </div>
+        <div class="doc-section">
+            <h3>3. AI 生成</h3>
+            <ul>
+                <li>点击「✨ 生成研学信息」按钮，弹出生成进度弹窗，依次展示「分析课程信息 → 生成研学内容 → 即将完成」。</li>
+                <li>生成完成后自动切换到结果态，展示研学时长与研学内容。</li>
+            </ul>
+        </div>
+        <div class="doc-section">
+            <h3>4. 结果展示与操作</h3>
+            <ul>
+                <li><b>直接编辑</b>：研学内容区域可直接点击编辑，实时修改。</li>
+                <li><b>保存信息</b>：点击「💾 保存信息」后内容锁定，提示「已保存，研学信息将同步展示给参与人」，按钮切换为「🔄 重新生成 / ✏️ 编辑」。</li>
+                <li><b>编辑</b>：点击「✏️ 编辑」可重新解锁内容编辑。</li>
+                <li><b>重新生成</b>：点击「🔄 重新生成」回到填写态（保留已填提示词），可修改后再次生成。</li>
+            </ul>
+        </div>
+    </div>
 
     <script>
         var COURSE_NAME = '省博探秘 · AI赋活';

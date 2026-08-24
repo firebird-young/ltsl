@@ -9,6 +9,10 @@
     body {
         background: #F4F6FA;
         display: flex; justify-content: center;
+        align-items: flex-start;
+        gap: 24px;
+        padding: 20px 0;
+        min-height: 100vh;
         font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
     }
     .app-container {
@@ -114,6 +118,26 @@
         z-index: 999; opacity: 0; transition: opacity .25s; pointer-events: none;
     }
     .toast.show { opacity: 1; }
+    /* ===== 功能说明面板 ===== */
+    .doc-panel {
+        width: 560px; background: #fff; border-radius: 16px;
+        box-shadow: 0 2px 20px rgba(0,0,0,.08);
+        padding: 24px 28px;
+        max-height: calc(100vh - 40px); overflow-y: auto;
+        font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', Arial, sans-serif;
+        line-height: 1.7; font-size: 14px; color: #333;
+    }
+    .doc-panel::-webkit-scrollbar { width: 5px; }
+    .doc-panel::-webkit-scrollbar-thumb { background: #d0d5e0; border-radius: 3px; }
+    .doc-panel .doc-title { font-size: 20px; font-weight: 700; color: #1F3864; border-bottom: 2px solid #2E75B6; padding-bottom: 10px; margin-bottom: 16px; }
+    .doc-panel h3 { font-size: 16px; font-weight: 600; color: #2E75B6; margin: 16px 0 8px; }
+    .doc-panel p { font-size: 13px; color: #555; margin-bottom: 6px; }
+    .doc-panel ul { padding-left: 20px; margin: 4px 0 8px; }
+    .doc-panel li { margin-bottom: 3px; font-size: 13px; color: #555; }
+    @media (max-width: 1100px) {
+        body { flex-direction: column; align-items: center; padding: 12px 0; }
+        .doc-panel { width: 100%; max-width: 430px; max-height: none; }
+    }
 </style>
 </head>
 <body>
@@ -186,6 +210,43 @@
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
+<!-- 功能说明面板 -->
+<div class="doc-panel">
+    <div class="doc-title">研学现场 - 功能说明</div>
+    <div class="doc-section">
+        <h3>1. 页面用途</h3>
+        <p>展示当前研学课程信息，上传研学现场实时采集的图片与视频素材，供所有参与人查看。</p>
+    </div>
+    <div class="doc-section">
+        <h3>2. 课程信息</h3>
+        <ul>
+            <li>顶部展示课程卡片（课程名称、时间、状态徽标），当前示例为「省博探秘 · AI赋活 · 待出行」。</li>
+            <li><b>进入研学信息</b>：点击入口跳转到研学信息页，使用 AI 生成研学信息并同步展示给参与人。</li>
+        </ul>
+    </div>
+    <div class="doc-section">
+        <h3>3. 图片上传</h3>
+        <ul>
+            <li>点击「添加图片」块，弹出底部选择面板，可选「📷 相机拍摄」或「🖼️ 相册上传」。</li>
+            <li>支持多选，jpg/png 格式，单文件最大 20MB，无数量上限。</li>
+        </ul>
+    </div>
+    <div class="doc-section">
+        <h3>4. 视频上传</h3>
+        <ul>
+            <li>点击「添加视频」块，同样弹出底部选择面板，可选「📷 相机拍摄」或「🖼️ 相册上传」。</li>
+            <li>支持多选，mp4 格式，单文件最大 20MB，无数量上限。</li>
+        </ul>
+    </div>
+    <div class="doc-section">
+        <h3>5. 素材管理与预览</h3>
+        <ul>
+            <li><b>网格预览</b>：图片、视频分别以四列网格展示，视频缩略图带「视频」角标。</li>
+            <li><b>删除素材</b>：每个素材右上角有 × 按钮，点击可单独删除。</li>
+        </ul>
+    </div>
+</div>
+
 <script>
     const videoGrid = document.getElementById('videoGrid');
     const imageGrid = document.getElementById('imageGrid');
@@ -206,7 +267,6 @@
                 <span class="ug-del" onclick="deleteVideo(${i})">×</span>`;
             videoGrid.appendChild(item);
         });
-        videoAdd.style.display = videos.length >= 9 ? 'none' : 'flex';
     }
 
     function renderImages() {
@@ -219,12 +279,10 @@
                 <span class="ug-del" onclick="deleteImage(${i})">×</span>`;
             imageGrid.appendChild(item);
         });
-        imageAdd.style.display = images.length >= 9 ? 'none' : 'flex';
     }
 
     function handleVideoFiles(files) {
         Array.from(files).forEach(file => {
-            if (videos.length >= 9) return;
             videos.push(URL.createObjectURL(file));
         });
         renderVideos();
@@ -232,7 +290,6 @@
 
     function handleImageFiles(files) {
         Array.from(files).forEach(file => {
-            if (images.length >= 9) return;
             images.push(URL.createObjectURL(file));
         });
         renderImages();
