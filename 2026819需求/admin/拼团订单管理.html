@@ -304,6 +304,12 @@
             <input type="text" id="filterCourse" placeholder="请输入课程名称">
             <label>场次时间</label>
             <input type="date" id="filterDate">
+            <label>场次名称</label>
+            <input type="text" id="filterSessionName" placeholder="请输入场次名称，如 内测">
+            <label>核验机构</label>
+            <select id="filterVerify"><option value="">全部</option></select>
+            <label>执行机构</label>
+            <select id="filterExec"><option value="">全部</option></select>
             <button class="btn-primary" onclick="renderTable()">查询</button>
             <button class="btn-ghost" onclick="resetFilter()">重置</button>
             <button class="btn-ghost" onclick="exportGroups()">导出</button>
@@ -467,11 +473,19 @@
         var fId = document.getElementById('filterId').value.trim();
         var fCourse = document.getElementById('filterCourse').value.trim();
         var fDate = document.getElementById('filterDate').value;
+        var fSessionName = document.getElementById('filterSessionName').value.trim();
+        var fVerify = document.getElementById('filterVerify').value;
+        var fExec = document.getElementById('filterExec').value;
         var list = groups.filter(function(g) {
             if (currentTab !== 'all' && g.status !== currentTab) return false;
             if (fId && g.id.indexOf(fId) === -1) return false;
             if (fCourse && g.course.indexOf(fCourse) === -1) return false;
             if (fDate && g.courseTime !== fDate) return false;
+            var sessionParts = g.session.split(' ');
+            var sessionName = sessionParts.slice(1).join(' ');
+            if (fSessionName && sessionName.indexOf(fSessionName) === -1) return false;
+            if (fVerify && g.verifyInstitution !== fVerify) return false;
+            if (fExec && g.execInstitution !== fExec) return false;
             return true;
         });
         if (list.length === 0) {
@@ -592,6 +606,9 @@
         document.getElementById('filterId').value = '';
         document.getElementById('filterCourse').value = '';
         document.getElementById('filterDate').value = '';
+        document.getElementById('filterSessionName').value = '';
+        document.getElementById('filterVerify').value = '';
+        document.getElementById('filterExec').value = '';
         renderTable();
     }
 
@@ -660,6 +677,22 @@
         alert('企微群图片已保存');
     }
 
+    function fillOrgOptions() {
+        var verifySet = {}, execSet = {};
+        groups.forEach(function(g) {
+            if (g.verifyInstitution) verifySet[g.verifyInstitution] = 1;
+            if (g.execInstitution) execSet[g.execInstitution] = 1;
+        });
+        var vSel = document.getElementById('filterVerify');
+        var eSel = document.getElementById('filterExec');
+        Object.keys(verifySet).forEach(function(name) {
+            vSel.innerHTML += '<option value="' + name + '">' + name + '</option>';
+        });
+        Object.keys(execSet).forEach(function(name) {
+            eSel.innerHTML += '<option value="' + name + '">' + name + '</option>';
+        });
+    }
+    fillOrgOptions();
     updateBadges();
     renderTable();
 </script>
@@ -674,9 +707,9 @@
         <p><b>总述</b>：拼团订单管理页用于后台查看和管理所有拼团订单，支持按条件搜索、按状态筛选、查看订单详情、导出数据，并可在指定状态下进入研学报告管理。</p>
         <h4>1. 搜索筛选</h4>
         <ul>
-            <li>支持按<b>拼团订单号、产品编号、场次名称、创建时间、最晚拼团确认时间</b>精确搜索。</li>
-            <li>支持按<b>核验机构、执行机构</b>下拉筛选。</li>
-            <li>点击"🔍 搜索"应用条件，"↻ 重置"清空条件。</li>
+            <li>支持按<b>拼团编号、课程名称、场次时间、场次名称</b>搜索，并按<b>核验机构、执行机构</b>下拉筛选。</li>
+            <li>场次时间通过<b>日期选择控件</b>选择年月日，场次名称支持关键字模糊匹配（如"内测""上午场"）；核验机构、执行机构选项<b>自动从订单数据生成</b>。</li>
+            <li>点击"查询"应用条件，"重置"清空条件。</li>
         </ul>
         <h4>2. 状态标签页</h4>
         <ul>
@@ -692,6 +725,9 @@
         <h4>4. 操作列</h4>
         <ul>
             <li><b>查看</b>：所有订单均提供，点击查看订单详情。</li>
+            <li><b>手动完成</b>：仅"<b>待成团</b>"状态的订单显示，用于人工确认成团；点击后弹<b>二次确认</b>，确认后订单状态变为"已完成"并记录成团时间。</li>
+            <li><b>发送提醒</b>：仅"<b>待出行</b>"状态的订单显示，向参团用户发送出行提醒；点击后弹<b>二次确认</b>，确认后提示"已发送出行提醒"。</li>
+            <li><b>企微群</b>：所有订单均提供，点击弹出<b>企微群二维码上传</b>弹窗，支持选择图片预览上传，保存后提示"企微群图片已保存"。</li>
             <li><b>研学报告管理</b>：仅"<b>待出行</b>""<b>已完成</b>"状态的订单显示，点击跳转至该订单的研学报告管理页。</li>
             <li><b>导出</b>：右上角"📥 导出"按钮，将当前列表数据导出。</li>
         </ul>

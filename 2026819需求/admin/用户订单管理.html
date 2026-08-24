@@ -242,8 +242,14 @@
             <input type="text" id="filterId" placeholder="请输入订单编号">
             <label>用户手机</label>
             <input type="text" id="filterPhone" placeholder="请输入用户手机号">
-            <label>课程编号</label>
-            <input type="text" id="filterCourseNo" placeholder="请输入课程编号">
+            <label>课程名称</label>
+            <input type="text" id="filterCourseName" placeholder="请输入课程名称">
+            <label>拼团编号</label>
+            <input type="text" id="filterGroupId" placeholder="请输入拼团订单编号">
+            <label>场次时间</label>
+            <input type="date" id="filterSessionDate">
+            <label>场次名称</label>
+            <input type="text" id="filterSessionName" placeholder="请输入场次名称，如 内测">
             <button class="btn-primary" onclick="renderTable()">查询</button>
             <button class="btn-ghost" onclick="resetFilter()">重置</button>
             <button class="btn-ghost" onclick="exportOrders()">导出</button>
@@ -461,12 +467,21 @@
         var tbody = document.getElementById('orderTableBody');
         var fId = document.getElementById('filterId').value.trim();
         var fPhone = document.getElementById('filterPhone').value.trim();
-        var fCourseNo = document.getElementById('filterCourseNo').value.trim();
+        var fCourseName = document.getElementById('filterCourseName').value.trim();
+        var fGroupId = document.getElementById('filterGroupId').value.trim();
+        var fSessionDate = document.getElementById('filterSessionDate').value.trim();
+        var fSessionName = document.getElementById('filterSessionName').value.trim();
         var list = orders.filter(function(o) {
             if (currentTab !== 'all' && o.status !== currentTab) return false;
             if (fId && o.id.indexOf(fId) === -1) return false;
             if (fPhone && o.user.phone.indexOf(fPhone) === -1) return false;
-            if (fCourseNo && o.courseNo.indexOf(fCourseNo) === -1) return false;
+            if (fCourseName && o.course.indexOf(fCourseName) === -1) return false;
+            if (fGroupId && o.groupId.indexOf(fGroupId) === -1) return false;
+            var sessionParts = o.session.split(' ');
+            var sessionDate = sessionParts[0] || '';
+            var sessionName = sessionParts.slice(1).join(' ');
+            if (fSessionDate && sessionDate.indexOf(fSessionDate) === -1) return false;
+            if (fSessionName && sessionName.indexOf(fSessionName) === -1) return false;
             return true;
         });
         if (list.length === 0) {
@@ -641,7 +656,10 @@
     function resetFilter() {
         document.getElementById('filterId').value = '';
         document.getElementById('filterPhone').value = '';
-        document.getElementById('filterCourseNo').value = '';
+        document.getElementById('filterCourseName').value = '';
+        document.getElementById('filterGroupId').value = '';
+        document.getElementById('filterSessionDate').value = '';
+        document.getElementById('filterSessionName').value = '';
         renderTable();
     }
 
@@ -698,7 +716,7 @@
         </ul>
         <h4>2. 搜索筛选</h4>
         <ul>
-            <li>支持按<b>订单编号、用户手机、课程编号</b>精确搜索。</li>
+            <li>支持按<b>订单编号、用户手机、课程名称、拼团订单编号、场次时间、场次名称</b>精确搜索。</li>
             <li>点击"查询"应用条件，"重置"清空条件。</li>
         </ul>
         <h4>3. 订单列表</h4>
