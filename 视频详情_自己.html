@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>视频详情 - 离泰数链</title>
+    <title>我的作品 - 视频详情</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -364,6 +364,10 @@
                 <span class="ab-icon">↗</span>
                 <span>分享</span>
             </button>
+            <button class="ab-btn" id="deleteBtn" style="color:#ff3b30;" onclick="deleteVideo()">
+                <span class="ab-icon">🗑</span>
+                <span>删除</span>
+            </button>
         </div>
 
         <div class="comment-preview" id="commentPreview">
@@ -393,25 +397,29 @@
 </div>
 
 <script>
+    // 与「我的作品」页数据对应的作品列表（均为当前用户自己的作品）
     var feedData = [
-        { id: 1, title: '博物馆犀牛', video: '博物馆.mp4', cover: '博物馆.mp4', creator: '晓宇', realCreator: '张**', course: '我为杜甫建茅屋', liked: false, likes: 28, showAllComments: false, comments: [
+        { id: 0, title: '博物馆犀牛', video: '博物馆.mp4', cover: '博物馆.mp4', creator: '晓宇', realCreator: '张**', course: '我为杜甫建茅屋', liked: false, likes: 28, showAllComments: false, comments: [
             { cid: 1, avatar: '👦', name: '小梅', text: '好有意思的画面，感觉回到了唐代！', time: '2小时前', isMine: false },
             { cid: 2, avatar: '👨', name: '浩浩', text: 'AI生成的视频越来越棒了', time: '5小时前', isMine: false }
         ]},
-        { id: 2, title: '茅屋搭建的完整过程', video: '博物馆.mp4', cover: '快速搭建茅屋', creator: '梅梅', realCreator: '杨*', course: '快速搭建茅屋', liked: false, likes: 15, showAllComments: false, comments: [
-            { cid: 3, avatar: '👤', name: '飞飞', text: '这个搭建过程讲解得很清楚', time: '1天前', isMine: false }
+        { id: 1, title: '杜甫和李白的故事', video: '博物馆.mp4', cover: '杜甫和李白.png', creator: '晓宇', realCreator: '张**', course: '我为杜甫建茅屋', liked: false, likes: 35, showAllComments: false, comments: [
+            { cid: 3, avatar: '👩', name: '小红', text: '两大诗人的故事真有趣', time: '3小时前', isMine: false },
+            { cid: 4, avatar: '👤', name: '小梅', text: '画面很有诗意', time: '1天前', isMine: false }
         ]},
-        { id: 3, title: '诗界无心·草堂寻心', video: '博物馆.mp4', cover: '诗界无心·草堂寻心.jpg', creator: '浩宇', realCreator: '王**', course: '诗界无心·草堂寻心', liked: true, likes: 42, showAllComments: false, comments: [
-            { cid: 4, avatar: '👩', name: '小红', text: '画面太美了，像水墨画一样', time: '1天前', isMine: false },
-            { cid: 5, avatar: '👦', name: '小明', text: '下次我也要去草堂看看', time: '2天前', isMine: false },
-            { cid: 6, avatar: '👨', name: '大力', text: 'AI创作的水平越来越高了', time: '2天前', isMine: false }
+        { id: 2, title: '茅屋搭建的完整过程', video: '博物馆.mp4', cover: '快速搭建茅屋', creator: '晓宇', realCreator: '张**', course: '快速搭建茅屋', liked: false, likes: 15, showAllComments: false, comments: [
+            { cid: 5, avatar: '👤', name: '飞飞', text: '这个搭建过程讲解得很清楚', time: '1天前', isMine: false }
         ]},
-        { id: 4, title: '盆景美学·指尖上的山水', video: '博物馆.mp4', cover: '盆景美学·指尖上的山水.jpg', creator: '小宇', realCreator: '刘*', course: '盆景美学·指尖山水', liked: false, likes: 33, showAllComments: false, comments: [
-            { cid: 7, avatar: '👤', name: '晓华', text: '盆景艺术配上AI视频太有创意了', time: '3天前', isMine: false }
+        { id: 3, title: '诗界无心·草堂寻心', video: '博物馆.mp4', cover: '诗界无心·草堂寻心.jpg', creator: '晓宇', realCreator: '张**', course: '诗界无心·草堂寻心', liked: true, likes: 42, showAllComments: false, comments: [
+            { cid: 6, avatar: '👩', name: '小红', text: '画面太美了，像水墨画一样', time: '1天前', isMine: false },
+            { cid: 7, avatar: '👦', name: '小明', text: '下次我也要去草堂看看', time: '2天前', isMine: false },
+            { cid: 8, avatar: '👨', name: '大力', text: 'AI创作的水平越来越高了', time: '2天前', isMine: false }
         ]},
-        { id: 5, title: '杜甫和李白的故事', video: '博物馆.mp4', cover: '杜甫和李白.png', creator: '小明', realCreator: '赵**', course: '杜甫和李白的故事', liked: false, likes: 21, showAllComments: false, comments: []},
-        { id: 6, title: '春假托管班精彩回顾', video: '博物馆.mp4', cover: '盆景美学·指尖上的山水.jpg', creator: '芳芳', realCreator: '李*', course: '春假托管班', liked: false, likes: 18, showAllComments: false, comments: [
-            { cid: 8, avatar: '👩', name: '小芳', text: '孩子们玩得很开心', time: '4天前', isMine: false }
+        { id: 4, title: '盆景美学·指尖上的山水', video: '博物馆.mp4', cover: '盆景美学·指尖上的山水.jpg', creator: '晓宇', realCreator: '张**', course: '盆景美学·指尖山水', liked: false, likes: 33, showAllComments: false, comments: [
+            { cid: 9, avatar: '👤', name: '晓华', text: '盆景艺术配上AI视频太有创意了', time: '3天前', isMine: false }
+        ]},
+        { id: 5, title: '春假托管班精彩回顾', video: '博物馆.mp4', cover: '盆景美学·指尖上的山水.jpg', creator: '晓宇', realCreator: '张**', course: '春假托管班', liked: false, likes: 18, showAllComments: false, comments: [
+            { cid: 10, avatar: '👩', name: '小芳', text: '孩子们玩得很开心', time: '4天前', isMine: false }
         ]},
     ];
 
@@ -428,7 +436,8 @@
         document.getElementById('caName').innerHTML = f.creator + ' <span class="ca-real">' + f.realCreator + '</span>';
         document.getElementById('caCourseText').textContent = f.course;
 
-        // 社区入口：无论是否自己的作品，均不可删除视频（操作栏不显示删除按钮）
+        // 我的作品入口：均为自己的作品，始终显示删除按钮
+        document.getElementById('deleteBtn').style.display = 'flex';
 
         var video = document.getElementById('mainVideo');
         video.src = f.video;
@@ -451,7 +460,7 @@
     }
 
     function goBack() {
-        window.location.href = '社区.html';
+        window.location.href = '我的作品.html';
     }
 
     function togglePlay() {
@@ -488,8 +497,8 @@
         var f = feedData[currentIdx];
         document.getElementById('csCount').textContent = f.comments.length;
         var list = document.getElementById('csList');
-        // 社区入口：所有评论均不可删除（无论是否自己的评论）
-        var isMyVideo = false;
+        // 我的作品入口：自己的作品下所有评论可删，自己发的评论也可删
+        var isMyVideo = f.creator === currentUser;
         var html = '';
         for (var i = 0; i < f.comments.length; i++) {
             var c = f.comments[i];
@@ -646,26 +655,25 @@
         <button class="fm-close" onclick="toggleFuncModal()">✕</button>
     </div>
     <div class="fm-body">
-        <h4>一、视频播放</h4>
+        <h4>一、页面入口</h4>
+        <ul>
+            <li><strong>来源</strong>：本页从「我的作品」点击作品卡片进入，展示当前用户自己的作品</li>
+            <li><strong>返回</strong>：顶部返回按钮回到我的作品页</li>
+        </ul>
+        <h4>二、视频播放</h4>
         <ul>
             <li><strong>全屏播放</strong>：进入页面自动播放视频，点击视频切换播放/暂停</li>
-            <li><strong>顶部信息</strong>：显示视频标题，左侧返回按钮回到社区列表</li>
-        </ul>
-        <h4>二、创作者信息</h4>
-        <ul>
-            <li><strong>头像与昵称</strong>：显示创作者头像、登录账号昵称和打码真实姓名</li>
-            <li><strong>关联课程</strong>：展示视频关联的研学课程名称，带「课程」标识标签</li>
+            <li><strong>顶部信息</strong>：显示视频标题</li>
         </ul>
         <h4>三、互动操作</h4>
         <ul>
             <li><strong>点赞</strong>：点击爱心按钮点赞/取消点赞，实时更新点赞数</li>
             <li><strong>评论</strong>：点击评论按钮弹出底部浮层，可查看全部评论和发送新评论</li>
-            <li><strong>评论</strong>：可查看全部评论和发送新评论，社区入口不支持删除评论（长按无删除操作）</li>
-            <li><strong>删除作品</strong>：社区入口无论是否自己的作品，均不显示删除按钮、不可删除视频</li>
+            <li><strong>长按删除评论</strong>：长按评论条目 600ms 后出现「松手删除」提示，松手确认后可删除。自己的作品下所有评论均可删，自己发的评论也可删</li>
+            <li><strong>删除作品</strong>：自己的作品操作栏显示红色「删除」按钮，点击确认后可删除视频并返回我的作品页</li>
             <li><strong>分享</strong>：点击分享按钮（原型示意）</li>
         </ul>
     </div>
 </div>
 </body>
 </html>
-
