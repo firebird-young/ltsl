@@ -331,6 +331,122 @@
         }
         .create-popup .cp-prompt-textarea:focus { border-color: #0669FF; }
 
+        /* ===== 模式返回条 ===== */
+        .mode-back-bar { padding: 4px 0 10px; }
+        .mode-back-btn {
+            display: inline-flex; align-items: center; gap: 2px;
+            font-size: 12px; color: #666;
+            background: rgba(255,255,255,0.7); border: 1px solid #E3E3EA;
+            border-radius: 14px; padding: 4px 12px; cursor: pointer;
+        }
+        .mode-back-btn:active { background: #E8F1FF; color: #0669FF; }
+        .mode-select-title { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 12px; }
+
+        /* ===== 图片创作 ===== */
+        .img-create { padding: 8px 0; }
+        .img-title { font-size: 16px; font-weight: 600; color: #333; margin-bottom: 4px; }
+        .img-desc { font-size: 13px; color: #999; margin-bottom: 16px; }
+        .img-textarea {
+            width: 100%; min-height: 140px; padding: 14px;
+            border: 1px solid #e0e0e0; border-radius: 10px;
+            font-size: 13px; color: #333; resize: vertical; outline: none;
+            font-family: inherit; line-height: 1.7; background: #fafafa;
+        }
+        .img-textarea:focus { border-color: #0669FF; }
+        .img-hint { font-size: 12px; color: #bbb; margin-top: 8px; }
+        .img-ref-block { margin-bottom: 12px; }
+        .img-ref-title { font-size: 13px; font-weight: 600; color: #333; margin-bottom: 8px; }
+        .img-ref-empty {
+            border: 1px dashed #d0d5e0; border-radius: 10px; padding: 18px 0;
+            display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer;
+            background: #fafafd; margin-bottom: 8px;
+        }
+        .img-ref-empty .ire-icon { font-size: 30px; }
+        .img-ref-empty .ire-text { font-size: 13px; color: #888; }
+        .img-ref-actions { display: flex; gap: 8px; }
+        .queued-modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,.45);
+            display: none; align-items: center; justify-content: center; z-index: 9999;
+        }
+        .queued-modal.show { display: flex; }
+        .queued-modal-card {
+            width: 280px; background: #fff; border-radius: 16px;
+            padding: 30px 22px 22px; text-align: center;
+        }
+        .queued-modal-card .qm-icon { font-size: 44px; margin-bottom: 12px; }
+        .queued-modal-card .qm-title { font-size: 16px; font-weight: 600; color: #333; margin-bottom: 8px; }
+        .queued-modal-card .qm-desc { font-size: 13px; color: #999; margin-bottom: 20px; }
+        .queued-modal-card .qm-btn {
+            width: 100%; height: 42px; border: none; border-radius: 10px;
+            background: #0669FF; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit;
+        }
+
+        /* ===== 参考图引用 ===== */
+        .ref-section { margin-bottom: 6px; }
+        .ref-title { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 10px; }
+        .ref-sub { font-size: 12px; color: #999; font-weight: 400; }
+        .ref-radio-group { display: flex; gap: 10px; margin-bottom: 10px; }
+        .ref-radio {
+            flex: 1; height: 38px; border-radius: 8px; border: 1px solid #e2e5ee;
+            background: #fff; color: #555; font-size: 13px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            font-family: inherit;
+        }
+        .ref-radio input { accent-color: #0669FF; }
+        .ref-radio.active { border-color: #0669FF; background: #E8F1FF; color: #0669FF; font-weight: 600; }
+        .ref-preview-area { min-height: 44px; }
+        .ref-empty {
+            border: 1px dashed #e0e3ec; border-radius: 8px; padding: 12px 0;
+            text-align: center; font-size: 12px; color: #bbb; background: #fafafd;
+        }
+        .ref-preview-wrap { position: relative; }
+        .ref-preview {
+            height: 120px; border-radius: 10px; background-size: cover; background-position: center;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .ref-preview.ai { flex-direction: column; gap: 6px; }
+        .ref-preview.ai .ref-ai-icon { font-size: 34px; }
+        .ref-ai-name { font-size: 12px; color: #fff; background: rgba(0,0,0,.35); padding: 2px 8px; border-radius: 8px; }
+        .ref-reupload {
+            margin-top: 8px; text-align: center; font-size: 12px; color: #0669FF;
+            padding: 9px 0; border: 1px dashed #b9c8f2; border-radius: 8px; cursor: pointer; background: #F4F8FF;
+        }
+        .ref-del {
+            position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; border-radius: 50%;
+            background: rgba(0,0,0,.5); border: none; color: #fff; font-size: 12px; line-height: 1;
+            cursor: pointer; font-family: inherit;
+        }
+        .ref-upload-modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,.45);
+            display: none; align-items: flex-end; justify-content: center; z-index: 10010;
+        }
+        .ref-upload-modal.show { display: flex; }
+        .ref-upload-sheet {
+            width: 100%; max-width: 430px; background: #fff; border-radius: 16px 16px 0 0;
+            padding: 10px 14px 20px;
+        }
+        .ref-upload-head { text-align: center; font-size: 14px; font-weight: 600; color: #333; padding: 10px 0 8px; }
+        .ref-upload-item {
+            height: 46px; display: flex; align-items: center; justify-content: center;
+            font-size: 15px; color: #333; cursor: pointer; border-bottom: 1px solid #f5f5f7;
+        }
+        .ref-upload-cancel {
+            height: 46px; display: flex; align-items: center; justify-content: center;
+            font-size: 15px; color: #999; cursor: pointer; margin-top: 8px; background: #f5f5f7; border-radius: 10px;
+        }
+        .ref-ai-modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,.45);
+            display: none; align-items: center; justify-content: center; z-index: 10011;
+        }
+        .ref-ai-modal.show { display: flex; }
+        .ref-ai-panel { width: 320px; background: #fff; border-radius: 16px; padding: 18px; }
+        .ref-ai-head { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 12px; text-align: center; }
+        .ref-ai-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .ref-ai-item { cursor: pointer; text-align: center; }
+        .ref-ai-thumb { height: 90px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 30px; margin-bottom: 6px; }
+        .ref-ai-label { font-size: 12px; color: #666; }
+        .ref-ai-cancel { width: 100%; height: 38px; margin-top: 14px; border: none; border-radius: 10px; background: #f5f5f7; color: #666; font-size: 14px; cursor: pointer; font-family: inherit; }
+
         /* ===== 创作模式选择 ===== */
         .mode-select { padding: 8px 0; }
         .mode-card {
@@ -626,6 +742,31 @@
         .share-popup .sp-btn-primary { background: #0669FF; color: #fff; }
         .share-popup .sp-btn-primary:active { opacity: 0.85; }
         .share-popup .sp-btn-secondary { background: transparent; color: #999; font-size: 13px; font-weight: 400; height: 36px; border: 1px dashed #ddd; border-radius: 8px; }
+
+        /* ── 功能说明面板（始终位于手机框右侧）── */
+        .doc-panel {
+            position: fixed;
+            left: 50%;
+            top: 24px;
+            margin-left: 235px;
+            width: 560px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 6px 24px rgba(0,0,0,.12);
+            border: 1px solid #e6e9f2;
+            padding: 24px 28px;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', Arial, sans-serif;
+            line-height: 1.7; font-size: 14px; color: #333;
+        }
+        .doc-panel::-webkit-scrollbar { width: 5px; }
+        .doc-panel::-webkit-scrollbar-thumb { background: #d0d5e0; border-radius: 3px; }
+        .doc-panel .doc-title { font-size: 20px; font-weight: 700; color: #1F3864; border-bottom: 2px solid #2E75B6; padding-bottom: 10px; margin-bottom: 16px; }
+        .doc-panel h3 { font-size: 16px; font-weight: 600; color: #2E75B6; margin: 16px 0 8px; }
+        .doc-panel p { font-size: 13px; color: #555; margin-bottom: 6px; }
+        .doc-panel ul { padding-left: 20px; margin: 4px 0 8px; }
+        .doc-panel li { margin-bottom: 3px; font-size: 13px; color: #555; }
     </style>
 </head>
 <body>
@@ -651,9 +792,9 @@
         <div class="course-tag">我为杜甫建茅屋</div>
         <div class="creating-section">
             <div class="section-header">
-                <div class="sh-left"><span class="sh-icon">⏳</span><span class="sh-title">创作中</span><span class="sh-count"><strong>2</strong></span></div>
+                <div class="sh-left"><span class="sh-icon">⏳</span><span class="sh-title">创作中</span><span class="sh-count"><strong id="creatingCount">2</strong></span></div>
             </div>
-            <div class="creating-grid">
+            <div class="creating-grid" id="creatingGrid">
                 <div class="creating-card"><span class="cc-icon">📹</span><div class="cc-progress"></div></div>
                 <div class="creating-card"><span class="cc-icon">📹</span><div class="cc-progress"></div></div>
                 <div class="creating-card"><span class="cc-icon">🎮</span><div class="cc-progress" style="background:#ccc;"></div></div>
@@ -679,12 +820,12 @@
     <div class="cp-header">
         <span class="cp-title">AI创作</span>
         <div style="display:flex;align-items:center;gap:8px;">
-            <button class="cp-close" id="backToSelectBtn" onclick="backToModeSelect()" style="font-size:12px;width:auto;padding:4px 12px;border-radius:14px;" title="返回选择">选择模式</button>
             <button class="cp-close" onclick="closeCreate()">✕</button>
         </div>
     </div>
     <div class="cp-tabs">
         <button class="cp-tab active" onclick="switchCreateTab('video')">🎬 视频创作</button>
+        <button class="cp-tab" onclick="switchCreateTab('image')">🖼️ 图片创作</button>
         <button class="cp-tab" onclick="switchCreateTab('game')">🎮 游戏创作</button>
     </div>
     <div class="cp-progress" id="progressBar"></div>
@@ -692,6 +833,36 @@
     <div class="cp-actions" id="actionBar"></div>
 </div>
 <input type="file" id="photoFileInput" accept="image/*" capture="environment" onchange="handlePhotoSelect(this)" style="display:none;">
+<input type="file" id="refPhotoInput" accept="image/*" capture="environment" onchange="handleRefPhoto(this)" style="display:none;">
+<input type="file" id="refAlbumInput" accept="image/*" onchange="handleRefPhoto(this)" style="display:none;">
+<input type="file" id="imgRefPhotoInput" accept="image/*" capture="environment" onchange="handleImgRefPhoto(this)" style="display:none;">
+<input type="file" id="imgRefAlbumInput" accept="image/*" onchange="handleImgRefPhoto(this)" style="display:none;">
+
+<div class="queued-modal" id="queuedModal">
+    <div class="queued-modal-card">
+        <div class="qm-icon">⏳</div>
+        <div class="qm-title">正在生成中</div>
+        <div class="qm-desc">稍后可以在作品中查看</div>
+        <button class="qm-btn" onclick="confirmQueued()">稍后查看</button>
+    </div>
+</div>
+
+<div class="ref-ai-modal" id="refAiModal">
+    <div class="ref-ai-panel">
+        <div class="ref-ai-head">🎨 选择 AI 创作图片</div>
+        <div class="ref-ai-grid" id="refAiGrid"></div>
+        <button class="ref-ai-cancel" onclick="closeRefAiPicker()">取消</button>
+    </div>
+</div>
+
+<div class="ref-upload-modal" id="refUploadModal">
+    <div class="ref-upload-sheet">
+        <div class="ref-upload-head">选择参考图</div>
+        <div class="ref-upload-item" onclick="pickRefCamera()">📷 拍照</div>
+        <div class="ref-upload-item" onclick="pickRefAlbum()">🖼️ 从相册选择</div>
+        <div class="ref-upload-cancel" onclick="closeRefUploadSheet()">取消</div>
+    </div>
+</div>
 
 <!-- 标题输入弹窗 -->
 <div class="title-overlay" id="titleOverlay" onclick="if(event.target===this)closeTitlePopup()">
@@ -776,6 +947,31 @@
 
 
 </script>
+
+<!-- 功能说明面板 -->
+<div class="doc-panel">
+    <div class="doc-title">AI创作页 · 功能说明</div>
+
+    <h3>总述</h3>
+    <p>AI创作页用于让创作者通过 AI 生成视频和图片作品，支持视频创作（问答、语音、拍照三种输入方式）与图片创作。作品提交后异步生成，自动进入「创作中」列表，生成完成后归入「已完成」。</p>
+
+    <h3>2. 视频创作</h3>
+    <ul>
+        <li>提供三种创作方式：<b>问答创作 / 语音输入 / 拍照识别</b>。</li>
+        <li><b>问答创作</b>：按步骤回答 AI 提问，逐步生成视频脚本。</li>
+        <li><b>语音输入</b>：长按「🎤 按住说话」录音（微信风格录音浮层，带声波动画与计时），松手发送语音；滑动到底部目标条「滑到这里 发送」，滑至取消区松手取消；录音后展示语音识别结果，可编辑后生成脚本。</li>
+        <li><b>拍照识别</b>：点击虚线框拍照或从相册选择图片，AI 分析画面内容后生成视频脚本。</li>
+        <li><b>我的视频脚本</b>（三种方式最后一步）：展示 AI 生成的脚本，可直接编辑修改；顶部提供<b>参考图引用</b>（单选「上传 / 图片库」，仅限 1 张）——「上传」支持拍照或从相册选择，「图片库」从已创作好的 AI 图片中选择。</li>
+        <li><b>确认脚本</b>：点击后弹出「⏳ 正在生成中，稍后查看」异步提示，作品进入「创作中」列表。</li>
+    </ul>
+
+    <h3>3. 图片创作</h3>
+    <ul>
+        <li>支持上传<b>参考图</b>（拍照或相册，仅限 1 张），展示在提示词上方；默认提示词为「请把参考图的小男生生成卡通风格形象」。</li>
+        <li>输入图片描述，<b>提示词不超过 500 字</b>。</li>
+        <li>点击「生成图片」后关闭弹窗，弹出「⏳ 正在生成中 / 稍后查看」提示，点击「稍后查看」后作品自动加入主页「创作中」列表。</li>
+    </ul>
+</div>
 </body>
 <script>
     /* ===== 数据 ===== */
@@ -860,11 +1056,12 @@
             alert('🎮 游戏创作功能即将上线，敬请期待！');
             return;
         }
-        createTab = 'video';
+        createTab = tab;
         createMode = 'select';
         var tabs = document.querySelectorAll('.cp-tab');
         for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('active');
-        tabs[0].classList.add('active');
+        tabs[tab === 'image' ? 1 : 0].classList.add('active');
+        renderRemainBanner();
         renderCreate();
     }
 
@@ -875,13 +1072,14 @@
         if (!tabs) return;
         var banner = document.createElement('div');
         banner.id = 'remainBanner';
+        var tabName = createTab === 'image' ? '🖼️ 图片创作' : '🎬 视频创作';
         if (remainCount <= 0) {
             banner.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:#FFF3E0;font-size:12px;color:#E65100;flex-shrink:0;';
-            banner.innerHTML = '<span>⛔ 视频创作剩余0次</span>'
+            banner.innerHTML = '<span>⛔ ' + tabName + '剩余0次</span>'
                 + '<a href="购买次数.html" style="padding:4px 12px;background:#FF9500;color:#fff;border-radius:16px;text-decoration:none;font-size:12px;font-weight:600;">立即购买</a>';
         } else {
             banner.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:#E8F5E9;font-size:12px;color:#2E7D32;flex-shrink:0;';
-            banner.innerHTML = '<span>🎬 视频创作剩余<strong>' + remainCount + '</strong>次</span>'
+            banner.innerHTML = '<span>' + tabName + '剩余<strong>' + remainCount + '</strong>次</span>'
                 + '<a href="购买次数.html" style="padding:4px 12px;background:#0669FF;color:#fff;border-radius:16px;text-decoration:none;font-size:12px;font-weight:600;">购买</a>';
         }
         tabs.parentNode.insertBefore(banner, tabs.nextSibling);
@@ -928,22 +1126,22 @@
     /* ===== 渲染分发 ===== */
     function renderCreate() {
         var progress = document.getElementById('progressBar');
-        var backBtn = document.getElementById('backToSelectBtn');
+        if (createTab === 'image') {
+            if (progress) progress.style.display = 'none';
+            renderImageCreate();
+            return;
+        }
         if (createMode === 'select') {
             if (progress) progress.style.display = 'none';
-            if (backBtn) backBtn.style.display = 'none';
             renderModeSelect();
         } else if (createMode === 'qa') {
             if (progress) progress.style.display = 'flex';
-            if (backBtn) backBtn.style.display = '';
             renderStep();
         } else if (createMode === 'voice') {
             if (progress) progress.style.display = 'none';
-            if (backBtn) backBtn.style.display = '';
             renderVoiceStep();
         } else if (createMode === 'photo') {
             if (progress) progress.style.display = 'none';
-            if (backBtn) backBtn.style.display = '';
             renderPhotoStep();
         }
     }
@@ -951,7 +1149,9 @@
     /* ===== 模式选择 ===== */
     function renderModeSelect() {
         var body = document.getElementById('questionBody');
+        var tabName = createTab === 'image' ? '图片' : '视频';
         body.innerHTML = '<div class="mode-select">'
+            + '<div class="mode-select-title">选择' + tabName + '创作方式</div>'
             + '<div class="mode-card" onclick="selectMode(\'qa\')">'
             +   '<div class="mc-icon qa">📝</div>'
             +   '<div class="mc-info"><div class="mc-title">问答创作</div><div class="mc-desc">回答几个小问题，AI 帮你生成视频脚本</div></div>'
@@ -1002,6 +1202,98 @@
         renderCreate();
     }
 
+    /* ===== 模式返回条（仅当前 tab 的模式内容内显示） ===== */
+    function prependModeBack() {
+        var body = document.getElementById('questionBody');
+        if (!body) return;
+        var exist = body.querySelector('.mode-back-bar');
+        if (exist) exist.remove();
+        var bar = document.createElement('div');
+        bar.className = 'mode-back-bar';
+        bar.innerHTML = '<span class="mode-back-btn" onclick="backToModeSelect()">‹ 选择模式</span>';
+        body.insertBefore(bar, body.firstChild);
+    }
+
+    /* ===== 图片创作流程 ===== */
+    var imgRefImage = null;
+
+    function renderImageCreate() {
+        var body = document.getElementById('questionBody');
+        var actions = document.getElementById('actionBar');
+        body.innerHTML = '<div class="img-create">'
+            + '<div class="img-title">🖼️ 图片创作</div>'
+            + '<div class="img-desc">支持参考图 + 提示词，AI 将为你生成图片</div>'
+            + '<div class="img-ref-block">'
+            + '<div class="img-ref-title">📷 参考图 <span class="ref-sub">（可选，仅限 1 张）</span></div>'
+            + '<div id="imgRefArea"></div>'
+            + '</div>'
+            + '<textarea class="img-textarea" id="imgPrompt" rows="5" maxlength="500">描述你想要的图片</textarea>'
+            + '<div class="img-hint">提示词不超过 500 字</div>'
+            + '</div>';
+        actions.innerHTML = '<button class="cp-next" onclick="submitImageCreate()">✨ 生成图片</button>';
+        renderImgRefArea();
+    }
+
+    function renderImgRefArea() {
+        var wrap = document.getElementById('imgRefArea');
+        if (!wrap) return;
+        var html;
+        if (imgRefImage) {
+            html = '<div class="ref-preview-wrap">'
+                + '<div class="ref-preview" style="background-image:url(' + imgRefImage + ')"></div>'
+                + '<button class="ref-del" onclick="clearImgRef()">✕</button>'
+                + '</div>'
+                + '<div class="ref-reupload" onclick="openRefUploadSheet(\'image\')">📷 重新上传（拍照 / 相册）</div>';
+        } else {
+            html = '<div class="img-ref-empty" onclick="openRefUploadSheet(\'image\')">'
+                + '<span class="ire-icon">🖼️</span>'
+                + '<span class="ire-text">添加参考图（拍照 / 相册）</span>'
+                + '</div>';
+        }
+        wrap.innerHTML = html;
+    }
+
+    function handleImgRefPhoto(input) {
+        var file = input.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            imgRefImage = e.target.result;
+            renderImgRefArea();
+        };
+        reader.readAsDataURL(file);
+        input.value = '';
+    }
+
+    function clearImgRef() {
+        imgRefImage = null;
+        renderImgRefArea();
+    }
+
+    function submitImageCreate() {
+        var el = document.getElementById('imgPrompt');
+        if (!el) return;
+        var text = el.value.trim();
+        if (!text) { alert('请输入图片描述'); return; }
+        if (text.length > 500) { alert('提示词不能超过 500 字'); return; }
+        closeCreate();
+        document.getElementById('queuedModal').classList.add('show');
+    }
+
+    /* 异步提交：弹窗提示生成中，作品进入「创作中」列表 */
+    function confirmQueued() {
+        document.getElementById('queuedModal').classList.remove('show');
+        var grid = document.getElementById('creatingGrid');
+        if (grid) {
+            var card = document.createElement('div');
+            card.className = 'creating-card';
+            card.innerHTML = '<span class="cc-icon">🖼️</span><div class="cc-progress"></div>';
+            grid.appendChild(card);
+        }
+        var count = document.getElementById('creatingCount');
+        if (count) count.textContent = parseInt(count.textContent || '0', 10) + 1;
+    }
+
     /* ===== 语音输入流程 ===== */
     function renderVoiceStep() {
         var body = document.getElementById('questionBody');
@@ -1029,6 +1321,7 @@
         } else if (voiceStep === 'prompt') {
             renderPromptPreview('voice');
         }
+        prependModeBack();
     }
 
     /* ===== 按住说话录音（微信风格） ===== */
@@ -1107,8 +1400,8 @@
         } else {
             overlay.classList.remove('cancel-mode');
             hint.textContent = '松手 发送语音';
-            targetText.textContent = '滑到这里 转文字';
-            targetIcon.textContent = '🔤';
+            targetText.textContent = '滑到这里 发送';
+            targetIcon.textContent = '📤';
         }
     }
 
@@ -1263,6 +1556,7 @@
         } else if (photoStep === 'prompt') {
             renderPromptPreview('photo');
         }
+        prependModeBack();
     }
 
     function handlePhotoSelect(input) {
@@ -1303,6 +1597,7 @@
             + '<div class="al-sub">' + subText + '</div>'
             + '</div>';
         document.getElementById('actionBar').innerHTML = '';
+        prependModeBack();
     }
 
     /* ===== 次数不足提示 ===== */
@@ -1322,19 +1617,13 @@
         var body = document.getElementById('questionBody');
         var actions = document.getElementById('actionBar');
 
-        var tagHtml = mode === 'qa'
-            ? '<span class="prompt-source-tag qa">📝 问答创作</span>'
-            : mode === 'voice'
-            ? '<span class="prompt-source-tag voice">🎤 语音输入</span>'
-            : '<span class="prompt-source-tag photo">📷 拍照识别</span>';
-
         var promptText = mode === 'qa' ? DEMO_PROMPT
             : mode === 'voice' ? VOICE_PROMPT_DEMO
             : PHOTO_PROMPT_DEMO;
 
         body.innerHTML = '<div style="padding:4px 0;">'
-            + tagHtml
-            + '<div class="cp-q-title" style="font-size:16px;margin-bottom:12px;">🎬 我的视频脚本</div>'
+            + '<div id="refSection"></div>'
+            + '<div class="cp-q-title" style="font-size:16px;margin:16px 0 12px;">🎬 我的视频脚本</div>'
             + '<div style="font-size:13px;color:#666;margin-bottom:10px;">以下是 AI 根据你的输入生成的视频脚本，你可以直接使用或修改：</div>'
             + '<textarea class="cp-prompt-textarea" id="promptPreview">' + promptText + '</textarea>'
             + '</div>';
@@ -1345,6 +1634,112 @@
 
         actions.innerHTML = '<button class="cp-prev" onclick="' + backFn + '">← 修改输入</button>'
             + '<button class="cp-next" onclick="generateVideo()">✅ 确认脚本</button>';
+        prependModeBack();
+        renderRefSection();
+    }
+
+    /* ===== 参考图引用（三种模式最后一步共用，仅限 1 张） ===== */
+    var refImage = null;
+    var refSource = '';
+    var refUploadTarget = 'video';
+
+    var AI_PICKS = [
+        { name: '古风少女', bg: 'linear-gradient(135deg,#FF9A9E,#FAD0C4)' },
+        { name: '水墨山水', bg: 'linear-gradient(135deg,#A1C4FD,#C2E9FB)' },
+        { name: '博物馆研学', bg: 'linear-gradient(135deg,#FBC2EB,#A6C1EE)' },
+        { name: '田园风光', bg: 'linear-gradient(135deg,#D4FC79,#96E6A1)' }
+    ];
+
+    function renderRefSection() {
+        var wrap = document.getElementById('refSection');
+        if (!wrap) return;
+        var html = '<div class="ref-section">'
+            + '<div class="ref-title">🖼️ 参考图引用 <span class="ref-sub">（可选，仅限 1 张）</span></div>'
+            + '<div class="ref-radio-group">'
+            + '<label class="ref-radio' + (refSource === 'upload' ? ' active' : '') + '"><input type="radio" name="refSource" ' + (refSource === 'upload' ? 'checked' : '') + ' onclick="chooseRefSource(\'upload\')">上传</label>'
+            + '<label class="ref-radio' + (refSource === 'library' ? ' active' : '') + '"><input type="radio" name="refSource" ' + (refSource === 'library' ? 'checked' : '') + ' onclick="chooseRefSource(\'library\')">图片库</label>'
+            + '</div>'
+            + '<div class="ref-preview-area">';
+        if (refImage) {
+            html += '<div class="ref-preview-wrap">'
+                + (refImage.type === 'photo'
+                    ? '<div class="ref-preview" style="background-image:url(' + refImage.url + ')"></div>'
+                    : '<div class="ref-preview ai" style="background:' + refImage.bg + '"><span class="ref-ai-icon">🎨</span><span class="ref-ai-name">' + refImage.name + '</span></div>')
+                + '<button class="ref-del" onclick="clearRefImage()">✕</button>'
+                + '</div>';
+        } else {
+            html += '<div class="ref-empty">未选择参考图</div>';
+        }
+        html += '</div>'
+            + '</div>';
+        wrap.innerHTML = html;
+    }
+
+    /* 单选：上传 → 拍照/相册；图片库 → 已创作 AI 图片 */
+    function chooseRefSource(src) {
+        refSource = src;
+        if (src === 'upload') {
+            openRefUploadSheet();
+        } else {
+            openRefAiPicker();
+        }
+        renderRefSection();
+    }
+
+    function openRefUploadSheet(target) {
+        refUploadTarget = target || 'video';
+        document.getElementById('refUploadModal').classList.add('show');
+    }
+    function closeRefUploadSheet() {
+        document.getElementById('refUploadModal').classList.remove('show');
+    }
+    function pickRefCamera() {
+        closeRefUploadSheet();
+        document.getElementById(refUploadTarget === 'image' ? 'imgRefPhotoInput' : 'refPhotoInput').click();
+    }
+    function pickRefAlbum() {
+        closeRefUploadSheet();
+        document.getElementById(refUploadTarget === 'image' ? 'imgRefAlbumInput' : 'refAlbumInput').click();
+    }
+
+    function handleRefPhoto(input) {
+        var file = input.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            refImage = { type: 'photo', url: e.target.result };
+            renderRefSection();
+        };
+        reader.readAsDataURL(file);
+        input.value = '';
+    }
+
+    function clearRefImage() {
+        refImage = null;
+        renderRefSection();
+    }
+
+    function openRefAiPicker() {
+        var modal = document.getElementById('refAiModal');
+        var grid = document.getElementById('refAiGrid');
+        var html = '';
+        AI_PICKS.forEach(function(p, i) {
+            html += '<div class="ref-ai-item" onclick="chooseAiRef(' + i + ')">'
+                + '<div class="ref-ai-thumb" style="background:' + p.bg + '">🎨</div>'
+                + '<div class="ref-ai-label">' + p.name + '</div></div>';
+        });
+        grid.innerHTML = html;
+        modal.classList.add('show');
+    }
+
+    function chooseAiRef(i) {
+        refImage = { type: 'ai', name: AI_PICKS[i].name, bg: AI_PICKS[i].bg };
+        document.getElementById('refAiModal').classList.remove('show');
+        renderRefSection();
+    }
+
+    function closeRefAiPicker() {
+        document.getElementById('refAiModal').classList.remove('show');
     }
 
     /* ===== QA 模式 ===== */
@@ -1451,6 +1846,7 @@
             + (isLast
                 ? '<button class="cp-next" ' + (hasAnswer ? '' : 'disabled') + ' onclick="submitAll()">生成我的脚本</button>'
                 : '<button class="cp-next" ' + (hasAnswer ? '' : 'disabled') + ' onclick="nextStep()">下一题 →</button>');
+        prependModeBack();
     }
 
     function selectOption(step, optIdx) {

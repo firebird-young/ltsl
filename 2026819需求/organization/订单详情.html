@@ -419,7 +419,7 @@
                     var actionsHtml = '';
                     if (isStudent && (g.status === 'verified' || g.status === 'expired')) {
                         actionsHtml = '<div class="tr-actions">'
-                            + '<button class="action-btn btn-eval" onclick="goArchive(\'' + esc(t.name) + '\')">档案</button>'
+                            + '<button class="action-btn btn-eval" onclick="goArchive(\'' + esc(t.name) + '\')">报告</button>'
                             + '<button class="action-btn btn-ai" onclick="doAiCreate(\'' + esc(t.name) + '\')">AI创作</button>'
                             + '</div>';
                     }
@@ -450,7 +450,7 @@
             location.href = '../../AI创作_v3.html?name=' + encodeURIComponent(name);
         }
         function goReport() {
-            location.href = '研学报告管理.html';
+            location.href = '研学现场.html';
         }
 
         /* ===== 注释线：从 AI创作 按钮引出到说明框 ===== */

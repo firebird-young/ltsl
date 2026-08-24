@@ -234,6 +234,22 @@
             display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;
         }
         .upload-text { font-size: 14px; color: #999; }
+
+        /* ===== 功能说明浮窗 ===== */
+        .f-btn { padding: 6px 14px; border-radius: 16px; border: 1px solid #D9D9D9; background: #fff; color: #333; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+        .f-btn:hover { border-color: #0669FF; color: #0669FF; }
+        .f-modal { position: fixed; top: 72px; right: 16px; width: 500px; max-height: calc(100vh - 88px); overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .f-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid #F0F0F0; cursor: move; }
+        .f-modal .f-head h3 { font-size: 15px; font-weight: 600; color: #1F1F1F; }
+        .f-modal .f-close { width: 26px; height: 26px; border: none; background: #F5F5F5; color: #666; border-radius: 50%; cursor: pointer; font-size: 14px; line-height: 1; }
+        .f-modal .f-body { font-size: 12.5px; color: #444; line-height: 1.8; }
+        .f-modal .f-body h4 { font-size: 13px; color: #1F1F1F; margin: 10px 0 6px; }
+        .f-modal .f-body h4:first-child { margin-top: 0; }
+        .f-modal .f-body ul { padding-left: 18px; margin: 4px 0 8px; }
+        .f-modal .f-body li { margin: 3px 0; }
+        .f-modal .f-body b { color: #0669FF; font-weight: 600; }
+        .f-modal .f-foot { margin-top: 14px; padding-top: 12px; border-top: 1px solid #F0F0F0; font-size: 12px; color: #999; }
     </style>
 </head>
 <body>
@@ -246,9 +262,12 @@
             <li class="active">订单管理</li>
             <li>用户管理</li>
         </ul>
-        <div class="user-area">
-            <div class="avatar">管</div>
-            <div class="name">管理员</div>
+        <div style="display:flex;align-items:center;gap:12px;">
+            <button class="f-btn" onclick="toggleFuncModal()">📖 功能说明</button>
+            <div class="user-area">
+                <div class="avatar">管</div>
+                <div class="name">管理员</div>
+            </div>
         </div>
     </div>
 
@@ -643,6 +662,75 @@
 
     updateBadges();
     renderTable();
+</script>
+
+<!-- ===== 功能说明浮窗 ===== -->
+<div class="f-modal" id="funcModal">
+    <div class="f-head" id="funcHead">
+        <h3>📖 拼团订单管理 · 功能说明</h3>
+        <button class="f-close" onclick="toggleFuncModal()">✕</button>
+    </div>
+    <div class="f-body">
+        <p><b>总述</b>：拼团订单管理页用于后台查看和管理所有拼团订单，支持按条件搜索、按状态筛选、查看订单详情、导出数据，并可在指定状态下进入研学报告管理。</p>
+        <h4>1. 搜索筛选</h4>
+        <ul>
+            <li>支持按<b>拼团订单号、产品编号、场次名称、创建时间、最晚拼团确认时间</b>精确搜索。</li>
+            <li>支持按<b>核验机构、执行机构</b>下拉筛选。</li>
+            <li>点击"🔍 搜索"应用条件，"↻ 重置"清空条件。</li>
+        </ul>
+        <h4>2. 状态标签页</h4>
+        <ul>
+            <li>顶部标签页按订单状态分组：<b>全部订单 / 待成团 / 待出行 / 拼团失败 / 已完成</b>，各标签显示对应数量。</li>
+            <li>点击标签仅展示对应状态订单。</li>
+        </ul>
+        <h4>3. 订单列表</h4>
+        <ul>
+            <li>表格展示：<b>拼团订单编号（可点击查看）、课程名称、课程编号、执行机构、场次名称、场次时间、总金额、创建时间、最晚拼团确认、成团时间、状态、拼团进度</b>。</li>
+            <li><b>拼团进度</b>以进度条 + 数字（如 8/10）展示当前成团进度，满员/半程进度条颜色区分。</li>
+            <li>底部显示记录总数，支持<b>分页浏览</b>。</li>
+        </ul>
+        <h4>4. 操作列</h4>
+        <ul>
+            <li><b>查看</b>：所有订单均提供，点击查看订单详情。</li>
+            <li><b>研学报告管理</b>：仅"<b>待出行</b>""<b>已完成</b>"状态的订单显示，点击跳转至该订单的研学报告管理页。</li>
+            <li><b>导出</b>：右上角"📥 导出"按钮，将当前列表数据导出。</li>
+        </ul>
+    </div>
+    <div class="f-foot">拖动标题栏可移动本浮窗位置</div>
+</div>
+
+<script>
+    (function() {
+        var modal = document.getElementById('funcModal');
+        var head = document.getElementById('funcHead');
+        var dragging = false, startX = 0, startY = 0, startLeft = 0, startTop = 0;
+        head.addEventListener('mousedown', function(e) {
+            dragging = true;
+            startX = e.clientX; startY = e.clientY;
+            startLeft = modal.offsetLeft; startTop = modal.offsetTop;
+            document.body.style.userSelect = 'none';
+        });
+        document.addEventListener('mousemove', function(e) {
+            if (!dragging) return;
+            modal.style.left = (startLeft + e.clientX - startX) + 'px';
+            modal.style.top = (startTop + e.clientY - startY) + 'px';
+            modal.style.right = 'auto';
+        });
+        document.addEventListener('mouseup', function() {
+            dragging = false;
+            document.body.style.userSelect = '';
+        });
+    })();
+
+    function toggleFuncModal() {
+        var el = document.getElementById('funcModal');
+        el.classList.toggle('show');
+        if (el.classList.contains('show') && !el.dataset.dragged) {
+            el.style.top = '72px';
+            el.style.right = '16px';
+            el.style.left = 'auto';
+        }
+    }
 </script>
 </body>
 </html>

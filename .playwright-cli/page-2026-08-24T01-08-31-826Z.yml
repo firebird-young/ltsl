@@ -1,0 +1,273 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]: 离泰数链
+    - list [ref=e4]:
+      - listitem [ref=e5] [cursor=pointer]: 首页
+      - listitem [ref=e6] [cursor=pointer]: 课程管理
+      - listitem [ref=e7] [cursor=pointer]: 场次方案
+      - listitem [ref=e8] [cursor=pointer]: 订单管理
+      - listitem [ref=e9] [cursor=pointer]: 用户管理
+    - generic [ref=e10]:
+      - button "📖 功能说明" [active] [ref=e11]
+      - generic [ref=e12]:
+        - generic [ref=e13]: 管
+        - generic [ref=e14]: 管理员
+  - generic [ref=e15]:
+    - link "首页" [ref=e16] [cursor=pointer]:
+      - /url: "#"
+    - generic [ref=e17]: /
+    - link "课程管理" [ref=e18] [cursor=pointer]:
+      - /url: "#"
+    - generic [ref=e19]: /
+    - generic [ref=e20]: 课程发布
+  - generic [ref=e21]:
+    - heading "课程发布" [level=2] [ref=e23]
+    - generic [ref=e24]:
+      - generic [ref=e25]:
+        - generic [ref=e26]: 基本信息
+        - generic [ref=e27]:
+          - generic [ref=e28]:
+            - generic [ref=e29]: "*课程名称："
+            - generic [ref=e31]:
+              - textbox "请输入课程名称" [ref=e32]
+              - generic [ref=e33]: 0/40
+          - generic [ref=e34]:
+            - generic [ref=e35]: "*地址："
+            - generic [ref=e38]:
+              - generic [ref=e39]: 集合地点（必填）
+              - combobox [ref=e40] [cursor=pointer]:
+                - option "请选择" [selected]
+                - option "北京市"
+                - option "上海市"
+                - option "杭州市"
+              - textbox "请输入详细地址" [ref=e41]
+              - button "+" [ref=e42] [cursor=pointer]
+          - generic [ref=e43]:
+            - generic [ref=e44]: "*课程分类："
+            - listbox [ref=e46] [cursor=pointer]:
+              - option "请选择课程分类（多选）"
+              - option "自然科学"
+              - option "人文历史"
+              - option "艺术创作"
+              - option "户外探险"
+              - option "亲子互动"
+          - generic [ref=e47]:
+            - generic [ref=e48]: "*核验机构："
+            - combobox [ref=e50] [cursor=pointer]:
+              - option "请选择核验机构" [selected]
+              - option "组织 A"
+              - option "组织 B"
+          - generic [ref=e51]:
+            - generic [ref=e52]: "*执行机构："
+            - combobox [ref=e54] [cursor=pointer]:
+              - option "请选择执行机构" [selected]
+              - option "机构 A"
+              - option "机构 B"
+          - generic [ref=e55]:
+            - generic [ref=e56]: "*课程封面："
+            - generic [ref=e59] [cursor=pointer]: +
+          - generic [ref=e60]:
+            - generic [ref=e61]: 课程时间：
+            - generic [ref=e63]:
+              - textbox "请输入课程时间" [ref=e64]
+              - generic [ref=e65]: 0/50
+          - generic [ref=e66]:
+            - generic [ref=e67]: 简介：
+            - generic [ref=e69]:
+              - textbox "请输入课程简介" [ref=e70]
+              - generic [ref=e71]: 0/200
+          - generic [ref=e72]:
+            - generic [ref=e73]: 适用人群：
+            - generic [ref=e75]:
+              - textbox "请输入适用人群" [ref=e76]
+              - generic [ref=e77]: 0/20
+          - generic [ref=e78]:
+            - generic [ref=e79]: "*自定义标签："
+            - textbox "添加标签" [ref=e82]
+          - generic [ref=e83]:
+            - generic [ref=e84]: "*详情："
+            - generic [ref=e86]:
+              - button "B" [ref=e87] [cursor=pointer]:
+                - generic [ref=e88]: B
+              - button "I" [ref=e89] [cursor=pointer]:
+                - generic [ref=e90]: I
+              - button "U" [ref=e91] [cursor=pointer]:
+                - generic [ref=e92]: U
+              - button "S" [ref=e93] [cursor=pointer]:
+                - generic [ref=e94]: S
+              - button "H1" [ref=e96] [cursor=pointer]
+              - button "H2" [ref=e97] [cursor=pointer]
+              - button "☰" [ref=e99] [cursor=pointer]
+              - button "#" [ref=e100] [cursor=pointer]
+              - button "≡" [ref=e102] [cursor=pointer]
+              - button "≡" [ref=e103] [cursor=pointer]
+              - button "≡" [ref=e104] [cursor=pointer]
+      - generic [ref=e106]:
+        - generic [ref=e107]: 销售设置
+        - generic [ref=e108]:
+          - generic [ref=e109]:
+            - generic [ref=e110]: "*提前预定时间："
+            - generic [ref=e112]:
+              - generic [ref=e113]: 课程开始前
+              - generic [ref=e114]:
+                - button "-" [ref=e115] [cursor=pointer]
+                - spinbutton [ref=e116]: "1"
+                - button "+" [ref=e117] [cursor=pointer]
+              - generic [ref=e118]: 天
+          - generic [ref=e119]:
+            - generic [ref=e120]: "*最晚预定时间："
+            - generic [ref=e122]:
+              - generic [ref=e123]: 课程开始前
+              - generic [ref=e124]:
+                - button "-" [ref=e125] [cursor=pointer]
+                - spinbutton [ref=e126]: "1"
+                - button "+" [ref=e127] [cursor=pointer]
+              - generic [ref=e128]: 天
+          - generic [ref=e129]:
+            - generic [ref=e130]: 自助核销：
+            - generic [ref=e133]:
+              - button "不开启" [ref=e134] [cursor=pointer]
+              - button "开启" [ref=e135] [cursor=pointer]
+          - generic [ref=e136]:
+            - generic [ref=e137]: "*场次方案："
+            - generic [ref=e138]:
+              - button "+ 新增场次" [ref=e140] [cursor=pointer]
+              - table [ref=e142]:
+                - rowgroup [ref=e143]:
+                  - row "场次名称 时间 成团规则 规格和价格 操作" [ref=e144]:
+                    - columnheader "场次名称" [ref=e145]
+                    - columnheader "时间" [ref=e146]
+                    - columnheader "成团规则" [ref=e147]
+                    - columnheader "规格和价格" [ref=e148]
+                    - columnheader "操作" [ref=e149]
+                - rowgroup [ref=e150]:
+                  - row "暂无场次方案，请点击右上角新增" [ref=e151]:
+                    - cell "暂无场次方案，请点击右上角新增" [ref=e152]
+          - generic [ref=e153]:
+            - generic [ref=e154]: "*费用包含："
+            - generic [ref=e156]:
+              - button "B" [ref=e157] [cursor=pointer]:
+                - generic [ref=e158]: B
+              - button "I" [ref=e159] [cursor=pointer]:
+                - generic [ref=e160]: I
+              - button "U" [ref=e161] [cursor=pointer]:
+                - generic [ref=e162]: U
+              - button "S" [ref=e163] [cursor=pointer]:
+                - generic [ref=e164]: S
+              - button "H1" [ref=e166] [cursor=pointer]
+              - button "H2" [ref=e167] [cursor=pointer]
+              - button "☰" [ref=e169] [cursor=pointer]
+              - button "#" [ref=e170] [cursor=pointer]
+              - button "≡" [ref=e172] [cursor=pointer]
+              - button "≡" [ref=e173] [cursor=pointer]
+              - button "≡" [ref=e174] [cursor=pointer]
+          - generic [ref=e176]:
+            - generic [ref=e177]: "*费用不包含："
+            - generic [ref=e179]:
+              - button "B" [ref=e180] [cursor=pointer]:
+                - generic [ref=e181]: B
+              - button "I" [ref=e182] [cursor=pointer]:
+                - generic [ref=e183]: I
+              - button "U" [ref=e184] [cursor=pointer]:
+                - generic [ref=e185]: U
+              - button "S" [ref=e186] [cursor=pointer]:
+                - generic [ref=e187]: S
+              - button "H1" [ref=e189] [cursor=pointer]
+              - button "H2" [ref=e190] [cursor=pointer]
+              - button "☰" [ref=e192] [cursor=pointer]
+              - button "#" [ref=e193] [cursor=pointer]
+              - button "≡" [ref=e195] [cursor=pointer]
+              - button "≡" [ref=e196] [cursor=pointer]
+              - button "≡" [ref=e197] [cursor=pointer]
+          - generic [ref=e199]:
+            - generic [ref=e200]: "*预定须知："
+            - generic [ref=e202]:
+              - button "B" [ref=e203] [cursor=pointer]:
+                - generic [ref=e204]: B
+              - button "I" [ref=e205] [cursor=pointer]:
+                - generic [ref=e206]: I
+              - button "U" [ref=e207] [cursor=pointer]:
+                - generic [ref=e208]: U
+              - button "S" [ref=e209] [cursor=pointer]:
+                - generic [ref=e210]: S
+              - button "H1" [ref=e212] [cursor=pointer]
+              - button "H2" [ref=e213] [cursor=pointer]
+              - button "☰" [ref=e215] [cursor=pointer]
+              - button "#" [ref=e216] [cursor=pointer]
+              - button "≡" [ref=e218] [cursor=pointer]
+              - button "≡" [ref=e219] [cursor=pointer]
+              - button "≡" [ref=e220] [cursor=pointer]
+          - generic [ref=e222]:
+            - generic [ref=e223]: "*取消政策："
+            - generic [ref=e224]:
+              - button "+ 添加规则" [ref=e226] [cursor=pointer]
+              - table [ref=e228]:
+                - rowgroup [ref=e229]:
+                  - row "取消阶段 退还课程费用 操作" [ref=e230]:
+                    - columnheader "取消阶段" [ref=e231]
+                    - columnheader "退还课程费用" [ref=e232]
+                    - columnheader "操作" [ref=e233]
+                - rowgroup [ref=e234]:
+                  - row "课程开始当日及之后 /% 编辑 删除" [ref=e235]:
+                    - cell "课程开始当日及之后" [ref=e236]
+                    - cell "/%" [ref=e237]
+                    - cell "编辑 删除" [ref=e238]:
+                      - button "编辑" [ref=e239] [cursor=pointer]
+                      - button "删除" [ref=e240] [cursor=pointer]
+  - generic [ref=e241]:
+    - button "暂存" [ref=e242] [cursor=pointer]
+    - button "发布" [ref=e243] [cursor=pointer]
+  - generic [ref=e244]:
+    - generic [ref=e245]:
+      - generic [ref=e246]: 📖 功能说明
+      - button "✕" [ref=e247] [cursor=pointer]
+    - generic [ref=e248]:
+      - paragraph [ref=e249]:
+        - text: 课程发布页用于管理员创建研学课程，填写基本信息、销售设置（含自助核销与场次方案）后暂存或发布。本次仅新增
+        - strong [ref=e250]: 自助核销
+        - text: 与
+        - strong [ref=e251]: 场次方案
+        - text: 两个功能点。
+      - heading "一、自助核销" [level=4] [ref=e252]
+      - list [ref=e253]:
+        - listitem [ref=e254]:
+          - text: 位于"销售设置"中，开关为
+          - strong [ref=e255]: 不开启 / 开启
+          - text: 二选一。
+        - listitem [ref=e256]:
+          - strong [ref=e257]: 不开启
+          - text: ：用户端订单页不展示滑动核销，出行前仅按活动时间到场参与。
+        - listitem [ref=e258]:
+          - strong [ref=e259]: 开启
+          - text: ：展开"课程开始前
+          - strong [ref=e260]: X
+          - text: 天"步进器，用于设置自主核销的
+          - strong [ref=e261]: 开放时间
+          - text: （即出行前 X 天起，用户可在订单详情页滑动核销）。
+        - listitem [ref=e262]: 开启后，达到开放时间的订单会展示滑动核销入口，核销后用户进入研学企微群。
+      - heading "二、场次方案" [level=4] [ref=e263]
+      - list [ref=e264]:
+        - listitem [ref=e265]:
+          - text: 必填项。通过右上角"
+          - strong [ref=e266]: + 新增场次
+          - text: "\"按钮打开弹窗，场次列表表格展示："
+          - strong [ref=e267]: 场次名称 / 时间 / 成团规则 / 规格和价格 / 操作
+          - text: （修改、删除）。
+        - listitem [ref=e268]:
+          - text: 弹窗分三步设置：
+          - list [ref=e269]:
+            - listitem [ref=e270]:
+              - strong [ref=e271]: ① 基础信息
+              - text: ：填写场次名称；点击时间框弹出日历，
+              - strong [ref=e272]: 支持多选、可离散选择
+              - text: 日期。
+            - listitem [ref=e273]:
+              - strong [ref=e274]: ② 规格设置
+              - text: ：
+              - strong [ref=e275]: 主类型默认存在
+              - text: （如：学生），可"添加其他类型"（如：家长）；每个类型下可添加多个规格，配置
+              - strong [ref=e276]: 规格名称、价格（元/人）、年龄限制
+              - text: （可启用起止年龄段）。
+            - listitem [ref=e277]:
+              - strong [ref=e278]: ③ 成团规则
+              - text: ：按主类型所有规格购买数量合计计算——设置最低成团人数与购买上限人数；设置活动开始前最晚确认 X 天。

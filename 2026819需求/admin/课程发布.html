@@ -427,7 +427,7 @@
         }
 
         /* ── 功能说明浮窗 ── */
-        .f-modal { position: fixed; top: 50%; right: 16px; transform: translateY(-50%); width: 500px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
+        .f-modal { position: fixed; top: 72px; right: 16px; width: 500px; max-height: calc(100vh - 88px); overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
         .f-modal.show { display: block; }
         .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
         .f-modal .fm-title:active { cursor: grabbing; }
@@ -1498,10 +1498,10 @@
         var el = document.getElementById('funcModal');
         el.classList.toggle('show');
         if (el.classList.contains('show') && !el.dataset.dragged) {
-            el.style.top = '50%';
+            el.style.top = '72px';
             el.style.right = '16px';
             el.style.left = 'auto';
-            el.style.transform = 'translateY(-50%)';
+            el.style.transform = 'none';
         }
     }
     (function() {
@@ -1551,7 +1551,6 @@
                     <li><strong>③ 成团规则</strong>：按主类型所有规格购买数量合计计算——设置最低成团人数与购买上限人数；设置活动开始前最晚确认 X 天。</li>
                 </ul>
             </li>
-            <li>底部提示：所有场次的拼团确认截止时间，必须设置在<strong>课程上线当天 0 点之前</strong>。</li>
         </ul>
     </div>
 </div>

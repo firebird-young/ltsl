@@ -172,6 +172,22 @@
         .detail-row { display: flex; padding: 8px 0; font-size: 14px; }
         .detail-row .label { width: 120px; color: #888; }
         .detail-row .value { flex: 1; color: #333; }
+
+        /* ===== 功能说明浮窗 ===== */
+        .f-btn { padding: 6px 14px; border-radius: 16px; border: 1px solid #D9D9D9; background: #fff; color: #333; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+        .f-btn:hover { border-color: #0669FF; color: #0669FF; }
+        .f-modal { position: fixed; top: 72px; right: 16px; width: 500px; max-height: calc(100vh - 88px); overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .f-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid #F0F0F0; cursor: move; }
+        .f-modal .f-head h3 { font-size: 15px; font-weight: 600; color: #1F1F1F; }
+        .f-modal .f-close { width: 26px; height: 26px; border: none; background: #F5F5F5; color: #666; border-radius: 50%; cursor: pointer; font-size: 14px; line-height: 1; }
+        .f-modal .f-body { font-size: 12.5px; color: #444; line-height: 1.8; }
+        .f-modal .f-body h4 { font-size: 13px; color: #1F1F1F; margin: 10px 0 6px; }
+        .f-modal .f-body h4:first-child { margin-top: 0; }
+        .f-modal .f-body ul { padding-left: 18px; margin: 4px 0 8px; }
+        .f-modal .f-body li { margin: 3px 0; }
+        .f-modal .f-body b { color: #0669FF; font-weight: 600; }
+        .f-modal .f-foot { margin-top: 14px; padding-top: 12px; border-top: 1px solid #F0F0F0; font-size: 12px; color: #999; }
     </style>
 </head>
 <body>
@@ -184,9 +200,12 @@
             <li class="active">订单管理</li>
             <li>用户管理</li>
         </ul>
-        <div class="user-area">
-            <div class="avatar">管</div>
-            <div class="name">管理员</div>
+        <div style="display:flex;align-items:center;gap:12px;">
+            <button class="f-btn" onclick="toggleFuncModal()">📖 功能说明</button>
+            <div class="user-area">
+                <div class="avatar">管</div>
+                <div class="name">管理员</div>
+            </div>
         </div>
     </div>
 
@@ -662,6 +681,81 @@
 
     updateBadges();
     renderTable();
+</script>
+
+<!-- ===== 功能说明浮窗 ===== -->
+<div class="f-modal" id="funcModal">
+    <div class="f-head" id="funcHead">
+        <h3>📖 用户订单管理 · 功能说明</h3>
+        <button class="f-close" onclick="toggleFuncModal()">✕</button>
+    </div>
+    <div class="f-body">
+        <p><b>总述</b>：用户订单管理页以用户为单位，后台查看和管理所有订单，支持按状态筛选、按条件搜索、查看订单详情、发起退款及导出数据。</p>
+        <h4>1. 状态标签页</h4>
+        <ul>
+            <li>顶部标签页按订单状态分组：<b>全部 / 待成团 / 退款中 / 已退款 / 待出行 / 已核销 / 已过期</b>，各标签显示对应数量。</li>
+            <li>点击标签仅展示对应状态订单。</li>
+        </ul>
+        <h4>2. 搜索筛选</h4>
+        <ul>
+            <li>支持按<b>订单编号、用户手机、课程编号</b>精确搜索。</li>
+            <li>点击"查询"应用条件，"重置"清空条件。</li>
+        </ul>
+        <h4>3. 订单列表</h4>
+        <ul>
+            <li>表格展示：<b>订单编号（可点击查看）、用户账号、课程/场次、出行人、付款详情、总金额、优惠金额、实付金额、订单状态、拼团确认时间、下单时间、关联拼团</b>。</li>
+            <li><b>出行人</b>展示姓名 + 性别 + 类型标签（<b>学生 / 家长</b>）。</li>
+            <li><b>付款详情</b>分类型展示单价与数量（学生 ¥199 × 1、家长 ¥100 × 1）。</li>
+        </ul>
+        <h4>4. 订单详情</h4>
+        <ul>
+            <li>点击订单编号或"查看"弹出详情弹窗，包含：<b>订单信息</b>（编号、状态、金额、下单/拼团确认时间等）、<b>用户与出行人</b>、<b>课程信息</b>、<b>关联拼团</b>（拼团编号与状态）。</li>
+        </ul>
+        <h4>5. 退款操作</h4>
+        <ul>
+            <li>非退款/已退款状态订单提供"<b>退款</b>"按钮，弹窗填写<b>退款比例（%）</b>与<b>退款备注</b>，确认后进入"退款中"并自动转为"已退款"。</li>
+            <li>"退款中""已退款"订单提供"<b>退款信息</b>"查看，展示退款流水号、状态、备注、退款时间、到账时间、付款/退款金额。</li>
+        </ul>
+        <h4>6. 数据导出</h4>
+        <ul>
+            <li>右上角"<b>导出</b>"按钮，将当前状态下的列表数据导出为表格文件。</li>
+        </ul>
+    </div>
+    <div class="f-foot">拖动标题栏可移动本浮窗位置</div>
+</div>
+
+<script>
+    (function() {
+        var modal = document.getElementById('funcModal');
+        var head = document.getElementById('funcHead');
+        var dragging = false, startX = 0, startY = 0, startLeft = 0, startTop = 0;
+        head.addEventListener('mousedown', function(e) {
+            dragging = true;
+            startX = e.clientX; startY = e.clientY;
+            startLeft = modal.offsetLeft; startTop = modal.offsetTop;
+            document.body.style.userSelect = 'none';
+        });
+        document.addEventListener('mousemove', function(e) {
+            if (!dragging) return;
+            modal.style.left = (startLeft + e.clientX - startX) + 'px';
+            modal.style.top = (startTop + e.clientY - startY) + 'px';
+            modal.style.right = 'auto';
+        });
+        document.addEventListener('mouseup', function() {
+            dragging = false;
+            document.body.style.userSelect = '';
+        });
+    })();
+
+    function toggleFuncModal() {
+        var el = document.getElementById('funcModal');
+        el.classList.toggle('show');
+        if (el.classList.contains('show') && !el.dataset.dragged) {
+            el.style.top = '72px';
+            el.style.right = '16px';
+            el.style.left = 'auto';
+        }
+    }
 </script>
 </body>
 </html>
