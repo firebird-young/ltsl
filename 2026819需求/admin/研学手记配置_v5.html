@@ -152,6 +152,13 @@
             margin-bottom: 14px;
         }
         .config-row:last-child { margin-bottom: 0; }
+        .ref-count-wrap { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #666; }
+        .ref-count-input {
+            width: 60px; height: 30px; border: 1px solid #ddd; border-radius: 6px;
+            text-align: center; font-size: 13px; color: #333; outline: none; background: #fff;
+        }
+        .ref-count-input:focus { border-color: #0669FF; }
+        .ref-count-input:disabled { opacity: 0.45; background: #f5f5f5; }
         .config-label {
             font-size: 13px;
             font-weight: 500;
@@ -698,6 +705,10 @@
                                 <button class="mode-btn" onclick="openQConfig()">✏️ 编辑问题配置</button>
                             </div>
                             <div class="mode-field">
+                                <span class="mode-field-label">视频脚本生成提示词</span>
+                                <textarea class="text-input" id="modeQaPrompt" style="min-height:60px;" placeholder="问答转脚本 Prompt 模板...">请帮我生成一段 15s 的视频创作脚本，脚本需按时间轴逐秒规划，明确标注每个镜头从第几秒到第几秒（必须是时间段内，不能是单秒）的具体画面内容、动作、运镜方式及音效提示。输出格式仅使用纯文本段落，严禁使用表格、Markdown语法（如#、*、-、|等符号）或任何代码块，视频中必须包含的核心元素为：</textarea>
+                            </div>
+                            <div class="mode-field">
                                 <span class="mode-field-label">视频规格</span>
                                 <div style="width:100%;">
                                     <button type="button" onclick="openVideoSpecModal('qa')" style="height:34px;padding:0 14px;border:1px solid #0669FF;border-radius:8px;background:#fff;color:#0669FF;font-size:13px;cursor:pointer;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.background='#E8F0FE'" onmouseout="this.style.background='#fff'">🎬 选择视频规格</button>
@@ -705,13 +716,16 @@
                                 </div>
                             </div>
                             <div class="mode-field">
-                                <span class="mode-field-label">允许参考图 <span style="color:#bbb;">（仅限 1 张，拍照或相册上传）</span></span>
-                                <label class="switch-sub">
-                                    <label class="switch">
-                                        <input type="checkbox" id="modeQaRefSwitch" checked>
-                                        <span class="slider"></span>
+                                <span class="mode-field-label">允许参考图 <span style="color:#bbb;">（拍照或相册上传，最多 9 张）</span></span>
+                                <div style="display:flex;align-items:center;">
+                                    <label class="switch-sub">
+                                        <label class="switch">
+                                            <input type="checkbox" id="modeQaRefSwitch" checked onchange="syncRefCountState()">
+                                            <span class="slider"></span>
+                                        </label>
                                     </label>
-                                </label>
+                                    <span class="ref-count-wrap" style="margin-left:10px;">数量 <input type="number" class="ref-count-input" id="modeQaRefCount" value="9" min="1" max="9"> 张</span>
+                                </div>
                             </div>
                         </div>
 
@@ -741,8 +755,8 @@
                                 </div>
                             </div>
                             <div class="mode-field">
-                                <span class="mode-field-label">Prompt</span>
-                                <textarea class="text-input" id="modeVoicePrompt" style="min-height:60px;" placeholder="语音转脚本 Prompt 模板...">请根据用户语音转写的内容，生成一段 15 秒的视频创作脚本，要求详细规划到第几秒到第几秒，输出内容不要表格，不要 markdown 语法，视频内容元素包含：</textarea>
+                                <span class="mode-field-label">视频脚本生成提示词</span>
+                                <textarea class="text-input" id="modeVoicePrompt" style="min-height:60px;" placeholder="语音转脚本 Prompt 模板...">请帮我生成一段 15s 的视频创作脚本，脚本需按时间轴逐秒规划，明确标注每个镜头从第几秒到第几秒（必须是时间段内，不能是单秒）的具体画面内容、动作、运镜方式及音效提示。输出格式仅使用纯文本段落，严禁使用表格、Markdown语法（如#、*、-、|等符号）或任何代码块，视频中必须包含的核心元素为：</textarea>
                             </div>
                             <div class="mode-field">
                                 <span class="mode-field-label">视频规格</span>
@@ -752,13 +766,16 @@
                                 </div>
                             </div>
                             <div class="mode-field">
-                                <span class="mode-field-label">允许参考图 <span style="color:#bbb;">（仅限 1 张，拍照或相册上传）</span></span>
-                                <label class="switch-sub">
-                                    <label class="switch">
-                                        <input type="checkbox" id="modeVoiceRefSwitch" checked>
-                                        <span class="slider"></span>
+                                <span class="mode-field-label">允许参考图 <span style="color:#bbb;">（拍照或相册上传，最多 9 张）</span></span>
+                                <div style="display:flex;align-items:center;">
+                                    <label class="switch-sub">
+                                        <label class="switch">
+                                            <input type="checkbox" id="modeVoiceRefSwitch" checked onchange="syncRefCountState()">
+                                            <span class="slider"></span>
+                                        </label>
                                     </label>
-                                </label>
+                                    <span class="ref-count-wrap" style="margin-left:10px;">数量 <input type="number" class="ref-count-input" id="modeVoiceRefCount" value="9" min="1" max="9"> 张</span>
+                                </div>
                             </div>
                         </div>
 
@@ -788,8 +805,12 @@
                                 </div>
                             </div>
                             <div class="mode-field">
-                                <span class="mode-field-label">Prompt</span>
-                                <textarea class="text-input" id="modePhotoPrompt" style="min-height:60px;" placeholder="拍照识别 Prompt 模板...">请识别用户上传照片中的主体、场景、色彩、氛围，并据此生成一段 15 秒的视频创作脚本，要求详细规划到第几秒到第几秒，输出内容不要表格，不要 markdown 语法，视频内容元素包含：</textarea>
+                                <span class="mode-field-label">图片理解提示词 <span style="color:#bbb;">（AI 分析用户照片时的提示词）</span></span>
+                                <textarea class="text-input" id="modePhotoImagePrompt" style="min-height:60px;" placeholder="图片理解提示词模板...">请识别照片中的主体、场景、色彩、氛围，用简洁的中文概括画面内容</textarea>
+                            </div>
+                            <div class="mode-field">
+                                <span class="mode-field-label">视频脚本生成提示词</span>
+                                <textarea class="text-input" id="modePhotoPrompt" style="min-height:60px;" placeholder="拍照识别 Prompt 模板...">请帮我生成一段 15s 的视频创作脚本，脚本需按时间轴逐秒规划，明确标注每个镜头从第几秒到第几秒（必须是时间段内，不能是单秒）的具体画面内容、动作、运镜方式及音效提示。输出格式仅使用纯文本段落，严禁使用表格、Markdown语法（如#、*、-、|等符号）或任何代码块，视频中必须包含的核心元素为：</textarea>
                             </div>
                             <div class="mode-field">
                                 <span class="mode-field-label">视频规格</span>
@@ -799,13 +820,16 @@
                                 </div>
                             </div>
                             <div class="mode-field">
-                                <span class="mode-field-label">允许参考图 <span style="color:#bbb;">（仅限 1 张，拍照或相册上传）</span></span>
-                                <label class="switch-sub">
-                                    <label class="switch">
-                                        <input type="checkbox" id="modePhotoRefSwitch" checked>
-                                        <span class="slider"></span>
+                                <span class="mode-field-label">允许参考图 <span style="color:#bbb;">（拍照或相册上传，最多 9 张）</span></span>
+                                <div style="display:flex;align-items:center;">
+                                    <label class="switch-sub">
+                                        <label class="switch">
+                                            <input type="checkbox" id="modePhotoRefSwitch" checked onchange="syncRefCountState()">
+                                            <span class="slider"></span>
+                                        </label>
                                     </label>
-                                </label>
+                                    <span class="ref-count-wrap" style="margin-left:10px;">数量 <input type="number" class="ref-count-input" id="modePhotoRefCount" value="9" min="1" max="9"> 张</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -833,13 +857,16 @@
 
                     <!-- 允许参考图 -->
                     <div class="config-row">
-                        <span class="config-label">允许参考图 <span class="optional">（仅限 1 张，拍照或相册上传）</span></span>
-                        <label class="switch-sub">
-                            <label class="switch">
-                                <input type="checkbox" id="imageRefSwitch" checked>
-                                <span class="slider"></span>
+                        <span class="config-label">允许参考图 <span class="optional">（拍照或相册上传，最多 6 张）</span></span>
+                        <div style="display:flex;align-items:center;">
+                            <label class="switch-sub">
+                                <label class="switch">
+                                    <input type="checkbox" id="imageRefSwitch" checked onchange="syncRefCountState()">
+                                    <span class="slider"></span>
+                                </label>
                             </label>
-                        </label>
+                            <span class="ref-count-wrap" style="margin-left:10px;">数量 <input type="number" class="ref-count-input" id="imageRefCount" value="1" min="1" max="6"> 张</span>
+                        </div>
                     </div>
 
                     <!-- 图片规格 -->
@@ -853,8 +880,8 @@
 
                     <!-- 图片 Prompt -->
                     <div class="config-row">
-                        <span class="config-label">图片 Prompt <span class="optional">（选填）</span></span>
-                        <textarea class="text-input" id="imagePrompt" placeholder="请输入图片创作描述模板，例如：&#10;请根据用户的提示词（结合参考图）生成一张符合研学主题的插画，国潮画风，色彩明亮柔和，突出蜀锦/织机等文化元素..."></textarea>
+                        <span class="config-label">图片生成提示词 <span class="optional">（选填）</span></span>
+                        <textarea class="text-input" id="imagePrompt" placeholder="请根据输入的内容创建一张卡通风格的图片，内容为："></textarea>
                     </div>
                 </div>
                 </div>
@@ -898,9 +925,10 @@
                 <div style="margin-top:24px;padding-top:20px;border-top:2px solid #1F3864;">
                     <div style="font-size:15px;font-weight:700;color:#1F3864;margin-bottom:12px;">2026.8.19 迭代 - 对接 AI创作</div>
                     <ol style="padding-left:20px;margin:4px 0 8px;">
-                        <li style="margin-bottom:6px;font-size:13px;color:#555;"><strong>视频创作支持三种模式</strong>：问答创作 / 语音输入 / 拍照识别，每种模式独立选择视频规格、独立定义比例与 Prompt，并可单独设置是否允许参考图（仅限 1 张），可独立启停</li>
-                        <li style="margin-bottom:6px;font-size:13px;color:#555;"><strong>新增AI图片创作</strong>：新增图片 Prompt 与允许参考图（仅限 1 张，拍照或相册）配置</li>
+                        <li style="margin-bottom:6px;font-size:13px;color:#555;"><strong>视频创作支持三种模式</strong>：问答创作 / 语音输入 / 拍照识别，每种模式独立选择视频规格、独立定义比例与 Prompt，并可单独设置是否允许参考图（最多9张），可独立启停</li>
+                        <li style="margin-bottom:6px;font-size:13px;color:#555;"><strong>新增AI图片创作</strong>：新增图片 Prompt 与允许参考图（最多6张，拍照或相册）配置</li>
                         <li style="margin-bottom:6px;font-size:13px;color:#555;"><strong>免费次数分开设置</strong>：「每个成员免费次数」按视频/图片分别设置，视频三种模式共享视频免费次数</li>
+                        <li style="margin-bottom:6px;font-size:13px;color:#555;"><strong>prompt</strong>：后台设置prompt拼接用户的内容</li>
                     </ol>
                 </div>
             </div>
@@ -1083,6 +1111,27 @@
         }
 
         document.getElementById('masterSwitch').addEventListener('change', onMasterToggle);
+
+        // ===== 参考图数量与开关联动（视频 1-9 张，图片 1-6 张） =====
+        function setRefCountVal(id, v) {
+            var el = document.getElementById(id);
+            if (!el || v === undefined) return;
+            var max = id === 'imageRefCount' ? 6 : 9;
+            v = parseInt(v, 10);
+            if (isNaN(v)) v = 1;
+            v = Math.min(max, Math.max(1, v));
+            el.value = v;
+        }
+        function syncRefCountState() {
+            [['modeQaRefSwitch', 'modeQaRefCount'],
+             ['modeVoiceRefSwitch', 'modeVoiceRefCount'],
+             ['modePhotoRefSwitch', 'modePhotoRefCount'],
+             ['imageRefSwitch', 'imageRefCount']].forEach(function(pair) {
+                var sw = document.getElementById(pair[0]);
+                var num = document.getElementById(pair[1]);
+                if (sw && num) num.disabled = !sw.checked;
+            });
+        }
 
         // ===== 问题配置 =====
         var questions = [
@@ -1372,8 +1421,10 @@
                         + '</div>';
                 }
                 if (cfg.imagePrompt !== undefined) { document.getElementById('imagePrompt').value = cfg.imagePrompt; }
+                if (cfg.modeQaPrompt !== undefined) { document.getElementById('modeQaPrompt').value = cfg.modeQaPrompt; }
                 if (cfg.modeVoicePrompt !== undefined) { document.getElementById('modeVoicePrompt').value = cfg.modeVoicePrompt; }
                 if (cfg.modePhotoPrompt !== undefined) { document.getElementById('modePhotoPrompt').value = cfg.modePhotoPrompt; }
+                if (cfg.modePhotoImagePrompt !== undefined) { document.getElementById('modePhotoImagePrompt').value = cfg.modePhotoImagePrompt; }
                 if (cfg.recommendedCourses) { selectedCourses = cfg.recommendedCourses; renderSelectedTags(); updatePlaceholder(); }
                 if (cfg.masterSwitch !== undefined) { document.getElementById('masterSwitch').checked = cfg.masterSwitch; onMasterToggle(); }
                 if (cfg.videoSwitch !== undefined) { document.getElementById('videoSwitch').checked = cfg.videoSwitch; }
@@ -1385,6 +1436,11 @@
                 if (cfg.modeQaRefSwitch !== undefined) { document.getElementById('modeQaRefSwitch').checked = cfg.modeQaRefSwitch; }
                 if (cfg.modeVoiceRefSwitch !== undefined) { document.getElementById('modeVoiceRefSwitch').checked = cfg.modeVoiceRefSwitch; }
                 if (cfg.modePhotoRefSwitch !== undefined) { document.getElementById('modePhotoRefSwitch').checked = cfg.modePhotoRefSwitch; }
+                setRefCountVal('modeQaRefCount', cfg.modeQaRefCount);
+                setRefCountVal('modeVoiceRefCount', cfg.modeVoiceRefCount);
+                setRefCountVal('modePhotoRefCount', cfg.modePhotoRefCount);
+                setRefCountVal('imageRefCount', cfg.imageRefCount);
+                syncRefCountState();
             } catch(e) {}
         }
 
@@ -1404,8 +1460,10 @@
                 voiceRatio: ratioVal('voiceRatio'),
                 photoRatio: ratioVal('photoRatio'),
                 imagePrompt: document.getElementById('imagePrompt').value.trim(),
+                modeQaPrompt: document.getElementById('modeQaPrompt').value.trim(),
                 modeVoicePrompt: document.getElementById('modeVoicePrompt').value.trim(),
                 modePhotoPrompt: document.getElementById('modePhotoPrompt').value.trim(),
+                modePhotoImagePrompt: document.getElementById('modePhotoImagePrompt').value.trim(),
                 questions: JSON.parse(JSON.stringify(questions)),
                 recommendedCourses: selectedCourses,
                 masterSwitch: document.getElementById('masterSwitch').checked,
@@ -1418,7 +1476,11 @@
                 modePhotoSwitch: document.getElementById('modePhotoSwitch').checked,
                 modeQaRefSwitch: document.getElementById('modeQaRefSwitch').checked,
                 modeVoiceRefSwitch: document.getElementById('modeVoiceRefSwitch').checked,
-                modePhotoRefSwitch: document.getElementById('modePhotoRefSwitch').checked
+                modePhotoRefSwitch: document.getElementById('modePhotoRefSwitch').checked,
+                modeQaRefCount: parseInt(document.getElementById('modeQaRefCount').value) || 1,
+                modeVoiceRefCount: parseInt(document.getElementById('modeVoiceRefCount').value) || 1,
+                modePhotoRefCount: parseInt(document.getElementById('modePhotoRefCount').value) || 1,
+                imageRefCount: parseInt(document.getElementById('imageRefCount').value) || 1
             };
             localStorage.setItem('studyNoteConfigV3', JSON.stringify(config));
             alert('✅ 手记配置已保存');
@@ -1443,6 +1505,7 @@
         loadVideoSpecs();
         loadImageSpecs();
         loadSavedConfig();
+        syncRefCountState();
     </script>
 </body>
 </html>

@@ -404,6 +404,27 @@
         .img-ref-empty .ire-icon { font-size: 30px; }
         .img-ref-empty .ire-text { font-size: 13px; color: #888; }
         .img-ref-actions { display: flex; gap: 8px; }
+        .img-ref-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 8px; }
+        .ref-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
+        .ref-cell { position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: #fafafd; }
+        .ref-cell-img { width: 100%; height: 100%; background-size: cover; background-position: center; }
+        .ref-cell-img.ai { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+        .ref-cell-add {
+            border: 1px dashed #d0d5e0; border-radius: 10px; aspect-ratio: 1;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+            cursor: pointer; background: #fafafd; color: #888; font-size: 12px; transition: all 0.2s;
+        }
+        .ref-cell-add:active { background: #F4F8FF; border-color: #0669FF; color: #0669FF; }
+        .img-ref-cell { position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: #fafafd; }
+        .img-ref-cell img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .img-ref-add {
+            border: 1px dashed #d0d5e0; border-radius: 10px; aspect-ratio: 1;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+            cursor: pointer; background: #fafafd; color: #888; transition: all 0.2s;
+        }
+        .img-ref-add:active { background: #F4F8FF; border-color: #0669FF; color: #0669FF; }
+        .img-ref-add .ira-icon { font-size: 26px; line-height: 1; }
+        .img-ref-add .ira-text { font-size: 11px; }
         .queued-modal {
             position: fixed; inset: 0; background: rgba(0,0,0,.45);
             display: none; align-items: center; justify-content: center; z-index: 9999;
@@ -872,7 +893,7 @@
 </div>
 <input type="file" id="photoFileInput" accept="image/*" capture="environment" onchange="handlePhotoSelect(this)" style="display:none;">
 <input type="file" id="refPhotoInput" accept="image/*" capture="environment" onchange="handleRefPhoto(this)" style="display:none;">
-<input type="file" id="refAlbumInput" accept="image/*" onchange="handleRefPhoto(this)" style="display:none;">
+<input type="file" id="refAlbumInput" accept="image/*" multiple onchange="handleRefPhoto(this)" style="display:none;">
 <input type="file" id="imgRefPhotoInput" accept="image/*" capture="environment" onchange="handleImgRefPhoto(this)" style="display:none;">
 <input type="file" id="imgRefAlbumInput" accept="image/*" onchange="handleImgRefPhoto(this)" style="display:none;">
 
@@ -999,13 +1020,13 @@
         <li><b>问答创作</b>：按步骤回答 AI 提问，逐步生成视频脚本。</li>
         <li><b>语音输入</b>：长按「🎤 按住说话」录音（微信风格录音浮层，带声波动画与计时），松手发送语音；滑动到底部目标条「滑到这里 发送」，滑至取消区松手取消；录音后展示语音识别结果，可编辑后生成脚本。</li>
         <li><b>拍照识别</b>：点击虚线框拍照或从相册选择图片，AI 分析画面内容后生成视频脚本。</li>
-        <li><b>我的视频脚本</b>（三种方式最后一步）：展示 AI 生成的脚本，可直接编辑修改；顶部提供<b>参考图引用</b>（单选「上传 / 图片库」，仅限 1 张）——「上传」支持拍照或从相册选择，「图片库」从已创作好的 AI 图片中选择。</li>
+        <li><b>我的视频脚本</b>（三种方式最后一步）：展示 AI 生成的脚本，可直接编辑修改；顶部提供<b>参考图引用</b>（单选「上传 / 图片库」）——「上传」支持拍照或从相册选择（可一次多选），「图片库」从已创作好的 AI 图片中选择。参考图数量由后台「研学手记配置」控制，最多 <b>9</b> 张。</li>
         <li><b>确认脚本</b>：点击后弹出「⏳ 正在生成中，稍后查看」异步提示，作品进入「创作中」列表。</li>
     </ul>
 
     <h3>3. 图片创作</h3>
     <ul>
-        <li>支持上传<b>参考图</b>（拍照或相册，仅限 1 张），展示在提示词上方；默认提示词为「请把参考图的小男生生成卡通风格形象」。</li>
+        <li>支持上传<b>参考图</b>（拍照或相册），展示在提示词上方；数量由后台「研学手记配置」控制，最多 <b>6</b> 张</li>
         <li>输入图片描述，<b>提示词不超过 500 字</b>。</li>
         <li>点击「生成图片」后关闭弹窗，弹出「⏳ 正在生成中 / 稍后查看」提示，点击「稍后查看」后作品自动加入主页「创作中」列表。</li>
     </ul>
@@ -1021,6 +1042,11 @@
         <li><b>合成视频</b>：选满 2 个后点击底部「合成视频」，提交模拟 AI 合成任务，作品进入「创作中」并显示「合成中」标签与进度。</li>
         <li><b>等待完成</b>：等待进度跑完后自动生成合成视频，进入「已完成」列表，标题形如「xxx + yyy 合成（陈昭君）」，已完成总数 +1。</li>
     </ul>
+
+    <h3>6. AI 创作流程图</h3>
+    <div style="margin-top:8px;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;cursor:pointer;" onclick="openImagePreview('../../asset/ai创作流程图.png')">
+        <img src="../../asset/ai创作流程图.png" style="width:100%;display:block;" alt="AI创作流程图">
+    </div>
 </div>
 </body>
 <script>
@@ -1448,8 +1474,9 @@
         body.insertBefore(bar, body.firstChild);
     }
 
-    /* ===== 图片创作流程 ===== */
-    var imgRefImage = null;
+    /* ===== 图片创作流程（参考图本原型模拟写死 3 张，实际最多 6 张） ===== */
+    var imgRefImages = [];
+    var IMG_REF_MAX = 3;
 
     function renderImageCreate() {
         var body = document.getElementById('questionBody');
@@ -1458,7 +1485,7 @@
             + '<div class="img-title">🖼️ 图片创作</div>'
             + '<div class="img-desc">支持参考图 + 提示词，AI 将为你生成图片</div>'
             + '<div class="img-ref-block">'
-            + '<div class="img-ref-title">📷 参考图 <span class="ref-sub">（可选，仅限 1 张）</span></div>'
+            + '<div class="img-ref-title">📷 参考图 <span class="ref-sub">（可选，最多 ' + IMG_REF_MAX + ' 张）</span></div>'
             + '<div id="imgRefArea"></div>'
             + '</div>'
             + '<textarea class="img-textarea" id="imgPrompt" rows="5" maxlength="500">描述你想要的图片</textarea>'
@@ -1471,36 +1498,45 @@
     function renderImgRefArea() {
         var wrap = document.getElementById('imgRefArea');
         if (!wrap) return;
-        var html;
-        if (imgRefImage) {
-            html = '<div class="ref-preview-wrap">'
-                + '<div class="ref-preview" style="background-image:url(' + imgRefImage + ')"></div>'
-                + '<button class="ref-del" onclick="clearImgRef()">✕</button>'
-                + '</div>'
-                + '<div class="ref-reupload" onclick="openRefUploadSheet(\'image\')">📷 重新上传（拍照 / 相册）</div>';
-        } else {
-            html = '<div class="img-ref-empty" onclick="openRefUploadSheet(\'image\')">'
-                + '<span class="ire-icon">🖼️</span>'
-                + '<span class="ire-text">添加参考图（拍照 / 相册）</span>'
+        var html = '<div class="img-ref-grid">';
+        for (var i = 0; i < imgRefImages.length; i++) {
+            html += '<div class="img-ref-cell">'
+                + '<img src="' + imgRefImages[i] + '" alt="参考图">'
+                + '<button class="ref-del" onclick="removeImgRef(' + i + ')">✕</button>'
                 + '</div>';
         }
+        if (imgRefImages.length < IMG_REF_MAX) {
+            html += '<div class="img-ref-add" onclick="openRefUploadSheet(\'image\')">'
+                + '<span class="ira-icon">➕</span>'
+                + '<span class="ira-text">' + (imgRefImages.length ? '继续添加' : '添加参考图') + '</span>'
+                + '</div>';
+        }
+        html += '</div>';
         wrap.innerHTML = html;
     }
 
     function handleImgRefPhoto(input) {
-        var file = input.files[0];
-        if (!file) return;
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            imgRefImage = e.target.result;
-            renderImgRefArea();
-        };
-        reader.readAsDataURL(file);
+        var files = input.files;
+        if (!files || !files.length) return;
+        var remaining = IMG_REF_MAX - imgRefImages.length;
+        if (remaining <= 0) { alert('最多上传 ' + IMG_REF_MAX + ' 张参考图'); input.value = ''; return; }
+        var list = Array.prototype.slice.call(files, 0, remaining);
+        if (files.length > remaining) alert('最多上传 ' + IMG_REF_MAX + ' 张参考图，已自动保留前 ' + remaining + ' 张');
+        var pending = list.length;
+        list.forEach(function(file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                imgRefImages.push(e.target.result);
+                pending--;
+                if (pending === 0) renderImgRefArea();
+            };
+            reader.readAsDataURL(file);
+        });
         input.value = '';
     }
 
-    function clearImgRef() {
-        imgRefImage = null;
+    function removeImgRef(idx) {
+        imgRefImages.splice(idx, 1);
         renderImgRefArea();
     }
 
@@ -1872,8 +1908,9 @@
         renderRefSection();
     }
 
-    /* ===== 参考图引用（三种模式最后一步共用，仅限 1 张） ===== */
-    var refImage = null;
+    /* ===== 参考图引用（三种模式最后一步共用，本原型模拟写死 3 张，实际最多 9 张） ===== */
+    var refImages = [];
+    var REF_MAX = 3;
     var refSource = '';
     var refUploadTarget = 'video';
 
@@ -1888,25 +1925,38 @@
         var wrap = document.getElementById('refSection');
         if (!wrap) return;
         var html = '<div class="ref-section">'
-            + '<div class="ref-title">🖼️ 参考图引用 <span class="ref-sub">（可选，仅限 1 张）</span></div>'
+            + '<div class="ref-title">🖼️ 参考图引用 <span class="ref-sub">（可选，最多 ' + REF_MAX + ' 张）</span></div>'
             + '<div class="ref-radio-group">'
             + '<label class="ref-radio' + (refSource === 'upload' ? ' active' : '') + '"><input type="radio" name="refSource" ' + (refSource === 'upload' ? 'checked' : '') + ' onclick="chooseRefSource(\'upload\')">上传</label>'
             + '<label class="ref-radio' + (refSource === 'library' ? ' active' : '') + '"><input type="radio" name="refSource" ' + (refSource === 'library' ? 'checked' : '') + ' onclick="chooseRefSource(\'library\')">图片库</label>'
             + '</div>'
             + '<div class="ref-preview-area">';
-        if (refImage) {
-            html += '<div class="ref-preview-wrap">'
-                + (refImage.type === 'photo'
-                    ? '<div class="ref-preview" style="background-image:url(' + refImage.url + ')"></div>'
-                    : '<div class="ref-preview ai" style="background:' + refImage.bg + '"><span class="ref-ai-icon">🎨</span><span class="ref-ai-name">' + refImage.name + '</span></div>')
-                + '<button class="ref-del" onclick="clearRefImage()">✕</button>'
-                + '</div>';
+        if (refImages.length) {
+            html += '<div class="ref-grid">';
+            for (var i = 0; i < refImages.length; i++) {
+                var r = refImages[i];
+                html += '<div class="ref-cell">'
+                    + (r.type === 'photo'
+                        ? '<div class="ref-cell-img" style="background-image:url(' + r.url + ')"></div>'
+                        : '<div class="ref-cell-img ai" style="background:' + r.bg + '"><span class="ref-ai-icon">🎨</span><span class="ref-ai-name">' + r.name + '</span></div>')
+                    + '<button class="ref-del" onclick="removeRefImage(' + i + ')">✕</button>'
+                    + '</div>';
+            }
+            if (refImages.length < REF_MAX) {
+                html += '<div class="ref-cell-add" onclick="addRefImage()">➕<span>添加</span></div>';
+            }
+            html += '</div>';
         } else {
-            html += '<div class="ref-empty">未选择参考图</div>';
+            html += '<div class="ref-empty" onclick="addRefImage()">未选择参考图，点击添加</div>';
         }
         html += '</div>'
             + '</div>';
         wrap.innerHTML = html;
+    }
+
+    function addRefImage() {
+        if (refSource === 'upload') openRefUploadSheet();
+        else openRefAiPicker();
     }
 
     /* 单选：上传 → 拍照/相册；图片库 → 已创作 AI 图片 */
@@ -1937,19 +1987,27 @@
     }
 
     function handleRefPhoto(input) {
-        var file = input.files[0];
-        if (!file) return;
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            refImage = { type: 'photo', url: e.target.result };
-            renderRefSection();
-        };
-        reader.readAsDataURL(file);
+        var files = input.files;
+        if (!files || !files.length) return;
+        var remaining = REF_MAX - refImages.length;
+        if (remaining <= 0) { alert('最多上传 ' + REF_MAX + ' 张参考图'); input.value = ''; return; }
+        var list = Array.prototype.slice.call(files, 0, remaining);
+        if (files.length > remaining) alert('最多上传 ' + REF_MAX + ' 张参考图，已自动保留前 ' + remaining + ' 张');
+        var pending = list.length;
+        list.forEach(function(file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                refImages.push({ type: 'photo', url: e.target.result });
+                pending--;
+                if (pending === 0) renderRefSection();
+            };
+            reader.readAsDataURL(file);
+        });
         input.value = '';
     }
 
-    function clearRefImage() {
-        refImage = null;
+    function removeRefImage(idx) {
+        refImages.splice(idx, 1);
         renderRefSection();
     }
 
@@ -1967,7 +2025,12 @@
     }
 
     function chooseAiRef(i) {
-        refImage = { type: 'ai', name: AI_PICKS[i].name, bg: AI_PICKS[i].bg };
+        if (refImages.length >= REF_MAX) {
+            alert('最多添加 ' + REF_MAX + ' 张参考图');
+            document.getElementById('refAiModal').classList.remove('show');
+            return;
+        }
+        refImages.push({ type: 'ai', name: AI_PICKS[i].name, bg: AI_PICKS[i].bg });
         document.getElementById('refAiModal').classList.remove('show');
         renderRefSection();
     }
