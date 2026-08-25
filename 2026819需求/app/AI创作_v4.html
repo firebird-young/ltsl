@@ -1188,12 +1188,12 @@
         if (!grid) return;
         var html = '';
         for (var i = 0; i < doneWorks.length; i++) {
-            var sel = selectMode && selectedIds.indexOf(i) > -1 ? ' selected' : '';
+            var sel = isSelectMode && selectedIds.indexOf(i) > -1 ? ' selected' : '';
             html += '<div class="done-card' + sel + '" data-index="' + i + '">'
                 + '<div class="dc-cover">📹</div>'
                 + '<div class="dc-name">' + doneWorks[i].name + '</div>'
                 + '<button class="dc-del" onclick="delWork(' + i + ')">🗑</button>'
-                + (selectMode ? '<div class="dc-select-mark">✓</div>' : '')
+                + (isSelectMode ? '<div class="dc-select-mark">✓</div>' : '')
                 + '</div>';
         }
         grid.innerHTML = html;
@@ -1228,7 +1228,7 @@
     }
 
     /* ===== 长按多选 → 合成视频 ===== */
-    var selectMode = false;
+    var isSelectMode = false;
     var selectedIds = [];
     var longPressTimer = null;
     var longPressFired = false;
@@ -1241,7 +1241,7 @@
 
     function enterSelectMode() {
         lastLongPressAt = Date.now();
-        selectMode = true;
+        isSelectMode = true;
         selectedIds = [];
         document.getElementById('aiCreateBtn').style.display = 'none';
         document.getElementById('mergeBar').style.display = 'flex';
@@ -1251,7 +1251,7 @@
     }
 
     function exitSelectMode() {
-        selectMode = false;
+        isSelectMode = false;
         selectedIds = [];
         document.getElementById('aiCreateBtn').style.display = '';
         document.getElementById('mergeBar').style.display = 'none';
@@ -1324,7 +1324,7 @@
     function onPressStart(e) {
         if (e.target.closest('.dc-del') || !e.target.closest('.done-card')) return;
         longPressFired = false;
-        if (selectMode) return; // 多选模式下不再触发长按
+        if (isSelectMode) return; // 多选模式下不再触发长按
         longPressTimer = setTimeout(function() {
             longPressTimer = null;
             longPressFired = true;
@@ -1353,7 +1353,7 @@
         var card = e.target.closest('.done-card');
         if (!card) return;
         var idx = parseInt(card.dataset.index, 10);
-        if (selectMode) toggleSelect(idx);
+        if (isSelectMode) toggleSelect(idx);
         else alert('视频预览（原型示意）');
     }
 
