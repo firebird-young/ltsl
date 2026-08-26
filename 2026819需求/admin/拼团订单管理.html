@@ -211,6 +211,8 @@
         .order-table tbody tr:last-child td { border-bottom: none; }
         .order-table tbody tr:nth-child(even) { background: #F7F9FC; }
         .order-table tbody tr:hover { background: #EEF3FF; }
+        .table-total-bar { padding: 10px 14px; background: #FDF6F6; border-bottom: 1px solid #F0F1F4; border-radius: 10px 10px 0 0; text-align: right; font-size: 13px; color: #666; }
+        .table-total-bar b { font-size: 14px; font-weight: 700; }
         .order-table .order-id { font-family: Consolas, Menlo, monospace; font-size: 12.5px; color: #0669FF; word-break: break-all; }
         .order-table .time-cell { font-size: 12.5px; color: #555; white-space: nowrap; }
         .order-table .phone-cell { font-family: Consolas, Menlo, monospace; font-size: 12.5px; color: #555; }
@@ -234,7 +236,7 @@
         .traveler-list .tv .type-tag.student { background: #E8F5E9; color: #389E0D; border: 1px solid #B7EB8F; }
         .traveler-list .tv .type-tag.parent { background: #FFF7E6; color: #D48806; border: 1px solid #FFD591; }
         .traveler-list .tv .tv-meta { font-size: 12px; color: #888; }
-        .traveler-list .tv .tv-spec { grid-area: spec; justify-self: end; align-self: center; font-size: 12.5px; color: #D4380D; font-weight: 600; white-space: nowrap; }
+        .traveler-list .tv .tv-spec { grid-area: spec; justify-self: end; align-self: center; font-size: 12.5px; color: #555; font-weight: 600; white-space: nowrap; }
         .traveler-list .tv .tv-idcard { font-size: 12px; color: #999; font-family: Consolas, Menlo, monospace; }
 
         /* 企微群上传 */
@@ -566,6 +568,7 @@
 
         // 已拼订单列表
         var orderHtml = '';
+        var grandTotal = 0;
         g.orders.forEach(function(o) {
             var travelerHtml = o.travelers.map(function(t) {
                 var isStudent = t.type === 'main';
@@ -595,6 +598,7 @@
                 + '<td><div class="traveler-list">' + travelerHtml + '</div></td>'
                 + '<td class="price">¥' + orderTotal.toFixed(2) + '</td>'
                 + '</tr>';
+            grandTotal += orderTotal;
         });
 
         document.getElementById('detailBody').innerHTML =
@@ -620,7 +624,9 @@
             + '</div>'
             + '<div class="detail-section">'
             + '<div class="sec-title">已拼订单（' + g.orders.length + '）</div>'
-            + '<div class="order-table-wrap"><table class="order-table"><thead><tr>'
+            + '<div class="order-table-wrap">'
+            + '<div class="table-total-bar">实付总额 <b class="price">¥' + grandTotal.toFixed(2) + '</b></div>'
+            + '<table class="order-table"><thead><tr>'
             + '<th>订单编号</th><th>购买时间</th><th>购买手机号</th><th>出行人员 / 规格</th><th>实付金额</th>'
             + '</tr></thead><tbody>' + orderHtml + '</tbody></table></div>'
             + '</div>';
