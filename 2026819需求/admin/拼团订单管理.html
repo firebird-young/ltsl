@@ -151,7 +151,7 @@
         }
         .modal.show { display: flex; }
         .modal-content {
-            background: #fff; width: 100%; max-width: 960px;
+            background: #fff; width: 100%; max-width: 1280px;
             max-height: 92vh; border-radius: 12px; overflow: hidden;
             display: flex; flex-direction: column;
             box-shadow: 0 12px 32px rgba(0,0,0,0.16);
@@ -165,7 +165,7 @@
         .modal-header h3 { font-size: 17px; font-weight: 600; color: #1a1a1a; }
         .modal-header .close { font-size: 22px; color: #999; cursor: pointer; border: none; background: transparent; }
         .modal-header .close:hover { color: #333; }
-        .modal-body { padding: 20px 24px; overflow-y: auto; }
+        .modal-body { padding: 20px 24px; overflow-y: auto; background: #F7F8FA; }
         .modal-footer {
             padding: 14px 24px; border-top: 1px solid #f0f0f0;
             display: flex; justify-content: flex-end; gap: 12px;
@@ -175,15 +175,15 @@
         .modal-footer .btn-ok { background: #0669FF; color: #fff; }
         .modal-footer .btn-ok:hover { background: #0052CC; }
 
-        .detail-section { margin-bottom: 20px; }
+        .detail-section { background: #fff; border: 1px solid #F0F1F4; border-radius: 10px; padding: 16px 18px; margin-bottom: 16px; }
         .detail-section:last-child { margin-bottom: 0; }
         .detail-section .sec-title {
             font-size: 14px; font-weight: 600; color: #333;
             padding-left: 8px; border-left: 3px solid #0669FF; margin-bottom: 12px;
         }
-        .detail-row { display: flex; padding: 8px 0; font-size: 14px; }
-        .detail-row .label { width: 120px; color: #888; }
-        .detail-row .value { flex: 1; color: #333; }
+        .detail-row { display: flex; align-items: flex-start; padding: 7px 0; font-size: 13.5px; line-height: 1.5; }
+        .detail-row .label { width: 130px; color: #999; flex-shrink: 0; }
+        .detail-row .value { flex: 1; color: #333; word-break: break-all; }
 
         .member-list { border: 1px solid #f0f0f0; border-radius: 8px; overflow: hidden; }
         .member-item {
@@ -198,32 +198,44 @@
         .member-item .tag.leader { background: #FFF7E6; color: #D48806; }
 
         /* 已拼订单列表 */
-        .order-table-wrap { border: 1px solid #f0f0f0; border-radius: 8px; overflow-x: auto; }
+        .order-table-wrap { border: 1px solid #F0F1F4; border-radius: 10px; }
         .order-table, .order-table th, .order-table td { box-sizing: border-box; }
-        .order-table { width: 100%; min-width: 860px; border-collapse: separate; border-spacing: 0; font-size: 13px; table-layout: fixed; }
-        .order-table thead th { background: #fafafa; padding: 10px 12px; text-align: left; font-weight: 600; color: #555; border-bottom: 1px solid #e8e8e8; }
-        .order-table thead th:nth-child(1) { width: 15%; }
-        .order-table thead th:nth-child(2) { width: 15%; }
-        .order-table thead th:nth-child(3) { width: 13%; }
-        .order-table thead th:nth-child(4) { width: 42%; }
+        .order-table { width: 100%; min-width: 1080px; border-collapse: separate; border-spacing: 0; font-size: 13px; table-layout: fixed; }
+        .order-table thead th { background: #FAFAFB; padding: 12px 14px; text-align: left; font-weight: 600; color: #4A4A5A; border-bottom: 1px solid #E8E8F0; font-size: 13px; }
+        .order-table thead th:nth-child(1) { width: 18%; }
+        .order-table thead th:nth-child(2) { width: 18%; }
+        .order-table thead th:nth-child(3) { width: 14%; }
+        .order-table thead th:nth-child(4) { width: 35%; }
         .order-table thead th:nth-child(5) { width: 15%; }
-        .order-table tbody td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; color: #333; vertical-align: middle; word-break: break-all; }
+        .order-table tbody td { padding: 12px 14px; border-bottom: 1px solid #F0F1F4; color: #333; vertical-align: middle; }
         .order-table tbody tr:last-child td { border-bottom: none; }
         .order-table tbody tr:nth-child(even) { background: #F7F9FC; }
         .order-table tbody tr:hover { background: #EEF3FF; }
+        .order-table .order-id { font-family: Consolas, Menlo, monospace; font-size: 12.5px; color: #0669FF; word-break: break-all; }
+        .order-table .time-cell { font-size: 12.5px; color: #555; white-space: nowrap; }
+        .order-table .phone-cell { font-family: Consolas, Menlo, monospace; font-size: 12.5px; color: #555; }
         .traveler-list { display: flex; flex-direction: column; }
-        .traveler-list .tv { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; white-space: nowrap; padding: 4px 0; }
-        .traveler-list .tv > * { flex-shrink: 0; }
-        .traveler-list .tv .tv-name { font-weight: 500; color: #333; }
+        .traveler-list .tv {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            grid-template-areas: "main spec" "sub spec";
+            column-gap: 12px; row-gap: 3px;
+            padding: 8px 0; align-items: center;
+        }
+        .traveler-list .tv:first-child { padding-top: 0; }
+        .traveler-list .tv:last-child { padding-bottom: 0; }
+        .traveler-list .tv .tv-main { grid-area: main; display: flex; align-items: center; gap: 6px; min-width: 0; }
+        .traveler-list .tv .tv-sub { grid-area: sub; display: flex; align-items: center; gap: 8px; min-width: 0; }
+        .traveler-list .tv .tv-name { font-weight: 600; color: #333; }
         .traveler-list .tv .type-tag {
-            display: inline-block; font-size: 11px; padding: 1px 6px; border-radius: 3px;
-            line-height: 1.5; white-space: nowrap; font-weight: 500;
+            display: inline-block; font-size: 11px; padding: 1px 7px; border-radius: 4px;
+            line-height: 1.6; white-space: nowrap; font-weight: 500;
         }
         .traveler-list .tv .type-tag.student { background: #E8F5E9; color: #389E0D; border: 1px solid #B7EB8F; }
         .traveler-list .tv .type-tag.parent { background: #FFF7E6; color: #D48806; border: 1px solid #FFD591; }
-        .traveler-list .tv .tv-meta { font-size: 12px; color: #666; }
-        .traveler-list .tv .tv-spec { font-size: 12px; color: #D4380D; font-weight: 500; white-space: nowrap; }
-        .traveler-list .tv .tv-idcard { font-size: 12px; color: #999; }
+        .traveler-list .tv .tv-meta { font-size: 12px; color: #888; }
+        .traveler-list .tv .tv-spec { grid-area: spec; justify-self: end; align-self: center; font-size: 12.5px; color: #D4380D; font-weight: 600; white-space: nowrap; }
+        .traveler-list .tv .tv-idcard { font-size: 12px; color: #999; font-family: Consolas, Menlo, monospace; }
 
         /* 企微群上传 */
         .upload-area {
@@ -558,14 +570,17 @@
             var travelerHtml = o.travelers.map(function(t) {
                 var isStudent = t.type === 'main';
                 var meta = '';
-                if (t.gender) meta += ' ' + esc(t.gender);
-                if (t.age !== undefined && t.age !== null) meta += ' ' + t.age + '岁';
+                if (t.gender) meta += esc(t.gender);
+                if (t.age !== undefined && t.age !== null) meta += (meta ? ' · ' : '') + t.age + '岁';
                 var idCard = t.idCard || '';
                 var feeName = t.feeName || (isStudent ? '学生带午餐' : '家长');
                 var fee = (t.fee !== undefined && t.fee !== null) ? t.fee : (isStudent ? 199 : 50);
                 var feeStr = fee % 1 === 0 ? String(fee) : fee.toFixed(2);
-                return '<div class="tv"><span class="tv-name">' + esc(t.name) + '</span><span class="type-tag ' + (isStudent ? 'student' : 'parent') + '">' + (isStudent ? '学生' : '家长') + '</span>'
-                    + '<span class="tv-meta">' + meta + '</span><span class="tv-spec">' + esc(feeName) + ' ¥' + feeStr + '</span><span class="tv-idcard">' + esc(idCard) + '</span></div>';
+                return '<div class="tv">'
+                    + '<div class="tv-main"><span class="tv-name">' + esc(t.name) + '</span><span class="type-tag ' + (isStudent ? 'student' : 'parent') + '">' + (isStudent ? '学生' : '家长') + '</span></div>'
+                    + '<div class="tv-sub"><span class="tv-meta">' + meta + '</span><span class="tv-idcard">' + esc(idCard) + '</span></div>'
+                    + '<span class="tv-spec">' + esc(feeName) + ' ¥' + feeStr + '</span>'
+                    + '</div>';
             }).join('');
             // 实付金额：按出行人费用明细动态计算
             var orderTotal = 0;
@@ -574,9 +589,9 @@
                 orderTotal += fee;
             });
             orderHtml += '<tr>'
-                + '<td>' + esc(o.orderId) + '</td>'
-                + '<td>' + esc(o.buyTime) + '</td>'
-                + '<td>' + esc(o.phone) + '</td>'
+                + '<td><span class="order-id">' + esc(o.orderId) + '</span></td>'
+                + '<td><span class="time-cell">' + esc(o.buyTime) + '</span></td>'
+                + '<td><span class="phone-cell">' + esc(o.phone) + '</span></td>'
                 + '<td><div class="traveler-list">' + travelerHtml + '</div></td>'
                 + '<td class="price">¥' + orderTotal.toFixed(2) + '</td>'
                 + '</tr>';
