@@ -234,6 +234,7 @@
         }
         .traveler-row .name { color: #333; font-weight: 500; }
         .traveler-row .gender { color: #999; font-size: 13px; }
+        .traveler-row .age { color: #666; font-size: 12.5px; margin-left: 2px; }
         .traveler-row .type-tag {
             display: inline-block;
             font-size: 11px;
@@ -372,31 +373,31 @@
                 phone: '13308001898',
                 status: 'pending',
                 travelers: [
-                    { name: '向小东', gender: '男', type: 'main', idCard: '510105**********38' },
-                    { name: '向志强', gender: '男', type: 'other', idCard: '510105**********39' }
+                    { name: '向小东', gender: '男', age: 10, type: 'main', idCard: '510105201603120038' },
+                    { name: '向志强', gender: '男', age: 42, type: 'other', idCard: '510105198410150039' }
                 ]
             },
             {
                 phone: '18228022180',
                 status: 'verified',
                 travelers: [
-                    { name: '刘润骞', gender: '男', type: 'main', idCard: '510106**********34' },
-                    { name: '刘慧敏', gender: '女', type: 'other', idCard: '510106**********35' }
+                    { name: '刘润骞', gender: '男', age: 11, type: 'main', idCard: '510106201511050134' },
+                    { name: '刘慧敏', gender: '女', age: 40, type: 'other', idCard: '510106198603220035' }
                 ]
             },
             {
                 phone: '18608130610',
                 status: 'verified',
                 travelers: [
-                    { name: '王梓辰', gender: '男', type: 'main', idCard: '510302**********17' },
-                    { name: '王建国', gender: '男', type: 'other', idCard: '510302**********18' }
+                    { name: '王梓辰', gender: '男', age: 10, type: 'main', idCard: '510302201607220217' },
+                    { name: '王建国', gender: '男', age: 45, type: 'other', idCard: '510302198105160018' }
                 ]
             },
             {
                 phone: '18113038800',
                 status: 'expired',
                 travelers: [
-                    { name: '文珏宇', gender: '女', type: 'main', idCard: '511502**********58' }
+                    { name: '文珏宇', gender: '女', age: 12, type: 'main', idCard: '511502201409180958' }
                 ]
             }
         ];
@@ -426,8 +427,10 @@
                     }
                     return '<div class="traveler-row">'
                         + '<div class="tr-top">'
-                        + '<div class="tr-left"><span class="name">' + esc(t.name) + '</span>'
-                        + '<span class="gender">' + esc(t.gender) + '</span>' + typeTag + '</div>'
+                        + '<div class="tr-left"><span class="name">' + esc(t.name) + '</span>' + typeTag
+                        + '<span class="gender">' + esc(t.gender) + '</span>'
+                        + (t.age ? '<span class="age">' + t.age + '岁</span>' : '')
+                        + '</div>'
                         + actionsHtml
                         + '</div>'
                         + '<div class="id-card">' + esc(t.idCard) + '</div>'
