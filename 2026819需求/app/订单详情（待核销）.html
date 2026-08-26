@@ -202,12 +202,6 @@
         .info-row .label { font-size: 14px; color: #666; }
         .info-row .value { font-size: 14px; color: #333; font-weight: 500; }
         .info-row .price { color: #E53935; }
-        .info-row .pay-detail {
-            display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
-            font-weight: 400; font-size: 13px; color: #555;
-        }
-        .info-row .pay-detail i { font-style: normal; color: #333; font-weight: 500; }
-        .pay-detail-row { align-items: flex-start; }
 
         /* 出行人 */
         .traveler-card {
@@ -228,8 +222,10 @@
         .traveler-item .name { font-size: 15px; color: #333; font-weight: 500; }
         .traveler-item .name .gender { font-size: 12px; color: #999; margin-left: 6px; font-weight: normal; }
         .traveler-item .id-card { font-size: 13px; color: #999; }
-        .traveler-item .tag { font-size: 12px; color: #0669FF; background: #f0f7ff; padding: 3px 8px; border-radius: 4px; flex-shrink: 0; }
+        .traveler-item .right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+        .traveler-item .tag { font-size: 12px; color: #0669FF; background: #f0f7ff; padding: 3px 8px; border-radius: 4px; }
         .traveler-item .tag.tag-parent { color: #FF8F1F; background: #FFF7E6; }
+        .traveler-item .spec { font-size: 12px; color: #E53935; font-weight: 500; white-space: nowrap; }
 
         /* 悬浮首页 */
         .home-float {
@@ -334,13 +330,7 @@
                     <span class="label">总金额</span>
                     <span class="value">¥ 199</span>
                 </div>
-                <div class="info-row pay-detail-row">
-                    <span class="label">付款明细</span>
-                    <span class="value pay-detail">
-                        <span>学生带午餐 <i>¥149</i> ×1</span>
-                        <span>家长带午餐 <i>¥50</i> ×1</span>
-                    </span>
-                </div>
+
                 <div class="info-row">
                     <span class="label">实付款</span>
                     <span class="value price">¥ 199</span>
@@ -371,14 +361,20 @@
                         <div class="name">媛姐 <span class="gender">女</span></div>
                         <div class="id-card">511621***********2X</div>
                     </div>
-                    <span class="tag">学生</span>
+                    <div class="right">
+                        <span class="tag">学生</span>
+                        <span class="spec">学生带午餐 ¥149</span>
+                    </div>
                 </div>
                 <div class="traveler-item">
                     <div class="left">
                         <div class="name">李建国 <span class="gender">男</span></div>
                         <div class="id-card">320102***********15</div>
                     </div>
-                    <span class="tag tag-parent">家长</span>
+                    <div class="right">
+                        <span class="tag tag-parent">家长</span>
+                        <span class="spec">家长带午餐 ¥50</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -413,7 +409,6 @@
     <h3>4. 订单信息</h3>
     <ul>
         <li><b>总金额</b>：订单总价（规格*数量）。</li>
-        <li><b>付款明细</b>：分规格展示单价与数量（学生带午餐 ¥149 ×1、家长带午餐 ¥50 ×1）。</li>
         <li><b>实付款</b>：实际支付金额（¥199）。</li>
         <li>订单编号 / 创建时间 / 拼团订单编号 / 联系手机号。</li>
     </ul>
@@ -421,8 +416,8 @@
 
     <h3>5. 出行人</h3>
     <ul>
-        <li>展示出行人<b>姓名 + 性别 + 身份证号</b>，右侧带类型标签：<b>学生</b> / <b>家长</b>，便于核对订单人员组成。</li>
-        <li>标签配色：<b>主类型</b>一个颜色（学生-蓝），<b>其他类型</b>一个颜色（家长-橙）。</li>
+        <li>展示出行人<b>姓名 + 性别 + 身份证号</b>，右侧带类型标签（<b>学生</b> / <b>家长</b>）及<b>规格与单价</b>（如：学生带午餐 ¥149），付款明细已并入出行人逐条展示，不再单独列付款明细。</li>
+        <li>标签配色：<b>主类型</b>一个颜色（学生-蓝），<b>其他类型</b>一个颜色（家长-橙）；规格价格为橙红色。</li>
     </ul>
 </div>
 

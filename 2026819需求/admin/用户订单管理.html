@@ -117,14 +117,13 @@
         .price { color: #E53935; font-weight: 600; }
         .traveler { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
         .traveler .gender { font-size: 12px; color: #999; }
+        .traveler .spec { font-size: 12px; color: #888; white-space: nowrap; }
         .type-tag {
             display: inline-block; font-size: 11px; padding: 1px 6px; border-radius: 3px;
             line-height: 1.5; white-space: nowrap; font-weight: 500;
         }
         .type-tag.student { background: #E8F5E9; color: #389E0D; border: 1px solid #B7EB8F; }
         .type-tag.parent { background: #FFF7E6; color: #D48806; border: 1px solid #FFD591; }
-        .pay-detail { font-size: 13px; color: #333; line-height: 1.8; }
-
         .refund-info-table { width: 100%; border-collapse: collapse; font-size: 14px; }
         .refund-info-table td { padding: 14px 16px; border-bottom: 1px solid #f0f0f0; }
         .refund-info-table tr:last-child td { border-bottom: none; }
@@ -263,8 +262,7 @@
                         <th>订单编号</th>
                         <th>用户账号</th>
                         <th>课程 / 场次</th>
-                        <th>出行人</th>
-                        <th>付款详情</th>
+                        <th>出行人 / 规格</th>
                         <th>总金额</th>
                         <th>优惠金额</th>
                         <th>实付金额</th>
@@ -485,7 +483,7 @@
             return true;
         });
         if (list.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="13" class="empty-state">暂无用户订单</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="12" class="empty-state">暂无用户订单</td></tr>';
             return;
         }
         var html = '';
@@ -493,23 +491,17 @@
             var s = statusMap[o.status];
             var travelerHtml = o.travelers.map(function(t) {
                 var isStudent = t.type === 'main';
+                var spec = isStudent ? '学生带午餐' : '家长';
+                var p = (t.price % 1 === 0) ? t.price.toFixed(0) : t.price.toFixed(2);
                 return '<div class="traveler"><span>' + esc(t.name) + '</span><span class="gender">' + esc(t.gender) + '</span>'
-                    + '<span class="type-tag ' + (isStudent ? 'student' : 'parent') + '">' + (isStudent ? '学生' : '家长') + '</span></div>';
+                    + '<span class="type-tag ' + (isStudent ? 'student' : 'parent') + '">' + (isStudent ? '学生' : '家长') + '</span>'
+                    + '<span class="spec">' + spec + ' ¥' + p + '</span></div>';
             }).join('');
-            var studentCount = 0, parentCount = 0;
-            o.travelers.forEach(function(t) {
-                if (t.type === 'main') studentCount += t.qty;
-                else parentCount += t.qty;
-            });
-            var payDetailHtml = '';
-            if (studentCount > 0) payDetailHtml += '<div class="pay-detail">学生带午餐 ¥199 × ' + studentCount + '</div>';
-            if (parentCount > 0) payDetailHtml += '<div class="pay-detail">家长 ¥100 × ' + parentCount + '</div>';
             html += '<tr>'
                 + '<td><a href="javascript:;" onclick="showDetail(\'' + o.id + '\')" style="color:#0669FF;text-decoration:none;">' + o.id + '</a></td>'
                 + '<td>' + esc(o.user.phone) + '</td>'
                 + '<td><div style="font-weight:500;">' + esc(o.course) + '</div><div style="font-size:12px;color:#888;margin-top:2px;">' + esc(o.courseNo) + ' / ' + esc(o.session) + '</div></td>'
                 + '<td>' + travelerHtml + '</td>'
-                + '<td>' + payDetailHtml + '</td>'
                 + '<td>¥' + o.totalAmount.toFixed(2) + '</td>'
                 + '<td>¥' + o.discount.toFixed(2) + '</td>'
                 + '<td class="price">¥' + o.amount.toFixed(2) + '</td>'
@@ -610,7 +602,8 @@
             var isStudent = t.type === 'main';
             return '<div style="padding:6px 0; border-bottom:1px solid #f5f5f5;">'
                 + '<div style="margin-bottom:2px;">' + esc(t.name) + ' <span style="color:#999;font-size:12px;">' + esc(t.gender) + '</span>'
-                + '<span class="type-tag ' + (isStudent ? 'student' : 'parent') + '" style="margin-left:6px;">' + (isStudent ? '学生' : '家长') + '</span></div>'
+                + '<span class="type-tag ' + (isStudent ? 'student' : 'parent') + '" style="margin-left:6px;">' + (isStudent ? '学生' : '家长') + '</span>'
+                + '<span style="font-size:12px;color:#888;margin-left:6px;">' + (isStudent ? '学生带午餐' : '家长') + ' ¥' + ((t.price % 1 === 0) ? t.price.toFixed(0) : t.price.toFixed(2)) + '</span></div>'
                 + '<div style="font-size:12px; color:#888;">身份证号：' + esc(t.idCard || '—') + '</div>'
                 + '</div>';
         }).join('');
@@ -666,16 +659,14 @@
     function exportOrders() {
         var list = orders.filter(function(o) { return currentTab === 'all' || o.status === currentTab; });
         if (list.length === 0) { alert('暂无数据可导出'); return; }
-        var header = ['订单编号', '用户账号', '课程编号', '课程名称', '场次', '出行人', '付款详情', '总金额', '优惠金额', '实付金额', '订单状态', '拼团确认时间', '下单时间', '关联拼团编号'];
+        var header = ['订单编号', '用户账号', '课程编号', '课程名称', '场次', '出行人（规格/价格）', '总金额', '优惠金额', '实付金额', '订单状态', '拼团确认时间', '下单时间', '关联拼团编号'];
         var rows = list.map(function(o) {
-            var travelers = o.travelers.map(function(t) { return t.name + '(' + t.gender + ')'; }).join('、');
-            var sc = 0, pc = 0;
-            o.travelers.forEach(function(t) { if (t.type === 'main') sc += t.qty; else pc += t.qty; });
-            var payDetail = [];
-            if (sc > 0) payDetail.push('学生199×' + sc);
-            if (pc > 0) payDetail.push('家长100×' + pc);
-            payDetail = payDetail.join('、');
-            return [o.id, o.user.phone, o.courseNo, o.course, o.session, travelers, payDetail, o.totalAmount, o.discount, o.amount, statusMap[o.status].label, o.confirmDate || '', o.createTime, o.groupId];
+            var travelers = o.travelers.map(function(t) {
+                var spec = t.type === 'main' ? '学生带午餐' : '家长';
+                var p = (t.price % 1 === 0) ? t.price.toFixed(0) : t.price.toFixed(2);
+                return t.name + '(' + t.gender + ' ' + spec + ' ¥' + p + ')';
+            }).join('、');
+            return [o.id, o.user.phone, o.courseNo, o.course, o.session, travelers, o.totalAmount, o.discount, o.amount, statusMap[o.status].label, o.confirmDate || '', o.createTime, o.groupId];
         });
         downloadCsv('用户订单管理.csv', header, rows);
     }
@@ -721,9 +712,8 @@
         </ul>
         <h4>3. 订单列表</h4>
         <ul>
-            <li>表格展示：<b>订单编号（可点击查看）、用户账号、课程/场次、出行人、付款详情、总金额、优惠金额、实付金额、订单状态、拼团确认时间、下单时间、关联拼团</b>。</li>
-            <li><b>出行人</b>展示姓名 + 性别 + 类型标签（<b>学生 / 家长</b>）。</li>
-            <li><b>付款详情</b>分类型展示规格单价与数量（学生带午餐 ¥199 × 1、家长带午餐 ¥100 × 1）。</li>
+            <li>表格展示：<b>订单编号（可点击查看）、用户账号、课程/场次、出行人/规格、总金额、优惠金额、实付金额、订单状态、拼团确认时间、下单时间、关联拼团</b>。</li>
+            <li><b>出行人 / 规格</b>列合并展示：每个出行人单独一行，包含姓名 + 性别 + 类型标签（<b>学生 / 家长</b>）及其规格与单价（如：李浩宇 学生带午餐 ¥199），不重复展示数量。</li>
         </ul>
         <h4>4. 订单详情</h4>
         <ul>
