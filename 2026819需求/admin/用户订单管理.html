@@ -502,7 +502,7 @@
                 else parentCount += t.qty;
             });
             var payDetailHtml = '';
-            if (studentCount > 0) payDetailHtml += '<div class="pay-detail">学生 ¥199 × ' + studentCount + '</div>';
+            if (studentCount > 0) payDetailHtml += '<div class="pay-detail">学生带午餐 ¥199 × ' + studentCount + '</div>';
             if (parentCount > 0) payDetailHtml += '<div class="pay-detail">家长 ¥100 × ' + parentCount + '</div>';
             html += '<tr>'
                 + '<td><a href="javascript:;" onclick="showDetail(\'' + o.id + '\')" style="color:#0669FF;text-decoration:none;">' + o.id + '</a></td>'
@@ -723,7 +723,7 @@
         <ul>
             <li>表格展示：<b>订单编号（可点击查看）、用户账号、课程/场次、出行人、付款详情、总金额、优惠金额、实付金额、订单状态、拼团确认时间、下单时间、关联拼团</b>。</li>
             <li><b>出行人</b>展示姓名 + 性别 + 类型标签（<b>学生 / 家长</b>）。</li>
-            <li><b>付款详情</b>分类型展示单价与数量（学生 ¥199 × 1、家长 ¥100 × 1）。</li>
+            <li><b>付款详情</b>分类型展示规格单价与数量（学生带午餐 ¥199 × 1、家长带午餐 ¥100 × 1）。</li>
         </ul>
         <h4>4. 订单详情</h4>
         <ul>

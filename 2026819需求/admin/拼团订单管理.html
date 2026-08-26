@@ -198,18 +198,22 @@
         .member-item .tag.leader { background: #FFF7E6; color: #D48806; }
 
         /* 已拼订单列表 */
-        .order-table-wrap { border: 1px solid #f0f0f0; border-radius: 8px; overflow: hidden; }
-        .order-table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
+        .order-table-wrap { border: 1px solid #f0f0f0; border-radius: 8px; overflow-x: auto; }
+        .order-table, .order-table th, .order-table td { box-sizing: border-box; }
+        .order-table { width: 100%; min-width: 860px; border-collapse: separate; border-spacing: 0; font-size: 13px; table-layout: fixed; }
         .order-table thead th { background: #fafafa; padding: 10px 12px; text-align: left; font-weight: 600; color: #555; border-bottom: 1px solid #e8e8e8; }
-        .order-table thead th:nth-child(1) { width: 15%; }
-        .order-table thead th:nth-child(2) { width: 15%; }
-        .order-table thead th:nth-child(3) { width: 13%; }
-        .order-table thead th:nth-child(4) { width: 30%; }
-        .order-table thead th:nth-child(5) { width: 12%; }
+        .order-table thead th:nth-child(1) { width: 14%; }
+        .order-table thead th:nth-child(2) { width: 14%; }
+        .order-table thead th:nth-child(3) { width: 12%; }
+        .order-table thead th:nth-child(4) { width: 26%; }
+        .order-table thead th:nth-child(5) { width: 19%; }
         .order-table thead th:nth-child(6) { width: 15%; }
         .order-table tbody td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; color: #333; vertical-align: middle; word-break: break-all; }
         .order-table tbody tr:last-child td { border-bottom: none; }
         .order-table tbody tr:hover { background: #FAFBFF; }
+        .pay-detail { display: flex; flex-direction: column; gap: 4px; }
+        .pay-detail .pay-item { font-size: 12px; color: #333; line-height: 1.5; }
+        .pay-detail .pay-fee { color: #D4380D; font-weight: 500; }
         .traveler-list { display: flex; flex-direction: column; gap: 6px; }
         .traveler-list .tv { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
         .traveler-list .tv .tv-name { font-weight: 500; color: #333; }
@@ -391,10 +395,10 @@
             id: 'P260820036767001', courseNo: 'C1001', course: '研學内测', session: '2026-08-25 内测', courseTime: '2026-08-25',
             verifyInstitution: '浙江省文旅集团', execInstitution: '杭州研学旅行社',
             minOrder: 5, maxOrder: 10, mainOrder: 2, otherOrder: 1, confirmDate: '2026-08-23 18:00',
-            status: 'wait', createTime: '2026-08-20 10:12:47', amount: 1499.00, groupTime: '',
+            status: 'wait', createTime: '2026-08-20 10:12:47', amount: 448.01, groupTime: '',
             orders: [
-                { orderId: 'U260820036767002', buyTime: '2026-08-20 10:12:47', phone: '13851872980', travelers: [{ name: '媛姐', type: 'main', gender: '女', age: 12, idCard: '51162120140312002X' }], amount: 0.01, status: '待成团' },
-                { orderId: 'U260820036767003', buyTime: '2026-08-20 10:20:00', phone: '13900139001', travelers: [{ name: '小明', type: 'main', gender: '男', age: 10, idCard: '330102201512230045' }, { name: '小明爸', type: 'other', gender: '男', age: 38, idCard: '330102198604120012' }], amount: 398.00, status: '待成团' },
+                { orderId: 'U260820036767002', buyTime: '2026-08-20 10:12:47', phone: '13851872980', travelers: [{ name: '媛姐', type: 'main', gender: '女', age: 12, idCard: '51162120140312002X', feeName: '学生（特惠）', fee: 0.01 }], amount: 0.01, status: '待成团' },
+                { orderId: 'U260820036767003', buyTime: '2026-08-20 10:20:00', phone: '13900139001', travelers: [{ name: '小明', type: 'main', gender: '男', age: 10, idCard: '330102201512230045' }, { name: '小明爸', type: 'other', gender: '男', age: 38, idCard: '330102198604120012' }], amount: 249.00, status: '待成团' },
                 { orderId: 'U260820036767004', buyTime: '2026-08-20 10:35:00', phone: '13700137001', travelers: [{ name: '小红', type: 'main', gender: '女', age: 9, idCard: '440305201601150028' }], amount: 199.00, status: '待成团' }
             ]
         },
@@ -402,11 +406,11 @@
             id: 'P260820036767002', courseNo: 'C1002', course: '杜甫草堂研学', session: '2026-08-30 上午场', courseTime: '2026-08-30',
             verifyInstitution: '浙江省文旅集团', execInstitution: '成都研学机构',
             minOrder: 10, maxOrder: 20, mainOrder: 3, otherOrder: 1, confirmDate: '2026-08-28 18:00',
-            status: 'fail', createTime: '2026-08-15 09:00:00', amount: 1990.00, groupTime: '',
+            status: 'fail', createTime: '2026-08-15 09:00:00', amount: 697.00, groupTime: '',
             orders: [
                 { orderId: 'U260820036767011', buyTime: '2026-08-15 09:00:00', phone: '13900139001', travelers: [{ name: '王小明', type: 'main', gender: '男', age: 11, idCard: '510108201410180025' }], amount: 199.00, status: '退款中' },
                 { orderId: 'U260820036767012', buyTime: '2026-08-15 09:05:00', phone: '13800138001', travelers: [{ name: '赵小红', type: 'main', gender: '女', age: 10, idCard: '330102201509220045' }], amount: 199.00, status: '退款中' },
-                { orderId: 'U260820036767013', buyTime: '2026-08-15 09:12:00', phone: '13500135001', travelers: [{ name: '陈小华', type: 'main', gender: '男', age: 12, idCard: '350103201404050067' }, { name: '陈小华家长', type: 'other', gender: '女', age: 40, idCard: '350103198606090089' }], amount: 398.00, status: '退款中' }
+                { orderId: 'U260820036767013', buyTime: '2026-08-15 09:12:00', phone: '13500135001', travelers: [{ name: '陈小华', type: 'main', gender: '男', age: 12, idCard: '350103201404050067' }, { name: '陈小华家长', type: 'other', gender: '女', age: 40, idCard: '350103198606090089' }], amount: 249.00, status: '退款中' }
             ],
             failReason: '已超过拼团确认时间，未达到最低成团人数'
         },
@@ -414,10 +418,10 @@
             id: 'P260820036767003', courseNo: 'C1003', course: '李白故里探索', session: '2026-09-01 下午场', courseTime: '2026-09-01',
             verifyInstitution: '安徽省文旅集团', execInstitution: '马鞍山研学社',
             minOrder: 6, maxOrder: 12, mainOrder: 5, otherOrder: 1, confirmDate: '2026-08-30 18:00',
-            status: 'active', createTime: '2026-08-18 14:30:00', amount: 1194.00, groupTime: '2026-08-18 16:00:00',
+            status: 'active', createTime: '2026-08-18 14:30:00', amount: 1045.00, groupTime: '2026-08-18 16:00:00',
             orders: [
                 { orderId: 'U260820036767021', buyTime: '2026-08-18 14:30:00', phone: '13300133001', travelers: [{ name: '陈小军', type: 'main', gender: '男', age: 11, idCard: '440305201504120012' }], amount: 199.00, status: '待出行' },
-                { orderId: 'U260820036767022', buyTime: '2026-08-18 14:32:00', phone: '13200132001', travelers: [{ name: '黄小芳', type: 'main', gender: '女', age: 10, idCard: '330102201510150045' }, { name: '黄小芳家长', type: 'other', gender: '女', age: 39, idCard: '330102198511200067' }], amount: 398.00, status: '待出行' },
+                { orderId: 'U260820036767022', buyTime: '2026-08-18 14:32:00', phone: '13200132001', travelers: [{ name: '黄小芳', type: 'main', gender: '女', age: 10, idCard: '330102201510150045' }, { name: '黄小芳家长', type: 'other', gender: '女', age: 39, idCard: '330102198511200067' }], amount: 249.00, status: '待出行' },
                 { orderId: 'U260820036767023', buyTime: '2026-08-18 14:40:00', phone: '13100131001', travelers: [{ name: '李大明', type: 'main', gender: '男', age: 12, idCard: '350103201408160089' }], amount: 199.00, status: '待出行' },
                 { orderId: 'U260820036767024', buyTime: '2026-08-18 14:45:00', phone: '13000130001', travelers: [{ name: '赵小丽', type: 'main', gender: '女', age: 9, idCard: '420106201701180023' }], amount: 199.00, status: '待出行' },
                 { orderId: 'U260820036767025', buyTime: '2026-08-18 14:50:00', phone: '18900189001', travelers: [{ name: '钱小强', type: 'main', gender: '男', age: 11, idCard: '510108201501120034' }], amount: 199.00, status: '待出行' }
@@ -427,12 +431,12 @@
             id: 'P260820036767004', courseNo: 'C1004', course: '博物馆奇妙日', session: '2026-08-10 上午场', courseTime: '2026-08-10',
             verifyInstitution: '江苏省文旅集团', execInstitution: '南京研学基地',
             minOrder: 8, maxOrder: 15, mainOrder: 8, otherOrder: 2, confirmDate: '2026-08-08 18:00',
-            status: 'done', createTime: '2026-08-01 10:00:00', amount: 1990.00, groupTime: '2026-08-02 10:30:00',
+            status: 'done', createTime: '2026-08-01 10:00:00', amount: 1493.00, groupTime: '2026-08-02 10:30:00',
             orders: [
-                { orderId: 'U260820036767031', buyTime: '2026-08-01 10:00:00', phone: '15000150001', travelers: [{ name: '张小明', type: 'main', gender: '男', age: 11, idCard: '330102201511120045' }, { name: '张小明家长', type: 'other', gender: '男', age: 40, idCard: '330102198602200067' }], amount: 398.00, status: '已核销' },
+                { orderId: 'U260820036767031', buyTime: '2026-08-01 10:00:00', phone: '15000150001', travelers: [{ name: '张小明', type: 'main', gender: '男', age: 11, idCard: '330102201511120045' }, { name: '张小明家长', type: 'other', gender: '男', age: 40, idCard: '330102198602200067' }], amount: 249.00, status: '已核销' },
                 { orderId: 'U260820036767032', buyTime: '2026-08-01 10:03:00', phone: '15100151001', travelers: [{ name: '家长A小孩', type: 'main', gender: '女', age: 10, idCard: '350103201601050089' }], amount: 199.00, status: '已核销' },
                 { orderId: 'U260820036767033', buyTime: '2026-08-01 10:08:00', phone: '15200152001', travelers: [{ name: '家长B小孩', type: 'main', gender: '男', age: 9, idCard: '420106201703200012' }], amount: 199.00, status: '已核销' },
-                { orderId: 'U260820036767034', buyTime: '2026-08-01 10:12:00', phone: '15300153001', travelers: [{ name: '家长C小孩', type: 'main', gender: '女', age: 12, idCard: '510108201404180034' }, { name: '家长C', type: 'other', gender: '女', age: 38, idCard: '510108198608120056' }], amount: 398.00, status: '已核销' },
+                { orderId: 'U260820036767034', buyTime: '2026-08-01 10:12:00', phone: '15300153001', travelers: [{ name: '家长C小孩', type: 'main', gender: '女', age: 12, idCard: '510108201404180034' }, { name: '家长C', type: 'other', gender: '女', age: 38, idCard: '510108198608120056' }], amount: 249.00, status: '已核销' },
                 { orderId: 'U260820036767035', buyTime: '2026-08-01 10:15:00', phone: '15400154001', travelers: [{ name: '家长D小孩', type: 'main', gender: '男', age: 11, idCard: '440305201503150078' }], amount: 199.00, status: '已核销' },
                 { orderId: 'U260820036767036', buyTime: '2026-08-01 10:20:00', phone: '15500155001', travelers: [{ name: '家长E小孩', type: 'main', gender: '女', age: 10, idCard: '330102201601200090' }], amount: 199.00, status: '已核销' },
                 { orderId: 'U260820036767037', buyTime: '2026-08-01 10:25:00', phone: '15600156001', travelers: [{ name: '家长F小孩', type: 'main', gender: '男', age: 9, idCard: '350103201702010011' }], amount: 199.00, status: '已核销' },
@@ -561,13 +565,31 @@
                 return '<div class="tv"><span class="tv-name">' + esc(t.name) + '</span><span class="type-tag ' + (isStudent ? 'student' : 'parent') + '">' + (isStudent ? '学生' : '家长') + '</span>'
                     + '<span class="tv-meta">' + meta + '</span><span class="tv-idcard">' + esc(idCard) + '</span></div>';
             }).join('');
+            // 付款详情：按费用项聚合展示（学生带午餐 ¥199 × 1 / 家长 ¥50 × 1）
+            var feeMap = {};
+            o.travelers.forEach(function(t) {
+                var feeName = t.feeName || (t.type === 'main' ? '学生带午餐' : '家长');
+                var fee = (t.fee !== undefined && t.fee !== null) ? t.fee : (t.type === 'main' ? 199 : 50);
+                var key = feeName + '|' + fee;
+                if (!feeMap[key]) feeMap[key] = { name: feeName, fee: fee, n: 0 };
+                feeMap[key].n++;
+            });
+            function fmtFee(v) { return v % 1 === 0 ? String(v) : v.toFixed(2); }
+            var payDetailHtml = Object.keys(feeMap).map(function(k) {
+                var it = feeMap[k];
+                return '<div class="pay-item">' + esc(it.name) + ' <span class="pay-fee">¥' + fmtFee(it.fee) + ' × ' + it.n + '</span></div>';
+            }).join('');
+            // 实付金额：按明细动态计算，确保与付款详情一致
+            var orderTotal = 0;
+            Object.keys(feeMap).forEach(function(k) { orderTotal += feeMap[k].fee * feeMap[k].n; });
             orderHtml += '<tr>'
                 + '<td>' + esc(o.orderId) + '</td>'
                 + '<td>' + esc(o.buyTime) + '</td>'
                 + '<td>' + esc(o.phone) + '</td>'
                 + '<td><div class="traveler-list">' + travelerHtml + '</div></td>'
-                + '<td class="price">¥' + o.amount.toFixed(2) + '</td>'
-                + '<td>' + esc(o.status) + '</td></tr>';
+                + '<td><div class="pay-detail">' + payDetailHtml + '</div></td>'
+                + '<td class="price">¥' + orderTotal.toFixed(2) + '</td>'
+                + '</tr>';
         });
 
         document.getElementById('detailBody').innerHTML =
@@ -594,7 +616,7 @@
             + '<div class="detail-section">'
             + '<div class="sec-title">已拼订单（' + g.orders.length + '）</div>'
             + '<div class="order-table-wrap"><table class="order-table"><thead><tr>'
-            + '<th>订单编号</th><th>购买时间</th><th>购买手机号</th><th>出行人员</th><th>付款金额</th><th>状态</th>'
+            + '<th>订单编号</th><th>购买时间</th><th>购买手机号</th><th>出行人员</th><th>付款详情</th><th>实付金额</th>'
             + '</tr></thead><tbody>' + orderHtml + '</tbody></table></div>'
             + '</div>';
         document.getElementById('detailModal').classList.add('show');
