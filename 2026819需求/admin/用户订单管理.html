@@ -356,7 +356,7 @@
     /* 状态机：待成团 / 退款中 / 已退款 / 待出行 / 已核销 / 已过期 */
     var orders = [
         {
-            id: 'U260820036767008', user: { phone: '13700137008' },
+            id: 'U260820036767008', user: { phone: '13700137008', contact: '13800138000' },
             courseNo: 'C1001', course: '研學内测', session: '2026-08-25 内测',
             travelers: [{ name: '李浩宇', gender: '男', age: 11, type: 'main', price: 199.00, qty: 1, idCard: '330102201409150018' }],
             totalAmount: 199.00, discount: 0, amount: 199.00, status: 'wait',
@@ -364,7 +364,7 @@
             groupId: 'P260820036767011', groupStatus: '待成团'
         },
         {
-            id: 'U260820036767002', user: { phone: '13851872980' },
+            id: 'U260820036767002', user: { phone: '13851872980', contact: '13851872980' },
             courseNo: 'C1001', course: '研學内测', session: '2026-08-25 内测',
             travelers: [{ name: '媛姐', gender: '女', age: 12, type: 'main', price: 0.01, qty: 1, idCard: '51162120140312002X' }],
             totalAmount: 0.01, discount: 0, amount: 0.01, status: 'active',
@@ -372,7 +372,7 @@
             groupId: 'P260820036767001', groupStatus: '待成团'
         },
         {
-            id: 'U260820036767001', user: { phone: '13900139001' },
+            id: 'U260820036767001', user: { phone: '13900139001', contact: '13700137008' },
             courseNo: 'C1002', course: '杜甫草堂研学', session: '2026-08-30 上午场',
             travelers: [{ name: '王小明', gender: '男', age: 11, type: 'main', price: 199.00, qty: 1, idCard: '510108201410180025' }, { name: '王子涵', gender: '女', age: 11, type: 'main', price: 199.00, qty: 1, idCard: '510108201408090042' }],
             totalAmount: 398.00, discount: 0, amount: 398.00, status: 'refunding',
@@ -381,7 +381,7 @@
             refundAmount: 398.00, refundReason: '拼团失败自动退款'
         },
         {
-            id: 'U260820036767003', user: { phone: '13700137001' },
+            id: 'U260820036767003', user: { phone: '13700137001', contact: '13900139001' },
             courseNo: 'C1002', course: '杜甫草堂研学', session: '2026-08-30 上午场',
             travelers: [{ name: '张大伟', gender: '男', age: 10, type: 'main', price: 199.00, qty: 1, idCard: '330102201508120037' }],
             totalAmount: 199.00, discount: 0, amount: 199.00, status: 'refunded',
@@ -395,7 +395,7 @@
             }
         },
         {
-            id: 'U260820036767004', user: { phone: '13300133001' },
+            id: 'U260820036767004', user: { phone: '13300133001', contact: '13800138002' },
             courseNo: 'C1003', course: '李白故里探索', session: '2026-09-01 下午场',
             travelers: [{ name: '陈小军', gender: '男', age: 11, type: 'main', price: 199.00, qty: 1, idCard: '440305201504120012' }, { name: '陈子昂', gender: '男', age: 11, type: 'main', price: 199.00, qty: 1, idCard: '440305201506230034' }],
             totalAmount: 398.00, discount: 0, amount: 398.00, status: 'active',
@@ -403,7 +403,7 @@
             groupId: 'P260820036767003', groupStatus: '待出行'
         },
         {
-            id: 'U260820036767005', user: { phone: '15000150001' },
+            id: 'U260820036767005', user: { phone: '15000150001', contact: '13900139002' },
             courseNo: 'C1004', course: '博物馆奇妙日', session: '2026-08-10 上午场',
             travelers: [{ name: '张静', gender: '女', age: 40, type: 'other', price: 199.00, qty: 1, idCard: '330102198602200067' }],
             totalAmount: 199.00, discount: 0, amount: 199.00, status: 'verified',
@@ -412,7 +412,7 @@
             verifyTime: '2026-08-10 08:30:00'
         },
         {
-            id: 'U260820036767006', user: { phone: '15800158001' },
+            id: 'U260820036767006', user: { phone: '15800158001', contact: '13700137002' },
             courseNo: 'C1005', course: '小小考古家', session: '2026-07-20 下午场',
             travelers: [{ name: '李梓萌', gender: '女', age: 10, type: 'main', price: 168.00, qty: 1, idCard: '350103201603050089' }],
             totalAmount: 168.00, discount: 0, amount: 168.00, status: 'verified',
@@ -421,7 +421,7 @@
             verifyTime: '2026-07-20 13:30:00'
         },
         {
-            id: 'U260820036767007', user: { phone: '15900159001' },
+            id: 'U260820036767007', user: { phone: '15900159001', contact: '15000150002' },
             courseNo: 'C1006', course: '夏日农场体验', session: '2026-07-15 上午场',
             travelers: [{ name: '王雅琴', gender: '女', age: 38, type: 'other', price: 128.00, qty: 1, idCard: '420106198708120056' }],
             totalAmount: 128.00, discount: 0, amount: 128.00, status: 'expired',
@@ -630,6 +630,7 @@
             + '<div class="detail-section">'
             + '<div class="sec-title">用户与出行人</div>'
             + '<div class="detail-row"><span class="label">用户账号</span><span class="value">' + esc(o.user.phone) + '</span></div>'
+            + '<div class="detail-row"><span class="label">联系手机号</span><span class="value">' + esc(o.user.contact || o.user.phone) + '</span></div>'
             + '<div class="detail-row"><span class="label">出行人</span><span class="value">' + travelerHtml + '</span></div>'
             + '</div>'
             + '<div class="detail-section">'
