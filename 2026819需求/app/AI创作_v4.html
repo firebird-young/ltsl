@@ -405,16 +405,21 @@
         .img-ref-empty .ire-text { font-size: 13px; color: #888; }
         .img-ref-actions { display: flex; gap: 8px; }
         .img-ref-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 8px; }
-        .ref-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
-        .ref-cell { position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: #fafafd; }
+        .ref-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 4px; }
+        .ref-cell {
+            position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden;
+            background: #F4F6FB; box-shadow: 0 2px 8px rgba(20,50,100,0.08);
+        }
         .ref-cell-img { width: 100%; height: 100%; background-size: cover; background-position: center; }
         .ref-cell-img.ai { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
         .ref-cell-add {
-            border: 1px dashed #d0d5e0; border-radius: 10px; aspect-ratio: 1;
+            border: 1.5px dashed #C0CDE4; border-radius: 12px; aspect-ratio: 1;
             display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
-            cursor: pointer; background: #fafafd; color: #888; font-size: 12px; transition: all 0.2s;
+            cursor: pointer; background: linear-gradient(135deg, #FBFCFE, #F3F7FF);
+            color: #8A94A6; font-size: 12px; transition: all 0.2s;
         }
-        .ref-cell-add:active { background: #F4F8FF; border-color: #0669FF; color: #0669FF; }
+        .ref-cell-add:hover { background: #F3F8FF; border-color: #2F6BFF; color: #2F6BFF; transform: translateY(-1px); }
+        .ref-cell-add:active { background: #EAF3FF; }
         .img-ref-cell { position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: #fafafd; }
         .img-ref-cell img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .img-ref-add {
@@ -443,39 +448,65 @@
         }
 
         /* ===== 参考图引用 ===== */
-        .ref-section { margin-bottom: 6px; }
-        .ref-title { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 10px; }
-        .ref-sub { font-size: 12px; color: #999; font-weight: 400; }
-        .ref-radio-group { display: flex; gap: 10px; margin-bottom: 10px; }
-        .ref-radio {
-            flex: 1; height: 38px; border-radius: 8px; border: 1px solid #e2e5ee;
-            background: #fff; color: #555; font-size: 13px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; gap: 6px;
-            font-family: inherit;
+        .ref-section {
+            margin-bottom: 6px;
+            background: #F7FAFF;
+            border: 1px solid #E4EDFB;
+            border-radius: 14px;
+            padding: 14px;
         }
-        .ref-radio input { accent-color: #0669FF; }
-        .ref-radio.active { border-color: #0669FF; background: #E8F1FF; color: #0669FF; font-weight: 600; }
+        .ref-title {
+            font-size: 14px; font-weight: 600; color: #1F2A3E;
+            margin-bottom: 12px; display: flex; align-items: center; gap: 4px;
+        }
+        .ref-sub { font-size: 12px; color: #8A94A6; font-weight: 400; }
+        .ref-radio-group {
+            display: flex; gap: 4px; margin-bottom: 12px;
+            background: #EDF1F8; border-radius: 12px; padding: 4px;
+        }
+        .ref-radio {
+            flex: 1; height: 40px; border-radius: 9px; border: none;
+            background: transparent; color: #667085; font-size: 13px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            font-family: inherit; position: relative;
+            transition: all 0.2s;
+        }
+        .ref-radio input { position: absolute; opacity: 0; width: 0; height: 0; }
+        .ref-radio::before { font-size: 15px; line-height: 1; }
+        .ref-radio:nth-child(1)::before { content: '📷'; }
+        .ref-radio:nth-child(2)::before { content: '🖼️'; }
+        .ref-radio:not(.active):hover { color: #2F6BFF; background: rgba(47,107,255,0.06); }
+        .ref-radio.active {
+            background: #fff; color: #2F6BFF; font-weight: 600;
+            box-shadow: 0 2px 8px rgba(31, 64, 122, 0.14);
+        }
         .ref-preview-area { min-height: 44px; }
         .ref-empty {
-            border: 1px dashed #e0e3ec; border-radius: 8px; padding: 12px 0;
-            text-align: center; font-size: 12px; color: #bbb; background: #fafafd;
+            border: 1.5px dashed #D6DEEB; border-radius: 12px; padding: 16px 0;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            text-align: center; font-size: 12px; color: #A3AEC4; background: #FAFBFE;
         }
+        .ref-empty::before { content: '🖼️'; font-size: 18px; line-height: 1; }
         .ref-preview-wrap { position: relative; }
         .ref-preview {
-            height: 120px; border-radius: 10px; background-size: cover; background-position: center;
+            height: 120px; border-radius: 12px; background-size: cover; background-position: center;
             display: flex; align-items: center; justify-content: center;
+            box-shadow: inset 0 0 0 1px rgba(20,50,100,0.06);
         }
         .ref-preview.ai { flex-direction: column; gap: 6px; }
         .ref-preview.ai .ref-ai-icon { font-size: 34px; }
         .ref-ai-name { font-size: 12px; color: #fff; background: rgba(0,0,0,.35); padding: 2px 8px; border-radius: 8px; }
         .ref-reupload {
-            margin-top: 8px; text-align: center; font-size: 12px; color: #0669FF;
-            padding: 9px 0; border: 1px dashed #b9c8f2; border-radius: 8px; cursor: pointer; background: #F4F8FF;
+            margin-top: 8px; text-align: center; font-size: 12px; color: #2F6BFF;
+            padding: 9px 0; border: 1px dashed #B9CBF0; border-radius: 10px; cursor: pointer;
+            background: #F4F8FF; transition: all 0.2s;
         }
+        .ref-reupload:hover { background: #EAF2FF; }
         .ref-del {
             position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; border-radius: 50%;
-            background: rgba(0,0,0,.5); border: none; color: #fff; font-size: 12px; line-height: 1;
+            background: rgba(15, 23, 42, 0.55); border: none; color: #fff; font-size: 12px; line-height: 1;
             cursor: pointer; font-family: inherit;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
         }
         .ref-upload-modal {
             position: fixed; inset: 0; background: rgba(0,0,0,.45);
@@ -483,30 +514,40 @@
         }
         .ref-upload-modal.show { display: flex; }
         .ref-upload-sheet {
-            width: 100%; max-width: 430px; background: #fff; border-radius: 16px 16px 0 0;
-            padding: 10px 14px 20px;
+            width: 100%; max-width: 430px; background: #fff; border-radius: 20px 20px 0 0;
+            padding: 10px 14px 20px; box-shadow: 0 -8px 32px rgba(10, 30, 80, 0.12);
         }
-        .ref-upload-head { text-align: center; font-size: 14px; font-weight: 600; color: #333; padding: 10px 0 8px; }
+        .ref-upload-head { text-align: center; font-size: 14px; font-weight: 600; color: #1F2A3E; padding: 10px 0 10px; }
         .ref-upload-item {
-            height: 46px; display: flex; align-items: center; justify-content: center;
-            font-size: 15px; color: #333; cursor: pointer; border-bottom: 1px solid #f5f5f7;
+            height: 48px; display: flex; align-items: center; justify-content: center;
+            font-size: 15px; color: #1F2A3E; cursor: pointer; border-radius: 12px;
+            background: #F7F9FD; margin-top: 8px; transition: background 0.15s;
         }
+        .ref-upload-item:active { background: #EDF2FB; }
         .ref-upload-cancel {
             height: 46px; display: flex; align-items: center; justify-content: center;
-            font-size: 15px; color: #999; cursor: pointer; margin-top: 8px; background: #f5f5f7; border-radius: 10px;
+            font-size: 15px; color: #8A94A6; cursor: pointer; margin-top: 10px;
+            background: #F0F3F8; border-radius: 12px; transition: background 0.15s;
         }
+        .ref-upload-cancel:active { background: #E6EAF2; }
         .ref-ai-modal {
             position: fixed; inset: 0; background: rgba(0,0,0,.45);
-            display: none; align-items: center; justify-content: center; z-index: 10011;
+            display: none; align-items: flex-end; justify-content: center; z-index: 10011;
         }
         .ref-ai-modal.show { display: flex; }
-        .ref-ai-panel { width: 320px; background: #fff; border-radius: 16px; padding: 18px; }
-        .ref-ai-head { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 12px; text-align: center; }
-        .ref-ai-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .ref-ai-item { cursor: pointer; text-align: center; }
-        .ref-ai-thumb { height: 90px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 30px; margin-bottom: 6px; }
-        .ref-ai-label { font-size: 12px; color: #666; }
-        .ref-ai-cancel { width: 100%; height: 38px; margin-top: 14px; border: none; border-radius: 10px; background: #f5f5f7; color: #666; font-size: 14px; cursor: pointer; font-family: inherit; }
+        .ref-ai-panel {
+            width: 100%; max-width: 430px; background: #fff;
+            border-radius: 20px 20px 0 0; padding: 16px 14px 20px;
+            box-shadow: 0 -8px 32px rgba(10, 30, 80, 0.12);
+        }
+        .ref-ai-head { font-size: 15px; font-weight: 600; color: #1F2A3E; margin-bottom: 14px; text-align: center; }
+        .ref-ai-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-height: 46vh; overflow-y: auto; }
+        .ref-ai-item { cursor: pointer; text-align: center; transition: transform 0.15s; }
+        .ref-ai-item:active { transform: scale(0.96); }
+        .ref-ai-thumb { height: 78px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 30px; margin-bottom: 6px; box-shadow: inset 0 0 0 1px rgba(20,50,100,0.06); background: #F4F6FB; }
+        .ref-ai-label { font-size: 12px; color: #667085; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ref-ai-cancel { width: 100%; height: 44px; margin-top: 14px; border: none; border-radius: 12px; background: #F0F3F8; color: #667085; font-size: 14px; cursor: pointer; font-family: inherit; transition: background 0.15s; }
+        .ref-ai-cancel:active { background: #E6EAF2; }
 
         /* ===== 创作模式选择 ===== */
         .mode-select { padding: 8px 0; }
@@ -1947,7 +1988,7 @@
             }
             html += '</div>';
         } else {
-            html += '<div class="ref-empty" onclick="addRefImage()">未选择参考图，点击添加</div>';
+            html += '<div class="ref-empty">未选择参考图</div>';
         }
         html += '</div>'
             + '</div>';
