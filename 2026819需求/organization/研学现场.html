@@ -7,7 +7,7 @@
 <style>
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
-        background: #F4F6FA;
+        background: linear-gradient(180deg, #EDF1F8 0%, #F7F9FD 100%);
         display: flex; justify-content: center;
         align-items: flex-start;
         gap: 24px;
@@ -17,58 +17,67 @@
     }
     .app-container {
         width: 100%; max-width: 430px; min-height: 100vh;
-        background: #F4F6FA;
+        background: linear-gradient(180deg, #F4F7FC 0%, #FBFCFE 100%);
         position: relative; padding-bottom: 24px;
     }
     /* ===== 顶部状态栏 ===== */
-    .status-bar { background: #fff; padding: 14px 20px 10px; }
+    .status-bar { background: linear-gradient(180deg, #fff 0%, #F9FBFF 100%); padding: 14px 20px 10px; }
     .top-nav {
         display: flex; align-items: center; justify-content: space-between;
         background: #fff; padding: 4px 20px 16px;
+        box-shadow: 0 4px 16px rgba(20, 50, 100, 0.06);
     }
-    .nav-back { font-size: 20px; color: #111; cursor: pointer; width: 28px; }
-    .nav-title { font-size: 17px; font-weight: 600; color: #111; }
+    .nav-back { font-size: 20px; color: #1F3864; cursor: pointer; width: 28px; text-decoration: none; line-height: 1; }
+    .nav-title { font-size: 17px; font-weight: 600; color: #1F3864; }
     .nav-right { width: 28px; }
     /* ===== 课程卡片 ===== */
     .course-card {
-        background: #fff; border-radius: 12px; padding: 14px 16px; margin: 12px 14px 10px;
-        display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        background: #fff; border-radius: 16px; padding: 14px 16px; margin: 12px 14px 10px;
+        display: flex; align-items: center; gap: 12px;
+        box-shadow: 0 6px 18px rgba(20, 50, 100, 0.06), 0 1px 2px rgba(20, 50, 100, 0.04);
     }
     .course-card .cover {
-        width: 64px; height: 64px; border-radius: 8px; overflow: hidden;
-        background: #1a2a3a; color: #fff; flex-shrink: 0;
+        width: 64px; height: 64px; border-radius: 12px; overflow: hidden;
+        background: linear-gradient(135deg, #1F3B64 0%, #2F6BFF 100%); color: #fff; flex-shrink: 0;
         display: flex; align-items: center; justify-content: center;
         font-size: 11px; font-weight: 600; text-align: center; line-height: 1.3;
+        box-shadow: 0 4px 10px rgba(47, 107, 255, 0.25);
     }
     .course-card .info { flex: 1; min-width: 0; }
-    .course-card .info .name { font-size: 15px; font-weight: 600; color: #222; margin-bottom: 3px; }
-    .course-card .info .detail { font-size: 12px; color: #888; }
+    .course-card .info .name { font-size: 15px; font-weight: 600; color: #1F2A3E; margin-bottom: 3px; }
+    .course-card .info .detail { font-size: 12px; color: #8A94A6; }
     .course-card .status-badge { flex-shrink: 0; font-size: 11px; padding: 3px 10px; border-radius: 10px; font-weight: 500; }
-    .status-travel { background: #E8F5E9; color: #389E0D; }
+    .status-travel { background: linear-gradient(135deg, #EAF9EF, #D9F2E1); color: #1E9E4A; }
     /* ===== 进入研学信息入口 ===== */
     .info-entry {
         display: flex; align-items: center; justify-content: space-between;
-        background: #F7FAFF; border: 1px solid #E3ECFF; border-radius: 12px;
+        background: linear-gradient(135deg, #F1F7FF 0%, #FAFCFF 100%);
+        border: 1px solid #DCE9FF; border-radius: 14px;
         padding: 14px; margin: 0 14px 14px; cursor: pointer;
+        box-shadow: 0 4px 14px rgba(20, 80, 200, 0.05);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
-    .info-entry:active { background: #EFF5FF; }
+    .info-entry:active { background: #EAF3FF; transform: scale(0.98); }
     .info-entry-left { display: flex; align-items: center; gap: 10px; }
     .info-entry-icon {
-        width: 40px; height: 40px; border-radius: 10px; background: #0669FF; color: #fff;
+        width: 40px; height: 40px; border-radius: 11px;
+        background: linear-gradient(135deg, #3B7BFF 0%, #0A58FF 100%); color: #fff;
         display: flex; align-items: center; justify-content: center; font-size: 18px;
+        box-shadow: 0 4px 10px rgba(6, 105, 255, 0.28);
     }
-    .info-entry-title { font-size: 14px; font-weight: 600; color: #222; }
-    .info-entry-sub { font-size: 11px; color: #999; margin-top: 2px; }
-    .info-entry-arrow { font-size: 22px; color: #B0BACB; }
+    .info-entry-title { font-size: 14px; font-weight: 600; color: #1F2A3E; }
+    .info-entry-sub { font-size: 11px; color: #93A0B5; margin-top: 2px; }
+    .info-entry-arrow { font-size: 22px; color: #9FB0C8; }
     /* ===== 研学现场卡片 ===== */
-    .scene-card { background: #fff; margin: 12px 14px 14px; border-radius: 12px; padding: 14px; }
-    .section-title { display: flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 600; color: #111; margin-bottom: 4px; }
-    .section-desc { font-size: 12px; color: #999; margin-bottom: 14px; }
-    .sub-title { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 600; color: #333; margin: 14px 0 8px; }
+    .scene-card { background: #fff; margin: 12px 14px 14px; border-radius: 16px; padding: 16px; box-shadow: 0 6px 18px rgba(20, 50, 100, 0.06); }
+    .section-title { display: flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 600; color: #1F2A3E; margin-bottom: 4px; }
+    .section-desc { font-size: 12px; color: #8A94A6; margin-bottom: 14px; }
+    .sub-title { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 600; color: #2B3A52; margin: 14px 0 8px; padding-left: 9px; position: relative; }
+    .sub-title::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 12px; border-radius: 2px; background: linear-gradient(180deg, #3B7BFF, #2F6BFF); }
     .sub-title:first-of-type { margin-top: 0; }
     /* 上传网格 */
     .upload-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-    .ug-item { position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden; background: #F2F4F8; }
+    .ug-item { position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: #F2F4F8; box-shadow: inset 0 0 0 1px rgba(20, 50, 100, 0.04); }
     .ug-item img, .ug-item video { width: 100%; height: 100%; object-fit: cover; display: block; }
     .ug-item .ug-video-tag {
         position: absolute; top: 4px; left: 4px; font-size: 10px; color: #fff;
@@ -79,16 +88,20 @@
         border-radius: 50%; background: rgba(0,0,0,0.55); color: #fff;
         display: flex; align-items: center; justify-content: center;
         font-size: 12px; cursor: pointer; line-height: 1;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.18);
     }
     .ug-add {
         width: 64px; height: 64px;
-        border: 1.5px dashed #C7D2E3; border-radius: 8px;
+        border: 1.5px dashed #B9C6DE; border-radius: 10px;
         display: flex; flex-direction: column; align-items: center; justify-content: center;
-        color: #B0BACB; cursor: pointer; background: #FAFBFF;
+        color: #8FA3C4; cursor: pointer;
+        background: linear-gradient(135deg, #FBFCFE 0%, #F3F7FF 100%);
+        transition: all 0.15s ease;
     }
+    .ug-add:hover { border-color: #2F6BFF; color: #2F6BFF; background: #F3F8FF; }
     .ug-add .plus { font-size: 18px; line-height: 1; }
-    .ug-add .txt { font-size: 10px; margin-top: 3px; color: #A8B4C8; }
-    .upload-hint { font-size: 11px; color: #BBB; margin-top: 8px; }
+    .ug-add .txt { font-size: 10px; margin-top: 3px; color: #94A6C0; }
+    .upload-hint { font-size: 11px; color: #A0ACC0; margin-top: 8px; }
     /* ===== 相机/相册选择菜单 ===== */
     .pick-mask {
         position: fixed; inset: 0; background: rgba(0,0,0,0.5);
@@ -97,18 +110,21 @@
     .pick-sheet {
         position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
         width: 100%; max-width: 430px; background: #fff;
-        border-radius: 16px 16px 0 0; z-index: 201;
+        border-radius: 20px 20px 0 0; z-index: 201;
         padding: 12px 14px calc(14px + env(safe-area-inset-bottom));
+        box-shadow: 0 -8px 32px rgba(10, 30, 80, 0.14);
     }
-    .pick-title { text-align: center; font-size: 13px; color: #888; padding: 6px 0 12px; }
+    .pick-title { text-align: center; font-size: 13px; color: #8A94A6; padding: 6px 0 12px; }
     .pick-item {
         text-align: center; font-size: 15px; font-weight: 500; color: #222;
         padding: 14px 0; border-top: 1px solid #F2F4F8; cursor: pointer;
+        border-radius: 10px;
     }
-    .pick-item:active { background: #F7F9FC; }
+    .pick-item:active { background: #F3F6FB; }
     .pick-cancel {
-        text-align: center; font-size: 15px; color: #0669FF;
+        text-align: center; font-size: 15px; font-weight: 500; color: #2F6BFF;
         padding: 12px 0; border-top: 1px solid #F2F4F8; cursor: pointer; margin-top: 6px;
+        background: #F7F9FC; border-radius: 10px;
     }
     /* ===== Toast ===== */
     .toast {
@@ -144,7 +160,7 @@
 <div class="app-container">
     <div class="status-bar"></div>
     <div class="top-nav">
-        <div class="nav-back" onclick="history.back()">←</div>
+        <a href="订单详情.html" class="nav-back">←</a>
         <div class="nav-title">研学现场</div>
         <div class="nav-right"></div>
     </div>
