@@ -348,6 +348,7 @@
                         <th>实付总额</th>
                         <th>拼团状态</th>
                         <th>成团时间</th>
+                        <th>最晚拼团确认时间</th>
                         <th>下单时间</th>
                         <th style="width:240px;">操作</th>
                     </tr>
@@ -527,6 +528,7 @@
                 + '<td class="price">¥' + g.amount.toFixed(2) + '</td>'
                 + '<td><span class="status-tag ' + s.cls + '">' + s.label + '</span></td>'
                 + '<td>' + groupTimeTxt + '</td>'
+                + '<td>' + (g.confirmDate || '—') + '</td>'
                 + '<td>' + g.createTime + '</td>'
                 + '<td>' + buildActions(g) + '</td></tr>';
         });

@@ -126,6 +126,46 @@
         }
         .item:hover .it-arrow { color: var(--accent); }
 
+        .chg-btn {
+            margin-left: auto;
+            font-size: 12px;
+            padding: 5px 14px;
+            border-radius: var(--radius-pill);
+            font-weight: 500;
+            background: #f0edff;
+            color: var(--accent);
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+        }
+        .chg-btn:hover { background: var(--accent); color: #fff; box-shadow: 0 4px 14px rgba(83,58,253,0.25); }
+        .chg-modal-mask {
+            position: fixed; inset: 0; background: rgba(13, 37, 61, 0.45);
+            display: none; align-items: center; justify-content: center; z-index: 9999;
+            padding: 20px;
+        }
+        .chg-modal-mask.show { display: flex; }
+        .chg-modal {
+            width: 100%; max-width: 560px; background: #fff;
+            border-radius: 16px; padding: 24px;
+            box-shadow: 0 24px 60px rgba(13,37,61,0.25);
+            animation: chgIn 0.18s ease;
+        }
+        @keyframes chgIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+        .chg-modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        .chg-modal-title { font-size: 17px; font-weight: 600; color: var(--ink); }
+        .chg-modal-close { font-size: 13px; color: var(--ink-subtle); cursor: pointer; padding: 4px 10px; border-radius: 9999px; background: #f6f9fc; transition: all 0.15s; }
+        .chg-modal-close:hover { background: #eef1f6; color: var(--ink); }
+        .chg-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        .chg-table th {
+            text-align: left; font-size: 12px; font-weight: 600; color: var(--ink-subtle);
+            padding: 10px 12px; background: #f6f9fc; border-bottom: 1px solid var(--border);
+        }
+        .chg-table td { padding: 12px; color: var(--ink); border-bottom: 1px solid #eef1f5; vertical-align: top; line-height: 1.6; }
+        .chg-table tr:last-child td { border-bottom: none; }
+        .chg-table .col-date { white-space: nowrap; font-weight: 500; }
+        .chg-table .col-module { white-space: nowrap; color: var(--accent); font-weight: 500; }
+
         .back-home {
             position: fixed;
             bottom: 32px;
@@ -241,6 +281,7 @@
     <div class="section">
         <div class="section-header">
             <span class="sh-label">2026.8.19 迭代</span>
+            <span class="chg-btn" onclick="openChangeLog()">需求变更记录</span>
         </div>
         <div class="list">
             <div class="item" style="flex-direction:column;align-items:stretch;gap:0;padding:0;">
@@ -429,6 +470,31 @@
 
 </div>
 
+<div class="chg-modal-mask" id="chgModal" onclick="if(event.target===this)closeChangeLog()">
+    <div class="chg-modal">
+        <div class="chg-modal-head">
+            <div class="chg-modal-title">需求变更记录</div>
+            <span class="chg-modal-close" onclick="closeChangeLog()">✕ 关闭</span>
+        </div>
+        <table class="chg-table">
+            <thead>
+                <tr>
+                    <th style="width:120px;">日期</th>
+                    <th style="width:150px;">模块</th>
+                    <th>变更内容</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="col-date">2026.8.31</td>
+                    <td class="col-module">拼团订单管理</td>
+                    <td>列表中遗漏了最晚拼团确认时间</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
 <script>
     var iterCollapsed = true;
 
@@ -447,6 +513,13 @@
 
     // 默认收起
     document.getElementById('iterList').style.display = 'none';
+
+    function openChangeLog() {
+        document.getElementById('chgModal').classList.add('show');
+    }
+    function closeChangeLog() {
+        document.getElementById('chgModal').classList.remove('show');
+    }
 </script>
 </body>
 </html>
