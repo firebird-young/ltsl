@@ -15,8 +15,7 @@
             items: [
                 { name: '课程管理',     href: '课程管理_v2.html' },
                 { name: '课程发布',     href: '课程发布.html' },
-                { name: '研学手记配置', href: '研学手记配置_v5.html' },
-                { name: '社区管理',     href: '社区管理.html' }
+                { name: '研学手记配置', href: '研学手记配置_v5.html' }
             ]
         },
         {
