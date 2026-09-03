@@ -3,17 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>研学评价</title>
+    <title>研学评价 - 研学机构端</title>
+    <link rel="stylesheet" href="../admin/asset/admin-sidebar.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
-            background: #f5f6f8;
+            background: #f0f2f5;
+            min-height: 100vh;
+            color: #333;
+        }
+        /* 中间内容区：手机原型居中，左右为固定目录栏与功能说明栏 */
+        .main-wrap {
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            gap: 24px;
-            padding: 20px 0;
+            padding: 24px 20px 48px;
             min-height: 100vh;
         }
         .app-container {
@@ -134,30 +139,84 @@
             border-radius: 3px; transition: width 0.3s;
         }
 
-        /* ── 功能说明面板 ── */
-        .doc-panel {
-            width: 560px; background: #fff; border-radius: 16px;
-            box-shadow: 0 2px 20px rgba(0,0,0,.08);
-            padding: 24px 28px;
-            max-height: calc(100vh - 40px); overflow-y: auto;
-            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', Arial, sans-serif;
-            line-height: 1.7; font-size: 14px; color: #333;
+        /* ===== 右侧功能说明面板（后台风格三栏布局：左目录 | 中内容 | 右说明） ===== */
+        .func-panel {
+            position: fixed; top: 0; right: 0; bottom: 0;
+            width: 340px; z-index: 890;
+            background: #fff; border-left: 1px solid #e3e6eb;
+            box-shadow: -1px 0 12px rgba(20, 30, 60, 0.04);
+            display: flex; flex-direction: column;
         }
-        .doc-panel::-webkit-scrollbar { width: 5px; }
-        .doc-panel::-webkit-scrollbar-thumb { background: #d0d5e0; border-radius: 3px; }
-        .doc-panel .doc-title { font-size: 20px; font-weight: 700; color: #1F3864; border-bottom: 2px solid #2E75B6; padding-bottom: 10px; margin-bottom: 16px; }
-        .doc-panel h3 { font-size: 16px; font-weight: 600; color: #2E75B6; margin: 16px 0 8px; }
-        .doc-panel p { font-size: 13px; color: #555; margin-bottom: 6px; }
-        .doc-panel ul { padding-left: 20px; margin: 4px 0 8px; }
-        .doc-panel li { margin-bottom: 3px; font-size: 13px; color: #555; }
-        @media (max-width: 1100px) {
-            body { flex-direction: column; align-items: center; padding: 12px 0; }
-            .doc-panel { width: 100%; max-width: 430px; max-height: none; }
+        .func-panel .fp-inner { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+        .func-panel .fp-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px 14px 13px 18px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
+        }
+        .func-panel .fp-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: #1d1d1f; }
+        .func-panel .fp-title::before {
+            content: ''; width: 8px; height: 8px; border-radius: 50%;
+            background: #409eff; box-shadow: 0 0 0 4px rgba(64, 158, 255, 0.14);
+        }
+        .func-panel .fp-fold-btn {
+            width: 28px; height: 28px; border: 1px solid #e3e6eb; background: #fff;
+            border-radius: 50%; color: #86868b; font-size: 15px; line-height: 1;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .func-panel .fp-fold-btn:hover { border-color: #409eff; color: #409eff; }
+        .func-panel .fp-body {
+            flex: 1; overflow-y: auto; padding: 4px 18px 40px;
+            font-size: 13px; color: #555; line-height: 1.9;
+        }
+        .func-panel .fp-body::-webkit-scrollbar { width: 5px; }
+        .func-panel .fp-body::-webkit-scrollbar-thumb { background: #d8dce3; border-radius: 3px; }
+        .func-panel .fp-body h3 { font-size: 14px; font-weight: 600; color: #1d1d1f; margin: 18px 0 6px; }
+        .func-panel .fp-body h3:first-child { margin-top: 12px; }
+        .func-panel .fp-body p { margin: 0 0 10px; }
+        .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .func-panel .fp-body li { margin-bottom: 6px; }
+        .func-panel .fp-body b { color: #333; }
+        .func-panel .fp-open {
+            display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+            border: none; background: transparent; cursor: pointer;
+            writing-mode: vertical-rl; text-orientation: upright;
+            font-size: 13px; font-weight: 600; letter-spacing: 6px; color: #86868b;
+            align-items: center; justify-content: center; font-family: inherit;
+            transition: all 0.2s;
+        }
+        .func-panel .fp-open:hover { color: #409eff; background: #fafbfc; }
+
+        /* 三栏布局：左侧深色目录样式来自 admin-sidebar.css，中间内容左右让位 */
+        @media (min-width: 1024px) {
+            body.has-sidenav .main-wrap { margin-left: 232px; }
+            .main-wrap { margin-right: 340px; }
+            body.fp-collapsed .main-wrap { margin-right: 40px; }
+            body.fp-collapsed .func-panel { width: 40px; }
+            body.fp-collapsed .fp-inner { display: none; }
+            body.fp-collapsed .fp-open { display: flex; }
+        }
+        @media (max-width: 1023.98px) {
+            .func-panel { display: none; }
+            .main-wrap { margin-right: 0; }
         }
 
     </style>
 </head>
-<body>
+<body class="has-sidenav">
+    <!-- ===== 左侧目录菜单（后台风格，样式取自 ../admin/asset/admin-sidebar.css） ===== -->
+    <aside class="admin-sidenav">
+        <div class="sn-brand"><span class="sn-dot"></span>研学机构小程序</div>
+        <div class="sn-group">
+            <a class="sn-item" href="订单详情.html">📋 订单详情</a>
+            <a class="sn-item" href="研学现场.html">📸 研学现场</a>
+            <a class="sn-item" href="研学信息.html">📄 研学信息</a>
+            <a class="sn-item active" href="研学用户评价.html">⭐ 研学评价</a>
+            <a class="sn-item" href="专属精彩.html">✨ 专属精彩</a>
+            <a class="sn-item" href="AI作品.html">🎨 AI 作品</a>
+        </div>
+    </aside>
+
+    <div class="main-wrap">
     <div class="app-container">
         <div class="status-bar">
             <span class="time">14:18</span>
@@ -239,37 +298,54 @@
         </div>
     </div>
 
-    <!-- 功能说明面板 -->
-    <div class="doc-panel">
-        <div class="doc-title">研学用户评价 - 功能说明</div>
-        <div class="doc-section">
-            <h3>1. 页面用途</h3>
-            <p>研学课程结束后，机构人员为学生撰写研学评价。页面顶部显示学生姓名，整个流程包含「输入提示词 → AI 生成评价 → 评星提交」三步。</p>
+    </div><!-- /.main-wrap -->
+
+    <!-- ===== 右侧功能说明面板（后台风格三栏布局） ===== -->
+    <aside class="func-panel">
+        <div class="fp-inner">
+            <div class="fp-header">
+                <span class="fp-title">功能说明</span>
+                <button class="fp-fold-btn" onclick="toggleFuncPanel()" title="收起功能说明">›</button>
+            </div>
+            <div class="fp-body">
+                <div class="doc-section">
+                    <h3>1. 页面用途</h3>
+                    <p>研学课程结束后，机构人员为学生撰写研学评价。页面顶部显示学生姓名，整个流程包含「输入提示词 → AI 生成评价 → 评星提交」三步。</p>
+                </div>
+                <div class="doc-section">
+                    <h3>2. 撰写评价</h3>
+                    <ul>
+                        <li><b>评价提示词</b>：在输入框填写提示词，作为 AI 生成评价的依据。</li>
+                        <li><b>插入变量</b>：提供 {用户姓名}、{课程名称} 两个变量快捷按钮，点击后在光标处插入，生成时自动替换为实际姓名和课程名称。</li>
+                        <li><b>生成评价</b>：点击底部「✨ 生成评价」按钮，弹出 AI 生成进度弹窗（正在分析 → 生成评价内容 → 即将完成），完成后自动切换到评价结果视图。</li>
+                    </ul>
+                </div>
+                <div class="doc-section">
+                    <h3>3. 评价结果</h3>
+                    <ul>
+                        <li><b>评价内容</b>：AI 根据提示词中的关键词自动生成对应维度的评价句子，结果区域支持直接点击编辑修改。</li>
+                        <li><b>评分</b>：点击 1-5 星为本次评价打分，同步显示文字描述。</li>
+                    </ul>
+                </div>
+                <div class="doc-section">
+                    <h3>4. 提交与编辑</h3>
+                    <ul>
+                        <li><b>提交评价</b>：完成评星后点击「💾 提交评价」，评价内容与评星变为只读，底部切换为「重新生成 + 编辑」。</li>
+                        <li><b>重新生成</b>：返回输入视图并保留原提示词，可调整后重新生成。</li>
+                        <li><b>编辑</b>：提交后可点击「✏️ 编辑」恢复评价内容和评星的可编辑状态，修改后再次提交。</li>
+                    </ul>
+                </div>
+            </div>
         </div>
-        <div class="doc-section">
-            <h3>2. 撰写评价</h3>
-            <ul>
-                <li><b>评价提示词</b>：在输入框填写提示词，作为 AI 生成评价的依据。</li>
-                <li><b>插入变量</b>：提供 {用户姓名}、{课程名称} 两个变量快捷按钮，点击后在光标处插入，生成时自动替换为实际姓名和课程名称。</li>
-                <li><b>生成评价</b>：点击底部「✨ 生成评价」按钮，弹出 AI 生成进度弹窗（正在分析 → 生成评价内容 → 即将完成），完成后自动切换到评价结果视图。</li>
-            </ul>
-        </div>
-        <div class="doc-section">
-            <h3>3. 评价结果</h3>
-            <ul>
-                <li><b>评价内容</b>：AI 根据提示词中的关键词自动生成对应维度的评价句子，结果区域支持直接点击编辑修改。</li>
-                <li><b>评分</b>：点击 1-5 星为本次评价打分，同步显示文字描述。</li>
-            </ul>
-        </div>
-        <div class="doc-section">
-            <h3>4. 提交与编辑</h3>
-            <ul>
-                <li><b>提交评价</b>：完成评星后点击「💾 提交评价」，评价内容与评星变为只读，底部切换为「重新生成 + 编辑」。</li>
-                <li><b>重新生成</b>：返回输入视图并保留原提示词，可调整后重新生成。</li>
-                <li><b>编辑</b>：提交后可点击「✏️ 编辑」恢复评价内容和评星的可编辑状态，修改后再次提交。</li>
-            </ul>
-        </div>
-    </div>
+        <button class="fp-open" onclick="toggleFuncPanel()" title="展开功能说明">功能说明‹</button>
+    </aside>
+
+    <script>
+        /* ── 右侧功能说明面板：收起 / 展开 ── */
+        function toggleFuncPanel() {
+            document.body.classList.toggle('fp-collapsed');
+        }
+    </script>
 
     <script>
         var currentName = '';

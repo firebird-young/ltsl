@@ -3,17 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>专属精彩</title>
+    <title>专属精彩 - 研学机构端</title>
+    <link rel="stylesheet" href="../admin/asset/admin-sidebar.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
-            background: #f5f6f8;
+            background: #f0f2f5;
+            min-height: 100vh;
+            color: #333;
+        }
+        /* 中间内容区：手机原型居中，左右为固定目录栏与功能说明栏 */
+        .main-wrap {
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            gap: 24px;
-            padding: 20px 0;
+            padding: 24px 20px 48px;
             min-height: 100vh;
         }
         .app-container {
@@ -131,29 +136,83 @@
         }
         .action-sheet .as-cancel:active { background: #f0f0f0; }
 
-        /* ── 功能说明面板 ── */
-        .doc-panel {
-            width: 560px; background: #fff; border-radius: 16px;
-            box-shadow: 0 2px 20px rgba(0,0,0,.08);
-            padding: 24px 28px;
-            max-height: calc(100vh - 40px); overflow-y: auto;
-            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', Arial, sans-serif;
-            line-height: 1.7; font-size: 14px; color: #333;
+        /* ===== 右侧功能说明面板（后台风格三栏布局：左目录 | 中内容 | 右说明） ===== */
+        .func-panel {
+            position: fixed; top: 0; right: 0; bottom: 0;
+            width: 340px; z-index: 890;
+            background: #fff; border-left: 1px solid #e3e6eb;
+            box-shadow: -1px 0 12px rgba(20, 30, 60, 0.04);
+            display: flex; flex-direction: column;
         }
-        .doc-panel::-webkit-scrollbar { width: 5px; }
-        .doc-panel::-webkit-scrollbar-thumb { background: #d0d5e0; border-radius: 3px; }
-        .doc-panel .doc-title { font-size: 20px; font-weight: 700; color: #1F3864; border-bottom: 2px solid #2E75B6; padding-bottom: 10px; margin-bottom: 16px; }
-        .doc-panel h3 { font-size: 16px; font-weight: 600; color: #2E75B6; margin: 16px 0 8px; }
-        .doc-panel p { font-size: 13px; color: #555; margin-bottom: 6px; }
-        .doc-panel ul { padding-left: 20px; margin: 4px 0 8px; }
-        .doc-panel li { margin-bottom: 3px; font-size: 13px; color: #555; }
-        @media (max-width: 1100px) {
-            body { flex-direction: column; align-items: center; padding: 12px 0; }
-            .doc-panel { width: 100%; max-width: 430px; max-height: none; }
+        .func-panel .fp-inner { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+        .func-panel .fp-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px 14px 13px 18px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
+        }
+        .func-panel .fp-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: #1d1d1f; }
+        .func-panel .fp-title::before {
+            content: ''; width: 8px; height: 8px; border-radius: 50%;
+            background: #409eff; box-shadow: 0 0 0 4px rgba(64, 158, 255, 0.14);
+        }
+        .func-panel .fp-fold-btn {
+            width: 28px; height: 28px; border: 1px solid #e3e6eb; background: #fff;
+            border-radius: 50%; color: #86868b; font-size: 15px; line-height: 1;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .func-panel .fp-fold-btn:hover { border-color: #409eff; color: #409eff; }
+        .func-panel .fp-body {
+            flex: 1; overflow-y: auto; padding: 4px 18px 40px;
+            font-size: 13px; color: #555; line-height: 1.9;
+        }
+        .func-panel .fp-body::-webkit-scrollbar { width: 5px; }
+        .func-panel .fp-body::-webkit-scrollbar-thumb { background: #d8dce3; border-radius: 3px; }
+        .func-panel .fp-body h3 { font-size: 14px; font-weight: 600; color: #1d1d1f; margin: 18px 0 6px; }
+        .func-panel .fp-body h3:first-child { margin-top: 12px; }
+        .func-panel .fp-body p { margin: 0 0 10px; }
+        .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .func-panel .fp-body li { margin-bottom: 6px; }
+        .func-panel .fp-body b { color: #333; }
+        .func-panel .fp-open {
+            display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+            border: none; background: transparent; cursor: pointer;
+            writing-mode: vertical-rl; text-orientation: upright;
+            font-size: 13px; font-weight: 600; letter-spacing: 6px; color: #86868b;
+            align-items: center; justify-content: center; font-family: inherit;
+            transition: all 0.2s;
+        }
+        .func-panel .fp-open:hover { color: #409eff; background: #fafbfc; }
+
+        /* 三栏布局：左侧深色目录样式来自 admin-sidebar.css，中间内容左右让位 */
+        @media (min-width: 1024px) {
+            body.has-sidenav .main-wrap { margin-left: 232px; }
+            .main-wrap { margin-right: 340px; }
+            body.fp-collapsed .main-wrap { margin-right: 40px; }
+            body.fp-collapsed .func-panel { width: 40px; }
+            body.fp-collapsed .fp-inner { display: none; }
+            body.fp-collapsed .fp-open { display: flex; }
+        }
+        @media (max-width: 1023.98px) {
+            .func-panel { display: none; }
+            .main-wrap { margin-right: 0; }
         }
     </style>
 </head>
-<body>
+<body class="has-sidenav">
+    <!-- ===== 左侧目录菜单（后台风格，样式取自 ../admin/asset/admin-sidebar.css） ===== -->
+    <aside class="admin-sidenav">
+        <div class="sn-brand"><span class="sn-dot"></span>研学机构小程序</div>
+        <div class="sn-group">
+            <a class="sn-item" href="订单详情.html">📋 订单详情</a>
+            <a class="sn-item" href="研学现场.html">📸 研学现场</a>
+            <a class="sn-item" href="研学信息.html">📄 研学信息</a>
+            <a class="sn-item" href="研学用户评价.html">⭐ 研学评价</a>
+            <a class="sn-item active" href="专属精彩.html">✨ 专属精彩</a>
+            <a class="sn-item" href="AI作品.html">🎨 AI 作品</a>
+        </div>
+    </aside>
+
+    <div class="main-wrap">
     <div class="app-container">
         <div class="status-bar">
             <span class="time">14:18</span>
@@ -219,37 +278,54 @@
         <button class="as-cancel" onclick="closeUploadSheet()">取消</button>
     </div>
 
-    <!-- 功能说明面板 -->
-    <div class="doc-panel">
-        <div class="doc-title">专属精彩 - 功能说明</div>
-        <div class="doc-section">
-            <h3>1. 页面用途</h3>
-            <p>「专属精彩」是学生的研学成果素材中心，用于查看和上传本次研学活动的专属视频与图片，并可通过顶部快捷入口跳转到「AI作品」和「研学评价」页面。</p>
+    </div><!-- /.main-wrap -->
+
+    <!-- ===== 右侧功能说明面板（后台风格三栏布局） ===== -->
+    <aside class="func-panel">
+        <div class="fp-inner">
+            <div class="fp-header">
+                <span class="fp-title">功能说明</span>
+                <button class="fp-fold-btn" onclick="toggleFuncPanel()" title="收起功能说明">›</button>
+            </div>
+            <div class="fp-body">
+                <div class="doc-section">
+                    <h3>1. 页面用途</h3>
+                    <p>「专属精彩」是学生的研学成果素材中心，用于查看和上传本次研学活动的专属视频与图片，并可通过顶部快捷入口跳转到「AI作品」和「研学评价」页面。</p>
+                </div>
+                <div class="doc-section">
+                    <h3>2. 快捷入口</h3>
+                    <ul>
+                        <li><b>AI作品</b>：点击跳转 AI 创作页，展示该学生 AI 创作的作品。</li>
+                        <li><b>研学评价</b>：点击跳转研学评价页，为该学生撰写研学评价。</li>
+                    </ul>
+                </div>
+                <div class="doc-section">
+                    <h3>3. 上传专属精彩</h3>
+                    <ul>
+                        <li><b>视频上传</b>：点击「上传视频」块，支持从相册选择或直接录像，可多选；仅支持常见视频格式，单文件最大 100MB。</li>
+                        <li><b>图片上传</b>：点击「上传图片」块，支持从相册选择或直接拍照，可多选；仅支持 jpg/png 格式，单文件最大 20MB。</li>
+                        <li><b>上传方式</b>：点击上传块会弹出底部选择面板，提供「📷 拍照/录像」和「🖼️ 从相册选择」两个选项。</li>
+                    </ul>
+                </div>
+                <div class="doc-section">
+                    <h3>4. 素材管理与预览</h3>
+                    <ul>
+                        <li><b>网格预览</b>：上传后的视频、图片以三列网格展示，视频缩略图带「▶ 视频」角标。</li>
+                        <li><b>删除素材</b>：每个素材右上角有 × 按钮，点击可单独删除。</li>
+                        <li><b>自动去重</b>：重复选择同一文件（同名且同大小）时自动忽略，不会重复上传。</li>
+                    </ul>
+                </div>
+            </div>
         </div>
-        <div class="doc-section">
-            <h3>2. 快捷入口</h3>
-            <ul>
-                <li><b>AI作品</b>：点击跳转 AI 创作页，展示该学生 AI 创作的作品。</li>
-                <li><b>研学评价</b>：点击跳转研学评价页，为该学生撰写研学评价。</li>
-            </ul>
-        </div>
-        <div class="doc-section">
-            <h3>3. 上传专属精彩</h3>
-            <ul>
-                <li><b>视频上传</b>：点击「上传视频」块，支持从相册选择或直接录像，可多选；仅支持常见视频格式，单文件最大 100MB。</li>
-                <li><b>图片上传</b>：点击「上传图片」块，支持从相册选择或直接拍照，可多选；仅支持 jpg/png 格式，单文件最大 20MB。</li>
-                <li><b>上传方式</b>：点击上传块会弹出底部选择面板，提供「📷 拍照/录像」和「🖼️ 从相册选择」两个选项。</li>
-            </ul>
-        </div>
-        <div class="doc-section">
-            <h3>4. 素材管理与预览</h3>
-            <ul>
-                <li><b>网格预览</b>：上传后的视频、图片以三列网格展示，视频缩略图带「▶ 视频」角标。</li>
-                <li><b>删除素材</b>：每个素材右上角有 × 按钮，点击可单独删除。</li>
-                <li><b>自动去重</b>：重复选择同一文件（同名且同大小）时自动忽略，不会重复上传。</li>
-            </ul>
-        </div>
-    </div>
+        <button class="fp-open" onclick="toggleFuncPanel()" title="展开功能说明">功能说明‹</button>
+    </aside>
+
+    <script>
+        /* ── 右侧功能说明面板：收起 / 展开 ── */
+        function toggleFuncPanel() {
+            document.body.classList.toggle('fp-collapsed');
+        }
+    </script>
 
     <script>
         var currentName = '';

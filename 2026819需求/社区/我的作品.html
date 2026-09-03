@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>我的作品 - 离泰数链</title>
+    <link rel="stylesheet" href="../admin/asset/admin-sidebar.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            color: #333;
+        }
+        /* 中间内容区：手机原型居中，左右为固定目录栏与功能说明栏 */
+        .main-wrap {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 24px 20px 48px;
+            min-height: 100vh;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 430px;
+            background: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            margin: 0 auto;
+        }
+        .content-area { flex: 1; padding-bottom: 24px; }
+
+        /* ── 状态筛选 Tab ── */
+        .status-tabs {
+            display: flex;
+            gap: 6px;
+            padding: 10px 12px;
+            background: #fff;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .status-tabs .st-item {
+            flex: 1;
+            height: 32px;
+            border-radius: 16px;
+            border: none;
+            background: #f2f4f7;
+            color: #666;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .status-tabs .st-item.active {
+            background: #1F3864;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .top-nav {
+            height: 50px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            border-bottom: 1px solid #f0f0f0;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .top-nav .back-btn {
+            width: 32px; height: 32px;
+            border-radius: 50%; border: none;
+            background: #f5f5f5;
+            font-size: 18px; color: #666;
+            cursor: pointer; display: flex;
+            align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .top-nav .back-btn:active { background: #e8e8e8; }
+        .top-nav .title {
+            flex: 1; text-align: center;
+            font-size: 17px; font-weight: 600; color: #333;
+        }
+
+        .feed-grid {
+            column-count: 2;
+            column-gap: 8px;
+            padding: 12px 8px 0;
+        }
+        .feed-card {
+            display: inline-block;
+            width: 100%;
+            margin-bottom: 8px;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .feed-card:active { opacity: 0.9; }
+        .feed-cover {
+            width: 100%;
+            background: #e0e0e0;
+            position: relative;
+            overflow: hidden;
+        }
+        .feed-cover.h { aspect-ratio: 4 / 3; }
+        .feed-cover.v { aspect-ratio: 3 / 4; }
+        .feed-cover img, .feed-cover video {
+            width: 100%; height: 100%;
+            object-fit: cover; display: block;
+        }
+        .feed-cover .play-badge {
+            position: absolute; bottom: 6px; right: 6px;
+            background: rgba(0,0,0,0.6); color: #fff;
+            font-size: 10px; padding: 2px 6px; border-radius: 4px;
+        }
+        .feed-cover .like-badge {
+            position: absolute; bottom: 6px; left: 6px;
+            background: rgba(0,0,0,0.5); color: #fff;
+            font-size: 10px; padding: 2px 6px; border-radius: 4px;
+            display: flex; align-items: center; gap: 2px;
+        }
+        .feed-body { padding: 8px 10px 10px; }
+        .feed-title {
+            font-size: 12px; font-weight: 500; color: #333;
+            line-height: 1.4;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+            overflow: hidden; margin-bottom: 6px;
+        }
+        .feed-creator {
+            display: flex; align-items: center; gap: 4px;
+        }
+        .feed-creator .fc-avatar {
+            width: 18px; height: 18px; border-radius: 50%;
+            background: #E8F0FE; display: flex; align-items: center;
+            justify-content: center; font-size: 9px; color: #0669FF; flex-shrink: 0;
+        }
+        .feed-creator .fc-name { font-size: 11px; color: #999; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .feed-creator .fc-real { font-size: 10px; color: #ccc; }
+
+        .feed-stats {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 4px;
+            font-size: 10px;
+            color: #bbb;
+        }
+        .feed-stats span { display: flex; align-items: center; gap: 2px; }
+
+        .feed-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #f5f5f5;
+        }
+        .publish-btn {
+            border: none; background: #1F3864; color: #fff;
+            font-size: 12px; padding: 4px 16px; border-radius: 14px; cursor: pointer;
+        }
+        .publish-btn:active { opacity: 0.85; }
+        .take-down-btn {
+            border: 1px solid #f0c0c0; background: #fff; color: #E5484D;
+            font-size: 12px; padding: 4px 16px; border-radius: 14px; cursor: pointer;
+        }
+        .take-down-btn:active { background: #FDF0F0; }
+
+        /* ── 二次确认弹窗 ── */
+        .confirm-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+            display: none; align-items: center; justify-content: center;
+            z-index: 100000;
+        }
+        .confirm-overlay.show { display: flex; }
+        .confirm-box {
+            width: 300px; background: #fff; border-radius: 14px; padding: 22px 20px 16px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+        }
+        .confirm-title { font-size: 16px; font-weight: 600; color: #333; text-align: center; margin-bottom: 10px; }
+        .confirm-msg { font-size: 13px; color: #666; text-align: center; margin-bottom: 20px; line-height: 1.6; }
+        .confirm-btns { display: flex; gap: 10px; }
+        .confirm-btns button {
+            flex: 1; height: 38px; border-radius: 10px; font-size: 14px; cursor: pointer; border: none;
+        }
+        .confirm-cancel { background: #f2f3f5; color: #666; }
+        .confirm-ok { background: #1F3864; color: #fff; }
+        .confirm-danger { background: #E5484D !important; color: #fff !important; }
+
+        .toast {
+            position: fixed; left: 50%; bottom: 80px; transform: translateX(-50%);
+            background: rgba(0,0,0,0.75); color: #fff; font-size: 13px;
+            padding: 10px 20px; border-radius: 20px; z-index: 99999;
+            opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap;
+        }
+        .toast.show { opacity: 1; }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 0;
+            color: #bbb;
+            font-size: 14px;
+            grid-column: 1 / -1;
+        }
+
+        /* ── 功能说明浮窗 ── */
+        .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 500px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
+        .f-modal.show { display: block; }
+        .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .f-modal .fm-title:active { cursor: grabbing; }
+        .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
+        .f-modal .fm-close:hover { background: #e8e8e8; }
+        .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+        .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
+        .f-modal .fm-body h4:first-child { margin-top: 0; }
+        .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
+        .f-modal .fm-body li { margin-bottom: 4px; }
+
+        /* ===== 右侧功能说明面板（后台风格三栏布局：左目录 | 中内容 | 右说明） ===== */
+        .func-panel {
+            position: fixed; top: 0; right: 0; bottom: 0;
+            width: 340px; z-index: 890;
+            background: #fff; border-left: 1px solid #e3e6eb;
+            box-shadow: -1px 0 12px rgba(20, 30, 60, 0.04);
+            display: flex; flex-direction: column;
+        }
+        .func-panel .fp-inner { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+        .func-panel .fp-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px 14px 13px 18px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
+        }
+        .func-panel .fp-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: #1d1d1f; }
+        .func-panel .fp-title::before {
+            content: ''; width: 8px; height: 8px; border-radius: 50%;
+            background: #409eff; box-shadow: 0 0 0 4px rgba(64, 158, 255, 0.14);
+        }
+        .func-panel .fp-fold-btn {
+            width: 28px; height: 28px; border: 1px solid #e3e6eb; background: #fff;
+            border-radius: 50%; color: #86868b; font-size: 15px; line-height: 1;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .func-panel .fp-fold-btn:hover { border-color: #409eff; color: #409eff; }
+        .func-panel .fp-body {
+            flex: 1; overflow-y: auto; padding: 4px 18px 40px;
+            font-size: 13px; color: #555; line-height: 1.9;
+        }
+        .func-panel .fp-body::-webkit-scrollbar { width: 5px; }
+        .func-panel .fp-body::-webkit-scrollbar-thumb { background: #d8dce3; border-radius: 3px; }
+        .func-panel .fp-body h3 { font-size: 14px; font-weight: 600; color: #1d1d1f; margin: 18px 0 6px; }
+        .func-panel .fp-body h3:first-child { margin-top: 12px; }
+        .func-panel .fp-body h4 { font-size: 13px; font-weight: 600; color: #333; margin: 14px 0 4px; }
+        .func-panel .fp-body p { margin: 0 0 10px; }
+        .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .func-panel .fp-body li { margin-bottom: 6px; }
+        .func-panel .fp-body b { color: #333; }
+        .func-panel .fp-open {
+            display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+            border: none; background: transparent; cursor: pointer;
+            writing-mode: vertical-rl; text-orientation: upright;
+            font-size: 13px; font-weight: 600; letter-spacing: 6px; color: #86868b;
+            align-items: center; justify-content: center; font-family: inherit;
+            transition: all 0.2s;
+        }
+        .func-panel .fp-open:hover { color: #409eff; background: #fafbfc; }
+
+        /* 三栏布局：左侧深色目录样式来自 admin-sidebar.css，中间内容左右让位 */
+        @media (min-width: 1024px) {
+            body.has-sidenav .main-wrap { margin-left: 232px; }
+            .main-wrap { margin-right: 340px; }
+            body.fp-collapsed .main-wrap { margin-right: 40px; }
+            body.fp-collapsed .func-panel { width: 40px; }
+            body.fp-collapsed .fp-inner { display: none; }
+            body.fp-collapsed .fp-open { display: flex; }
+        }
+        @media (max-width: 1023.98px) {
+            .func-panel { display: none; }
+            .main-wrap { margin-right: 0; }
+        }
+    </style>
+</head>
+<body class="has-sidenav">
+
+<div class="main-wrap">
+<div class="app-container">
+        <div class="top-nav">
+            <button class="back-btn" onclick="goBack()">‹</button>
+            <div class="title">我的作品</div>
+        </div>
+
+    <div class="content-area">
+        <div class="status-tabs" id="statusTabs">
+            <button class="st-item active" data-status="published" onclick="switchStatus('published')">已发布</button>
+            <button class="st-item" data-status="unpublished" onclick="switchStatus('unpublished')">未发布</button>
+        </div>
+        <div class="feed-grid" id="feedGrid"></div>
+    </div>
+</div><!-- /.app-container -->
+</div><!-- /.main-wrap -->
+
+<script>
+    var myWorks = [
+        { id: 0, title: '博物馆犀牛', cover: '../../博物馆.mp4', creator: '晓宇', realCreator: '张**', course: '我为杜甫建茅屋', likes: 28, comments: 2, orient: 'v', status: 'published' },
+        { id: 1, title: '杜甫和李白的故事', cover: '../../杜甫和李白.png', creator: '晓宇', realCreator: '张**', course: '我为杜甫建茅屋', likes: 35, comments: 5, orient: 'h', status: 'published' },
+        { id: 2, title: '茅屋搭建的完整过程', cover: '../../快速搭建茅屋', creator: '晓宇', realCreator: '张**', course: '快速搭建茅屋', likes: 15, comments: 1, orient: 'v', status: 'unpublished' },
+        { id: 3, title: '诗界无心·草堂寻心', cover: '../../诗界无心·草堂寻心.jpg', creator: '晓宇', realCreator: '张**', course: '诗界无心·草堂寻心', likes: 42, comments: 3, orient: 'h', status: 'published' },
+        { id: 4, title: '盆景美学·指尖上的山水', cover: '../../盆景美学·指尖上的山水.jpg', creator: '晓宇', realCreator: '张**', course: '盆景美学·指尖山水', likes: 33, comments: 4, orient: 'v', status: 'unpublished' },
+        { id: 5, title: '春假托管班精彩回顾', cover: '../../盆景美学·指尖上的山水.jpg', creator: '晓宇', realCreator: '张**', course: '春假托管班', likes: 18, comments: 0, orient: 'h', status: 'published' },
+    ];
+    var currentStatus = 'published';
+
+    function goBack() {
+        window.location.href = '我的.html';
+    }
+
+    function switchStatus(status) {
+        currentStatus = status;
+        var btns = document.querySelectorAll('#statusTabs .st-item');
+        for (var i = 0; i < btns.length; i++) {
+            btns[i].classList.toggle('active', btns[i].dataset.status === status);
+        }
+        renderWorks();
+    }
+
+    function renderWorks() {
+        var grid = document.getElementById('feedGrid');
+        var list = myWorks.filter(function(w) { return w.status === currentStatus; });
+        if (list.length === 0) {
+            var tips = { published: '暂无已发布作品', unpublished: '暂无未发布作品' };
+            grid.innerHTML = '<div class="empty-state">' + (tips[currentStatus] || '暂无作品') + '</div>';
+            return;
+        }
+        var html = '';
+        for (var i = 0; i < list.length; i++) {
+            var w = list[i];
+            var isVideo = w.cover && w.cover.indexOf('.mp4') !== -1;
+            var orient = w.orient || 'h';
+            var coverHtml = isVideo
+                ? '<video src="' + w.cover + '" muted playsinline preload="metadata"></video>'
+                : '<img src="' + w.cover + '" onerror="this.style.display=\'none\';this.parentNode.style.background=\'linear-gradient(135deg,#667eea,#764ba2)\'">';
+            html += '<div class="feed-card" onclick="goDetail(' + w.id + ')">'
+                + '<div class="feed-cover ' + orient + '">' + coverHtml
+                + '<span class="play-badge">▶</span>'
+                + '<span class="like-badge">♡ ' + w.likes + '</span>'
+                + '</div>'
+                + '<div class="feed-body">'
+                + '<div class="feed-title">' + w.title + '</div>'
+                + '<div class="feed-creator">'
+                + '<div class="fc-avatar">👤</div>'
+                + '<span class="fc-name">' + w.creator + '</span>'
+                + '<span class="fc-real">' + w.realCreator + '</span>'
+                + '</div>'
+                + '<div class="feed-stats">'
+                + '<span>💬 ' + w.comments + '</span>'
+                + '<span>📚 ' + w.course + '</span>'
+                + '</div>'
+                + (w.status === 'unpublished'
+                    ? '<div class="feed-actions"><button class="publish-btn" onclick="event.stopPropagation();openConfirm(' + w.id + ',\'publish\')">发布</button></div>'
+                    : '<div class="feed-actions"><button class="take-down-btn" onclick="event.stopPropagation();openConfirm(' + w.id + ',\'takendown\')">下架</button></div>')
+                + '</div>'
+                + '</div>';
+        }
+        grid.innerHTML = html;
+    }
+
+    function goDetail(idx) {
+        window.location.href = '视频详情_自己.html?idx=' + idx;
+    }
+
+    var toastTimer;
+    function showToast(msg) {
+        var t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function() { t.classList.remove('show'); }, 1800);
+    }
+
+    var pendingId = null;
+    var pendingAction = null;
+
+    function openConfirm(id, action) {
+        pendingId = id;
+        pendingAction = action;
+        var isPublish = action === 'publish';
+        document.getElementById('confirmTitle').textContent = isPublish ? '确认发布' : '确认下架';
+        document.getElementById('confirmMsg').innerHTML = isPublish
+            ? '确定将作品发布到社区吗？<br>发布后其他用户可见。'
+            : '确定将该作品从社区下架吗？<br>下架后其他用户将不可见。';
+        var ok = document.getElementById('confirmOk');
+        ok.textContent = isPublish ? '确认发布' : '确认下架';
+        ok.classList.toggle('confirm-danger', !isPublish);
+        document.getElementById('confirmOverlay').classList.add('show');
+    }
+
+    function closeConfirm() {
+        pendingId = null;
+        pendingAction = null;
+        document.getElementById('confirmOverlay').classList.remove('show');
+    }
+
+    function doConfirm() {
+        if (pendingId === null || !pendingAction) { closeConfirm(); return; }
+        var isPublish = pendingAction === 'publish';
+        for (var i = 0; i < myWorks.length; i++) {
+            if (myWorks[i].id === pendingId) { myWorks[i].status = isPublish ? 'published' : 'unpublished'; break; }
+        }
+        renderWorks();
+        showToast(isPublish ? '已发布到社区' : '已下架');
+        closeConfirm();
+    }
+
+    renderWorks();
+</script>
+
+<div class="toast" id="toast"></div>
+
+<!-- 二次确认弹窗（发布 / 下架） -->
+<div class="confirm-overlay" id="confirmOverlay" onclick="closeConfirm()">
+    <div class="confirm-box" onclick="event.stopPropagation()">
+        <div class="confirm-title" id="confirmTitle">确认发布</div>
+        <div class="confirm-msg" id="confirmMsg">确定将作品发布到社区吗？<br>发布后其他用户可见。</div>
+        <div class="confirm-btns">
+            <button class="confirm-cancel" onclick="closeConfirm()">取消</button>
+            <button class="confirm-ok" id="confirmOk" onclick="doConfirm()">确认发布</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== 右侧功能说明面板（后台风格三栏布局） ===== -->
+<aside class="func-panel">
+    <div class="fp-inner">
+        <div class="fp-header">
+            <span class="fp-title">功能说明</span>
+            <button class="fp-fold-btn" onclick="toggleFuncPanel()" title="收起功能说明">›</button>
+        </div>
+        <div class="fp-body">
+            <h3>1. 作品列表</h3>
+            <ul>
+                <li>小红书风格<b>双列网格</b>，展示用户所有已生成的 AI 视频作品（后续可扩展 AI 游戏、文章等）。</li>
+                <li>每个卡片显示封面、标题、点赞数、评论数、创作者信息、关联课程。</li>
+            </ul>
+            <h3>2. 状态筛选</h3>
+            <ul>
+                <li><b>已发布</b>：仅展示已发布到社区的作品。</li>
+                <li><b>未发布</b>：仅展示草稿 / 未发布的作品。</li>
+            </ul>
+            <h3>3. 发布与下架</h3>
+            <ul>
+                <li><b>发布</b>：未发布作品卡片带「发布」按钮，二次确认后发布到社区，状态变为「已发布」。</li>
+                <li><b>下架</b>：已发布作品卡片带红色「下架」按钮，二次确认后从社区下架，状态变为「未发布」。</li>
+            </ul>
+            <h3>4. 作品操作</h3>
+            <ul>
+                <li><b>查看详情</b>：点击卡片跳转「我的作品 · 视频详情」页，可播放、点赞、评论并删除视频与评论。</li>
+            </ul>
+        </div>
+    </div>
+    <button class="fp-open" onclick="toggleFuncPanel()" title="展开功能说明">功能说明‹</button>
+</aside>
+
+<script>
+    /* ── 右侧功能说明面板：收起 / 展开 ── */
+    function toggleFuncPanel() {
+        document.body.classList.toggle('fp-collapsed');
+    }
+</script>
+<script src="asset/community-sidebar.js"></script>
+</body>
+</html>

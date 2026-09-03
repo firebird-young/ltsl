@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>拼团订单管理 - 管理后台</title>
+    <link rel="stylesheet" href="asset/admin-sidebar.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -12,35 +13,6 @@
             min-height: 100vh;
             color: #333;
         }
-
-        /* 顶部导航 */
-        .header {
-            background: #fff;
-            height: 56px;
-            display: flex;
-            align-items: center;
-            padding: 0 24px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        .header .logo { font-size: 18px; font-weight: 700; color: #0669FF; margin-right: 32px; }
-        .header .nav-list { display: flex; gap: 24px; list-style: none; }
-        .header .nav-list li { font-size: 14px; color: #666; cursor: pointer; padding: 4px 0; position: relative; }
-        .header .nav-list li:hover { color: #0669FF; }
-        .header .nav-list li.active { color: #0669FF; font-weight: 600; }
-        .header .nav-list li.active::after {
-            content: ''; position: absolute; bottom: -4px; left: 0; right: 0;
-            height: 2px; background: #0669FF; border-radius: 1px;
-        }
-        .header .user-area { margin-left: auto; display: flex; align-items: center; gap: 16px; }
-        .header .user-area .avatar {
-            width: 32px; height: 32px; border-radius: 50%; background: #E8F0FE;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 14px; color: #0669FF;
-        }
-        .header .user-area .name { font-size: 14px; color: #333; }
 
         .breadcrumb { padding: 16px 24px 0; font-size: 13px; color: #999; display: flex; align-items: center; gap: 6px; }
         .breadcrumb a { color: #999; text-decoration: none; }
@@ -267,27 +239,68 @@
         .f-modal .f-body li { margin: 3px 0; }
         .f-modal .f-body b { color: #0669FF; font-weight: 600; }
         .f-modal .f-foot { margin-top: 14px; padding-top: 12px; border-top: 1px solid #F0F0F0; font-size: 12px; color: #999; }
+
+        /* ===== 右侧功能说明面板（后台风格三栏布局：左目录 | 中内容 | 右说明） ===== */
+        .func-panel {
+            position: fixed; top: 0; right: 0; bottom: 0;
+            width: 340px; z-index: 890;
+            background: #fff; border-left: 1px solid var(--border, #e3e6eb);
+            box-shadow: -1px 0 12px rgba(20, 30, 60, 0.04);
+            display: flex; flex-direction: column;
+        }
+        .func-panel .fp-inner { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+        .func-panel .fp-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px 14px 13px 18px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
+        }
+        .func-panel .fp-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: var(--ink, #1d1d1f); }
+        .func-panel .fp-title::before {
+            content: ''; width: 8px; height: 8px; border-radius: 50%;
+            background: var(--accent, #0066cc); box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.12);
+        }
+        .func-panel .fp-fold-btn {
+            width: 28px; height: 28px; border: 1px solid var(--border, #e3e6eb); background: #fff;
+            border-radius: 50%; color: var(--ink-subtle, #86868b); font-size: 15px; line-height: 1;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .func-panel .fp-fold-btn:hover { border-color: var(--accent, #0066cc); color: var(--accent, #0066cc); }
+        .func-panel .fp-body {
+            flex: 1; overflow-y: auto; padding: 4px 18px 40px;
+            font-size: 13px; color: #555; line-height: 1.9;
+        }
+        .func-panel .fp-body::-webkit-scrollbar { width: 5px; }
+        .func-panel .fp-body::-webkit-scrollbar-thumb { background: #d8dce3; border-radius: 3px; }
+        .func-panel .fp-body h4 { font-size: 14px; font-weight: 600; color: var(--ink, #1d1d1f); margin: 18px 0 6px; }
+        .func-panel .fp-body h4:first-child { margin-top: 12px; }
+        .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .func-panel .fp-body li { margin-bottom: 6px; }
+        .func-panel .fp-body strong { color: #333; }
+        .func-panel .fp-open {
+            display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+            border: none; background: transparent; cursor: pointer;
+            writing-mode: vertical-rl; text-orientation: upright;
+            font-size: 13px; font-weight: 600; letter-spacing: 6px; color: var(--ink-subtle, #86868b);
+            align-items: center; justify-content: center; font-family: inherit;
+            transition: all 0.2s;
+        }
+        .func-panel .fp-open:hover { color: var(--accent, #0066cc); background: #fafbfc; }
+
+        @media (min-width: 1024px) {
+            .main, .breadcrumb { margin-right: 340px; }
+            body.fp-collapsed .main,
+            body.fp-collapsed .breadcrumb { margin-right: 40px; }
+            body.fp-collapsed .func-panel { width: 40px; }
+            body.fp-collapsed .fp-inner { display: none; }
+            body.fp-collapsed .fp-open { display: flex; }
+        }
+        @media (max-width: 1023.98px) {
+            .func-panel { display: none; }
+            .main, .breadcrumb { margin-right: 0; }
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="logo">离泰数链</div>
-        <ul class="nav-list">
-            <li>首页</li>
-            <li>课程管理</li>
-            <li>场次方案</li>
-            <li class="active">订单管理</li>
-            <li>用户管理</li>
-        </ul>
-        <div style="display:flex;align-items:center;gap:12px;">
-            <button class="f-btn" onclick="toggleFuncModal()">📖 功能说明</button>
-            <div class="user-area">
-                <div class="avatar">管</div>
-                <div class="name">管理员</div>
-            </div>
-        </div>
-    </div>
-
     <div class="breadcrumb">
         <a href="#">首页</a>
         <span class="sep">/</span>
@@ -732,76 +745,53 @@
     renderTable();
 </script>
 
-<!-- ===== 功能说明浮窗 ===== -->
-<div class="f-modal" id="funcModal">
-    <div class="f-head" id="funcHead">
-        <h3>📖 拼团订单管理 · 功能说明</h3>
-        <button class="f-close" onclick="toggleFuncModal()">✕</button>
+<!-- ===== 右侧功能说明面板（后台风格三栏布局） ===== -->
+<aside class="func-panel">
+    <div class="fp-inner">
+        <div class="fp-header">
+            <span class="fp-title">功能说明</span>
+            <button class="fp-fold-btn" onclick="toggleFuncPanel()" title="收起功能说明">›</button>
+        </div>
+        <div class="fp-body">
+            <h4>一、页面用途</h4>
+            <ul>
+                <li>拼团订单管理页用于后台查看和管理所有拼团订单，支持按条件搜索、按状态筛选、查看订单详情、导出数据，并可在指定状态下进入研学报告管理。</li>
+            </ul>
+            <h4>二、搜索筛选</h4>
+            <ul>
+                <li>支持按<strong>拼团编号、课程名称、场次时间、场次名称</strong>搜索，并按<strong>核验机构、执行机构</strong>下拉筛选。</li>
+                <li>场次时间通过日期选择控件选择年月日；场次名称支持关键字模糊匹配（如「内测」「上午场」）；核验机构、执行机构选项自动从订单数据生成。</li>
+                <li>点击「查询」应用条件，「重置」清空条件。</li>
+            </ul>
+            <h4>三、状态标签页</h4>
+            <ul>
+                <li>顶部标签页按订单状态分组：<strong>全部订单 / 待成团 / 待出行 / 拼团失败 / 已完成</strong>，各标签显示对应数量，点击仅展示对应状态订单。</li>
+            </ul>
+            <h4>四、订单列表</h4>
+            <ul>
+                <li>表格展示：拼团订单编号（可点击查看）、课程名称、课程编号、执行机构、场次名称、场次时间、总金额、创建时间、最晚拼团确认、成团时间、状态、拼团进度。</li>
+                <li><strong>拼团进度</strong>以进度条 + 数字（如 8/10）展示当前成团进度，满员 / 半程进度条颜色区分；底部记录总数，支持分页浏览。</li>
+            </ul>
+            <h4>五、操作列</h4>
+            <ul>
+                <li><strong>查看</strong>：所有订单均提供，点击查看订单详情。</li>
+                <li><strong>手动完成</strong>：仅「待成团」状态的订单显示，用于人工确认成团；二次确认后订单状态变为「已完成」并记录成团时间。</li>
+                <li><strong>发送提醒</strong>：仅「待出行」状态的订单显示，向参团用户发送出行提醒；二次确认后提示「已发送出行提醒」。</li>
+                <li><strong>企微群</strong>：所有订单均提供，弹出企微群二维码上传弹窗，支持选择图片预览上传，保存后提示「企微群图片已保存」。</li>
+                <li><strong>研学报告管理</strong>：仅「待出行」「已完成」状态的订单显示，点击跳转至该订单的研学报告管理页。</li>
+                <li><strong>导出</strong>：右上角「📥 导出」按钮，将当前列表数据导出。</li>
+            </ul>
+        </div>
     </div>
-    <div class="f-body">
-        <p><b>总述</b>：拼团订单管理页用于后台查看和管理所有拼团订单，支持按条件搜索、按状态筛选、查看订单详情、导出数据，并可在指定状态下进入研学报告管理。</p>
-        <h4>1. 搜索筛选</h4>
-        <ul>
-            <li>支持按<b>拼团编号、课程名称、场次时间、场次名称</b>搜索，并按<b>核验机构、执行机构</b>下拉筛选。</li>
-            <li>场次时间通过<b>日期选择控件</b>选择年月日，场次名称支持关键字模糊匹配（如"内测""上午场"）；核验机构、执行机构选项<b>自动从订单数据生成</b>。</li>
-            <li>点击"查询"应用条件，"重置"清空条件。</li>
-        </ul>
-        <h4>2. 状态标签页</h4>
-        <ul>
-            <li>顶部标签页按订单状态分组：<b>全部订单 / 待成团 / 待出行 / 拼团失败 / 已完成</b>，各标签显示对应数量。</li>
-            <li>点击标签仅展示对应状态订单。</li>
-        </ul>
-        <h4>3. 订单列表</h4>
-        <ul>
-            <li>表格展示：<b>拼团订单编号（可点击查看）、课程名称、课程编号、执行机构、场次名称、场次时间、总金额、创建时间、最晚拼团确认、成团时间、状态、拼团进度</b>。</li>
-            <li><b>拼团进度</b>以进度条 + 数字（如 8/10）展示当前成团进度，满员/半程进度条颜色区分。</li>
-            <li>底部显示记录总数，支持<b>分页浏览</b>。</li>
-        </ul>
-        <h4>4. 操作列</h4>
-        <ul>
-            <li><b>查看</b>：所有订单均提供，点击查看订单详情。</li>
-            <li><b>手动完成</b>：仅"<b>待成团</b>"状态的订单显示，用于人工确认成团；点击后弹<b>二次确认</b>，确认后订单状态变为"已完成"并记录成团时间。</li>
-            <li><b>发送提醒</b>：仅"<b>待出行</b>"状态的订单显示，向参团用户发送出行提醒；点击后弹<b>二次确认</b>，确认后提示"已发送出行提醒"。</li>
-            <li><b>企微群</b>：所有订单均提供，点击弹出<b>企微群二维码上传</b>弹窗，支持选择图片预览上传，保存后提示"企微群图片已保存"。</li>
-            <li><b>研学报告管理</b>：仅"<b>待出行</b>""<b>已完成</b>"状态的订单显示，点击跳转至该订单的研学报告管理页。</li>
-            <li><b>导出</b>：右上角"📥 导出"按钮，将当前列表数据导出。</li>
-        </ul>
-    </div>
-    <div class="f-foot">拖动标题栏可移动本浮窗位置</div>
-</div>
+    <button class="fp-open" onclick="toggleFuncPanel()" title="展开功能说明">功能说明‹</button>
+</aside>
 
 <script>
-    (function() {
-        var modal = document.getElementById('funcModal');
-        var head = document.getElementById('funcHead');
-        var dragging = false, startX = 0, startY = 0, startLeft = 0, startTop = 0;
-        head.addEventListener('mousedown', function(e) {
-            dragging = true;
-            startX = e.clientX; startY = e.clientY;
-            startLeft = modal.offsetLeft; startTop = modal.offsetTop;
-            document.body.style.userSelect = 'none';
-        });
-        document.addEventListener('mousemove', function(e) {
-            if (!dragging) return;
-            modal.style.left = (startLeft + e.clientX - startX) + 'px';
-            modal.style.top = (startTop + e.clientY - startY) + 'px';
-            modal.style.right = 'auto';
-        });
-        document.addEventListener('mouseup', function() {
-            dragging = false;
-            document.body.style.userSelect = '';
-        });
-    })();
-
-    function toggleFuncModal() {
-        var el = document.getElementById('funcModal');
-        el.classList.toggle('show');
-        if (el.classList.contains('show') && !el.dataset.dragged) {
-            el.style.top = '72px';
-            el.style.right = '16px';
-            el.style.left = 'auto';
-        }
+    /* ── 右侧功能说明面板：收起 / 展开 ── */
+    function toggleFuncPanel() {
+        document.body.classList.toggle('fp-collapsed');
     }
 </script>
+<script src="asset/admin-sidebar.js"></script>
 </body>
 </html>

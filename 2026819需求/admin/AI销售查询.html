@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI销售查询 - 管理后台</title>
+    <link rel="stylesheet" href="asset/admin-sidebar.css">
+    <style>
+        :root {
+            --bg: #ffffff;
+            --accent: #0066cc;
+            --accent-hover: #0071e3;
+            --link: #0071e3;
+            --ink: #1d1d1f;
+            --ink-muted: #3f424b;
+            --ink-subtle: #86868b;
+            --border: #e0e0e0;
+            --card-bg: #ffffff;
+            --radius-sm: 9999px;
+            --radius-card: 18px;
+            --radius-pill: 9999px;
+            --shadow-card: 0 0 0 1px rgba(0,0,0,0.06);
+            --font: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font);
+            background: #f5f5f7;
+            min-height: 100vh;
+            color: var(--ink);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .breadcrumb { padding: 16px 24px 0; font-size: 13px; color: var(--ink-subtle); }
+        .breadcrumb a { color: var(--ink-subtle); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--accent); }
+        .breadcrumb .current { color: var(--ink); font-weight: 500; }
+
+        .main { padding: 16px 24px 40px; }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        .page-header h2 { font-size: 20px; font-weight: 600; color: var(--ink); }
+        .page-header .stat-badge {
+            font-size: 12px;
+            color: var(--ink-subtle);
+            background: #f5f5f7;
+            padding: 6px 16px;
+            border-radius: var(--radius-pill);
+        }
+
+        .search-area {
+            background: #fff;
+            border-radius: var(--radius-card);
+            padding: 20px 24px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-card);
+        }
+        .search-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            align-items: flex-end;
+        }
+        .search-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 140px;
+            flex: 0 0 auto;
+        }
+        .search-item label { font-size: 12px; color: var(--ink-subtle); font-weight: 500; }
+        .search-item input,
+        .search-item select {
+            height: 36px;
+            padding: 0 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-pill);
+            font-size: 13px;
+            color: var(--ink);
+            background: #fff;
+            outline: none;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        .search-item input:focus,
+        .search-item select:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,102,204,0.08); }
+        .search-actions {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            padding-bottom: 1px;
+            flex: 0 0 auto;
+        }
+        .search-actions .btn {
+            height: 36px;
+            padding: 0 20px;
+            border-radius: var(--radius-pill);
+            font-size: 13px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            font-family: inherit;
+            font-weight: 500;
+        }
+        .search-actions .btn-search { background: var(--accent); color: #fff; }
+        .search-actions .btn-search:hover { background: var(--accent-hover); }
+        .search-actions .btn-reset { background: #f5f5f7; color: var(--ink-subtle); border: 1px solid var(--border); }
+        .search-actions .btn-reset:hover { border-color: var(--accent); color: var(--accent); }
+
+        .table-wrap {
+            background: #fff;
+            border-radius: var(--radius-card);
+            overflow: hidden;
+            box-shadow: var(--shadow-card);
+        }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        thead th {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--ink-subtle);
+            text-align: left;
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            background: #fafafc;
+            white-space: nowrap;
+        }
+        tbody td {
+            font-size: 13px;
+            color: var(--ink);
+            padding: 14px 16px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: #FAFBFF; }
+
+        .tag {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .tag.video { background: #E8F0FE; color: var(--accent); }
+        .tag.game { background: #F3E8FF; color: #7c3aed; }
+        .tag.count { background: #FFF3E0; color: #ff9500; }
+        .tag.plan { background: #E8F5E9; color: #34c759; }
+        .tag.success { background: #E8F5E9; color: #34c759; }
+        .tag.pending { background: #FFF3E0; color: #ff9500; }
+        .tag.refunding { background: #FFF0F0; color: #D43828; }
+        .tag.refunded { background: #f5f5f7; color: var(--ink-subtle); }
+        .tag.success { background: #E8F5E9; color: #34c759; }
+
+        .action-btn {
+            padding: 5px 14px;
+            border: none;
+            border-radius: var(--radius-pill);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .action-btn.refund { background: #FFF0F0; color: #D43828; }
+        .action-btn.refund:hover { background: #D43828; color: #fff; }
+        .action-btn.disabled { opacity: 0.4; cursor: default; background: #f5f5f7; color: var(--ink-subtle); }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 24px;
+            gap: 6px;
+            border-top: 1px solid #f0f0f0;
+        }
+        .pagination .page-info { font-size: 13px; color: var(--ink-subtle); margin-right: 12px; }
+        .pagination .page-btn {
+            width: 32px; height: 32px;
+            border-radius: var(--radius-pill);
+            border: 1px solid var(--border);
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            color: var(--ink-subtle);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .pagination .page-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .pagination .page-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .pagination .page-btn.disabled { opacity: 0.4; cursor: default; }
+
+        .table-total {
+            padding: 12px 24px;
+            font-size: 13px;
+            color: var(--ink-subtle);
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+        }
+        .table-total .tt-summary strong { color: var(--ink); }
+
+        /* ===== 退款弹窗 ===== */
+        .refund-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .refund-overlay.show { display: flex; }
+        .refund-modal {
+            background: #fff;
+            width: 100%;
+            max-width: 400px;
+            border-radius: var(--radius-card);
+            padding: 28px 24px 24px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+        }
+        .refund-modal .rm-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 16px;
+        }
+        .refund-modal .rm-info {
+            background: #fafafc;
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+        .refund-modal .rm-info .rm-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
+        .refund-modal .rm-info .rm-row:last-child { margin-bottom: 0; }
+        .refund-modal .rm-info .rm-label { color: var(--ink-subtle); }
+        .refund-modal .rm-info .rm-value { color: var(--ink); font-weight: 500; }
+        .refund-modal textarea {
+            width: 100%;
+            height: 80px;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 13px;
+            color: var(--ink);
+            outline: none;
+            font-family: inherit;
+            resize: none;
+            margin-bottom: 16px;
+        }
+        .refund-modal textarea:focus { border-color: var(--accent); }
+        .refund-modal .rm-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .refund-modal .rm-actions button {
+            flex: 1;
+            height: 40px;
+            border: none;
+            border-radius: var(--radius-pill);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .refund-modal .rm-actions .rm-cancel { background: #f5f5f7; color: var(--ink-subtle); }
+        .refund-modal .rm-actions .rm-cancel:hover { background: #eee; }
+        .refund-modal .rm-actions .rm-confirm { background: #D43828; color: #fff; }
+        .refund-modal .rm-actions .rm-confirm:hover { background: #b52c1e; }
+
+        @media (max-width: 768px) {
+            .breadcrumb { padding: 12px 16px 0; }
+            .main { padding: 12px 16px 24px; }
+            .search-row { flex-direction: column; gap: 10px; }
+            .search-item { min-width: 100%; }
+        }
+
+        /* ===== 右侧功能说明面板（后台风格三栏布局：左目录 | 中内容 | 右说明） ===== */
+        .func-panel {
+            position: fixed; top: 0; right: 0; bottom: 0;
+            width: 340px; z-index: 890;
+            background: #fff; border-left: 1px solid var(--border, #e3e6eb);
+            box-shadow: -1px 0 12px rgba(20, 30, 60, 0.04);
+            display: flex; flex-direction: column;
+        }
+        .func-panel .fp-inner { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+        .func-panel .fp-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px 14px 13px 18px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
+        }
+        .func-panel .fp-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: var(--ink, #1d1d1f); }
+        .func-panel .fp-title::before {
+            content: ''; width: 8px; height: 8px; border-radius: 50%;
+            background: var(--accent, #0066cc); box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.12);
+        }
+        .func-panel .fp-fold-btn {
+            width: 28px; height: 28px; border: 1px solid var(--border, #e3e6eb); background: #fff;
+            border-radius: 50%; color: var(--ink-subtle, #86868b); font-size: 15px; line-height: 1;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .func-panel .fp-fold-btn:hover { border-color: var(--accent, #0066cc); color: var(--accent, #0066cc); }
+        .func-panel .fp-body {
+            flex: 1; overflow-y: auto; padding: 4px 18px 40px;
+            font-size: 13px; color: #555; line-height: 1.9;
+        }
+        .func-panel .fp-body::-webkit-scrollbar { width: 5px; }
+        .func-panel .fp-body::-webkit-scrollbar-thumb { background: #d8dce3; border-radius: 3px; }
+        .func-panel .fp-body h4 { font-size: 14px; font-weight: 600; color: var(--ink, #1d1d1f); margin: 18px 0 6px; }
+        .func-panel .fp-body h4:first-child { margin-top: 12px; }
+        .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .func-panel .fp-body li { margin-bottom: 6px; }
+        .func-panel .fp-body strong { color: #333; }
+        .func-panel .fp-open {
+            display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+            border: none; background: transparent; cursor: pointer;
+            writing-mode: vertical-rl; text-orientation: upright;
+            font-size: 13px; font-weight: 600; letter-spacing: 6px; color: var(--ink-subtle, #86868b);
+            align-items: center; justify-content: center; font-family: inherit;
+            transition: all 0.2s;
+        }
+        .func-panel .fp-open:hover { color: var(--accent, #0066cc); background: #fafbfc; }
+
+        @media (min-width: 1024px) {
+            .main, .breadcrumb { margin-right: 340px; }
+            body.fp-collapsed .main,
+            body.fp-collapsed .breadcrumb { margin-right: 40px; }
+            body.fp-collapsed .func-panel { width: 40px; }
+            body.fp-collapsed .fp-inner { display: none; }
+            body.fp-collapsed .fp-open { display: flex; }
+        }
+        @media (max-width: 1023.98px) {
+            .func-panel { display: none; }
+            .main, .breadcrumb { margin-right: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="breadcrumb">
+        <a href="../index.html">首页</a>
+        <span class="sep"> &gt; </span>
+        <a href="#">AI配置</a>
+        <span class="sep"> &gt; </span>
+        <span class="current">AI销售查询</span>
+    </div>
+
+    <div class="main">
+        <div class="page-header">
+            <h2>AI销售查询</h2>
+            <span class="stat-badge">总收入：<strong id="totalRevenue">¥0.00</strong></span>
+        </div>
+
+        <div class="search-area">
+            <div class="search-row">
+                <div class="search-item">
+                    <label>购买方式</label>
+                    <select id="searchMethod">
+                        <option value="all">全部</option>
+                        <option value="points">点数充值</option>
+                    </select>
+                </div>
+                <div class="search-item">
+                    <label>支付状态</label>
+                    <select id="searchStatus">
+                        <option value="all">全部</option>
+                        <option value="pending">待支付</option>
+                        <option value="success">支付成功</option>
+                        <option value="refunding">退款中</option>
+                        <option value="refunded">退款成功</option>
+                    </select>
+                </div>
+                <div class="search-item">
+                    <label>手机号</label>
+                    <input type="text" id="searchUser" placeholder="输入手机号">
+                </div>
+                <div class="search-item">
+                    <label>开始日期</label>
+                    <input type="date" id="searchStart">
+                </div>
+                <div class="search-item">
+                    <label>结束日期</label>
+                    <input type="date" id="searchEnd">
+                </div>
+                <div class="search-actions">
+                    <button class="btn btn-search" onclick="doSearch()">搜索</button>
+                    <button class="btn btn-reset" onclick="resetSearch()">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:7%">订单编号</th>
+                        <th style="width:8%">购买方式</th>
+                        <th style="width:10%">套餐名称</th>
+                        <th style="width:8%">点数</th>
+                        <th style="width:8%">单价</th>
+                        <th style="width:8%">总金额</th>
+                        <th style="width:9%">手机号</th>
+                        <th style="width:10%">支付时间</th>
+                        <th style="width:7%">状态</th>
+                        <th style="width:7%">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+            <div class="table-total">
+                <span>共 <strong id="totalCount">0</strong> 条记录</span>
+                <span class="tt-summary">总收入：<strong id="summaryRevenue">¥0.00</strong></span>
+            </div>
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </div>
+
+    <script>
+        var mockData = [
+            { id: 'P20260701001', method: 'points', planName: '1000 点', points: 1000, unitPrice: 0.698, total: 698.00, user: '13812345678', time: '2026-07-01 10:30', status: 'success', refundReason: '' },
+            { id: 'P20260701002', method: 'points', planName: '500 点', points: 500, unitPrice: 0.796, total: 398.00, user: '13900139002', time: '2026-07-01 14:20', status: 'success', refundReason: '' },
+            { id: 'P20260702003', method: 'points', planName: '150 点', points: 150, unitPrice: 0.92, total: 138.00, user: '18698765432', time: '2026-07-02 09:15', status: 'pending', refundReason: '' },
+            { id: 'P20260703004', method: 'points', planName: '50 点', points: 50, unitPrice: 0.998, total: 49.90, user: '13655667788', time: '2026-07-03 16:00', status: 'success', refundReason: '' },
+            { id: 'P20260703005', method: 'points', planName: '1000 点', points: 1000, unitPrice: 0.698, total: 698.00, user: '15099887766', time: '2026-07-03 11:20', status: 'refunding', refundReason: '' },
+            { id: 'P20260704006', method: 'points', planName: '500 点', points: 500, unitPrice: 0.796, total: 398.00, user: '17712340987', time: '2026-07-04 09:00', status: 'success', refundReason: '' },
+            { id: 'P20260705007', method: 'points', planName: '150 点', points: 150, unitPrice: 0.92, total: 138.00, user: '18856781234', time: '2026-07-05 14:30', status: 'success', refundReason: '' },
+            { id: 'P20260706008', method: 'points', planName: '50 点', points: 50, unitPrice: 0.998, total: 49.90, user: '13812345678', time: '2026-07-06 10:00', status: 'refunded', refundReason: '用户重复购买，协商后退款' },
+            { id: 'P20260707009', method: 'points', planName: '1000 点', points: 1000, unitPrice: 0.698, total: 698.00, user: '13655667788', time: '2026-07-07 08:30', status: 'success', refundReason: '' },
+            { id: 'P20260708010', method: 'points', planName: '500 点', points: 500, unitPrice: 0.796, total: 398.00, user: '17712340987', time: '2026-07-08 15:00', status: 'refunding', refundReason: '' },
+            { id: 'P20260709011', method: 'points', planName: '150 点', points: 150, unitPrice: 0.92, total: 138.00, user: '13900139002', time: '2026-07-09 11:00', status: 'success', refundReason: '' },
+            { id: 'P20260710012', method: 'points', planName: '50 点', points: 50, unitPrice: 0.998, total: 49.90, user: '18856781234', time: '2026-07-10 09:20', status: 'refunded', refundReason: '课程调整，用户申请退款' },
+        ];
+
+        var filteredData = [];
+        var currentPage = 1;
+        var pageSize = 8;
+
+        var methodMap = { points: '点数充值' };
+        var statusMap = { pending: '待支付', success: '支付成功', refunding: '退款中', refunded: '退款成功' };
+
+        function methodTag(method) { return '<span class="tag ' + method + '">' + methodMap[method] + '</span>'; }
+        function statusTag(status) { return '<span class="tag ' + status + '">' + statusMap[status] + '</span>'; }
+
+        var currentRefundIdx = -1;
+
+        function openRefund(idx) {
+            currentRefundIdx = idx;
+            var r = filteredData[idx];
+            document.getElementById('refundInfo').innerHTML = ''
+                + '<div class="rm-row"><span class="rm-label">订单编号</span><span class="rm-value">' + r.id + '</span></div>'
+                + '<div class="rm-row"><span class="rm-label">套餐</span><span class="rm-value">' + r.planName + '</span></div>'
+                + '<div class="rm-row"><span class="rm-label">用户</span><span class="rm-value">' + r.user + '</span></div>'
+                + '<div class="rm-row"><span class="rm-label">金额</span><span class="rm-value" style="color:#D43828;">¥' + r.total.toFixed(2) + '</span></div>';
+            document.getElementById('refundReason').value = '';
+            document.getElementById('refundOverlay').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function openRefundDetail(idx) {
+            var r = filteredData[idx];
+            document.getElementById('refundInfo').innerHTML = ''
+                + '<div class="rm-row"><span class="rm-label">订单编号</span><span class="rm-value">' + r.id + '</span></div>'
+                + '<div class="rm-row"><span class="rm-label">套餐</span><span class="rm-value">' + r.planName + '</span></div>'
+                + '<div class="rm-row"><span class="rm-label">用户</span><span class="rm-value">' + r.user + '</span></div>'
+                + '<div class="rm-row"><span class="rm-label">金额</span><span class="rm-value" style="color:#D43828;">¥' + r.total.toFixed(2) + '</span></div>'
+                + '<div class="rm-row"><span class="rm-label">退款原因</span><span class="rm-value">' + (r.refundReason || '未填写') + '</span></div>';
+            document.getElementById('refundReason').style.display = 'none';
+            document.querySelector('#refundOverlay .rm-actions').style.display = 'none';
+            document.querySelector('#refundOverlay .rm-title').textContent = '退款详情';
+            document.getElementById('refundOverlay').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeRefund() {
+            document.getElementById('refundOverlay').classList.remove('show');
+            document.body.style.overflow = '';
+            currentRefundIdx = -1;
+            document.getElementById('refundReason').style.display = '';
+            document.querySelector('#refundOverlay .rm-actions').style.display = '';
+            document.querySelector('#refundOverlay .rm-title').textContent = '确认退款';
+        }
+
+        function confirmRefund() {
+            if (currentRefundIdx < 0) return;
+            var reason = document.getElementById('refundReason').value.trim() || '管理员手动退款';
+            var r = filteredData[currentRefundIdx];
+            r.status = 'refunded';
+            r.refundReason = reason;
+            closeRefund();
+            renderTable();
+            alert('✅ 退款成功\n订单：' + r.id + '\n金额：¥' + r.total.toFixed(2));
+        }
+
+        function doSearch() {
+            currentPage = 1;
+            var method = document.getElementById('searchMethod').value;
+            var status = document.getElementById('searchStatus').value;
+            var user = document.getElementById('searchUser').value.trim().toLowerCase();
+            var start = document.getElementById('searchStart').value;
+            var end = document.getElementById('searchEnd').value;
+
+            filteredData = mockData.filter(function(item) {
+                if (method !== 'all' && item.method !== method) return false;
+                if (status !== 'all' && item.status !== status) return false;
+                if (user && item.user.toLowerCase().indexOf(user) === -1) return false;
+                if (start && item.time < start) return false;
+                if (end && item.time > end + ' 23:59:59') return false;
+                return true;
+            });
+            renderTable();
+        }
+
+        function resetSearch() {
+            document.getElementById('searchMethod').value = 'all';
+            document.getElementById('searchStatus').value = 'all';
+            document.getElementById('searchUser').value = '';
+            document.getElementById('searchStart').value = '';
+            document.getElementById('searchEnd').value = '';
+            doSearch();
+        }
+
+        function renderTable() {
+            var total = filteredData.length;
+            var totalPages = Math.ceil(total / pageSize) || 1;
+            var start = (currentPage - 1) * pageSize;
+            var end = Math.min(start + pageSize, total);
+            var pageData = filteredData.slice(start, end);
+
+            var revenue = 0;
+            var pendingCount = 0;
+            for (var i = 0; i < filteredData.length; i++) {
+                if (filteredData[i].status === 'success') revenue += filteredData[i].total;
+                if (filteredData[i].status === 'pending') pendingCount++;
+            }
+
+            document.getElementById('totalCount').textContent = total + (pendingCount > 0 ? '（待支付 ' + pendingCount + ' 笔）' : '');
+            document.getElementById('summaryRevenue').textContent = '¥' + revenue.toFixed(2);
+            document.getElementById('totalRevenue').textContent = '¥' + revenue.toFixed(2);
+
+            var tbody = document.getElementById('tableBody');
+            if (total === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--ink-subtle);">暂无销售记录</td></tr>';
+                document.getElementById('pagination').innerHTML = '';
+                return;
+            }
+
+            var html = '';
+            for (var j = 0; j < pageData.length; j++) {
+                var r = pageData[j];
+                var actionHtml = '';
+                if (r.status === 'success') {
+                    actionHtml = '<button class="action-btn refund" onclick="openRefund(' + (start + j) + ')">退款</button>';
+                } else if (r.status === 'refunded') {
+                    actionHtml = '<button class="action-btn refund" style="background:#f5f5f7;color:#666;" onclick="openRefundDetail(' + (start + j) + ')">查看原因</button>';
+                } else {
+                    actionHtml = '<button class="action-btn disabled">-</button>';
+                }
+                html += '<tr>'
+                    + '<td style="font-size:12px;color:var(--ink-subtle);font-family:monospace;">' + r.id + '</td>'
+                    + '<td>' + methodTag(r.method) + '</td>'
+                    + '<td>' + r.planName + '</td>'
+                    + '<td>' + r.points + ' 点</td>'
+                    + '<td>¥' + r.unitPrice.toFixed(2) + '</td>'
+                    + '<td style="font-weight:600;color:#D46B08;">¥' + r.total.toFixed(2) + '</td>'
+                    + '<td>' + r.user + '</td>'
+                    + '<td style="font-size:12px;color:var(--ink-subtle);">' + r.time + '</td>'
+                    + '<td>' + statusTag(r.status) + '</td>'
+                    + '<td>' + actionHtml + '</td>'
+                    + '</tr>';
+            }
+            tbody.innerHTML = html;
+            renderPagination(totalPages);
+        }
+
+        function renderPagination(totalPages) {
+            var el = document.getElementById('pagination');
+            if (totalPages <= 1) { el.innerHTML = ''; return; }
+            var html = '<span class="page-info">共 ' + totalPages + ' 页</span>';
+            html += '<button class="page-btn' + (currentPage <= 1 ? ' disabled' : '') + '" onclick="goPage(' + (currentPage - 1) + ')">‹</button>';
+            for (var p = 1; p <= totalPages; p++) {
+                if (p === currentPage) {
+                    html += '<button class="page-btn active">' + p + '</button>';
+                } else if (p <= 3 || p > totalPages - 2 || Math.abs(p - currentPage) <= 1) {
+                    html += '<button class="page-btn" onclick="goPage(' + p + ')">' + p + '</button>';
+                } else if (p === 4 && currentPage > 4) {
+                    html += '<button class="page-btn disabled" style="border:none;">…</button>';
+                }
+            }
+            html += '<button class="page-btn' + (currentPage >= totalPages ? ' disabled' : '') + '" onclick="goPage(' + (currentPage + 1) + ')">›</button>';
+            el.innerHTML = html;
+        }
+
+        function goPage(page) {
+            var total = filteredData.length;
+            var totalPages = Math.ceil(total / pageSize) || 1;
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            renderTable();
+        }
+
+        doSearch();
+    </script>
+
+    <!-- ===== 退款弹窗 ===== -->
+    <div class="refund-overlay" id="refundOverlay">
+        <div class="refund-modal">
+            <div class="rm-title">确认退款</div>
+            <div class="rm-info" id="refundInfo"></div>
+            <textarea id="refundReason" placeholder="请输入退款原因（选填）"></textarea>
+            <div class="rm-actions">
+                <button class="rm-cancel" onclick="closeRefund()">取消</button>
+                <button class="rm-confirm" onclick="confirmRefund()">确认退款</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 右侧功能说明面板（后台风格三栏布局） ===== -->
+    <aside class="func-panel">
+        <div class="fp-inner">
+            <div class="fp-header">
+                <span class="fp-title">功能说明</span>
+                <button class="fp-fold-btn" onclick="toggleFuncPanel()" title="收起功能说明">›</button>
+            </div>
+            <div class="fp-body">
+                <h4>一、页面用途</h4>
+                <ul>
+                    <li>查询用户「点数充值」产生的 AI 销售订单，页面顶部实时统计<strong>总收入</strong>。</li>
+                </ul>
+                <h4>二、搜索筛选</h4>
+                <ul>
+                    <li>按<strong>购买方式（点数充值）</strong>、<strong>支付状态</strong>（待支付 / 支付成功 / 退款中 / 退款成功）、<strong>手机号</strong>及<strong>开始 / 结束日期</strong>组合查询。</li>
+                    <li>点击「搜索」应用条件，「重置」一键清空。</li>
+                </ul>
+                <h4>三、订单明细</h4>
+                <ul>
+                    <li>表格展示：订单编号、购买方式、套餐名称、点数、单价、总金额、手机号、支付时间与状态。</li>
+                    <li>底部合计<strong>记录总数与总收入</strong>，支持分页浏览。</li>
+                </ul>
+                <h4>四、退款处理</h4>
+                <ul>
+                    <li>支付成功的订单提供「退款」操作，弹窗填写退款原因后状态进入「退款中」，随后自动转为「退款成功」。</li>
+                </ul>
+            </div>
+        </div>
+        <button class="fp-open" onclick="toggleFuncPanel()" title="展开功能说明">功能说明‹</button>
+    </aside>
+
+    <script>
+        /* ── 右侧功能说明面板：收起 / 展开 ── */
+        function toggleFuncPanel() {
+            document.body.classList.toggle('fp-collapsed');
+        }
+    </script>
+    <script src="asset/admin-sidebar.js"></script>
+</body>
+</html>

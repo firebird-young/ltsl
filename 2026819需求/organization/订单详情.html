@@ -3,14 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>订单详情</title>
+    <title>订单详情 - 研学机构端</title>
+    <link rel="stylesheet" href="../admin/asset/admin-sidebar.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
-            background: #f5f5f5;
+            background: #f0f2f5;
+            min-height: 100vh;
+            color: #333;
+        }
+        /* 中间内容区：手机原型居中，左右为固定目录栏与功能说明栏 */
+        .main-wrap {
             display: flex;
             justify-content: center;
+            align-items: flex-start;
+            padding: 24px 20px 48px;
             min-height: 100vh;
         }
         .app-container {
@@ -316,9 +324,83 @@
             z-index: 9998;
             pointer-events: none;
         }
+
+        /* ===== 右侧功能说明面板（后台风格三栏布局：左目录 | 中内容 | 右说明） ===== */
+        .func-panel {
+            position: fixed; top: 0; right: 0; bottom: 0;
+            width: 340px; z-index: 890;
+            background: #fff; border-left: 1px solid #e3e6eb;
+            box-shadow: -1px 0 12px rgba(20, 30, 60, 0.04);
+            display: flex; flex-direction: column;
+        }
+        .func-panel .fp-inner { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+        .func-panel .fp-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px 14px 13px 18px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
+        }
+        .func-panel .fp-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: #1d1d1f; }
+        .func-panel .fp-title::before {
+            content: ''; width: 8px; height: 8px; border-radius: 50%;
+            background: #409eff; box-shadow: 0 0 0 4px rgba(64, 158, 255, 0.14);
+        }
+        .func-panel .fp-fold-btn {
+            width: 28px; height: 28px; border: 1px solid #e3e6eb; background: #fff;
+            border-radius: 50%; color: #86868b; font-size: 15px; line-height: 1;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .func-panel .fp-fold-btn:hover { border-color: #409eff; color: #409eff; }
+        .func-panel .fp-body {
+            flex: 1; overflow-y: auto; padding: 4px 18px 40px;
+            font-size: 13px; color: #555; line-height: 1.9;
+        }
+        .func-panel .fp-body::-webkit-scrollbar { width: 5px; }
+        .func-panel .fp-body::-webkit-scrollbar-thumb { background: #d8dce3; border-radius: 3px; }
+        .func-panel .fp-body h4 { font-size: 14px; font-weight: 600; color: #1d1d1f; margin: 18px 0 6px; }
+        .func-panel .fp-body h4:first-child { margin-top: 12px; }
+        .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .func-panel .fp-body li { margin-bottom: 6px; }
+        .func-panel .fp-body strong { color: #333; }
+        .func-panel .fp-open {
+            display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+            border: none; background: transparent; cursor: pointer;
+            writing-mode: vertical-rl; text-orientation: upright;
+            font-size: 13px; font-weight: 600; letter-spacing: 6px; color: #86868b;
+            align-items: center; justify-content: center; font-family: inherit;
+            transition: all 0.2s;
+        }
+        .func-panel .fp-open:hover { color: #409eff; background: #fafbfc; }
+
+        /* 三栏布局：左侧深色目录样式来自 admin-sidebar.css，中间内容左右让位 */
+        @media (min-width: 1024px) {
+            body.has-sidenav .main-wrap { margin-left: 232px; }
+            .main-wrap { margin-right: 340px; }
+            body.fp-collapsed .main-wrap { margin-right: 40px; }
+            body.fp-collapsed .func-panel { width: 40px; }
+            body.fp-collapsed .fp-inner { display: none; }
+            body.fp-collapsed .fp-open { display: flex; }
+        }
+        @media (max-width: 1023.98px) {
+            .func-panel { display: none; }
+            .main-wrap { margin-right: 0; }
+        }
     </style>
 </head>
-<body>
+<body class="has-sidenav">
+    <!-- ===== 左侧目录菜单（后台风格，样式取自 ../admin/asset/admin-sidebar.css） ===== -->
+    <aside class="admin-sidenav">
+        <div class="sn-brand"><span class="sn-dot"></span>研学机构小程序</div>
+        <div class="sn-group">
+            <a class="sn-item active" href="订单详情.html">📋 订单详情</a>
+            <a class="sn-item" href="研学现场.html">📸 研学现场</a>
+            <a class="sn-item" href="研学信息.html">📄 研学信息</a>
+            <a class="sn-item" href="研学用户评价.html">⭐ 研学评价</a>
+            <a class="sn-item" href="专属精彩.html">✨ 专属精彩</a>
+            <a class="sn-item" href="AI作品.html">🎨 AI 作品</a>
+        </div>
+    </aside>
+
+    <div class="main-wrap">
     <div class="app-container">
         <div class="status-bar">
             <span class="time">14:18</span>
@@ -356,6 +438,58 @@
 
         <div class="group-list" id="groupList"></div>
     </div>
+    </div><!-- /.main-wrap -->
+
+    <!-- ===== 右侧功能说明面板（后台风格三栏布局） ===== -->
+    <aside class="func-panel">
+        <div class="fp-inner">
+            <div class="fp-header">
+                <span class="fp-title">功能说明</span>
+                <button class="fp-fold-btn" onclick="toggleFuncPanel()" title="收起功能说明">›</button>
+            </div>
+            <div class="fp-body">
+                <h4>一、页面用途</h4>
+                <ul>
+                    <li>研学机构（老师）端订单详情页：按课程场次查看用户订单，以<strong>联系人</strong>分组追踪核销状态并管理出行人名单，提供报告 / AI 创作入口。</li>
+                </ul>
+                <h4>二、课程与场次信息</h4>
+                <ul>
+                    <li>顶部浅黄条展示<strong>出行日期</strong>与整体<strong>状态标签</strong>（待出行）。</li>
+                    <li>课程卡展示课程名称、执行机构、<strong>订单数</strong>；「报告管理」按钮跳转研学现场页。</li>
+                </ul>
+                <h4>三、联系人分组与状态</h4>
+                <ul>
+                    <li>订单按<strong>联系电话</strong>分组，每组展示联系手机（📞 可拨打）与核销状态徽标。</li>
+                    <li>状态三种：<strong>待出行</strong>（橙）、<strong>已核销</strong>（绿）、<strong>已过期</strong>（灰）。</li>
+                </ul>
+                <h4>四、出行人名单</h4>
+                <ul>
+                    <li>每行展示：姓名 + <strong>类型标签（学生 / 家长）</strong> + 性别 + 年龄 + <strong>身份证号（不打码）</strong>。</li>
+                    <li>仅「主类型（学生）」成员且状态为已核销 / 已过期时，展示操作按钮。</li>
+                </ul>
+                <h4>五、操作入口</h4>
+                <ul>
+                    <li><strong>报告</strong>：进入该学生的「专属精彩」作品页。</li>
+                    <li><strong>AI创作</strong>：进入同名成员的 AI 创作页。</li>
+                    <li><strong>报告管理</strong>（课程卡）：进入研学现场（现场素材采集）。</li>
+                </ul>
+                <h4>六、本期改动说明</h4>
+                <ul>
+                    <li>同用户小程序 AI 创作页，原用户小程序「分享」功能继续保留；AI 创作成员只展示<strong>主类型</strong>成员，研学报告页仅针对<strong>主类型</strong>成员。</li>
+                    <li>去掉底部「确认完成」滑动按钮。</li>
+                    <li>用户订单展示调整：增加类型标签、年龄，身份证不打码。</li>
+                </ul>
+            </div>
+        </div>
+        <button class="fp-open" onclick="toggleFuncPanel()" title="展开功能说明">功能说明‹</button>
+    </aside>
+
+    <script>
+        /* ── 右侧功能说明面板：收起 / 展开 ── */
+        function toggleFuncPanel() {
+            document.body.classList.toggle('fp-collapsed');
+        }
+    </script>
 
     <!-- 注释说明框 -->
     <div class="note-card" id="noteCard" style="display:none;">
@@ -458,7 +592,7 @@
             location.href = '研学现场.html';
         }
 
-        /* ===== 注释线：从 AI创作 按钮引出到说明框 ===== */
+        /* ===== 注释线：从 AI创作 按钮引出到手机框外的产品说明框 ===== */
         function drawAnnotation() {
             var btn = document.querySelector('.btn-ai');
             var note = document.getElementById('noteCard');
@@ -466,23 +600,53 @@
             if (!btn) { note.style.display = 'none'; line.style.display = 'none'; return; }
 
             var br = btn.getBoundingClientRect();
+            var appRect = document.querySelector('.app-container').getBoundingClientRect();
             var cardW = 290;
             var margin = 16;
+            var W = window.innerWidth;
 
-            // 说明框放在右侧（屏幕窄时自动内收）
-            var cardX = Math.min(br.right + 24, window.innerWidth - cardW - margin);
-            cardX = Math.max(margin, cardX);
-            var cardTop = Math.max(20, br.top - 70);
+            // 可用范围：避开固定左侧目录栏(232px) 与 右侧功能说明面板(340/40px)
+            var leftLimit = (W >= 1024) ? 240 : 8;
+            var fpW = (W >= 1024) ? (document.body.classList.contains('fp-collapsed') ? 40 : 340) : 0;
+            var rightLimit = W - fpW - 8;
+            var spaceRight = rightLimit - (appRect.right + margin);
+            var spaceLeft = (appRect.left - margin) - leftLimit;
+
+            // 优先放在手机框右侧空白，其次左侧，均不足时放在手机框下方
+            var place = (spaceRight >= cardW) ? 'right'
+                : (spaceLeft >= cardW) ? 'left' : 'bottom';
+
+            var x, y;
+            if (place === 'right') {
+                x = Math.min(appRect.right + margin, rightLimit - cardW);
+                y = Math.max(appRect.top + 10, br.top - 80);
+            } else if (place === 'left') {
+                x = appRect.left - margin - cardW;
+                y = Math.max(appRect.top + 10, br.top - 80);
+            } else {
+                x = appRect.left + (appRect.width - cardW) / 2;
+                y = Math.min(appRect.bottom + margin, Math.max(appRect.top + 10, W - fpW - 240));
+            }
 
             note.style.display = 'block';
-            note.style.left = cardX + 'px';
-            note.style.top = cardTop + 'px';
+            note.style.left = x + 'px';
+            note.style.top = y + 'px';
 
-            // 锚点：按钮右中 / 说明框左中
-            var ax = br.right, ay = br.top + br.height / 2;
-            var cx = cardX, cy = cardTop + note.offsetHeight / 2;
-            var midX = (ax + cx) / 2;
-            var pts = [[ax, ay], [midX, ay], [midX, cy], [cx, cy]];
+            // 锚点：从按钮引向说明框，折线保持横向 / 纵向
+            var ax, ay, cx, cy, pts;
+            if (place === 'right') {
+                ax = br.right; ay = br.top + br.height / 2;
+                cx = x; cy = y + note.offsetHeight / 2;
+                pts = [[ax, ay], [(ax + cx) / 2, ay], [(ax + cx) / 2, cy], [cx, cy]];
+            } else if (place === 'left') {
+                ax = br.left; ay = br.top + br.height / 2;
+                cx = x + cardW; cy = y + note.offsetHeight / 2;
+                pts = [[ax, ay], [(ax + cx) / 2, ay], [(ax + cx) / 2, cy], [cx, cy]];
+            } else {
+                ax = br.left + br.width / 2; ay = br.bottom;
+                cx = x + cardW / 2; cy = y;
+                pts = [[ax, ay], [ax, (ay + cy) / 2], [cx, (ay + cy) / 2], [cx, cy]];
+            }
 
             var xs = pts.map(function(p) { return p[0]; });
             var ys = pts.map(function(p) { return p[1]; });

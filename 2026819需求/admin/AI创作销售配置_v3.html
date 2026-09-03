@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI销售配置 - 管理后台</title>
+    <link rel="stylesheet" href="asset/admin-sidebar.css">
     <style>
         :root {
             --bg: #ffffff;
@@ -30,27 +31,6 @@
             color: var(--ink);
             -webkit-font-smoothing: antialiased;
         }
-
-        .header {
-            background: #fff;
-            height: 56px;
-            display: flex;
-            align-items: center;
-            padding: 0 24px;
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        .header .logo { font-size: 18px; font-weight: 700; color: var(--accent); margin-right: 32px; }
-        .header .nav-list { display: flex; gap: 24px; list-style: none; }
-        .header .nav-list li { font-size: 14px; color: var(--ink-subtle); cursor: pointer; padding: 4px 0; position: relative; }
-        .header .nav-list li:hover { color: var(--accent); }
-        .header .nav-list li.active { color: var(--accent); font-weight: 600; }
-        .header .nav-list li.active::after { content: ''; position: absolute; bottom: -4px; left: 0; right: 0; height: 2px; background: var(--accent); border-radius: 1px; }
-        .header .user-area { margin-left: auto; display: flex; align-items: center; gap: 16px; }
-        .header .user-area .avatar { width: 32px; height: 32px; border-radius: 50%; background: #E8F0FE; display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--accent); }
-        .header .user-area .name { font-size: 14px; color: var(--ink); }
 
         .breadcrumb { padding: 16px 24px 0; font-size: 13px; color: var(--ink-subtle); }
         .breadcrumb a { color: var(--ink-subtle); text-decoration: none; }
@@ -230,29 +210,71 @@
         .btn-save:hover { background: var(--accent-hover); }
 
         @media (max-width: 768px) {
-            .header { padding: 0 16px; }
-            .header .nav-list { display: none; }
             .breadcrumb { padding: 12px 16px 0; }
             .main { padding: 12px 16px 24px; }
+        }
+
+        /* ===== 右侧功能说明面板（后台风格三栏：左侧目录 | 中间内容 | 右侧说明） ===== */
+        .func-panel {
+            position: fixed; top: 0; right: 0; bottom: 0;
+            width: 340px; z-index: 890;
+            background: #fff; border-left: 1px solid #e3e6eb;
+            box-shadow: -1px 0 12px rgba(20, 30, 60, 0.04);
+            display: flex; flex-direction: column;
+        }
+        .func-panel .fp-inner { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+        .func-panel .fp-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px 14px 13px 18px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
+        }
+        .func-panel .fp-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: var(--ink); }
+        .func-panel .fp-title::before {
+            content: ''; width: 8px; height: 8px; border-radius: 50%;
+            background: var(--accent); box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.12);
+        }
+        .func-panel .fp-fold-btn {
+            width: 28px; height: 28px; border: 1px solid var(--border); background: #fff;
+            border-radius: 50%; color: var(--ink-subtle); font-size: 15px; line-height: 1;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .func-panel .fp-fold-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .func-panel .fp-body {
+            flex: 1; overflow-y: auto; padding: 4px 18px 40px;
+            font-size: 13px; color: #555; line-height: 1.9;
+        }
+        .func-panel .fp-body::-webkit-scrollbar { width: 5px; }
+        .func-panel .fp-body::-webkit-scrollbar-thumb { background: #d8dce3; border-radius: 3px; }
+        .func-panel .fp-body h4 { font-size: 14px; font-weight: 600; color: var(--ink); margin: 18px 0 6px; }
+        .func-panel .fp-body h4:first-child { margin-top: 12px; }
+        .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .func-panel .fp-body li { margin-bottom: 6px; }
+        .func-panel .fp-body strong { color: #333; }
+        .func-panel .fp-open {
+            display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+            border: none; background: transparent; cursor: pointer;
+            writing-mode: vertical-rl; text-orientation: upright;
+            font-size: 13px; font-weight: 600; letter-spacing: 6px; color: var(--ink-subtle);
+            align-items: center; justify-content: center; font-family: inherit;
+            transition: all 0.2s;
+        }
+        .func-panel .fp-open:hover { color: var(--accent); background: #fafbfc; }
+
+        @media (min-width: 1024px) {
+            .main, .breadcrumb { margin-right: 340px; }
+            body.fp-collapsed .main,
+            body.fp-collapsed .breadcrumb { margin-right: 40px; }
+            body.fp-collapsed .func-panel { width: 40px; }
+            body.fp-collapsed .fp-inner { display: none; }
+            body.fp-collapsed .fp-open { display: flex; }
+        }
+        @media (max-width: 1023.98px) {
+            .func-panel { display: none; }
+            .main, .breadcrumb { margin-right: 0; }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="logo">离泰数链</div>
-        <ul class="nav-list">
-            <li>概览</li>
-            <li>内容管理</li>
-            <li class="active">AI配置</li>
-            <li onclick="window.location.href='积分规则配置.html'" style="cursor:pointer;">积分管理</li>
-            <li onclick="window.location.href='../系统参数配置.html'" style="cursor:pointer;">系统设置</li>
-        </ul>
-        <div class="user-area">
-            <span class="avatar">管</span>
-            <span class="name">管理员</span>
-        </div>
-    </div>
-
     <div class="breadcrumb">
         <a href="../index.html">首页</a>
         <span class="sep"> &gt; </span>
@@ -441,5 +463,49 @@
 
         loadConfig();
     </script>
+
+    <!-- ===== 右侧功能说明面板（后台风格三栏布局） ===== -->
+    <aside class="func-panel">
+        <div class="fp-inner">
+            <div class="fp-header">
+                <span class="fp-title">功能说明</span>
+                <button class="fp-fold-btn" onclick="toggleFuncPanel()" title="收起功能说明">›</button>
+            </div>
+            <div class="fp-body">
+                <h4>一、页面说明</h4>
+                <ul>
+                    <li>本页为移动端「购买点数」的销售配置入口。用户购买点数后，可用点数兑换 AI 创作次数。</li>
+                    <li>AI 视频、图片创作统一按点数计算，不再区分不同类型的余额。</li>
+                </ul>
+                <h4>二、点数消耗配置</h4>
+                <ul>
+                    <li>维护「点数消耗说明」文案，向用户说明点数的用途与兑换规则。</li>
+                </ul>
+                <h4>三、视频消耗模板</h4>
+                <ul>
+                    <li>按「视频模型 + 分辨率 + 视频时长」匹配点数消耗模板，用户创作视频时自动按匹配的模板扣除点数。</li>
+                    <li>点击「+ 新增消耗模板」可新建多条，模型、分辨率、时长、消耗点数在卡片上直接调整，可随时删除。</li>
+                </ul>
+                <h4>四、图片消耗模板</h4>
+                <ul>
+                    <li>切换到「图片模版」页签，按「图片模型」配置点数消耗模板，用户生成图片时按所选模型扣除对应点数。</li>
+                    <li>可新增多条模板并随时删除。</li>
+                </ul>
+                <h4>五、保存配置</h4>
+                <ul>
+                    <li>确认配置无误后点击「保存配置」一次性保存，页面会提示保存成功。</li>
+                </ul>
+            </div>
+        </div>
+        <button class="fp-open" onclick="toggleFuncPanel()" title="展开功能说明">功能说明‹</button>
+    </aside>
+
+    <script>
+        /* ── 右侧功能说明面板：收起 / 展开 ── */
+        function toggleFuncPanel() {
+            document.body.classList.toggle('fp-collapsed');
+        }
+    </script>
+    <script src="asset/admin-sidebar.js"></script>
 </body>
 </html>

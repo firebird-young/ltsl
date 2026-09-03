@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>课程发布 - 管理后台</title>
+    <link rel="stylesheet" href="asset/admin-sidebar.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -13,35 +14,6 @@
             color: #333;
             padding-bottom: 80px;
         }
-
-        /* 顶部导航 */
-        .header {
-            background: #fff;
-            height: 56px;
-            display: flex;
-            align-items: center;
-            padding: 0 24px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        .header .logo { font-size: 18px; font-weight: 700; color: #0669FF; margin-right: 32px; }
-        .header .nav-list { display: flex; gap: 24px; list-style: none; }
-        .header .nav-list li { font-size: 14px; color: #666; cursor: pointer; padding: 4px 0; position: relative; }
-        .header .nav-list li:hover { color: #0669FF; }
-        .header .nav-list li.active { color: #0669FF; font-weight: 600; }
-        .header .nav-list li.active::after {
-            content: ''; position: absolute; bottom: -4px; left: 0; right: 0;
-            height: 2px; background: #0669FF; border-radius: 1px;
-        }
-        .header .user-area { margin-left: auto; display: flex; align-items: center; gap: 16px; }
-        .header .user-area .avatar {
-            width: 32px; height: 32px; border-radius: 50%; background: #E8F0FE;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 14px; color: #0669FF;
-        }
-        .header .user-area .name { font-size: 14px; color: #333; }
 
         .breadcrumb { padding: 16px 24px 0; font-size: 13px; color: #999; display: flex; align-items: center; gap: 6px; }
         .breadcrumb a { color: #999; text-decoration: none; }
@@ -421,8 +393,6 @@
         .calendar-footer .btn-ok { background: #0669FF; color: #fff; }
 
         @media (max-width: 768px) {
-            .header { padding: 0 16px; }
-            .header .nav-list { display: none; }
             .main { padding: 12px 16px 24px; }
             .form-row { flex-direction: column; }
             .form-label { width: auto; text-align: left; margin-bottom: 6px; padding-top: 0; }
@@ -444,27 +414,68 @@
         .f-modal .fm-body h4:first-child { margin-top: 0; }
         .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
         .f-modal .fm-body li { margin-bottom: 4px; }
+
+        /* ===== 右侧功能说明面板（后台风格三栏布局：左目录 | 中内容 | 右说明） ===== */
+        .func-panel {
+            position: fixed; top: 0; right: 0; bottom: 0;
+            width: 340px; z-index: 890;
+            background: #fff; border-left: 1px solid var(--border, #e3e6eb);
+            box-shadow: -1px 0 12px rgba(20, 30, 60, 0.04);
+            display: flex; flex-direction: column;
+        }
+        .func-panel .fp-inner { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+        .func-panel .fp-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px 14px 13px 18px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
+        }
+        .func-panel .fp-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: var(--ink, #1d1d1f); }
+        .func-panel .fp-title::before {
+            content: ''; width: 8px; height: 8px; border-radius: 50%;
+            background: var(--accent, #0066cc); box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.12);
+        }
+        .func-panel .fp-fold-btn {
+            width: 28px; height: 28px; border: 1px solid var(--border, #e3e6eb); background: #fff;
+            border-radius: 50%; color: var(--ink-subtle, #86868b); font-size: 15px; line-height: 1;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .func-panel .fp-fold-btn:hover { border-color: var(--accent, #0066cc); color: var(--accent, #0066cc); }
+        .func-panel .fp-body {
+            flex: 1; overflow-y: auto; padding: 4px 18px 40px;
+            font-size: 13px; color: #555; line-height: 1.9;
+        }
+        .func-panel .fp-body::-webkit-scrollbar { width: 5px; }
+        .func-panel .fp-body::-webkit-scrollbar-thumb { background: #d8dce3; border-radius: 3px; }
+        .func-panel .fp-body h4 { font-size: 14px; font-weight: 600; color: var(--ink, #1d1d1f); margin: 18px 0 6px; }
+        .func-panel .fp-body h4:first-child { margin-top: 12px; }
+        .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .func-panel .fp-body li { margin-bottom: 6px; }
+        .func-panel .fp-body strong { color: #333; }
+        .func-panel .fp-open {
+            display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+            border: none; background: transparent; cursor: pointer;
+            writing-mode: vertical-rl; text-orientation: upright;
+            font-size: 13px; font-weight: 600; letter-spacing: 6px; color: var(--ink-subtle, #86868b);
+            align-items: center; justify-content: center; font-family: inherit;
+            transition: all 0.2s;
+        }
+        .func-panel .fp-open:hover { color: var(--accent, #0066cc); background: #fafbfc; }
+
+        @media (min-width: 1024px) {
+            .main, .breadcrumb { margin-right: 340px; }
+            body.fp-collapsed .main,
+            body.fp-collapsed .breadcrumb { margin-right: 40px; }
+            body.fp-collapsed .func-panel { width: 40px; }
+            body.fp-collapsed .fp-inner { display: none; }
+            body.fp-collapsed .fp-open { display: flex; }
+        }
+        @media (max-width: 1023.98px) {
+            .func-panel { display: none; }
+            .main, .breadcrumb { margin-right: 0; }
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="logo">离泰数链</div>
-        <ul class="nav-list">
-            <li>首页</li>
-            <li class="active">课程管理</li>
-            <li>场次方案</li>
-            <li>订单管理</li>
-            <li>用户管理</li>
-        </ul>
-        <div style="display:flex;align-items:center;gap:12px">
-            <button class="btn btn-default" onclick="toggleFuncModal()" style="font-size:12px;padding:4px 12px;border-radius:6px;background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4)">📖 功能说明</button>
-            <div class="user-area">
-                <div class="avatar">管</div>
-                <div class="name">管理员</div>
-            </div>
-        </div>
-    </div>
-
     <div class="breadcrumb">
         <a href="#">首页</a>
         <span class="sep">/</span>
@@ -1507,66 +1518,50 @@
     /* 初始化 */
     renderPlanTable();
 
-    /* ================= 功能说明浮窗 ================= */
-    function toggleFuncModal() {
-        var el = document.getElementById('funcModal');
-        el.classList.toggle('show');
-        if (el.classList.contains('show') && !el.dataset.dragged) {
-            el.style.top = '72px';
-            el.style.right = '16px';
-            el.style.left = 'auto';
-            el.style.transform = 'none';
-        }
-    }
-    (function() {
-        var modal, titleBar, offX, offY, dragging = false;
-        document.addEventListener('DOMContentLoaded', function() {
-            modal = document.getElementById('funcModal');
-            titleBar = modal.querySelector('.fm-title');
-            titleBar.addEventListener('mousedown', startDrag);
-            titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
-            document.addEventListener('mousemove', onDrag);
-            document.addEventListener('mouseup', endDrag);
-            document.addEventListener('touchmove', onDragTouch, {passive:true});
-            document.addEventListener('touchend', endDrag);
-        });
-        function startDrag(e) { modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
-        function startDragTouch(e) { var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
-        function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
-        function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
-        function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
-    })();
+
 </script>
 
-<!-- ====== 功能说明浮窗 ====== -->
-<div class="f-modal" id="funcModal">
-    <div class="fm-title">
-        <span>📖 功能说明</span>
-        <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+<!-- ===== 右侧功能说明面板（后台风格三栏布局） ===== -->
+<aside class="func-panel">
+    <div class="fp-inner">
+        <div class="fp-header">
+            <span class="fp-title">功能说明</span>
+            <button class="fp-fold-btn" onclick="toggleFuncPanel()" title="收起功能说明">›</button>
+        </div>
+        <div class="fp-body">
+            <h4>一、页面用途</h4>
+            <ul>
+                <li>课程发布页用于管理员创建研学课程，填写<strong>基本信息、销售设置（含自助核销与场次方案）</strong>后暂存或发布。本页重点为<strong>自助核销</strong>与<strong>场次方案</strong>两大配置。</li>
+            </ul>
+            <h4>二、自助核销</h4>
+            <ul>
+                <li>位于「销售设置」中，开关为<strong>不开启 / 开启</strong>二选一。</li>
+                <li><strong>不开启</strong>：用户端订单页不展示滑动核销，出行前仅按活动时间到场参与。</li>
+                <li><strong>开启</strong>：展开「课程开始前 X 天」步进器，用于设置自助核销的<strong>开放时间</strong>（即出行前 X 天起，用户可在订单详情页滑动核销）。</li>
+                <li>开启后，达到开放时间的订单会展示滑动核销入口，核销后用户进入研学企微群。</li>
+            </ul>
+            <h4>三、场次方案</h4>
+            <ul>
+                <li>必填项。通过右上角「<strong>+ 新增场次</strong>」按钮打开弹窗，场次列表表格展示：<strong>场次名称 / 时间 / 成团规则 / 规格和价格 / 操作</strong>（修改、删除）。</li>
+                <li>弹窗分三步设置：
+                    <ul>
+                        <li><strong>① 基础信息</strong>：填写场次名称；点击时间框弹出日历，<strong>支持多选、可离散选择</strong>日期。</li>
+                        <li><strong>② 规格设置</strong>：<strong>主类型默认存在</strong>（如：学生），可添加其他类型（如：家长）；每个类型下可添加多个规格，配置<strong>规格名称、价格（元/人）、年龄限制</strong>（可启用起止年龄段）。</li>
+                        <li><strong>③ 成团规则</strong>：按主类型所有规格购买数量合计计算——设置最低成团人数与购买上限人数；设置活动开始前最晚确认 X 天。</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
     </div>
-    <div class="fm-body">
-        <p style="margin:0 0 12px;color:#666">课程发布页用于管理员创建研学课程，填写基本信息、销售设置（含自助核销与场次方案）后暂存或发布。本次仅新增<strong>自助核销</strong>与<strong>场次方案</strong>两个功能点。</p>
+    <button class="fp-open" onclick="toggleFuncPanel()" title="展开功能说明">功能说明‹</button>
+</aside>
 
-        <h4>一、自助核销</h4>
-        <ul>
-            <li>位于"销售设置"中，开关为<strong>不开启 / 开启</strong>二选一。</li>
-            <li><strong>不开启</strong>：用户端订单页不展示滑动核销，出行前仅按活动时间到场参与。</li>
-            <li><strong>开启</strong>：展开"课程开始前 <strong>X</strong> 天"步进器，用于设置自主核销的<strong>开放时间</strong>（即出行前 X 天起，用户可在订单详情页滑动核销）。</li>
-            <li>开启后，达到开放时间的订单会展示滑动核销入口，核销后用户进入研学企微群。</li>
-        </ul>
-
-        <h4>二、场次方案</h4>
-        <ul>
-            <li>必填项。通过右上角"<strong>+ 新增场次</strong>"按钮打开弹窗，场次列表表格展示：<strong>场次名称 / 时间 / 成团规则 / 规格和价格 / 操作</strong>（修改、删除）。</li>
-            <li>弹窗分三步设置：
-                <ul>
-                    <li><strong>① 基础信息</strong>：填写场次名称；点击时间框弹出日历，<strong>支持多选、可离散选择</strong>日期。</li>
-                    <li><strong>② 规格设置</strong>：<strong>主类型默认存在</strong>（如：学生），可"添加其他类型"（如：家长）；每个类型下可添加多个规格，配置<strong>规格名称、价格（元/人）、年龄限制</strong>（可启用起止年龄段）。</li>
-                    <li><strong>③ 成团规则</strong>：按主类型所有规格购买数量合计计算——设置最低成团人数与购买上限人数；设置活动开始前最晚确认 X 天。</li>
-                </ul>
-            </li>
-        </ul>
-    </div>
-</div>
+<script>
+    /* ── 右侧功能说明面板：收起 / 展开 ── */
+    function toggleFuncPanel() {
+        document.body.classList.toggle('fp-collapsed');
+    }
+</script>
+<script src="asset/admin-sidebar.js"></script>
 </body>
 </html>
