@@ -549,16 +549,18 @@
     }
 
     function buildActions(g) {
-        var html = '<button class="action-btn btn-view" onclick="showDetail(\'' + g.id + '\')">查看</button>';
+        var html = '';
         if (g.status === 'wait') {
-            html += '<button class="action-btn btn-finish" onclick="finishGroup(\'' + g.id + '\')">手动完成</button>';
+            html += '<button class="action-btn btn-finish" onclick="finishGroup(\'' + g.id + '\')">手动成团</button>';
         } else if (g.status === 'active') {
+            html += '<button class="action-btn btn-finish" onclick="finishGroup(\'' + g.id + '\')">确认完成</button>';
             html += '<button class="action-btn btn-remind" onclick="sendRemind(\'' + g.id + '\')">发送提醒</button>';
             html += '<button class="action-btn btn-view" onclick="reportManage(\'' + g.id + '\')">研学报告管理</button>';
         } else if (g.status === 'done') {
             html += '<button class="action-btn btn-view" onclick="reportManage(\'' + g.id + '\')">研学报告管理</button>';
         }
         html += '<button class="action-btn btn-verify" onclick="openQrModal(\'' + g.id + '\')">企微群</button>';
+        html += '<button class="action-btn btn-view" onclick="showDetail(\'' + g.id + '\')">查看</button>';
         return html;
     }
 
@@ -567,10 +569,14 @@
         alert('已发送出行提醒');
     }
     function finishGroup(id) {
-        if (!confirm('确定手动完成该拼团？')) return;
         var g = groups.find(function(x) { return x.id === id; });
-        if (g) { g.status = 'done'; g.groupTime = new Date().toLocaleString('zh-CN', { hour12: false }); updateBadges(); renderTable(); }
-        alert('拼团已标记为完成');
+        if (!g) return;
+        var isWait = g.status === 'wait';
+        if (!confirm(isWait ? '确定手动成团该拼团？' : '确定该拼团行程已完成？')) return;
+        g.status = 'done';
+        g.groupTime = new Date().toLocaleString('zh-CN', { hour12: false });
+        updateBadges(); renderTable();
+        alert(isWait ? '拼团已手动成团' : '拼团行程已确认完成');
     }
     function reportManage(id) {
         alert('打开研学报告管理：' + id);
@@ -774,11 +780,12 @@
             </ul>
             <h4>五、操作列</h4>
             <ul>
-                <li><strong>查看</strong>：所有订单均提供，点击查看订单详情。</li>
-                <li><strong>手动完成</strong>：仅「待成团」状态的订单显示，用于人工确认成团；二次确认后订单状态变为「已完成」并记录成团时间。</li>
+                <li><strong>手动成团</strong>：仅「待成团」状态的订单显示，人工确认成团；二次确认后订单状态变为「待出行」并记录成团时间。</li>
+                <li><strong>确认完成</strong>：仅「待出行」状态的订单显示，确认该拼团行程已完成；二次确认后订单状态变为「已完成」。</li>
                 <li><strong>发送提醒</strong>：仅「待出行」状态的订单显示，向参团用户发送出行提醒；二次确认后提示「已发送出行提醒」。</li>
-                <li><strong>企微群</strong>：所有订单均提供，弹出企微群二维码上传弹窗，支持选择图片预览上传，保存后提示「企微群图片已保存」。</li>
                 <li><strong>研学报告管理</strong>：仅「待出行」「已完成」状态的订单显示，点击跳转至该订单的研学报告管理页。</li>
+                <li><strong>企微群</strong>：所有订单均提供，弹出企微群二维码上传弹窗，支持选择图片预览上传，保存后提示「企微群图片已保存」。</li>
+                <li><strong>查看</strong>：所有订单均提供，点击查看订单详情。</li>
                 <li><strong>导出</strong>：右上角「📥 导出」按钮，将当前列表数据导出。</li>
             </ul>
         </div>
