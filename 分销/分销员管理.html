@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分销员管理 - 管理后台</title>
+    <link rel="stylesheet" href="asset/admin-sidebar.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+            background: #f5f5f7;
+            min-height: 100vh;
+            color: #1d1d1f;
+        }
+        .breadcrumb { padding: 16px 24px 0; font-size: 13px; color: #86868b; }
+        .breadcrumb a { color: #86868b; text-decoration: none; }
+        .breadcrumb a:hover { color: #0066cc; }
+        .breadcrumb .current { color: #1d1d1f; font-weight: 500; }
+
+        .main { padding: 16px 24px 40px; }
+
+        /* 统计卡片 */
+        .stat-row { display: flex; gap: 16px; margin-bottom: 20px; }
+        .stat-card {
+            flex: 1; background: #fff; border-radius: 18px; padding: 18px 20px;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.06);
+        }
+        .stat-card .sc-label { font-size: 13px; color: #86868b; }
+        .stat-card .sc-value { font-size: 24px; font-weight: 700; color: #1d1d1f; margin-top: 4px; }
+        .stat-card .sc-value.blue { color: #0066cc; }
+        .stat-card .sc-value.green { color: #34c759; }
+        .stat-card .sc-value.orange { color: #ff9500; }
+
+        /* 筛选 */
+        .filter-bar {
+            display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;
+        }
+        .filter-bar .search-input {
+            flex: 1; min-width: 200px; height: 38px; border: 1px solid #e0e0e0; border-radius: 9999px;
+            padding: 0 16px; font-size: 13px; outline: none; transition: border-color 0.2s;
+        }
+        .filter-bar .search-input:focus { border-color: #0066cc; box-shadow: 0 0 0 2px rgba(0,102,204,0.08); }
+
+        /* 表格 */
+        .table-wrap {
+            background: #fff; border-radius: 18px; overflow-x: auto; box-shadow: 0 0 0 1px rgba(0,0,0,0.06);
+        }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        thead th {
+            font-size: 12px; font-weight: 600; color: #86868b; text-align: left;
+            padding: 12px 16px; border-bottom: 1px solid #e0e0e0; background: #fafafc;
+        }
+        tbody td {
+            font-size: 13px; color: #333; padding: 14px 16px; border-bottom: 1px solid #f5f5f5;
+        }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: #FAFBFF; }
+
+        .tag {
+            display: inline-block; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 500;
+        }
+        .tag.green { background: #E8F5E9; color: #389E0D; }
+        .tag.orange { background: #FFF7E6; color: #D48806; }
+        .tag.blue { background: #E8F0FE; color: #0066cc; }
+
+        .dist-link {
+            color: #0066cc; text-decoration: none; font-weight: 500; cursor: pointer;
+        }
+        .dist-link:hover { text-decoration: underline; }
+
+        .pagination { display: flex; justify-content: center; gap: 6px; margin-top: 16px; }
+        .pagination .page-btn {
+            width: 34px; height: 34px; border: 1px solid #e0e0e0; border-radius: 9999px;
+            display: flex; align-items: center; justify-content: center; font-size: 13px;
+            color: #86868b; cursor: pointer; background: #fff; transition: all 0.2s;
+        }
+        .pagination .page-btn:hover { border-color: #0066cc; color: #0066cc; }
+        .pagination .page-btn.active { background: #0066cc; color: #fff; border-color: #0066cc; }
+        .pagination .page-btn.disabled { opacity: 0.4; cursor: default; }
+
+        /* ===== 右侧功能说明面板 ===== */
+        .func-panel {
+            position: fixed; top: 0; right: 0; bottom: 0;
+            width: 340px; z-index: 890;
+            background: #fff; border-left: 1px solid #e3e6eb;
+            box-shadow: -1px 0 12px rgba(20, 30, 60, 0.04);
+            display: flex; flex-direction: column;
+        }
+        .func-panel .fp-inner { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+        .func-panel .fp-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px 14px 13px 18px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
+        }
+        .func-panel .fp-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: #1d1d1f; }
+        .func-panel .fp-title::before {
+            content: ''; width: 8px; height: 8px; border-radius: 50%;
+            background: #0066cc; box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.12);
+        }
+        .func-panel .fp-fold-btn {
+            width: 28px; height: 28px; border: 1px solid #e0e0e0; background: #fff;
+            border-radius: 50%; color: #86868b; font-size: 15px; line-height: 1;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+        }
+        .func-panel .fp-fold-btn:hover { border-color: #0066cc; color: #0066cc; }
+        .func-panel .fp-body {
+            flex: 1; overflow-y: auto; padding: 4px 18px 40px;
+            font-size: 13px; color: #555; line-height: 1.9;
+        }
+        .func-panel .fp-body::-webkit-scrollbar { width: 5px; }
+        .func-panel .fp-body::-webkit-scrollbar-thumb { background: #d8dce3; border-radius: 3px; }
+        .func-panel .fp-body h4 { font-size: 14px; font-weight: 600; color: #1d1d1f; margin: 18px 0 6px; }
+        .func-panel .fp-body h4:first-child { margin-top: 12px; }
+        .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .func-panel .fp-body li { margin-bottom: 6px; }
+        .func-panel .fp-body strong { color: #333; }
+        .func-panel .fp-open {
+            display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+            border: none; background: transparent; cursor: pointer;
+            writing-mode: vertical-rl; text-orientation: upright;
+            font-size: 13px; font-weight: 600; letter-spacing: 6px; color: #86868b;
+            align-items: center; justify-content: center; font-family: inherit; transition: all 0.2s;
+        }
+        .func-panel .fp-open:hover { color: #0066cc; background: #fafbfc; }
+
+        @media (min-width: 1024px) {
+            .main, .breadcrumb { margin-right: 340px; }
+            body.fp-collapsed .main,
+            body.fp-collapsed .breadcrumb { margin-right: 40px; }
+            body.fp-collapsed .func-panel { width: 40px; }
+            body.fp-collapsed .fp-inner { display: none; }
+            body.fp-collapsed .fp-open { display: flex; }
+        }
+        @media (max-width: 1023.98px) {
+            .func-panel { display: none; }
+            .main, .breadcrumb { margin-right: 0; }
+        }
+    </style>
+</head>
+<body>
+<div class="breadcrumb">
+    <a href="分销.html">分销中心</a>
+    <span> / </span>
+    <span class="current">分销员管理</span>
+</div>
+
+<div class="main">
+    <div class="stat-row">
+        <div class="stat-card">
+            <div class="sc-label">分销员总数</div>
+            <div class="sc-value blue" id="totalCount">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="sc-label">本月新增</div>
+            <div class="sc-value green" id="newThisMonth">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="sc-label">本月总佣金</div>
+            <div class="sc-value orange" id="monthCommission">¥0</div>
+        </div>
+        <div class="stat-card">
+            <div class="sc-label">活跃分销员</div>
+            <div class="sc-value" id="activeCount">0</div>
+        </div>
+    </div>
+
+    <div class="filter-bar">
+        <input class="search-input" id="searchInput" placeholder="搜索分销员姓名、手机号..." oninput="doSearch()">
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>分销员</th>
+                    <th>手机号</th>
+                    <th>等级</th>
+                    <th>分销订单</th>
+                    <th>订单总额</th>
+                    <th>总佣金</th>
+                    <th>分佣比例</th>
+                    <th>当前余额</th>
+                    <th>状态</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+    <div class="pagination" id="pagination"></div>
+</div>
+
+<script>
+    var distData = [
+        { name: '王小明', phone: '13812345678', level: '金牌分销员', levelTag: 'Lv.3', orders: 9, orderAmount: 1723.33, commission: 258.50, rate: '15%', balance: 86.00, monthNew: true, monthActive: true },
+        { name: '李大力', phone: '18698765432', level: '银牌分销员', levelTag: 'Lv.2', orders: 6, orderAmount: 1130.00, commission: 169.50, rate: '15%', balance: 67.20, monthNew: false, monthActive: true },
+        { name: '张小红', phone: '13655667788', level: '金牌分销员', levelTag: 'Lv.3', orders: 4, orderAmount: 1120.00, commission: 168.00, rate: '15%', balance: 880.00, monthNew: true, monthActive: true },
+        { name: '赵思远', phone: '15099887766', level: '铜牌分销员', levelTag: 'Lv.1', orders: 2, orderAmount: 373.33, commission: 56.00, rate: '15%', balance: 0.00, monthNew: false, monthActive: false },
+        { name: '刘佳', phone: '17712340987', level: '银牌分销员', levelTag: 'Lv.2', orders: 5, orderAmount: 890.00, commission: 133.50, rate: '15%', balance: 0.00, monthNew: false, monthActive: true },
+        { name: '陈伟', phone: '18856781234', level: '铜牌分销员', levelTag: 'Lv.1', orders: 1, orderAmount: 150.00, commission: 22.50, rate: '15%', balance: 22.50, monthNew: true, monthActive: false },
+    ];
+
+    var page = 1, pageSize = 8;
+
+    function fmt(n) { return n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+
+    function doSearch() { page = 1; render(); }
+
+    function render() {
+        var keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+        var filtered = distData.filter(function(d) {
+            return keyword === '' || d.name.indexOf(keyword) !== -1 || d.phone.indexOf(keyword) !== -1;
+        });
+
+        // 统计
+        var total = distData.length;
+        var monthNew = distData.filter(function(d) { return d.monthNew; }).length;
+        var monthComm = distData.reduce(function(s, d) { return s + d.commission; }, 0);
+        var active = distData.filter(function(d) { return d.monthActive; }).length;
+        document.getElementById('totalCount').textContent = total;
+        document.getElementById('newThisMonth').textContent = monthNew;
+        document.getElementById('monthCommission').textContent = '¥' + fmt(monthComm);
+        document.getElementById('activeCount').textContent = active;
+
+        var totalPages = Math.ceil(filtered.length / pageSize) || 1;
+        var start = (page - 1) * pageSize;
+        var pageData = filtered.slice(start, start + pageSize);
+
+        var html = '';
+        pageData.forEach(function(d) {
+            var statusTag = d.monthActive
+                ? '<span class="tag green">活跃</span>'
+                : '<span class="tag orange">沉睡</span>';
+            html += '<tr>'
+                + '<td><a class="dist-link" href="分销员详情.html?name=' + encodeURIComponent(d.name) + '&phone=' + d.phone + '">' + d.name + '</a></td>'
+                + '<td style="font-family:monospace;">' + d.phone + '</td>'
+                + '<td>' + d.level + ' <span style="font-size:11px;color:#999;">' + d.levelTag + '</span></td>'
+                + '<td><b>' + d.orders + '</b></td>'
+                + '<td>¥' + fmt(d.orderAmount) + '</td>'
+                + '<td>¥' + fmt(d.commission) + '</td>'
+                + '<td>' + d.rate + '</td>'
+                + '<td><b>' + (d.balance > 0 ? '¥' + fmt(d.balance) : '<span style="color:#ccc;">¥0.00</span>') + '</b></td>'
+                + '<td>' + statusTag + '</td>'
+                + '</tr>';
+        });
+        if (!html) html = '<tr><td colspan="9" style="text-align:center;color:#999;padding:40px;">暂无数据</td></tr>';
+        document.getElementById('tableBody').innerHTML = html;
+
+        // 分页
+        var ph = '';
+        ph += page > 1 ? '<div class="page-btn" onclick="goPage(' + (page-1) + ')">‹</div>' : '<div class="page-btn disabled">‹</div>';
+        for (var i = 1; i <= totalPages; i++) {
+            ph += '<div class="page-btn' + (i === page ? ' active' : '') + '" onclick="goPage(' + i + ')">' + i + '</div>';
+        }
+        ph += page < totalPages ? '<div class="page-btn" onclick="goPage(' + (page+1) + ')">›</div>' : '<div class="page-btn disabled">›</div>';
+        document.getElementById('pagination').innerHTML = ph;
+    }
+
+    function goPage(p) { page = p; render(); }
+
+    render();
+</script>
+<!-- ===== 右侧功能说明面板 ===== -->
+<aside class="func-panel">
+    <div class="fp-inner">
+        <div class="fp-header">
+            <span class="fp-title">功能说明</span>
+            <button class="fp-fold-btn" onclick="toggleFuncPanel()" title="收起功能说明">›</button>
+        </div>
+        <div class="fp-body">
+            <h4>一、统计概览</h4>
+            <ul>
+                <li><strong>分销员总数</strong>：当前平台全部注册分销员人数；</li>
+                <li><strong>本月新增</strong>：本月新加入的分销员人数；</li>
+                <li><strong>本月总佣金</strong>：本月累计发放的分销佣金总额；</li>
+                <li><strong>活跃分销员</strong>：近期有推广订单的分销员（活跃）数量。</li>
+            </ul>
+            <h4>二、搜索筛选</h4>
+            <ul>
+                <li>顶部搜索框支持按分销员<strong>姓名、手机号</strong>实时模糊查询，输入即过滤；</li>
+                <li>统计卡片数字随列表筛选自动联动，但统计的是全量数据。</li>
+            </ul>
+            <h4>三、分销员列表</h4>
+            <ul>
+                <li><strong>分销员姓名</strong>：蓝色链接，点击进入该分销员的详情页（带个人佣金与推广订单数据）；</li>
+                <li><strong>等级</strong>：钻石/钻石/金牌/银牌/铜牌，对应 Lv.1~Lv.5，等级决定佣金比例；</li>
+                <li><strong>分销订单 / 订单总额</strong>：该分销员推广成交的订单数与订单金额合计；</li>
+                <li><strong>总佣金</strong>：累计产生佣金；<strong>分佣比例</strong>：当前按订单金额计提的比例；</li>
+                <li><strong>当前余额</strong>：已结算待打款金额；</li>
+                <li><strong>状态</strong>：活跃（绿）/ 沉睡（橙，三个月内无推广）；</li>
+                <li><strong>分页</strong>：每页 8 条，支持前后翻页。</li>
+            </ul>
+        </div>
+    </div>
+    <button class="fp-open" onclick="toggleFuncPanel()" title="展开功能说明">功能说明‹</button>
+</aside>
+
+<script>
+    /* ── 右侧功能说明面板：收起 / 展开 ── */
+    function toggleFuncPanel() {
+        document.body.classList.toggle('fp-collapsed');
+    }
+</script>
+<script src="asset/admin-sidebar.js"></script>
+</body>
+</html>

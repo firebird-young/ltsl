@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的推广 - 推广合作协议与实名认证</title>
+    <link rel="stylesheet" href="asset/admin-sidebar.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', 'Microsoft YaHei', Arial, sans-serif;
+            background: #f5f5f7; min-height: 100vh; color: #1d1d1f;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        :root {
+            --accent: #0066FF;
+            --accent-dark: #0047B3;
+            --text-main: #1d1d1f;
+            --text-sub: #666666;
+            --text-weak: #999999;
+            --line: #f0f0f0;
+        }
+
+        /* ===== 中间内容区（手机原型预览） ===== */
+        .main { padding: 16px 24px 48px; }
+        .stage-tip {
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
+            margin-bottom: 12px; flex-wrap: wrap;
+        }
+        .stage-tip .st-label { font-size: 13px; color: #86868b; }
+        .stage-tip .st-badge {
+            font-size: 12px; font-weight: 600; color: #0066FF;
+            background: #fff; border: 1px solid #b8d5ff; border-radius: 9999px; padding: 4px 14px;
+        }
+
+        /* ===== 手机页面容器 ===== */
+        .app-container {
+            position: relative;
+            width: 100%; max-width: 430px; margin: 0 auto;
+            background: #f5f5f5; border-radius: 18px;
+            box-shadow: 0 10px 34px rgba(30, 60, 120, 0.14);
+        }
+        @media (max-width: 540px) {
+            .app-container { border-radius: 0; box-shadow: none; }
+            .page-top { border-radius: 0; }
+        }
+
+        /* ===== 顶部：状态栏 + 标题栏 ===== */
+        .page-top {
+            position: sticky; top: 0; z-index: 80;
+            border-radius: 18px 18px 0 0; overflow: hidden;
+            box-shadow: 0 2px 10px rgba(20, 40, 90, 0.08);
+        }
+        .status-bar {
+            height: 44px; background: #fff; color: #1d1d1f;
+            display: flex; align-items: center; justify-content: space-between; padding: 0 20px;
+        }
+        .status-bar .sb-time { font-size: 15px; font-weight: 600; letter-spacing: 0.3px; }
+        .status-bar .sb-date { font-size: 12px; color: #666; }
+        .status-bar .sb-right { display: flex; align-items: center; gap: 7px; }
+        .status-bar .sb-signal { display: inline-flex; align-items: flex-end; gap: 1.5px; height: 11px; }
+        .status-bar .sb-signal i { width: 3px; border-radius: 1px; background: currentColor; }
+        .status-bar .sb-signal i:nth-child(1) { height: 4px; }
+        .status-bar .sb-signal i:nth-child(2) { height: 6px; }
+        .status-bar .sb-signal i:nth-child(3) { height: 8px; }
+        .status-bar .sb-signal i:nth-child(4) { height: 11px; }
+        .status-bar .sb-wifi { width: 15px; height: 11px; position: relative; display: inline-block; }
+        .status-bar .sb-wifi::before {
+            content: ''; position: absolute; left: 50%; bottom: 0; transform: translateX(-50%);
+            width: 5px; height: 5px; border-radius: 50%; background: currentColor;
+        }
+        .status-bar .sb-wifi::after {
+            content: ''; position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%);
+            width: 14px; height: 14px; box-sizing: border-box;
+            border-top: 2px solid currentColor; border-radius: 50%;
+        }
+        .status-bar .sb-batt {
+            width: 25px; height: 12px; border: 1.4px solid currentColor; border-radius: 3px;
+            padding: 1.5px; box-sizing: border-box; position: relative;
+        }
+        .status-bar .sb-batt::after {
+            content: ''; position: absolute; right: -3.5px; top: 50%; transform: translateY(-50%);
+            width: 2px; height: 5px; background: currentColor; border-radius: 0 1px 1px 0;
+        }
+        .status-bar .sb-batt i { display: block; height: 100%; width: 78%; background: currentColor; border-radius: 1px; }
+
+        .top-nav {
+            height: 50px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            display: flex; align-items: center; padding: 0 14px;
+        }
+        .top-nav .back-btn {
+            width: 32px; height: 32px; border: none; background: none;
+            display: flex; align-items: center; justify-content: flex-start;
+            color: #fff; font-size: 30px; line-height: 1; cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .top-nav .top-nav-title { flex: 1; text-align: center; font-size: 17px; font-weight: 600; color: #fff; }
+        .top-nav .right-space { width: 32px; }
+
+        /* ===== 步骤指示条 ===== */
+        .phone-body { padding: 14px 16px 24px; }
+        .step-bar {
+            display: flex; align-items: center; justify-content: center;
+            gap: 10px; margin-bottom: 14px;
+        }
+        .step-seg { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-weak); }
+        .step-seg i {
+            width: 18px; height: 18px; border-radius: 50%;
+            background: #e3e6ee; color: #fff; font-style: normal;
+            font-size: 11px; font-weight: 600;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .step-seg.on { color: var(--accent); font-weight: 600; }
+        .step-seg.on i { background: linear-gradient(135deg, var(--accent), var(--accent-dark)); }
+        .step-seg.done { color: #1d9e58; font-weight: 600; }
+        .step-seg.done i { background: #27ae60; }
+        .step-seg i svg { width: 10px; height: 10px; color: #fff; display: none; }
+        .step-seg.done i svg { display: block; }
+        .step-line { width: 44px; height: 2px; border-radius: 2px; background: #e3e6ee; }
+        .step-line.on { background: var(--accent); }
+
+        /* ===== 推广协议 ===== */
+        .proto-card {
+            background: #fff; border-radius: 16px; overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+        }
+        .proto-head {
+            display: flex; align-items: center; gap: 12px;
+            padding: 16px 16px 14px; border-bottom: 1px solid var(--line);
+        }
+        .proto-head .ic {
+            width: 46px; height: 46px; border-radius: 14px; flex-shrink: 0;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            display: flex; align-items: center; justify-content: center;
+        }
+        .proto-head .ic svg { width: 24px; height: 24px; color: #fff; }
+        .proto-head .t1 { font-size: 16px; font-weight: 700; }
+        .proto-head .t2 { font-size: 12px; color: var(--text-weak); margin-top: 4px; }
+        .agree-scroll {
+            height: 448px; overflow-y: auto; -webkit-overflow-scrolling: touch;
+            margin: 14px 14px 6px;
+            background: #fbfcfe; border: 1px solid #eef1f6; border-radius: 12px;
+            padding: 12px 16px 20px;
+        }
+        .agree-scroll::-webkit-scrollbar { width: 4px; }
+        .agree-scroll::-webkit-scrollbar-thumb { background: #d3d9e3; border-radius: 4px; }
+        .clause-title { font-size: 13.5px; font-weight: 700; color: var(--accent-dark); margin: 16px 0 6px; }
+        .clause-title:first-child { margin-top: 4px; }
+        .agree-scroll p { font-size: 13px; color: #4a4a52; line-height: 1.95; margin-bottom: 8px; }
+        .agree-scroll p b { color: #333; }
+        .agree-scroll .end-flag {
+            text-align: center; color: #27ae60; font-size: 12px;
+            border-top: 1px dashed #dfe4ec; margin-top: 14px; padding-top: 12px;
+        }
+
+        /* 底部操作条 */
+        .agree-bar {
+            padding: 12px 14px 6px;
+        }
+        .agree-meta {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 12px; color: var(--text-sub);
+            min-height: 20px; margin-bottom: 10px;
+        }
+        .agree-chip {
+            flex-shrink: 0; min-width: 64px; text-align: center;
+            font-size: 12px; font-weight: 600; border-radius: 9999px; padding: 2px 10px;
+        }
+        .agree-chip.gray { background: #f0f2f5; color: #8a8f99; }
+        .agree-chip.blue { background: #e8f1ff; color: var(--accent); }
+        .agree-chip.green { background: #e9f7ef; color: #1d9e58; }
+        .primary-btn {
+            width: 100%; height: 48px; border: none; border-radius: 24px;
+            background: #b9c9e8; color: #fff; font-size: 16px; font-weight: 600;
+            letter-spacing: 1px; cursor: not-allowed;
+            transition: all .2s; -webkit-tap-highlight-color: transparent;
+        }
+        .primary-btn.on {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            cursor: pointer;
+        }
+        .primary-btn.on:active { transform: scale(0.98); }
+        .back-home {
+            display: block; text-align: center; font-size: 12.5px;
+            color: var(--text-weak); text-decoration: none; margin-top: 14px;
+        }
+
+        /* ===== 实名认证 ===== */
+        .form-card {
+            background: #fff; border-radius: 16px; padding: 18px 16px 20px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+        }
+        .form-title {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 16px; font-weight: 700;
+        }
+        .form-title svg { width: 18px; height: 18px; color: var(--accent); }
+        .form-sub {
+            font-size: 12.5px; color: var(--text-sub); line-height: 1.8;
+            margin: 8px 0 16px; padding: 10px 12px;
+            background: #f4f8ff; border-radius: 10px;
+        }
+        .form-sub b { color: var(--accent-dark); font-weight: 700; }
+        .field { display: block; margin-bottom: 14px; }
+        .f-label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+        .f-box {
+            display: flex; align-items: center; gap: 8px;
+            height: 46px; padding: 0 12px;
+            background: #f6f7f9; border: 1px solid #e8eaee; border-radius: 12px;
+            transition: border-color .2s, background .2s;
+        }
+        .f-box:focus-within { border-color: var(--accent); background: #fff; }
+        .f-box svg { width: 18px; height: 18px; color: #9aa2ae; flex-shrink: 0; }
+        .f-box input {
+            flex: 1; border: none; outline: none; background: transparent;
+            font-size: 15px; letter-spacing: 1px; color: var(--text-main);
+        }
+        .f-box input::placeholder { color: #b6bac3; letter-spacing: 0; }
+        .form-err {
+            display: none; font-size: 12px; color: #e5453f;
+            margin: 2px 0 10px; padding-left: 4px;
+        }
+        /* ===== 核验遮罩 ===== */
+        .verify-mask {
+            position: absolute; inset: 0; z-index: 200;
+            background: rgba(245, 246, 249, 0.86);
+            backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 18px;
+        }
+        .verify-card {
+            width: 280px; background: #fff; border-radius: 18px;
+            padding: 30px 22px 24px; text-align: center;
+            box-shadow: 0 12px 40px rgba(20, 40, 100, 0.16);
+        }
+        .v-main { width: 74px; height: 74px; margin: 0 auto 14px; position: relative; }
+        .v-main .spin-ring {
+            width: 74px; height: 74px; border-radius: 50%;
+            border: 3px solid #e4e9f2; border-top-color: var(--accent);
+            animation: vspin 0.9s linear infinite;
+        }
+        .v-main .shield-ic {
+            position: absolute; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .v-main .shield-ic svg { width: 34px; height: 34px; color: var(--accent); }
+        .v-main .ok-ic {
+            display: none; width: 74px; height: 74px; border-radius: 50%;
+            background: #27ae60; align-items: center; justify-content: center;
+            animation: okpop 0.4s ease;
+        }
+        .v-main .ok-ic svg { width: 38px; height: 38px; color: #fff; }
+        @keyframes vspin { to { transform: rotate(360deg); } }
+        @keyframes okpop {
+            from { transform: scale(0.4); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .v-title { font-size: 16px; font-weight: 700; }
+        .v-desc { font-size: 12.5px; color: var(--text-sub); line-height: 1.7; margin-top: 6px; }
+        .v-flow { list-style: none; margin-top: 18px; text-align: left; }
+        .v-flow li {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 13px; color: #8a8f99; padding: 7px 4px;
+        }
+        .v-flow li i {
+            width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0;
+            background: #eceff4; display: flex; align-items: center; justify-content: center;
+        }
+        .v-flow li i svg { width: 10px; height: 10px; color: #fff; display: none; }
+        .v-flow li.run { color: var(--accent); font-weight: 600; }
+        .v-flow li.run i { background: #fff; border: 2px solid var(--accent); border-top-color: transparent; border-radius: 50%; animation: vspin 0.8s linear infinite; }
+        .v-flow li.done { color: #1d9e58; }
+        .v-flow li.done i { background: #27ae60; }
+        .v-flow li.done i svg { display: block; }
+
+        .hidden { display: none !important; }
+
+        /* ===== 右侧功能说明面板 ===== */
+        .func-panel {
+            position: fixed; top: 0; right: 0; bottom: 0;
+            width: 340px; z-index: 890;
+            background: #fff; border-left: 1px solid #e3e6eb;
+            box-shadow: -1px 0 12px rgba(20, 30, 60, 0.04);
+            display: flex; flex-direction: column;
+        }
+        .func-panel .fp-inner { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+        .func-panel .fp-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px 14px 13px 18px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
+        }
+        .func-panel .fp-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: #1d1d1f; }
+        .func-panel .fp-title::before {
+            content: ''; width: 8px; height: 8px; border-radius: 50%;
+            background: var(--accent); box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.12);
+        }
+        .func-panel .fp-fold-btn {
+            width: 28px; height: 28px; border: 1px solid #e0e0e0; background: #fff;
+            border-radius: 50%; color: #86868b; font-size: 15px; line-height: 1;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+        }
+        .func-panel .fp-fold-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .func-panel .fp-body {
+            flex: 1; overflow-y: auto; padding: 4px 18px 40px;
+            font-size: 13px; color: #555; line-height: 1.9;
+        }
+        .func-panel .fp-body::-webkit-scrollbar { width: 5px; }
+        .func-panel .fp-body::-webkit-scrollbar-thumb { background: #d8dce3; border-radius: 3px; }
+        .func-panel .fp-body h4 { font-size: 14px; font-weight: 600; color: #1d1d1f; margin: 18px 0 6px; }
+        .func-panel .fp-body h4:first-child { margin-top: 12px; }
+        .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .func-panel .fp-body li { margin-bottom: 6px; }
+        .func-panel .fp-body strong { color: #333; }
+        .func-panel .fp-open {
+            display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+            border: none; background: transparent; cursor: pointer;
+            writing-mode: vertical-rl; text-orientation: upright;
+            font-size: 13px; font-weight: 600; letter-spacing: 6px; color: #86868b;
+            align-items: center; justify-content: center; font-family: inherit; transition: all 0.2s;
+        }
+        .func-panel .fp-open:hover { color: var(--accent); background: #fafbfc; }
+
+        @media (min-width: 1024px) {
+            .main { margin-right: 340px; }
+            body.fp-collapsed .main { margin-right: 40px; }
+            body.fp-collapsed .func-panel { width: 40px; }
+            body.fp-collapsed .fp-inner { display: none; }
+            body.fp-collapsed .fp-open { display: flex; }
+        }
+        @media (max-width: 1023.98px) {
+            .func-panel { display: none; }
+            .main { margin-right: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="main">
+    <div class="stage-tip">
+        <span class="st-label">分销中心 · 我的推广</span>
+        <span class="st-badge">📱 移动端页面</span>
+    </div>
+
+    <div class="app-container">
+        <header class="page-top">
+            <div class="status-bar">
+                <span class="sb-left">
+                    <span class="sb-time" id="sbTime">9:41</span>
+                    <span class="sb-date" id="sbDate">9月8日 星期二</span>
+                </span>
+                <span class="sb-right">
+                    <span class="sb-signal"><i></i><i></i><i></i><i></i></span>
+                    <span class="sb-wifi"></span>
+                    <span class="sb-batt"><i></i></span>
+                </span>
+            </div>
+            <div class="top-nav">
+                <button class="back-btn" onclick="goBack()" aria-label="返回">‹</button>
+                <div class="top-nav-title" id="navTitle">我的推广</div>
+                <span class="right-space"></span>
+            </div>
+        </header>
+
+        <!-- ===== 步骤 1：推广合作协议 ===== -->
+        <div class="phone-body" id="stepAgree">
+            <div class="step-bar">
+                <div class="step-seg on"><i>1</i>阅读协议</div>
+                <div class="step-line"></div>
+                <div class="step-seg"><i>2</i>实名认证</div>
+            </div>
+
+            <div class="proto-card">
+                <div class="proto-head">
+                    <div class="ic">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>
+                    </div>
+                    <div>
+                        <div class="t1">离泰数链 · 推广合作协议</div>
+                        <div class="t2">版本 V2.1　更新于 2026-09-01</div>
+                    </div>
+                </div>
+
+                <div class="agree-scroll" id="agreeScroll">
+                    <div class="clause-title">第一条　合作性质</div>
+                    <p>甲方（平台方）为<b>离泰数链</b>平台运营方；乙方（推广员）自愿申请成为平台推广员，通过合法推广行为获取推广服务费。本协议为乙方在完成实名认证前需阅读并同意的前提性文件。</p>
+
+                    <div class="clause-title">第二条　申请条件与实名认证</div>
+                    <p>2.1 乙方须为年满十八周岁、具备完全民事行为能力的自然人，并以本人真实身份信息注册。</p>
+                    <p>2.2 乙方知悉并同意，平台依据相关法律法规及监管要求，在开通推广资格前对乙方进行<b>实名信息核验</b>，包括真实姓名、身份证号码与公安部人口信息一致性比对。</p>
+                    <p>2.3 乙方保证提供的身份信息真实、准确、完整。因提供虚假信息产生的一切后果由乙方自行承担，平台有权拒绝开通或立即终止推广资格。</p>
+
+                    <div class="clause-title">第三条　推广行为规范</div>
+                    <p>3.1 乙方应通过平台提供的专属推广海报、二维码及分享链接开展推广，不得以欺骗、夸大、虚假宣传等方式误导用户。</p>
+                    <p>3.2 乙方不得恶意刷单、自购自返、伪造订单或以其他不正当手段获取服务费；一经发现，平台有权追回全部违规所得并取消资格。</p>
+                    <p>3.3 乙方推广内容须符合国家法律法规及平台社区规范，不得发布违法违规、侵权或违背公序良俗的信息。</p>
+
+                    <div class="clause-title">第四条　服务费结算</div>
+                    <p>4.1 乙方通过专属推广链接产生的有效订单，经客户核销/确认收货且超过 7 天无退款（售后）后，按乙方推广等级对应的<b>分佣比例</b>计算服务费。</p>
+                    <p>4.2 已结算服务费计入乙方账户余额，平台于<b>每月末自动批量打款</b>至乙方授权的收款账户（微信零钱，免确认模式），无需逐笔申请。</p>
+                    <p>4.3 订单发生退款或未达结算条件的预计服务费标记为作废，不计入累计收益；月度汇总以实际到账金额为准。</p>
+
+                    <div class="clause-title">第五条　账户与安全</div>
+                    <p>5.1 乙方应妥善保管推广账户、收款账户及授权状态，因个人原因造成的账户损失由乙方自行承担。</p>
+                    <p>5.2 乙方收款账户变更、授权失效的，应及时在「提现账户管理」中更新；未及时更新导致的打款失败或延迟，平台不承担相应责任。</p>
+
+                    <div class="clause-title">第六条　信息保护</div>
+                    <p>6.1 平台仅在本协议目的范围内收集、使用乙方个人信息，并通过加密技术传输与存储，未经乙方同意不向无关第三方披露，法律法规另有规定的除外。</p>
+                    <p>6.2 实名核验信息仅用于身份真实性核验，不用于其他商业用途。</p>
+
+                    <div class="clause-title">第七条　协议变更与终止</div>
+                    <p>7.1 平台有权根据业务或政策调整适时修订本协议，修订后将在平台公示并继续使用视为同意。</p>
+                    <p>7.2 乙方违反本协议约定的，平台可暂停或终止其推广资格并保留追责权利；乙方亦可通过「我的推广-停止推广」申请退出。</p>
+
+                    <div class="clause-title">第八条　其他</div>
+                    <p>8.1 本协议自乙方在线确认并完成实名认证后生效。</p>
+                    <p>8.2 本协议未尽事宜，参照平台相关规则执行；因本协议产生的争议，双方应友好协商解决。</p>
+
+                    <div class="end-flag">—— 协议正文结束，请滑至底部后确认 ——</div>
+                </div>
+            </div>
+
+            <div class="agree-bar">
+                <div class="agree-meta">
+                    <span class="agree-chip gray" id="agreeChip">阅读全文</span>
+                    <span id="agreeText">请向下滑动阅读协议至底部</span>
+                </div>
+                <button class="primary-btn" id="agreeBtn" disabled>同意协议并继续</button>
+                <a class="back-home" href="我的主页.html">暂不同意，返回我的主页</a>
+            </div>
+        </div>
+
+        <!-- ===== 步骤 2：实名认证 ===== -->
+        <div class="phone-body hidden" id="stepForm">
+            <div class="step-bar">
+                <div class="step-seg done"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></i>阅读协议</div>
+                <div class="step-line on"></div>
+                <div class="step-seg on"><i>2</i>实名认证</div>
+            </div>
+
+            <div class="form-card">
+                <div class="form-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    身份实名认证
+                </div>
+                <div class="form-sub">成为推广员需完成实名认证，填写信息<b>必须与当前登录微信的实名信息保持一致</b>。信息仅用于身份核验、公安比对、佣金打款及税务报税，平台加密严格保密，请填写真实姓名及身份证号码。</div>
+
+                <label class="field">
+                    <span class="f-label">真实姓名</span>
+                    <div class="f-box">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        <input type="text" id="realName" maxlength="12" placeholder="请输入与身份证一致的姓名" autocomplete="off">
+                    </div>
+                </label>
+
+                <label class="field">
+                    <span class="f-label">身份证号码</span>
+                    <div class="f-box">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><circle cx="8" cy="10" r="1"></circle><line x1="6" y1="14" x2="10" y2="14"></line><circle cx="15" cy="10" r="2"></circle><path d="M13.5 14.5a2.5 2.5 0 0 1 3 0"></path></svg>
+                        <input type="text" id="idNo" maxlength="18" placeholder="请输入18位身份证号码" autocomplete="off">
+                    </div>
+                </label>
+
+                <div class="form-err" id="formErr"></div>
+                <button class="primary-btn on" id="idSubmitBtn">提交实名认证</button>
+            </div>
+        </div>
+
+        <!-- ===== 步骤 3：模拟实名校验 ===== -->
+        <div class="verify-mask hidden" id="stepVerify">
+            <div class="verify-card">
+                <div class="v-main">
+                    <div class="spin-ring" id="vRing"></div>
+                    <div class="shield-ic" id="vShield">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    </div>
+                    <div class="ok-ic" id="vOk">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </div>
+                </div>
+                <div class="v-title" id="vTitle">正在发起核验</div>
+                <div class="v-desc" id="vDesc">请稍候，正在连接公安部身份核验通道…</div>
+                <ul class="v-flow" id="vFlow">
+                    <li id="vf1"><i></i>发起实名核验请求</li>
+                    <li id="vf2"><i></i>与公安部人口信息比对</li>
+                    <li id="vf3"><i></i>完成身份核验</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== 右侧功能说明面板 ===== -->
+<aside class="func-panel">
+    <div class="fp-inner">
+        <div class="fp-header">
+            <span class="fp-title">功能说明</span>
+            <button class="fp-fold-btn" onclick="toggleFuncPanel()" title="收起功能说明">›</button>
+        </div>
+        <div class="fp-body">
+            <h4>一、页面概述</h4>
+            <ul>
+                <li>从「我的主页 → 我的推广」进入的移动端流程页（430px 预览）。成为推广员前需依次完成：<strong>阅读并同意《推广合作协议》→ 实名认证 → 远程实名校验</strong>，校验通过后自动进入分销中心。</li>
+            </ul>
+            <h4>二、协议步骤</h4>
+            <ul>
+                <li>须将协议内容<strong>滑动至底部</strong>（出现“协议正文结束”标记）后，底部「同意协议并继续」按钮才可点击（原型演示，无强制阅读时长限制）。</li>
+                <li>点「暂不同意」可返回我的主页，流程不生效。</li>
+            </ul>
+            <h4>三、实名认证</h4>
+            <ul>
+                <li>填写<strong>真实姓名</strong>（汉字）与 <strong>18 位身份证号码</strong>（含校验位算法验证，原型做前端格式校验演示）；</li>
+                <li>校验不通过时表单下方红字提示，不进入下一步。</li>
+            </ul>
+            <h4>四、远程实名校验</h4>
+            <ul>
+                <li>提交后模拟远程核验过程：发起核验请求 → 与公安部人口信息比对 → 核验通过（绿色成功态）；</li>
+                <li>原型为演示效果，约 3.5 秒后自动跳转至<strong>分销中心（分销.html）</strong>。</li>
+            </ul>
+        </div>
+    </div>
+    <button class="fp-open" onclick="toggleFuncPanel()" title="展开功能说明">功能说明‹</button>
+</aside>
+
+<script>
+    function goBack() {
+        if (history.length > 1) { history.back(); }
+        else { location.href = '我的主页.html'; }
+    }
+    function toggleFuncPanel() {
+        document.body.classList.toggle('fp-collapsed');
+    }
+
+    /* ── 顶部状态栏：实时时间 ── */
+    (function () {
+        var now = new Date();
+        var pad = function (n) { return n < 10 ? '0' + n : '' + n; };
+        var week = ['日', '一', '二', '三', '四', '五', '六'];
+        var t = document.getElementById('sbTime');
+        if (t) t.textContent = pad(now.getHours()) + ':' + pad(now.getMinutes());
+        var dateEl = document.getElementById('sbDate');
+        if (dateEl) dateEl.textContent = (now.getMonth() + 1) + '月' + now.getDate() + '日 星期' + week[now.getDay()];
+    })();
+
+    /* =========================================================
+       步骤 1：推广协议 —— 滑动到底部后按钮才可点击
+    ========================================================= */
+    var readDone = false;
+    var agreeScroll = document.getElementById('agreeScroll');
+    var agreeBtn = document.getElementById('agreeBtn');
+    var agreeChip = document.getElementById('agreeChip');
+    var agreeText = document.getElementById('agreeText');
+
+    function updateAgree() {
+        var ok = readDone;
+        agreeBtn.disabled = !ok;
+        agreeBtn.classList.toggle('on', ok);
+
+        if (ok) {
+            agreeChip.className = 'agree-chip green';
+            agreeChip.textContent = '已同意';
+            agreeText.textContent = '已阅读并同意《离泰数链·推广合作协议》全部内容';
+        } else {
+            agreeChip.className = 'agree-chip gray';
+            agreeChip.textContent = '阅读全文';
+            agreeText.textContent = '请将协议内容滑动至底部';
+        }
+    }
+
+    /* 滑到底部检测 */
+    agreeScroll.addEventListener('scroll', function () {
+        if (readDone) return;
+        if (agreeScroll.scrollTop + agreeScroll.clientHeight >= agreeScroll.scrollHeight - 8) {
+            readDone = true;
+        }
+        updateAgree();
+    });
+    updateAgree();
+
+    agreeBtn.addEventListener('click', function () {
+        if (agreeBtn.disabled) return;
+        document.getElementById('stepAgree').classList.add('hidden');
+        document.getElementById('stepForm').classList.remove('hidden');
+        document.getElementById('navTitle').textContent = '身份认证';
+    });
+
+    /* =========================================================
+       步骤 2：实名认证 —— 姓名 + 身份证号码（前端格式校验）
+    ========================================================= */
+    function isValidName(n) {
+        return /^[\u4e00-\u9fa5·]{2,10}$/.test(n.trim());
+    }
+
+    /* GB11643-1999 身份证校验 */
+    function isValidIdCard(id) {
+        id = (id || '').toUpperCase();
+        if (!/^\d{17}[\dX]$/.test(id)) return false;
+        var w = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2];
+        var map = '10X98765432';
+        var sum = 0;
+        for (var i = 0; i < 17; i++) { sum += (id.charCodeAt(i) - 48) * w[i]; }
+        return map.charAt(sum % 11) === id.charAt(17);
+    }
+
+    var idNo = document.getElementById('idNo');
+    idNo.addEventListener('input', function () {
+        var v = this.value.replace(/[^0-9xX]/g, '').toUpperCase();
+        if (v.length > 18) v = v.slice(0, 18);
+        this.value = v;
+        document.getElementById('formErr').style.display = 'none';
+    });
+
+    document.getElementById('idSubmitBtn').addEventListener('click', function () {
+        var name = document.getElementById('realName').value;
+        var id = idNo.value;
+        var err = document.getElementById('formErr');
+
+        if (!isValidName(name)) {
+            err.textContent = '请输入真实姓名（2-10 位汉字，与身份证一致）';
+            err.style.display = 'block';
+            return;
+        }
+        if (!isValidIdCard(id)) {
+            err.textContent = '身份证号码格式有误，请核对后重新输入（18 位，含末位校验位）';
+            err.style.display = 'block';
+            return;
+        }
+        err.style.display = 'none';
+
+        var btn = this;
+        btn.disabled = true;
+        btn.classList.remove('on');
+        btn.textContent = '核验中…';
+
+        setTimeout(function () {
+            startVerifying(name, id);
+        }, 700);
+    });
+
+    /* =========================================================
+       步骤 3：模拟远程实名校验 → 通过后跳转分销.html
+    ========================================================= */
+    var flowTimers = [];
+
+    function setFlow(idx, cls) {
+        var li = document.getElementById('vf' + idx);
+        li.className = cls;
+    }
+
+    function startVerifying(name, id) {
+        var mask = document.getElementById('stepVerify');
+        var ring = document.getElementById('vRing');
+        var shield = document.getElementById('vShield');
+        var ok = document.getElementById('vOk');
+        var title = document.getElementById('vTitle');
+        var desc = document.getElementById('vDesc');
+
+        mask.classList.remove('hidden');
+        ring.style.display = 'block';
+        shield.style.display = 'flex';
+        ok.style.display = 'none';
+        title.textContent = '正在发起核验';
+        desc.textContent = '请稍候，正在连接公安部身份核验通道…';
+        setFlow(1, 'run');
+        setFlow(2, '');
+        setFlow(3, '');
+
+        flowTimers.push(setTimeout(function () {
+            setFlow(1, 'done');
+            setFlow(2, 'run');
+            title.textContent = '正在进行身份比对';
+            desc.textContent = '姓名与证件号信息匹配中，请稍候…';
+        }, 1100));
+
+        flowTimers.push(setTimeout(function () {
+            setFlow(2, 'done');
+            setFlow(3, 'run');
+            title.textContent = '即将完成核验';
+            desc.textContent = '正在完成加密通道回执…';
+        }, 2300));
+
+        flowTimers.push(setTimeout(function () {
+            setFlow(3, 'done');
+            ring.style.display = 'none';
+            shield.style.display = 'none';
+            ok.style.display = 'flex';
+            title.textContent = '核验通过';
+            desc.innerHTML = '身份核验成功，即将进入分销中心<br>开始您的推广之旅';
+        }, 3400));
+
+        flowTimers.push(setTimeout(function () {
+            location.href = '分销.html';
+        }, 5000));
+    }
+</script>
+<script src="asset/admin-sidebar.js"></script>
+
+</body>
+</html>

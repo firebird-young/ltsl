@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>提现账户管理 - 离泰数链</title>
+    <link rel="stylesheet" href="asset/admin-sidebar.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', 'Microsoft YaHei', Arial, sans-serif;
+            background: #f5f5f7;
+            min-height: 100vh;
+            color: #1d1d1f;
+        }
+
+        /* ===== 中间内容区（手机原型预览） ===== */
+        .main { padding: 16px 24px 48px; }
+        .stage-tip {
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
+            margin-bottom: 12px; flex-wrap: wrap;
+        }
+        .stage-tip .st-label { font-size: 13px; color: #86868b; }
+        .stage-tip         .st-badge {
+            font-size: 12px; font-weight: 600; color: #0066FF;
+            background: #fff; border: 1px solid #b8d5ff; border-radius: 9999px; padding: 4px 14px;
+        }
+        /* ===== 手机页面容器（无外框，平铺预览） ===== */
+        .app-container {
+            width: 100%; max-width: 430px; margin: 0 auto;
+            background: #f5f5f5; border-radius: 18px;
+            box-shadow: 0 10px 34px rgba(30, 60, 120, 0.14);
+            -webkit-font-smoothing: antialiased;
+        }
+        @media (max-width: 540px) {
+            .app-container { border-radius: 0; box-shadow: none; }
+            .page-top { border-radius: 0; }
+        }
+
+        /* ===== 顶部状态栏（时间/日期/信号/WiFi/电量） ===== */
+        .page-top {
+            position: sticky; top: 0; z-index: 80;
+            border-radius: 18px 18px 0 0; overflow: hidden;
+            box-shadow: 0 2px 10px rgba(20, 40, 90, 0.08);
+        }
+        .status-bar {
+            height: 44px; background: #fff; color: #1d1d1f;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px;
+        }
+        .status-bar .sb-time { font-size: 15px; font-weight: 600; letter-spacing: 0.3px; }
+        .status-bar .sb-date { font-size: 12px; color: #666; }
+        .status-bar .sb-right { display: flex; align-items: center; gap: 7px; }
+        .status-bar .sb-signal { display: inline-flex; align-items: flex-end; gap: 1.5px; height: 11px; }
+        .status-bar .sb-signal i { width: 3px; border-radius: 1px; background: currentColor; }
+        .status-bar .sb-signal i:nth-child(1) { height: 4px; }
+        .status-bar .sb-signal i:nth-child(2) { height: 6px; }
+        .status-bar .sb-signal i:nth-child(3) { height: 8px; }
+        .status-bar .sb-signal i:nth-child(4) { height: 11px; }
+        .status-bar .sb-wifi { width: 15px; height: 11px; position: relative; display: inline-block; }
+        .status-bar .sb-wifi::before {
+            content: ''; position: absolute; left: 50%; bottom: 0; transform: translateX(-50%);
+            width: 5px; height: 5px; border-radius: 50%; background: currentColor;
+        }
+        .status-bar .sb-wifi::after {
+            content: ''; position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%);
+            width: 14px; height: 14px; box-sizing: border-box;
+            border-top: 2px solid currentColor; border-radius: 50%;
+        }
+        .status-bar .sb-batt {
+            width: 25px; height: 12px; border: 1.4px solid currentColor; border-radius: 3px;
+            padding: 1.5px; box-sizing: border-box; position: relative;
+        }
+        .status-bar .sb-batt::after {
+            content: ''; position: absolute; right: -3.5px; top: 50%; transform: translateY(-50%);
+            width: 2px; height: 5px; background: currentColor; border-radius: 0 1px 1px 0;
+        }
+        .status-bar .sb-batt i { display: block; height: 100%; width: 78%; background: currentColor; border-radius: 1px; }
+
+        /* ===== 顶部导航 ===== */
+        .top-nav {
+            height: 50px;
+            background: linear-gradient(135deg, #0066FF, #0047B3);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+        }
+        .top-nav-title { flex: 1; text-align: center; font-size: 17px; font-weight: 600; color: #fff; }
+        .top-nav .right-placeholder { width: 32px; }
+        .top-nav .back-btn {
+            width: 32px; height: 32px; padding: 0; border: none; background: none;
+            display: flex; align-items: center; justify-content: flex-start;
+            color: #fff; font-size: 30px; line-height: 1; cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* ===== 卡片通用 ===== */
+        .card {
+            background: #fff; border-radius: 14px; margin: 12px 16px 0;
+            padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .card-title {
+            font-size: 15px; font-weight: 700; color: #333; margin-bottom: 10px;
+            display: flex; align-items: center; gap: 6px;
+        }
+
+        /* ===== 授权状态 ===== */
+        .auth-top { display: flex; align-items: center; gap: 12px; }
+        .auth-top .auth-icon {
+            width: 46px; height: 46px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
+        }
+        .auth-top .auth-icon.active { background: #E8F5E9; }
+        .auth-top .auth-icon.inactive { background: #f0f0f0; }
+        .auth-top .auth-title { font-size: 16px; font-weight: 700; color: #333; flex: 1; }
+        .auth-tag {
+            display: inline-block; padding: 2px 10px; border-radius: 10px;
+            font-size: 11px; font-weight: 600; margin-left: 6px; vertical-align: 1px;
+        }
+        .auth-tag.active { background: #E8F5E9; color: #07C160; }
+        .auth-tag.inactive { background: #FFF3E0; color: #D48806; }
+        .auth-hint { font-size: 12px; color: #999; margin-top: 8px; line-height: 1.6; }
+        .auth-btn {
+            width: 100%; margin-top: 12px; padding: 11px 0; border-radius: 12px;
+            border: none; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit;
+        }
+        .auth-btn.primary { background: linear-gradient(135deg, #0066FF, #0047B3); color: #fff; }
+        .auth-btn.secondary { background: #fff; color: #ff3b30; border: 1px solid #ff3b30; }
+        .auth-btn:active { opacity: 0.85; }
+
+        /* ===== 打款信息 ===== */
+        .pc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .pc-cell { background: #fafafc; border-radius: 12px; padding: 12px; }
+        .pc-label { font-size: 11px; color: #999; }
+        .pc-value { font-size: 16px; font-weight: 700; margin-top: 5px; color: #333; }
+        .pc-value .sub { font-size: 11px; font-weight: 400; color: #999; }
+        .pc-value.highlight { color: #0066FF; }
+        .pc-value.green { color: #2E7D32; }
+        .pc-value.dim { color: #c7c7cc; }
+        .pc-note { font-size: 11px; color: #999; margin-top: 12px; line-height: 1.7; }
+        .pc-empty {
+            display: none; flex-direction: column; align-items: center; gap: 6px;
+            padding: 30px 16px; background: #fafafc;
+            border: 1px dashed #d5dae3; border-radius: 14px; text-align: center;
+        }
+        .pc-empty-icon { width: 46px; height: 46px; border-radius: 50%; background: #eef3ff;
+            display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .pc-empty-text { font-size: 14px; font-weight: 600; color: #444; }
+        .pc-empty-sub { font-size: 11.5px; color: #a0a4ad; }
+
+        /* ===== 打款记录 ===== */
+        .record-header {
+            display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px;
+        }
+        .record-header .rh-title { font-size: 15px; font-weight: 700; color: #333; }
+        .record-header .rh-more { font-size: 12px; color: #999; cursor: pointer; }
+        .record-item {
+            display: flex; align-items: center; padding: 11px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .record-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .record-item .ri-icon {
+            width: 38px; height: 38px; border-radius: 50%; background: #E8F5E9;
+            display: flex; align-items: center; justify-content: center; font-size: 17px;
+            flex-shrink: 0; margin-right: 12px;
+        }
+        .record-item .ri-info { flex: 1; min-width: 0; }
+        .record-item .ri-info .ri-name { font-size: 14px; font-weight: 500; color: #333; }
+        .record-item .ri-info .ri-time { font-size: 11px; color: #bbb; margin-top: 2px; }
+        .record-item .ri-amount { font-size: 15px; font-weight: 600; color: #333; flex-shrink: 0; }
+        .record-item .ri-status { font-size: 11px; color: #07C160; margin-left: 8px; flex-shrink: 0; }
+
+        /* ===== 授权弹窗 ===== */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 20, 30, 0.55); z-index: 1500;
+            align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-box {
+            background: #fff; border-radius: 16px; width: 100%; max-width: 340px;
+            padding: 26px 22px 22px; text-align: center; animation: modalIn 0.25s ease;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+        }
+        @keyframes modalIn {
+            from { transform: scale(0.92); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .modal-box .m-icon { font-size: 44px; margin-bottom: 10px; }
+        .modal-box .m-title { font-size: 17px; font-weight: 700; color: #333; margin-bottom: 6px; }
+        .modal-box .m-desc { font-size: 13px; color: #86868b; margin-bottom: 18px; line-height: 1.7; }
+        .modal-box .m-desc .hl { color: #ff3b30; font-weight: 600; }
+        .modal-box .m-btns { display: flex; gap: 10px; }
+        .modal-box .m-btns .mbtn {
+            flex: 1; padding: 10px 0; border-radius: 9999px; border: none;
+            font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit;
+        }
+        .modal-box .m-btns .mbtn.primary { background: linear-gradient(135deg, #0066FF, #0047B3); color: #fff; }
+        .modal-box .m-btns .mbtn.cancel { background: #f5f5f7; color: #86868b; }
+        .modal-box .m-btns .mbtn.danger { background: #ff3b30; color: #fff; }
+        .modal-box .m-loading { padding: 26px 0; font-size: 14px; color: #86868b; }
+        .modal-box .m-loading .spinner {
+            display: block; width: 32px; height: 32px;
+            border: 3px solid #f0f0f0; border-top-color: #0066FF;
+            border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ===== 模拟微信支付-授权页（底部浮层，按手机宽度对齐） ===== */
+        .wx-auth {
+            position: fixed; top: 0; left: 0;
+            z-index: 300; display: none; align-items: flex-end;
+            background: rgba(17, 17, 17, 0.5);
+        }
+        .wx-auth.show { display: flex; }
+        .wx-sheet {
+            width: 100%; max-height: 94%;
+            background: #fff; border-radius: 16px 16px 0 0;
+            display: flex; flex-direction: column; overflow: hidden;
+            animation: wxSheetUp .32s ease;
+        }
+        @keyframes wxSheetUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        .wx-header {
+            height: 50px; flex-shrink: 0; display: flex; align-items: center;
+            padding: 0 8px;
+        }
+        .wx-close {
+            width: 40px; height: 40px; border: none; background: none;
+            font-size: 30px; line-height: 1; color: #191919; cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .wx-body { flex: 1; overflow-y: auto; min-height: 0; padding: 4px 26px 16px; display: flex; flex-direction: column; }
+        .wx-brand { text-align: center; margin: 8px 0 18px; }
+        .wx-logo {
+            width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 14px;
+            background: #07c160; color: #fff; font-size: 24px; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .wx-request-title {
+            font-size: 18px; font-weight: 700; color: #191919;
+            text-align: center; line-height: 1.55; margin-bottom: 20px;
+        }
+        .wx-table { background: #fafafa; border-radius: 12px; padding: 4px 16px; }
+        .wx-row {
+            display: flex; padding: 13px 0; border-bottom: 1px solid #f0f0f0;
+            font-size: 13.5px; line-height: 1.55;
+        }
+        .wx-row:last-child { border-bottom: none; }
+        .wx-row .r-label { color: #999; min-width: 76px; flex-shrink: 0; }
+        .wx-row .r-value { flex: 1; color: #333; text-align: right; word-break: break-all; }
+        .wx-foot { padding: 14px 26px 22px; text-align: center; }
+        .wx-agree {
+            width: 100%; height: 46px; border: none; border-radius: 6px;
+            background: #07c160; color: #fff; font-size: 17px; font-weight: 600;
+            cursor: pointer; margin-bottom: 14px; -webkit-tap-highlight-color: transparent;
+        }
+        .wx-agree:active { opacity: 0.85; }
+        .wx-brand-bottom { color: #07c160; font-size: 13px; letter-spacing: 0.5px; margin-bottom: 16px; }
+        .wx-homebar { width: 134px; height: 5px; border-radius: 3px; background: #1d1d1f; margin: 0 auto; }
+        /* 授权中 / 成功态 */
+        .wx-center {
+            flex: 1; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; text-align: center;
+            padding: 40px 0 70px;
+        }
+        .wx-spin {
+            width: 40px; height: 40px; border-radius: 50%;
+            border: 3px solid #ececec; border-top-color: #07c160;
+            animation: spin .8s linear infinite; margin-bottom: 16px;
+        }
+        .wx-load-text { font-size: 14px; color: #86868b; }
+        .wx-ok-ic {
+            width: 60px; height: 60px; border-radius: 50%; background: #07c160;
+            color: #fff; font-size: 30px; font-weight: 700;
+            display: flex; align-items: center; justify-content: center; margin-bottom: 16px;
+            animation: okpop .35s ease;
+        }
+        @keyframes okpop {
+            from { transform: scale(.4); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .wx-success-title { font-size: 18px; font-weight: 700; color: #191919; margin-bottom: 8px; }
+        .wx-ok-desc { font-size: 13px; color: #86868b; line-height: 1.8; margin-bottom: 30px; }
+
+        /* ===== 右侧功能说明面板 ===== */
+        .func-panel {
+            position: fixed; top: 0; right: 0; bottom: 0;
+            width: 340px; z-index: 890;
+            background: #fff; border-left: 1px solid #e3e6eb;
+            box-shadow: -1px 0 12px rgba(20, 30, 60, 0.04);
+            display: flex; flex-direction: column;
+        }
+        .func-panel .fp-inner { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+        .func-panel .fp-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px 14px 13px 18px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
+        }
+        .func-panel .fp-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: #1d1d1f; }
+        .func-panel .fp-title::before {
+            content: ''; width: 8px; height: 8px; border-radius: 50%;
+            background: #0066cc; box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.12);
+        }
+        .func-panel .fp-fold-btn {
+            width: 28px; height: 28px; border: 1px solid #e0e0e0; background: #fff;
+            border-radius: 50%; color: #86868b; font-size: 15px; line-height: 1;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+        }
+        .func-panel .fp-fold-btn:hover { border-color: #0066cc; color: #0066cc; }
+        .func-panel .fp-body {
+            flex: 1; overflow-y: auto; padding: 4px 18px 40px;
+            font-size: 13px; color: #555; line-height: 1.9;
+        }
+        .func-panel .fp-body::-webkit-scrollbar { width: 5px; }
+        .func-panel .fp-body::-webkit-scrollbar-thumb { background: #d8dce3; border-radius: 3px; }
+        .func-panel .fp-body h4 { font-size: 14px; font-weight: 600; color: #1d1d1f; margin: 18px 0 6px; }
+        .func-panel .fp-body h4:first-child { margin-top: 12px; }
+        .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .func-panel .fp-body li { margin-bottom: 6px; }
+        .func-panel .fp-body strong { color: #333; }
+        .func-panel .fp-open {
+            display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+            border: none; background: transparent; cursor: pointer;
+            writing-mode: vertical-rl; text-orientation: upright;
+            font-size: 13px; font-weight: 600; letter-spacing: 6px; color: #86868b;
+            align-items: center; justify-content: center; font-family: inherit; transition: all 0.2s;
+        }
+        .func-panel .fp-open:hover { color: #0066cc; background: #fafbfc; }
+
+        @media (min-width: 1024px) {
+            .main { margin-right: 340px; }
+            body.fp-collapsed .main { margin-right: 40px; }
+            body.fp-collapsed .func-panel { width: 40px; }
+            body.fp-collapsed .fp-inner { display: none; }
+            body.fp-collapsed .fp-open { display: flex; }
+        }
+        @media (max-width: 1023.98px) {
+            .func-panel { display: none; }
+            .main { margin-right: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="main">
+    <div class="stage-tip">
+        <span class="st-label">分销员手机端管理微信提现账户</span>
+        <span class="st-badge">📱 移动端页面</span>
+    </div>
+    <div class="app-container">
+
+        <!-- 顶部：状态栏 + 导航 -->
+        <header class="page-top">
+            <div class="status-bar">
+                <span class="sb-time" id="sbTime">9:41</span>
+                <span class="sb-date" id="sbDate">9月8日 星期二</span>
+                <span class="sb-right">
+                    <span class="sb-signal"><i></i><i></i><i></i><i></i></span>
+                    <span class="sb-wifi"></span>
+                    <span class="sb-batt"><i></i></span>
+                </span>
+            </div>
+            <div class="top-nav">
+                <button class="back-btn" onclick="goBack()" aria-label="返回">‹</button>
+                <div class="top-nav-title">提现管理</div>
+                <span class="right-placeholder"></span>
+            </div>
+        </header>
+
+                <!-- 授权状态 -->
+                <div class="card" id="authCard">
+                    <div class="auth-top">
+                        <div class="auth-icon active" id="authIcon">✅</div>
+                        <div class="auth-title">微信提现账户 <span class="auth-tag active" id="authTag">已绑定</span></div>
+                    </div>
+                    <div class="auth-hint">绑定微信账号后，系统每月末自动将可提现余额批量打款到微信零钱</div>
+                    <button class="auth-btn secondary" id="authBtn" onclick="handleAuthAction()">解绑账号</button>
+                </div>
+
+                <!-- 下次打款信息 -->
+                <div class="card">
+                    <div class="card-title">💳 下次打款信息</div>
+                    <div class="pc-empty" id="pcEmpty">
+                        <div class="pc-empty-icon">🔗</div>
+                        <div class="pc-empty-text">请先绑定微信账号</div>
+                    </div>
+                    <div class="pc-grid" id="nextPayGrid">
+                        <div class="pc-cell">
+                            <div class="pc-label">下次打款日期</div>
+                            <div class="pc-value highlight">2026年6月30日</div>
+                        </div>
+                        <div class="pc-cell">
+                            <div class="pc-label">下次预计打款</div>
+                            <div class="pc-value highlight" id="payoutAmount">¥1,560.00</div>
+                        </div>
+                        <div class="pc-cell">
+                            <div class="pc-label">打款账户</div>
+                            <div class="pc-value">微信零钱</div>
+                        </div>
+                        <div class="pc-cell">
+                            <div class="pc-label">打款模式</div>
+                            <div class="pc-value green">自动打款</div>
+                        </div>
+                    </div>
+                    <div class="pc-note" id="nextPayNote">每月末最后一天，将自动为您打款账户全部已结算余额。<br><span style="color:#b45309;">温馨提示：</span><span style="color:#666;">佣金将依法预扣个人所得税，您微信实际收到的为扣税后金额，税款由平台代为申报。</span></div>
+                </div>
+
+                <!-- 打款记录 -->
+                <div class="card" style="margin-bottom:16px;" id="recordSection">
+                    <div class="record-header">
+                        <span class="rh-title">📄 打款记录</span>
+                        <span class="rh-more" onclick="goLedger()">查看更多 ›</span>
+                    </div>
+                    <div id="recordList">
+                        <div class="record-item">
+                            <div class="ri-icon">💰</div>
+                            <div class="ri-info">
+                                <div class="ri-name">2026年5月批量打款</div>
+                                <div class="ri-time">2026-05-31 23:59</div>
+                            </div>
+                            <div class="ri-amount">+¥2,300.00</div>
+                            <div class="ri-status">已到账</div>
+                        </div>
+                        <div class="record-item">
+                            <div class="ri-icon">💰</div>
+                            <div class="ri-info">
+                                <div class="ri-name">2026年4月批量打款</div>
+                                <div class="ri-time">2026-04-30 23:59</div>
+                            </div>
+                            <div class="ri-amount">+¥1,640.00</div>
+                            <div class="ri-status">已到账</div>
+                        </div>
+                        <div class="record-item">
+                            <div class="ri-icon">💰</div>
+                            <div class="ri-info">
+                                <div class="ri-name">2026年3月批量打款</div>
+                                <div class="ri-time">2026-03-31 23:59</div>
+                            </div>
+                            <div class="ri-amount">+¥1,400.00</div>
+                            <div class="ri-status">已到账</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== 模拟微信支付-授权页（底部浮层） ===== -->
+                <div class="wx-auth" id="wxAuth">
+                    <div class="wx-sheet">
+                        <div class="wx-header">
+                            <button class="wx-close" onclick="wxRefuse()">×</button>
+                        </div>
+                        <div class="wx-body" id="wxBody"></div>
+                        <div class="wx-foot" id="wxFoot"></div>
+                    </div>
+                </div>
+
+    </div>
+</div>
+
+<!-- 授权/解除弹窗 -->
+<div class="modal-overlay" id="authModal">
+    <div class="modal-box" id="modalContent">
+        <!-- 由 JS 动态填充 -->
+    </div>
+</div>
+
+<!-- ===== 右侧功能说明面板 ===== -->
+<aside class="func-panel">
+    <div class="fp-inner">
+        <div class="fp-header">
+            <span class="fp-title">功能说明</span>
+            <button class="fp-fold-btn" onclick="toggleFuncPanel()" title="收起功能说明">›</button>
+        </div>
+        <div class="fp-body">
+            <h4>一、页面概述</h4>
+            <ul>
+                <li>提现账户管理页面（手机端）用于管理微信账号绑定及系统自动打款。绑定后每月末自动将可提现余额批量打款至用户微信零钱（免确认授权模式）。</li>
+            </ul>
+            <h4>二、账号绑定</h4>
+            <ul>
+                <li>展示状态：<strong>已绑定</strong>（可自动打款）/ <strong>未绑定</strong>；</li>
+                <li><strong>绑定</strong>：点「绑定账号」→ 弹出<strong>微信支付-授权页</strong>（底部浮层，模拟转账授权：转账类型/转账说明/收款方式-零钱）→ 点「同意」→ 授权成功即完成开通，全程无需填写真实姓名与身份证号码；</li>
+                <li><strong>解绑</strong>：点「解绑账号」→ 二次确认 → 解绑成功；解绑后不再自动打款，「本次预计打款」显示 ¥0.00。</li>
+            </ul>
+            <h4>三、自动打款</h4>
+            <ul>
+                <li>每月末自动批量打款，金额 =「当前余额（已结算）」全部金额；</li>
+                <li>对接微信支付「商家转账」接口（佣金报酬场景），已绑定用户无需每次确认收款。</li>
+            </ul>
+            <h4>四、打款记录</h4>
+            <ul>
+                <li>展示历次自动打款（月份、金额、到账状态）；「查看更多」进入「分销记账」查看完整流水。</li>
+            </ul>
+        </div>
+    </div>
+    <button class="fp-open" onclick="toggleFuncPanel()" title="展开功能说明">功能说明‹</button>
+</aside>
+
+<script>
+    /* ── 返回 ── */
+    function goBack() {
+        if (history.length > 1) { history.back(); }
+        else { location.href = '分销.html'; }
+    }
+    var isAuthorized = true;
+    function goLedger() { window.location.href = '分销记账.html'; }
+
+    function handleAuthAction() {
+        if (isAuthorized) {
+            showRevokeConfirm();
+        } else {
+            showAuthConfirm();
+        }
+    }
+
+    /* ===== 微信支付-授权（模拟底部浮层，无需填写姓名/身份证） ===== */
+    function showAuthConfirm() { openWxAuth(); }
+
+    function openWxAuth() {
+        /* 让底部浮层与手机容器同宽同位置，避免占满整个电脑视口 */
+        var overlay = document.getElementById('wxAuth');
+        var box = document.querySelector('.app-container').getBoundingClientRect();
+        var top = Math.max(box.top, 0);
+        overlay.style.left = box.left + 'px';
+        overlay.style.width = box.width + 'px';
+        overlay.style.top = top + 'px';
+        overlay.style.height = (window.innerHeight - top) + 'px';
+        wxRender('card');
+        overlay.classList.add('show');
+    }
+
+    function wxRefuse() {
+        document.getElementById('wxAuth').classList.remove('show');
+    }
+
+    // 点击浮层外部遮罩关闭
+    document.getElementById('wxAuth').addEventListener('click', function (e) {
+        if (e.target === this) wxRefuse();
+    });
+
+    function wxRender(step) {
+        var body = document.getElementById('wxBody');
+        var foot = document.getElementById('wxFoot');
+
+        if (step === 'loading') {
+            foot.style.display = 'none';
+            body.innerHTML = '<div class="wx-center"><div class="wx-spin"></div><div class="wx-load-text">正在连接微信支付，请稍候…</div></div>';
+            return;
+        }
+        if (step === 'success') {
+            foot.style.display = 'none';
+            body.innerHTML = '<div class="wx-center">' +
+                '<div class="wx-ok-ic">✓</div>' +
+                '<div class="wx-success-title">开通成功</div>' +
+                '<div class="wx-ok-desc">微信账号已绑定成功，每月末系统将自动把可提现余额打款至您的微信零钱</div>' +
+                '<button class="wx-agree" style="width:220px;" onclick="wxFinish()">完成</button>' +
+                '</div>';
+            return;
+        }
+
+        foot.style.display = '';
+        body.innerHTML =
+            '<div class="wx-brand">' +
+                '<div class="wx-logo">离泰</div>' +
+            '</div>' +
+            '<div class="wx-request-title">在「离泰数链」通过微信支付收款</div>' +
+            '<div class="wx-table">' +
+                '<div class="wx-row"><span class="r-label">转账类型</span><span class="r-value">活动奖励</span></div>' +
+                '<div class="wx-row"><span class="r-label">转账说明</span><span class="r-value">同意后每月末系统将自动把可提现佣金转账至您选定的微信零钱</span></div>' +
+                '<div class="wx-row"><span class="r-label">收款方式</span><span class="r-value">零钱</span></div>' +
+            '</div>';
+        foot.innerHTML = '<button class="wx-agree" onclick="wxAllow()">同意</button>' +
+            '<div class="wx-brand-bottom">微信支付-授权页</div>' +
+            '<div class="wx-homebar"></div>';
+    }
+
+    function wxAllow() {
+        wxRender('loading');
+        setTimeout(function () { wxRender('success'); }, 1500);
+    }
+
+    function wxFinish() {
+        document.getElementById('wxAuth').classList.remove('show');
+        completeAuth(true);
+    }
+
+    function completeAuth(result) {
+        closeModal();
+        isAuthorized = result;
+        updateAuthUI();
+    }
+
+    /* ===== 解除授权 ===== */
+    function showRevokeConfirm() {
+        var modal = document.getElementById('authModal');
+        var content = document.getElementById('modalContent');
+        content.innerHTML = `
+            <div class="m-icon">⚠️</div>
+            <div class="m-title">确认解绑</div>
+            <div class="m-desc">解绑后系统将<span class="hl">不再</span>自动打款</div>
+            <div class="m-btns">
+                <button class="mbtn cancel" onclick="closeModal()">取消</button>
+                <button class="mbtn danger" onclick="startRevoke()">确认解绑</button>
+            </div>
+        `;
+        modal.classList.add('show');
+    }
+
+    function startRevoke() {
+        var content = document.getElementById('modalContent');
+        content.innerHTML = `
+            <div class="m-loading">
+                <div class="spinner" style="border-top-color:#ff3b30;"></div>
+                <div>正在解绑账号...</div>
+            </div>
+        `;
+        setTimeout(function() {
+            content.innerHTML = `
+                <div class="m-icon">🔓</div>
+                <div class="m-title">已解绑</div>
+                <div class="m-desc">如需自动打款，请重新绑定账号</div>
+                <div class="m-btns">
+                    <button class="mbtn primary" onclick="completeAuth(false)" style="flex:1;">我知道了</button>
+                </div>
+            `;
+        }, 1500);
+    }
+
+    function closeModal() {
+        document.getElementById('authModal').classList.remove('show');
+    }
+
+    /* ===== UI 更新 ===== */
+    function updateAuthUI() {
+        var icon = document.getElementById('authIcon');
+        var tag = document.getElementById('authTag');
+        var btn = document.getElementById('authBtn');
+        var payoutAmount = document.getElementById('payoutAmount');
+        var recordList = document.getElementById('recordList');
+        var grid = document.getElementById('nextPayGrid');
+        var note = document.getElementById('nextPayNote');
+        var empty = document.getElementById('pcEmpty');
+
+        if (isAuthorized) {
+            icon.textContent = '✅';
+            icon.className = 'auth-icon active';
+            tag.textContent = '已绑定';
+            tag.className = 'auth-tag active';
+            btn.textContent = '解绑账号';
+            btn.className = 'auth-btn secondary';
+            grid.style.display = '';
+            note.style.display = '';
+            empty.style.display = 'none';
+            payoutAmount.textContent = '¥1,560.00';
+            payoutAmount.className = 'pc-value highlight';
+            recordList.innerHTML = `
+                <div class="record-item">
+                    <div class="ri-icon">💰</div>
+                    <div class="ri-info">
+                        <div class="ri-name">2026年5月批量打款</div>
+                        <div class="ri-time">2026-05-31 23:59</div>
+                    </div>
+                    <div class="ri-amount">+¥2,300.00</div>
+                    <div class="ri-status">已到账</div>
+                </div>
+                <div class="record-item">
+                    <div class="ri-icon">💰</div>
+                    <div class="ri-info">
+                        <div class="ri-name">2026年4月批量打款</div>
+                        <div class="ri-time">2026-04-30 23:59</div>
+                    </div>
+                    <div class="ri-amount">+¥1,640.00</div>
+                    <div class="ri-status">已到账</div>
+                </div>
+                <div class="record-item">
+                    <div class="ri-icon">💰</div>
+                    <div class="ri-info">
+                        <div class="ri-name">2026年3月批量打款</div>
+                        <div class="ri-time">2026-03-31 23:59</div>
+                    </div>
+                    <div class="ri-amount">+¥1,400.00</div>
+                    <div class="ri-status">已到账</div>
+                </div>
+            `;
+        } else {
+            icon.textContent = '🔒';
+            icon.className = 'auth-icon inactive';
+            tag.textContent = '未绑定';
+            tag.className = 'auth-tag inactive';
+            btn.textContent = '绑定账号';
+            btn.className = 'auth-btn primary';
+            grid.style.display = 'none';
+            note.style.display = 'none';
+            empty.style.display = 'flex';
+            payoutAmount.textContent = '¥0.00';
+            payoutAmount.className = 'pc-value dim';
+            recordList.innerHTML = `
+                <div class="record-item">
+                    <div class="ri-icon">💰</div>
+                    <div class="ri-info">
+                        <div class="ri-name">2026年5月批量打款</div>
+                        <div class="ri-time">2026-05-31 23:59</div>
+                    </div>
+                    <div class="ri-amount">+¥2,300.00</div>
+                    <div class="ri-status">已到账</div>
+                </div>
+                <div class="record-item">
+                    <div class="ri-icon">💰</div>
+                    <div class="ri-info">
+                        <div class="ri-name">2026年4月批量打款</div>
+                        <div class="ri-time">2026-04-30 23:59</div>
+                    </div>
+                    <div class="ri-amount">+¥1,640.00</div>
+                    <div class="ri-status">已到账</div>
+                </div>
+                <div class="record-item">
+                    <div class="ri-icon">💰</div>
+                    <div class="ri-info">
+                        <div class="ri-name">2026年3月批量打款</div>
+                        <div class="ri-time">2026-03-31 23:59</div>
+                    </div>
+                    <div class="ri-amount">+¥1,400.00</div>
+                    <div class="ri-status">已到账</div>
+                </div>
+            `;
+        }
+    }
+
+    // 点击弹窗遮罩关闭
+    document.getElementById('authModal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
+
+    /* ── 右侧功能说明面板：收起 / 展开 ── */
+    function toggleFuncPanel() {
+        document.body.classList.toggle('fp-collapsed');
+    }
+
+    /* ── 顶部状态栏：自动填充当前时间与日期 ── */
+    (function () {
+        var d = new Date();
+        var w = ['日', '一', '二', '三', '四', '五', '六'];
+        function pad(n) { return n < 10 ? '0' + n : n; }
+        var t = document.getElementById('sbTime');
+        if (t) t.textContent = pad(d.getHours()) + ':' + pad(d.getMinutes());
+        var dateEl = document.getElementById('sbDate');
+        if (dateEl) dateEl.textContent = (d.getMonth() + 1) + '月' + d.getDate() + '日 星期' + w[d.getDay()];
+    })();
+</script>
+<script src="asset/admin-sidebar.js"></script>
+</body>
+</html>
