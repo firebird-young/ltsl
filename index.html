@@ -6,547 +6,386 @@
     <title>需求目录 - 离泰数链</title>
     <style>
         :root {
-            --bg: #ffffff;
-            --accent: #533afd;
-            --accent-hover: #4434d4;
-            --link: #4434d4;
-            --ink: #0d253d;
-            --ink-muted: #3f424b;
-            --ink-subtle: #64748d;
-            --border: #e3e8ee;
-            --card-bg: #ffffff;
-            --radius-card: 12px;
-            --radius-pill: 9999px;
-            --shadow-card: 0 1px 3px rgba(83,58,253,0.06);
-            --shadow-card-hover: 0 4px 20px rgba(83,58,253,0.10);
-            --font-display: 'sohne-var', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif;
-            --font-body: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif;
+            --accent: #2563eb;
+            --accent-dark: #1e40af;
+            --accent-light: #eff6ff;
+            --accent-lighter: #f0f5ff;
+            --ink: #111827;
+            --ink-muted: #374151;
+            --ink-subtle: #9ca3af;
+            --border: #e5e7eb;
+            --radius: 12px;
+            /* 三级色块 */
+            --c1-bg: #4a90d9;          /* 主标题：柔和蓝底 */
+            --c1-text: #ffffff;
+            --c1-count-bg: rgba(255,255,255,0.2);
+            --c2-bg: #eaf2fc;          /* 副标题：浅蓝底 */
+            --c2-text: #2563eb;
+            --c2-count: #6b8fcf;
+            --c3-bg: #ffffff;          /* 子项：白底 */
+            --c3-text: #374151;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: var(--font-body);
-            background: var(--bg);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            padding: 60px 24px 100px;
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
+            background: #f3f4f6; min-height: 100vh; color: var(--ink);
             -webkit-font-smoothing: antialiased;
-            color: var(--ink);
-        }
-        .page-wrap {
-            width: 100%;
-            max-width: 680px;
-        }
-        .header-area {
-            text-align: center;
-            padding-bottom: 56px;
-        }
-        .header-area .app-name {
-            font-size: 40px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            color: var(--ink);
-            font-family: var(--font-display);
-        }
-        .header-area .app-desc {
-            font-size: 17px;
-            color: var(--ink-subtle);
-            margin-top: 6px;
-            font-weight: 400;
-            font-family: var(--font-body);
         }
 
-        .section {
-            margin-bottom: 48px;
-        }
-        .section-header {
-            display: flex;
-            align-items: baseline;
-            gap: 10px;
-            padding-bottom: 14px;
-            margin-bottom: 16px;
+        /* ===== 顶部栏 ===== */
+        .topbar {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(255,255,255,0.9); backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border);
+            padding: 12px 24px;
+            display: flex; align-items: center; justify-content: space-between;
         }
-        .section-header .sh-label {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--ink);
-            letter-spacing: -0.2px;
+        .topbar-title { font-size: 15px; font-weight: 700; color: var(--ink); }
+        .topbar-actions { display: flex; gap: 8px; }
+        .topbar-btn {
+            font-size: 13px; padding: 6px 14px; border-radius: 8px;
+            border: 1px solid var(--border); background: #fff; color: var(--ink-muted);
+            cursor: pointer; font-family: inherit; transition: all 0.15s;
         }
-        .section-header .sh-badge {
-            font-size: 12px;
-            padding: 3px 12px;
-            border-radius: var(--radius-pill);
-            font-weight: 500;
-            margin-left: auto;
-        }
-        .section-header .sh-badge.green { background: #f0edff; color: #533afd; }
-        .section-header .sh-badge.gray { background: #f6f9fc; color: #64748d; }
+        .topbar-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
 
-        .list { display: flex; flex-direction: column; gap: 8px; }
+        /* ===== 主容器 ===== */
+        .page-wrap { max-width: 1200px; margin: 0 auto; padding: 28px 40px 80px; }
+
+        /* ===== Hero ===== */
+        .hero { margin-bottom: 24px; }
+        .hero h1 { font-size: 28px; font-weight: 700; color: var(--ink); letter-spacing: -0.5px; }
+        .hero p { font-size: 13px; color: var(--ink-subtle); margin-top: 4px; }
+
+        /* ===== 主标题色块 ===== */
+        .section {
+            margin-bottom: 10px; border-radius: var(--radius); overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        .sec-head {
+            display: flex; align-items: center; gap: 10px;
+            padding: 14px 18px; cursor: pointer; user-select: none;
+            background: var(--c1-bg); transition: filter 0.15s;
+        }
+        .sec-head:hover { filter: brightness(1.08); }
+        .sec-chevron {
+            width: 18px; height: 18px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            color: rgba(255,255,255,0.7); transition: transform 0.25s ease; font-size: 14px;
+        }
+        .section.open .sec-chevron { transform: rotate(90deg); color: #fff; }
+        .sec-title { font-size: 16px; font-weight: 700; color: var(--c1-text); }
+        .sec-count {
+            font-size: 11px; color: var(--c1-text); background: var(--c1-count-bg);
+            padding: 2px 8px; border-radius: 9999px; font-weight: 500;
+        }
+        .sec-chg-btn {
+            font-size: 11px; padding: 3px 10px; border-radius: 6px; font-weight: 500;
+            background: rgba(255,255,255,0.15); color: #fff;
+            margin-left: auto; flex-shrink: 0; cursor: pointer; border: 1px solid rgba(255,255,255,0.25);
+            transition: all 0.15s;
+        }
+        .sec-chg-btn:hover { background: rgba(255,255,255,0.3); }
+        .sec-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+        .section.open .sec-body { max-height: 5000px; }
+
+        /* ===== 副标题色块 ===== */
+        .subgroup { background: var(--c2-bg); }
+        .subgroup + .subgroup { border-top: 1px solid rgba(37,99,235,0.08); }
+        .sub-head {
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 18px; cursor: pointer; user-select: none;
+            transition: background 0.15s;
+        }
+        .sub-head:hover { background: #dce8fc; }
+        .sub-dot { width: 4px; height: 14px; border-radius: 2px; background: var(--accent); flex-shrink: 0; }
+        .sub-title { font-size: 14px; font-weight: 600; color: var(--c2-text); }
+        .sub-count { font-size: 11px; color: var(--c2-count); }
+        .sub-chevron { font-size: 12px; color: var(--c2-count); transition: transform 0.2s; margin-left: auto; }
+        .subgroup.open .sub-chevron { transform: rotate(90deg); color: var(--accent); }
+        .sub-body { max-height: 0; overflow: hidden; transition: max-height 0.25s ease; }
+        .subgroup.open .sub-body { max-height: 2000px; }
+
+        /* ===== 子项色块 ===== */
         .item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 14px 18px;
-            background: var(--card-bg);
-            border-radius: var(--radius-card);
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.2s ease;
-            box-shadow: var(--shadow-card);
+            display: flex; align-items: center; gap: 10px;
+            padding: 9px 18px;
+            text-decoration: none; color: var(--c3-text);
+            background: var(--c3-bg);
+            transition: background 0.12s;
         }
-        .item:hover { transform: translateY(-1px); box-shadow: var(--shadow-card-hover); }
-        .item:active { transform: scale(0.98); }
-        .item .it-label {
-            font-size: 15px;
-            font-weight: 500;
-            color: var(--ink);
-            flex: 1;
-        }
-        .item .it-tag {
-            font-size: 12px;
-            padding: 3px 12px;
-            border-radius: var(--radius-pill);
-            font-weight: 500;
-            flex-shrink: 0;
-        }
-        .item .it-tag.green { background: #f0edff; color: #533afd; }
-        .item .it-tag.gray { background: #f6f9fc; color: #64748d; }
-        .item .it-tag.p0 { background: #fff1f0; color: #cf1322; }
-        .item .it-tag.p1 { background: #e6f7ff; color: #096dd9; }
-        .item .it-tag.p2 { background: #f6ffed; color: #389e0d; }
-        .item .it-tag.p3 { background: #f5f5f5; color: #595959; }
-        .item .it-arrow {
-            font-size: 14px;
-            color: var(--border);
-            flex-shrink: 0;
-            font-weight: 300;
-        }
-        .item:hover .it-arrow { color: var(--accent); }
+        .item:hover { background: var(--accent-lighter); }
+        .item:active { background: #dbeafe; }
+        .item-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); flex-shrink: 0; opacity: 0.35; }
+        .item-label { font-size: 13px; font-weight: 500; flex: 1; }
+        .item-arrow { font-size: 13px; color: #d1d5db; flex-shrink: 0; }
+        .item:hover .item-arrow { color: var(--accent); }
 
-        .chg-btn {
-            margin-left: auto;
-            font-size: 12px;
-            padding: 5px 14px;
-            border-radius: var(--radius-pill);
-            font-weight: 500;
-            background: #f0edff;
-            color: var(--accent);
-            cursor: pointer;
-            user-select: none;
-            transition: all 0.2s ease;
+        /* ===== 标签 ===== */
+        .tag { font-size: 11px; padding: 2px 8px; border-radius: 6px; font-weight: 500; flex-shrink: 0; }
+        .tag.green { background: #ecfdf5; color: #059669; }
+        .tag.gray { background: #f3f4f6; color: var(--ink-subtle); }
+        .tag.p0 { background: #fef2f2; color: #dc2626; }
+        .tag.p1 { background: #eff6ff; color: #2563eb; }
+        .tag.p2 { background: #f0fdf4; color: #16a34a; }
+        .tag.p3 { background: #f9fafb; color: #6b7280; }
+
+        /* ===== flat（无副标题，子项直接在主标题下） ===== */
+        .flat-list .item { padding-left: 18px; }
+
+        /* ===== 变更记录弹窗 ===== */
+        .chg-mask {
+            position: fixed; inset: 0; background: rgba(17,24,39,0.4);
+            display: none; align-items: center; justify-content: center; z-index: 9999; padding: 20px;
         }
-        .chg-btn:hover { background: var(--accent); color: #fff; box-shadow: 0 4px 14px rgba(83,58,253,0.25); }
-        .chg-modal-mask {
-            position: fixed; inset: 0; background: rgba(13, 37, 61, 0.45);
-            display: none; align-items: center; justify-content: center; z-index: 9999;
-            padding: 20px;
-        }
-        .chg-modal-mask.show { display: flex; }
+        .chg-mask.show { display: flex; }
         .chg-modal {
-            width: 100%; max-width: 560px; background: #fff;
-            border-radius: 16px; padding: 24px;
-            box-shadow: 0 24px 60px rgba(13,37,61,0.25);
-            animation: chgIn 0.18s ease;
+            width: 100%; max-width: 560px; background: #fff; border-radius: 14px; padding: 24px;
+            box-shadow: 0 20px 60px rgba(17,24,39,0.2); animation: chgIn 0.18s ease;
         }
         @keyframes chgIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-        .chg-modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-        .chg-modal-title { font-size: 17px; font-weight: 600; color: var(--ink); }
-        .chg-modal-close { font-size: 13px; color: var(--ink-subtle); cursor: pointer; padding: 4px 10px; border-radius: 9999px; background: #f6f9fc; transition: all 0.15s; }
-        .chg-modal-close:hover { background: #eef1f6; color: var(--ink); }
+        .chg-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        .chg-title { font-size: 16px; font-weight: 600; color: var(--ink); }
+        .chg-close { font-size: 13px; color: var(--ink-subtle); cursor: pointer; padding: 4px 10px; border-radius: 6px; background: #f3f4f6; transition: all 0.15s; }
+        .chg-close:hover { background: #e5e7eb; color: var(--ink); }
         .chg-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        .chg-table th {
-            text-align: left; font-size: 12px; font-weight: 600; color: var(--ink-subtle);
-            padding: 10px 12px; background: #f6f9fc; border-bottom: 1px solid var(--border);
-        }
-        .chg-table td { padding: 12px; color: var(--ink); border-bottom: 1px solid #eef1f5; vertical-align: top; line-height: 1.6; }
+        .chg-table th { text-align: left; font-size: 12px; font-weight: 600; color: var(--ink-subtle); padding: 10px 12px; background: #f9fafb; border-bottom: 1px solid var(--border); }
+        .chg-table td { padding: 12px; color: var(--ink); border-bottom: 1px solid #f3f4f6; vertical-align: top; line-height: 1.6; }
         .chg-table tr:last-child td { border-bottom: none; }
         .chg-table .col-date { white-space: nowrap; font-weight: 500; }
         .chg-table .col-module { white-space: nowrap; color: var(--accent); font-weight: 500; }
 
-        .back-home {
-            position: fixed;
-            bottom: 32px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #533afd;
-            color: #fff;
-            padding: 12px 32px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.2s;
-            border: none;
-            font-family: var(--font-body);
+        @media (max-width: 600px) {
+            .page-wrap { padding: 16px 12px 80px; }
+            .hero h1 { font-size: 24px; }
+            .sec-head { padding: 13px 16px; }
+            .sub-head { padding: 10px 16px; }
+            .item { padding: 9px 16px; }
         }
-        .back-home:hover { background: #4434d4; }
     </style>
 </head>
 <body>
-<div class="page-wrap">
-    <div class="header-area">
-        <div class="app-name">需求目录</div>
-        <div class="app-desc">离泰数链</div>
-    </div>
 
-    <div class="section">
-        <div class="section-header">
-            <span class="sh-label">AI创作和研学报告</span>
-        </div>
-        <div class="list">
-            <a class="item" href="AI创作和研学报告.html">
-                <span class="it-label">AI创作和研学报告</span>
-                <span class="it-tag green">已完成</span>
-            </a>
-        </div>
+<div class="topbar">
+    <span class="topbar-title">需求目录 · 离泰数链</span>
+    <div class="topbar-actions">
+        <button class="topbar-btn" onclick="expandAll()">全部展开</button>
+        <button class="topbar-btn" onclick="collapseAll()">全部收起</button>
     </div>
-
-    <div class="section">
-        <div class="section-header" style="cursor:pointer;" onclick="toggleIteration()">
-            <span class="sh-label">2026.7.7 迭代</span>
-            <span id="iterToggle" style="font-size:14px;color:var(--ink-subtle);margin-left:auto;">▾ 展开</span>
-        </div>
-        <div class="list" id="iterList">
-            <a class="item" href="admin/积分规则配置.html">
-                <span class="it-label">商城积分</span>
-                <span class="it-tag gray">待开发</span>
-                <span class="it-arrow">›</span>
-            </a>
-            <div class="item" style="flex-direction:column;align-items:stretch;gap:0;padding:0;">
-                <div style="padding:14px 18px 8px;font-size:15px;font-weight:500;color:var(--ink);">AI创作优化</div>
-                <div style="border-top:1px solid var(--border);padding:6px 6px;">
-                    <a class="item" href="AI创作_v2.html" style="border-radius:8px;padding:10px 14px;margin-bottom:4px;">
-                        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
-                        <span class="it-label">AI创作</span>
-                        <span class="it-tag green">已完成</span>
-                        <span class="it-arrow">›</span>
-                    </a>
-                    <a class="item" href="购买次数_v2.html" style="border-radius:8px;padding:10px 14px;margin-bottom:4px;">
-                        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
-                        <span class="it-label">AI次数购买</span>
-                        <span class="it-tag gray">待开发</span>
-                        <span class="it-arrow">›</span>
-                    </a>
-                    <a class="item" href="购买记录.html" style="border-radius:8px;padding:10px 14px;margin-bottom:4px;">
-                        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
-                        <span class="it-label">购买记录</span>
-                        <span class="it-tag gray">待开发</span>
-                        <span class="it-arrow">›</span>
-                    </a>
-                    <a class="item" href="admin/研学手记配置_v4.html" style="border-radius:8px;padding:10px 14px;margin-bottom:4px;">
-                        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
-                        <span class="it-label">研学手记配置（后台）</span>
-                        <span class="it-tag gray">待开发</span>
-                        <span class="it-arrow">›</span>
-                    </a>
-                    <a class="item" href="admin/AI创作销售配置_v2.html" style="border-radius:8px;padding:10px 14px;margin-bottom:4px;">
-                        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
-                        <span class="it-label">AI创作销售配置（后台）</span>
-                        <span class="it-tag gray">待开发</span>
-                        <span class="it-arrow">›</span>
-                    </a>
-                    <a class="item" href="admin/AI销售查询.html" style="border-radius:8px;padding:10px 14px;">
-                        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
-                        <span class="it-label">AI销售查询（后台）</span>
-                        <span class="it-tag gray">待开发</span>
-                        <span class="it-arrow">›</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="section">
-        <div class="section-header">
-            <span class="sh-label">2026.7.27 迭代</span>
-        </div>
-        <div class="list">
-            <div class="item" style="flex-direction:column;align-items:stretch;gap:0;padding:0;">
-                <div style="padding:14px 18px 8px;font-size:15px;font-weight:500;color:var(--ink);">AI创作分享</div>
-                <div style="border-top:1px solid var(--border);padding:6px 6px;">
-                    <a class="item" href="AI创作_v3.html" style="border-radius:8px;padding:10px 14px;">
-                        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
-                        <span class="it-label">AI创作分享</span>
-                        <span class="it-tag green">已完成</span>
-                        <span class="it-arrow">›</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="section">
-        <div class="section-header">
-            <span class="sh-label">2026.8.19 迭代</span>
-            <span class="chg-btn" onclick="openChangeLog()">需求变更记录</span>
-        </div>
-        <div class="list">
-            <div class="item" style="flex-direction:column;align-items:stretch;gap:0;padding:0;">
-                <div style="padding:14px 18px 8px;font-size:15px;font-weight:500;color:var(--ink);">用户小程序</div>
-                <div style="border-top:1px solid var(--border);padding:6px 6px;">
-                    <a class="item" href="2026819需求/app/选择场次.html" style="border-radius:8px;padding:10px 14px;margin-bottom:4px;">
-                        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
-                        <span class="it-label">选择场次</span>
-                        <span class="it-tag p0">P0</span>
-                        <span class="it-tag gray">待开发</span>
-                        <span class="it-arrow">›</span>
-                    </a>
-                    <a class="item" href="2026819需求/app/填写购买信息.html" style="border-radius:8px;padding:10px 14px;margin-bottom:4px;">
-                        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
-                        <span class="it-label">填写购买信息</span>
-                        <span class="it-tag p0">P0</span>
-                        <span class="it-tag gray">待开发</span>
-                        <span class="it-arrow">›</span>
-                    </a>
-                    <a class="item" href="2026819需求/app/选择出行人.html" style="border-radius:8px;padding:10px 14px;margin-bottom:4px;">
-                        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
-                        <span class="it-label">选择出行人</span>
-                        <span class="it-tag p0">P0</span>
-                        <span class="it-tag gray">待开发</span>
-                        <span class="it-arrow">›</span>
-                    </a>
-                    <a class="item" href="2026819需求/app/购买成功.html" style="border-radius:8px;padding:10px 14px;margin-bottom:4px;">
-                        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
-                        <span class="it-label">购买成功</span>
-                        <span class="it-tag p1">P1</span>
-                        <span class="it-tag gray">待开发</span>
-                        <span class="it-arrow">›</span>
-                    </a>
-                    <a class="item" href="2026819需求/app/订单详情（待核销）.html" style="border-radius:8px;padding:10px 14px;margin-bottom:4px;">
-                        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
-                        <span class="it-label">订单详情（待核销）</span>
-                        <span class="it-tag p0">P0</span>
-                        <span class="it-tag gray">待开发</span>
-                        <span class="it-arrow">›</span>
-                    </a>
-                    <a class="item" href="2026819需求/app/消息短信.html" style="border-radius:8px;padding:10px 14px;margin-bottom:4px;">
-                        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
-                        <span class="it-label">消息短信</span>
-                        <span class="it-tag p1">P1</span>
-                        <span class="it-tag gray">待开发</span>
-                        <span class="it-arrow">›</span>
-                    </a>
-                    <a class="item" href="2026819需求/app/AI创作_v4.html" style="border-radius:8px;padding:10px 14px;">
-                        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
-                        <span class="it-label">AI创作</span>
-                        <span class="it-tag p1">P1</span>
-                        <span class="it-tag gray">待开发</span>
-                        <span class="it-arrow">›</span>
-                    </a>
-                </div>
-            </div>
-            <div class="item" style="flex-direction:column;align-items:stretch;gap:0;padding:0;">
-                <div style="padding:14px 18px 8px;font-size:15px;font-weight:500;color:var(--ink);">后台</div>
-                <div style="border-top:1px solid var(--border);padding:6px 6px;">
-                    <a class="item" href="2026819需求/admin/课程发布.html" style="border-radius:8px;padding:10px 14px;margin-bottom:4px;">
-                        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
-                        <span class="it-label">课程发布</span>
-                        <span class="it-tag p0">P0</span>
-                        <span class="it-tag gray">待开发</span>
-                        <span class="it-arrow">›</span>
-                    </a>
-                    <a class="item" href="2026819需求/admin/拼团订单管理.html" style="border-radius:8px;padding:10px 14px;margin-bottom:4px;">
-                        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
-                        <span class="it-label">拼团订单管理</span>
-                        <span class="it-tag p0">P0</span>
-                        <span class="it-tag gray">待开发</span>
-                        <span class="it-arrow">›</span>
-                    </a>
-                    <a class="item" href="2026819需求/admin/用户订单管理.html" style="border-radius:8px;padding:10px 14px;margin-bottom:4px;">
-                        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
-                        <span class="it-label">用户订单管理</span>
-                        <span class="it-tag p0">P0</span>
-                        <span class="it-tag gray">待开发</span>
-                        <span class="it-arrow">›</span>
-                    </a>
-                    <a class="item" href="2026819需求/admin/研学手记配置_v5.html" style="border-radius:8px;padding:10px 14px;margin-bottom:4px;">
-                        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
-                        <span class="it-label">研学手记配置</span>
-                        <span class="it-tag p1">P1</span>
-                        <span class="it-tag gray">待开发</span>
-                        <span class="it-arrow">›</span>
-                    </a>
-                    <a class="item" href="2026819需求/admin/AI创作销售配置_v3.html" style="border-radius:8px;padding:10px 14px;">
-                        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
-                        <span class="it-label">AI创作销售配置</span>
-                        <span class="it-tag p1">P1</span>
-                        <span class="it-tag gray">待开发</span>
-                        <span class="it-arrow">›</span>
-                    </a>
-                    <a class="item" href="2026819需求/admin/课程管理_v2.html" style="border-radius:8px;padding:10px 14px;">
-                        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
-                        <span class="it-label">课程管理</span>
-                        <span class="it-tag p1">P1</span>
-                        <span class="it-tag gray">待开发</span>
-                        <span class="it-arrow">›</span>
-                    </a>
-                </div>
-            </div>
-            <div class="item" style="flex-direction:column;align-items:stretch;gap:0;padding:0;">
-                <div style="padding:14px 18px 8px;font-size:15px;font-weight:500;color:var(--ink);">机构端</div>
-                <div style="border-top:1px solid var(--border);padding:6px 6px;">
-                    <a class="item" href="2026819需求/organization/订单详情.html" style="border-radius:8px;padding:10px 14px;margin-bottom:4px;">
-                        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
-                        <span class="it-label">订单详情</span>
-                        <span class="it-tag p0">P0</span>
-                        <span class="it-tag gray">待开发</span>
-                        <span class="it-arrow">›</span>
-                    </a>
-                    <a class="item" href="2026819需求/organization/研学用户评价.html" style="border-radius:8px;padding:10px 14px;margin-bottom:4px;">
-                        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
-                        <span class="it-label">研学用户评价</span>
-                        <span class="it-tag p2">P2</span>
-                        <span class="it-tag gray">待开发</span>
-                        <span class="it-arrow">›</span>
-                    </a>
-                    <a class="item" href="2026819需求/organization/AI作品.html" style="border-radius:8px;padding:10px 14px;margin-bottom:4px;">
-                        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
-                        <span class="it-label">AI作品</span>
-                        <span class="it-tag p2">P2</span>
-                        <span class="it-tag gray">待开发</span>
-                        <span class="it-arrow">›</span>
-                    </a>
-                    <a class="item" href="2026819需求/organization/专属精彩.html" style="border-radius:8px;padding:10px 14px;margin-bottom:4px;">
-                        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
-                        <span class="it-label">专属精彩</span>
-                        <span class="it-tag p2">P2</span>
-                        <span class="it-tag gray">待开发</span>
-                        <span class="it-arrow">›</span>
-                    </a>
-                    <a class="item" href="2026819需求/organization/研学信息.html" style="border-radius:8px;padding:10px 14px;margin-bottom:4px;">
-                        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
-                        <span class="it-label">研学信息</span>
-                        <span class="it-tag p2">P2</span>
-                        <span class="it-tag gray">待开发</span>
-                        <span class="it-arrow">›</span>
-                    </a>
-                    <a class="item" href="2026819需求/organization/研学现场.html" style="border-radius:8px;padding:10px 14px;">
-                        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
-                        <span class="it-label">研学现场</span>
-                        <span class="it-tag p2">P2</span>
-                        <span class="it-tag gray">待开发</span>
-                        <span class="it-arrow">›</span>
-                    </a>
-                </div>
-            </div>
-            <div class="item" style="flex-direction:column;align-items:stretch;gap:0;padding:0;">
-                <div style="padding:14px 18px 8px;font-size:15px;font-weight:500;color:var(--ink);">社区</div>
-                <div style="border-top:1px solid var(--border);padding:6px 6px;">
-                    <a class="item" href="2026819需求/社区/社区.html" style="border-radius:8px;padding:10px 14px;margin-bottom:4px;">
-                        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
-                        <span class="it-label">社区</span>
-                        <span class="it-tag p3">P3</span>
-                        <span class="it-tag gray">待开发</span>
-                        <span class="it-arrow">›</span>
-                    </a>
-                    <a class="item" href="2026819需求/社区/视频详情.html" style="border-radius:8px;padding:10px 14px;margin-bottom:4px;">
-                        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
-                        <span class="it-label">视频详情</span>
-                        <span class="it-tag p3">P3</span>
-                        <span class="it-tag gray">待开发</span>
-                        <span class="it-arrow">›</span>
-                    </a>
-                    <a class="item" href="2026819需求/社区/视频详情_自己.html" style="border-radius:8px;padding:10px 14px;margin-bottom:4px;">
-                        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
-                        <span class="it-label">我的视频详情</span>
-                        <span class="it-tag p3">P3</span>
-                        <span class="it-tag gray">待开发</span>
-                        <span class="it-arrow">›</span>
-                    </a>
-                    <a class="item" href="2026819需求/社区/我的作品.html" style="border-radius:8px;padding:10px 14px;margin-bottom:4px;">
-                        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
-                        <span class="it-label">我的作品</span>
-                        <span class="it-tag p3">P3</span>
-                        <span class="it-tag gray">待开发</span>
-                        <span class="it-arrow">›</span>
-                    </a>
-                    <a class="item" href="2026819需求/社区/我的.html" style="border-radius:8px;padding:10px 14px;margin-bottom:4px;">
-                        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
-                        <span class="it-label">我的</span>
-                        <span class="it-tag p3">P3</span>
-                        <span class="it-tag gray">待开发</span>
-                        <span class="it-arrow">›</span>
-                    </a>
-                    <a class="item" href="2026819需求/社区/社区管理.html" style="border-radius:8px;padding:10px 14px;">
-                        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;"></span>
-                        <span class="it-label">社区视频管理（后台）</span>
-                        <span class="it-tag p3">P3</span>
-                        <span class="it-tag gray">待开发</span>
-                        <span class="it-arrow">›</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="section">
-        <div class="section-header">
-            <span class="sh-label">分销</span>
-        </div>
-        <div class="list">
-            <a class="item" href="分销/我的主页.html">
-                <span class="it-label">分销入口</span>
-                <span class="it-tag gray">待开发</span>
-                <span class="it-arrow">›</span>
-            </a>
-        </div>
-    </div>
-
 </div>
 
-<div class="chg-modal-mask" id="chgModal" onclick="if(event.target===this)closeChangeLog()">
+<div class="page-wrap" id="pageWrap">
+    <div class="hero">
+        <h1>离泰数链</h1>
+        <p>产品需求原型总览</p>
+    </div>
+</div>
+
+<!-- 变更记录弹窗 -->
+<div class="chg-mask" id="chgModal" onclick="if(event.target===this)closeChangeLog()">
     <div class="chg-modal">
-        <div class="chg-modal-head">
-            <div class="chg-modal-title">需求变更记录</div>
-            <span class="chg-modal-close" onclick="closeChangeLog()">✕ 关闭</span>
+        <div class="chg-head">
+            <div class="chg-title">需求变更记录</div>
+            <span class="chg-close" onclick="closeChangeLog()">✕ 关闭</span>
         </div>
         <table class="chg-table">
-            <thead>
-                <tr>
-                    <th style="width:120px;">日期</th>
-                    <th style="width:150px;">模块</th>
-                    <th>变更内容</th>
-                </tr>
-            </thead>
+            <thead><tr><th style="width:120px;">日期</th><th style="width:150px;">模块</th><th>变更内容</th></tr></thead>
             <tbody>
-                <tr>
-                    <td class="col-date">2026.8.31</td>
-                    <td class="col-module">拼团订单管理</td>
-                    <td>列表中遗漏了最晚拼团确认时间</td>
-                </tr>
+                <tr><td class="col-date">2026.8.31</td><td class="col-module">拼团订单管理</td><td>列表中遗漏了最晚拼团确认时间</td></tr>
             </tbody>
         </table>
     </div>
 </div>
 
 <script>
-    var iterCollapsed = true;
-
-    function toggleIteration() {
-        iterCollapsed = !iterCollapsed;
-        var list = document.getElementById('iterList');
-        var toggle = document.getElementById('iterToggle');
-        if (iterCollapsed) {
-            list.style.display = 'none';
-            toggle.textContent = '▾ 展开';
-        } else {
-            list.style.display = '';
-            toggle.textContent = '▴ 收起';
-        }
+/* ===== 数据配置：新增迭代/页面只需在此添加 ===== */
+var SECTIONS = [
+    {
+        title: "AI创作和研学报告",
+        flat: true,
+        items: [
+            { label: "AI创作和研学报告", href: "AI创作和研学报告.html", tags: [{t:"已完成",c:"green"}] }
+        ]
+    },
+    {
+        title: "2026.7.7 迭代",
+        groups: [
+            {
+                name: "商城积分",
+                items: [
+                    { label: "商城积分", href: "admin/积分规则配置.html", tags: [{t:"待开发",c:"gray"}] }
+                ]
+            },
+            {
+                name: "AI创作优化",
+                items: [
+                    { label: "AI创作", href: "AI创作_v2.html", tags: [{t:"已完成",c:"green"}] },
+                    { label: "AI次数购买", href: "购买次数_v2.html", tags: [{t:"待开发",c:"gray"}] },
+                    { label: "购买记录", href: "购买记录.html", tags: [{t:"待开发",c:"gray"}] },
+                    { label: "研学手记配置（后台）", href: "admin/研学手记配置_v4.html", tags: [{t:"待开发",c:"gray"}] },
+                    { label: "AI创作销售配置（后台）", href: "admin/AI创作销售配置_v2.html", tags: [{t:"待开发",c:"gray"}] },
+                    { label: "AI销售查询（后台）", href: "admin/AI销售查询.html", tags: [{t:"待开发",c:"gray"}] }
+                ]
+            }
+        ]
+    },
+    {
+        title: "2026.7.27 迭代",
+        groups: [
+            {
+                name: "AI创作分享",
+                items: [
+                    { label: "AI创作分享", href: "AI创作_v3.html", tags: [{t:"已完成",c:"green"}] }
+                ]
+            }
+        ]
+    },
+    {
+        title: "2026.8.19 迭代",
+        chgLog: true,
+        groups: [
+            {
+                name: "用户小程序",
+                items: [
+                    { label: "选择场次", href: "2026819需求/app/选择场次.html", tags: [{t:"P0",c:"p0"},{t:"待开发",c:"gray"}] },
+                    { label: "填写购买信息", href: "2026819需求/app/填写购买信息.html", tags: [{t:"P0",c:"p0"},{t:"待开发",c:"gray"}] },
+                    { label: "选择出行人", href: "2026819需求/app/选择出行人.html", tags: [{t:"P0",c:"p0"},{t:"待开发",c:"gray"}] },
+                    { label: "购买成功", href: "2026819需求/app/购买成功.html", tags: [{t:"P1",c:"p1"},{t:"待开发",c:"gray"}] },
+                    { label: "订单详情（待核销）", href: "2026819需求/app/订单详情（待核销）.html", tags: [{t:"P0",c:"p0"},{t:"待开发",c:"gray"}] },
+                    { label: "消息短信", href: "2026819需求/app/消息短信.html", tags: [{t:"P1",c:"p1"},{t:"待开发",c:"gray"}] },
+                    { label: "AI创作", href: "2026819需求/app/AI创作_v4.html", tags: [{t:"P1",c:"p1"},{t:"待开发",c:"gray"}] }
+                ]
+            },
+            {
+                name: "后台",
+                items: [
+                    { label: "课程发布", href: "2026819需求/admin/课程发布.html", tags: [{t:"P0",c:"p0"},{t:"待开发",c:"gray"}] },
+                    { label: "拼团订单管理", href: "2026819需求/admin/拼团订单管理.html", tags: [{t:"P0",c:"p0"},{t:"待开发",c:"gray"}] },
+                    { label: "用户订单管理", href: "2026819需求/admin/用户订单管理.html", tags: [{t:"P0",c:"p0"},{t:"待开发",c:"gray"}] },
+                    { label: "研学手记配置", href: "2026819需求/admin/研学手记配置_v5.html", tags: [{t:"P1",c:"p1"},{t:"待开发",c:"gray"}] },
+                    { label: "AI创作销售配置", href: "2026819需求/admin/AI创作销售配置_v3.html", tags: [{t:"P1",c:"p1"},{t:"待开发",c:"gray"}] },
+                    { label: "课程管理", href: "2026819需求/admin/课程管理_v2.html", tags: [{t:"P1",c:"p1"},{t:"待开发",c:"gray"}] }
+                ]
+            },
+            {
+                name: "机构端",
+                items: [
+                    { label: "订单详情", href: "2026819需求/organization/订单详情.html", tags: [{t:"P0",c:"p0"},{t:"待开发",c:"gray"}] },
+                    { label: "研学用户评价", href: "2026819需求/organization/研学用户评价.html", tags: [{t:"P2",c:"p2"},{t:"待开发",c:"gray"}] },
+                    { label: "AI作品", href: "2026819需求/organization/AI作品.html", tags: [{t:"P2",c:"p2"},{t:"待开发",c:"gray"}] },
+                    { label: "专属精彩", href: "2026819需求/organization/专属精彩.html", tags: [{t:"P2",c:"p2"},{t:"待开发",c:"gray"}] },
+                    { label: "研学信息", href: "2026819需求/organization/研学信息.html", tags: [{t:"P2",c:"p2"},{t:"待开发",c:"gray"}] },
+                    { label: "研学现场", href: "2026819需求/organization/研学现场.html", tags: [{t:"P2",c:"p2"},{t:"待开发",c:"gray"}] }
+                ]
+            },
+            {
+                name: "社区",
+                items: [
+                    { label: "社区", href: "2026819需求/社区/社区.html", tags: [{t:"P3",c:"p3"},{t:"待开发",c:"gray"}] },
+                    { label: "视频详情", href: "2026819需求/社区/视频详情.html", tags: [{t:"P3",c:"p3"},{t:"待开发",c:"gray"}] },
+                    { label: "我的视频详情", href: "2026819需求/社区/视频详情_自己.html", tags: [{t:"P3",c:"p3"},{t:"待开发",c:"gray"}] },
+                    { label: "我的作品", href: "2026819需求/社区/我的作品.html", tags: [{t:"P3",c:"p3"},{t:"待开发",c:"gray"}] },
+                    { label: "我的", href: "2026819需求/社区/我的.html", tags: [{t:"P3",c:"p3"},{t:"待开发",c:"gray"}] },
+                    { label: "社区视频管理（后台）", href: "2026819需求/社区/社区管理.html", tags: [{t:"P3",c:"p3"},{t:"待开发",c:"gray"}] }
+                ]
+            }
+        ]
+    },
+    {
+        title: "分销（tbd）",
+        flat: true,
+        items: [
+            { label: "分销入口", href: "分销/我的主页.html", tags: [{t:"待开发",c:"gray"}] }
+        ]
     }
+];
 
-    // 默认收起
-    document.getElementById('iterList').style.display = 'none';
+/* ===== 渲染 ===== */
+function renderTags(tags) {
+    if (!tags || !tags.length) return '';
+    return tags.map(function(tg) {
+        return '<span class="tag ' + tg.c + '">' + tg.t + '</span>';
+    }).join('');
+}
 
-    function openChangeLog() {
-        document.getElementById('chgModal').classList.add('show');
+function renderItems(items) {
+    return items.map(function(it) {
+        return '<a class="item" href="' + it.href + '" target="_blank">'
+            + '<span class="item-dot"></span>'
+            + '<span class="item-label">' + it.label + '</span>'
+            + renderTags(it.tags)
+            + '<span class="item-arrow">›</span>'
+            + '</a>';
+    }).join('');
+}
+
+function countItems(section) {
+    if (section.flat) return section.items.length;
+    var n = 0;
+    section.groups.forEach(function(g) { n += g.items.length; });
+    return n;
+}
+
+function renderSection(section) {
+    var total = countItems(section);
+    var badgeHtml = '';
+    if (section.chgLog) {
+        badgeHtml = '<span class="sec-chg-btn" onclick="event.stopPropagation();openChangeLog()">变更记录</span>';
     }
-    function closeChangeLog() {
-        document.getElementById('chgModal').classList.remove('show');
+    var bodyHtml = '';
+    if (section.flat) {
+        bodyHtml = '<div class="flat-list">' + renderItems(section.items) + '</div>';
+    } else {
+        bodyHtml = section.groups.map(function(g, gi) {
+            return '<div class="subgroup" id="sub_' + section.id + '_' + gi + '">'
+                + '<div class="sub-head" onclick="toggleSub(\'' + section.id + '\',' + gi + ')">'
+                + '<span class="sub-dot"></span>'
+                + '<span class="sub-title">' + g.name + '</span>'
+                + '<span class="sub-count">' + g.items.length + '项</span>'
+                + '<span class="sub-chevron">›</span>'
+                + '</div>'
+                + '<div class="sub-body">' + renderItems(g.items) + '</div>'
+                + '</div>';
+        }).join('');
     }
+    return '<div class="section" id="' + section.id + '">'
+        + '<div class="sec-head" onclick="toggleSection(\'' + section.id + '\')">'
+        + '<span class="sec-chevron">›</span>'
+        + '<span class="sec-title">' + section.title + '</span>'
+        + '<span class="sec-count">' + total + '项</span>'
+        + badgeHtml
+        + '</div>'
+        + '<div class="sec-body">' + bodyHtml + '</div>'
+        + '</div>';
+}
+
+/* ===== 交互 ===== */
+function toggleSection(id) {
+    var el = document.getElementById(id);
+    el.classList.toggle('open');
+}
+function toggleSub(secId, gi) {
+    var el = document.getElementById('sub_' + secId + '_' + gi);
+    el.classList.toggle('open');
+}
+function expandAll() {
+    document.querySelectorAll('.section').forEach(function(s) { s.classList.add('open'); });
+    document.querySelectorAll('.subgroup').forEach(function(s) { s.classList.add('open'); });
+}
+function collapseAll() {
+    document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('open'); });
+    document.querySelectorAll('.subgroup').forEach(function(s) { s.classList.remove('open'); });
+}
+function openChangeLog() { document.getElementById('chgModal').classList.add('show'); }
+function closeChangeLog() { document.getElementById('chgModal').classList.remove('show'); }
+
+/* ===== 初始化（默认全部收起） ===== */
+(function init() {
+    SECTIONS.forEach(function(s, i) { s.id = 'sec_' + i; });
+    var html = SECTIONS.map(renderSection).join('');
+    var hero = document.querySelector('.hero');
+    hero.insertAdjacentHTML('afterend', html);
+})();
 </script>
 </body>
 </html>

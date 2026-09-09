@@ -669,7 +669,7 @@
     function exportGroups() {
         var list = groups.filter(function(g) { return currentTab === 'all' || g.status === currentTab; });
         if (list.length === 0) { alert('暂无数据可导出'); return; }
-        var header = ['拼团编号', '课程编号', '课程名称', '场次', '核验机构', '执行机构', '最低成团人数', '最高成团人数', '拼团进度(主类型)', '其他成员数', '总成员数', '实付总额', '拼团状态', '成团时间', '拼团确认时间', '下单时间'];
+        var header = ['拼团编号', '课程编号', '课程名称', '场次', '核验机构', '执行机构', '最低成团人数', '最高成团人数', '拼团进度(主类型)', '其他成员数', '总成员数', '实付总额', '拼团状态', '成团时间', '拼团确认时间', '创建时间'];
         var rows = list.map(function(g) {
             return [g.id, g.courseNo, g.course, g.session, g.verifyInstitution, g.execInstitution, g.minOrder, g.maxOrder, g.mainOrder, g.otherOrder, (g.mainOrder + g.otherOrder), g.amount, statusMap[g.status].label, g.groupTime || '', g.confirmDate, g.createTime];
         });
