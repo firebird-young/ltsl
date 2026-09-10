@@ -282,7 +282,7 @@
                         <th>实付金额</th>
                         <th>订单状态</th>
                         <th>拼团确认时间</th>
-                        <th>下单时间</th>
+                        <th>创建时间</th>
                         <th>关联拼团</th>
                         <th style="width:240px;">操作</th>
                     </tr>
@@ -676,16 +676,62 @@
     function exportOrders() {
         var list = orders.filter(function(o) { return currentTab === 'all' || o.status === currentTab; });
         if (list.length === 0) { alert('暂无数据可导出'); return; }
-        var header = ['订单编号', '用户账号', '课程编号', '课程名称', '场次', '出行人（规格/价格）', '总金额', '优惠金额', '实付金额', '订单状态', '拼团确认时间', '下单时间', '关联拼团编号'];
+        var header = ['订单编号', '用户账号', '课程编号', '课程名称', '场次时间', '场次名称', '出行人（年龄 / 规格 / 价格）', '总金额', '优惠金额', '实付金额', '订单状态', '拼团确认时间', '创建时间', '关联拼团编号'];
         var rows = list.map(function(o) {
+            /* 场次拆分为「场次时间 + 场次名称」两列（场次格式：日期 空格 名称） */
+            var sessionParts = o.session.split(' ');
+            var sessionDate = sessionParts[0] || '';
+            var sessionName = sessionParts.slice(1).join(' ');
             var travelers = o.travelers.map(function(t) {
                 var spec = t.type === 'main' ? '学生带午餐' : '家长';
                 var p = (t.price % 1 === 0) ? t.price.toFixed(0) : t.price.toFixed(2);
-                return t.name + '(' + t.gender + ' ' + spec + ' ¥' + p + ')';
-            }).join('、');
-            return [o.id, o.user.phone, o.courseNo, o.course, o.session, travelers, o.totalAmount, o.discount, o.amount, statusMap[o.status].label, o.confirmDate || '', o.createTime, o.groupId];
+                var ageText = t.age ? ' ' + t.age + '岁' : '';
+                return t.name + '(' + t.gender + ageText + ' ' + spec + ' ¥' + p + ')';
+            }).join('\n');
+            return [o.id, o.user.phone, o.courseNo, o.course, sessionDate, sessionName, travelers, o.totalAmount, o.discount, o.amount, statusMap[o.status].label, o.confirmDate || '', o.createTime, o.groupId];
         });
-        downloadCsv('用户订单管理.csv', header, rows);
+        /* 列宽（px）：与导出表头一一对应，「出行人（年龄 / 规格 / 价格）」列加宽，避免导出后内容被挤压 */
+        var widths = [200, 150, 180, 200, 140, 140, 480, 100, 100, 100, 110, 160, 160, 180];
+        downloadExcel('用户订单管理_' + exportTimeStamp() + '.xls', header, rows, widths);
+    }
+
+    /* 导出文件名时间戳：YYYYMMDD_HHmm */
+    function exportTimeStamp() {
+        var d = new Date();
+        var p = function(n) { return n < 10 ? '0' + n : '' + n; };
+        return '' + d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + '_' + p(d.getHours()) + p(d.getMinutes());
+    }
+
+    /* 导出为 Excel（HTML 表格形式，可指定列宽；单元格内多人按行换行保留） */
+    function downloadExcel(filename, header, rows, widths) {
+        var escapeCell = function(v) {
+            return String(v == null ? '' : v)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/\n/g, '<br>');
+        };
+        var colgroup = '<colgroup>' + widths.map(function(w) {
+            return '<col style="width:' + w + 'px;">';
+        }).join('') + '</colgroup>';
+        var thead = '<tr>' + header.map(function(h, i) {
+            return '<th style="width:' + widths[i] + 'px;">' + escapeCell(h) + '</th>';
+        }).join('') + '</tr>';
+        var tbody = rows.map(function(r) {
+            return '<tr>' + r.map(function(c, i) {
+                return '<td style="width:' + widths[i] + 'px; vertical-align:top; mso-number-format:\'\\@\';">' + escapeCell(c) + '</td>';
+            }).join('') + '</tr>';
+        }).join('');
+        var html = '<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8">'
+            + '<style>table{border-collapse:collapse;font-family:"Microsoft YaHei",Arial,sans-serif;font-size:11pt;}'
+            + 'th,td{border:1px solid #d0d5dd;padding:4px 8px;text-align:left;vertical-align:top;}'
+            + 'th{background:#f2f5fa;font-weight:bold;}</style></head><body>'
+            + '<table>' + colgroup + thead + tbody + '</table></body></html>';
+        var blob = new Blob(['\uFEFF' + html], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     }
 
     function downloadCsv(filename, header, rows) {
@@ -746,7 +792,8 @@
             </ul>
             <h4>七、数据导出</h4>
             <ul>
-                <li>右上角「导出」按钮，将当前状态下的列表数据导出为表格文件。</li>
+                <li>右上角「导出」按钮，将当前状态下的列表数据导出为表格文件（Excel 格式 .xls，UTF-8，内置各列列宽，Excel / WPS 可直接打开，文件名带导出时间戳，如 <strong>用户订单管理_20260910_1530.xls</strong>）。</li>
+                <li>导出列：订单编号、用户账号、课程编号、课程名称、<strong>场次时间</strong>、<strong>场次名称</strong>（场次按「日期 + 名称」拆为两列）、<strong>出行人（年龄 / 规格 / 价格）</strong>（含姓名、性别、<strong>年龄</strong>、规格与单价，<strong>多个出行人逐个换行</strong>展示）、总金额、优惠金额、实付金额、订单状态、拼团确认时间、<strong>创建时间</strong>、关联拼团编号。</li>
             </ul>
         </div>
     </div>

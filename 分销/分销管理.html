@@ -41,16 +41,34 @@
         .main { padding: 16px 24px 40px; }
 
         /* 统计卡片 */
-        .stat-row { display: flex; gap: 16px; margin-bottom: 24px; }
+        .stat-group { margin-bottom: 22px; }
+        .stat-group-title {
+            display: flex; align-items: center; gap: 7px;
+            font-size: 13px; font-weight: 600; color: var(--ink-muted);
+            margin: 2px 2px 10px;
+        }
+        .stat-group-title::before {
+            content: ""; width: 3px; height: 13px; border-radius: 2px;
+            background: var(--accent); flex-shrink: 0;
+        }
+        .stat-row { display: flex; flex-wrap: wrap; gap: 16px; }
         .stat-card {
-            flex: 1; background: #fff; border-radius: var(--radius-card); padding: 18px 20px;
+            flex: 1 1 calc(33.333% - 11px); min-width: 240px;
+            background: #fff; border-radius: var(--radius-card); padding: 18px 20px;
             box-shadow: var(--shadow-card);
         }
         .stat-card .sc-label { font-size: 13px; color: var(--ink-subtle); font-weight: 400; }
-        .stat-card .sc-value { font-size: 24px; font-weight: 700; color: var(--ink); margin-top: 4px; }
+        .stat-card .sc-value { font-size: 23px; font-weight: 700; color: var(--ink); margin-top: 5px; letter-spacing: -0.2px; }
         .stat-card .sc-value.blue { color: var(--accent); }
         .stat-card .sc-value.green { color: #34c759; }
         .stat-card .sc-value.orange { color: #ff9500; }
+        .stat-card .sc-value.red { color: #e5484d; }
+        /* 佣金总额组：四张卡强制一行 */
+        .stat-row.row-4 .stat-card { flex: 1 1 calc(25% - 12px); min-width: 0; }
+        @media (max-width: 1100px) {
+            .stat-card { flex-basis: calc(50% - 8px); }
+            .stat-row.row-4 .stat-card { flex-basis: calc(25% - 12px); }
+        }
 
         /* Tab 切换 */
         .tab-bar { display: flex; gap: 0; margin-bottom: 16px; background: #fff; border-radius: var(--radius-pill); overflow: hidden; box-shadow: var(--shadow-card); padding: 4px; }
@@ -83,6 +101,104 @@
         }
         .filter-bar .btn.primary { background: var(--accent); color: #fff; }
         .filter-bar .btn.primary:hover { background: var(--accent-hover); }
+
+        /* ── 独立筛选面板（分销订单） ── */
+        .adv-filter {
+            background: #fff; border-radius: var(--radius-card); box-shadow: var(--shadow-card);
+            padding: 16px 18px 14px; margin-bottom: 16px;
+        }
+        .af-title {
+            display: flex; align-items: center; gap: 7px;
+            font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 12px;
+        }
+        .af-title::before { content: ""; width: 3px; height: 13px; border-radius: 2px; background: var(--accent); flex-shrink: 0; }
+        .af-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px 14px; }
+        .af-field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+        .af-field > label { font-size: 12px; color: var(--ink-subtle); }
+        .af-field input[type="text"], .af-field input[type="date"], .af-field select {
+            width: 100%; height: 34px; border: 1px solid var(--border); border-radius: 8px; padding: 0 10px;
+            font-size: 13px; outline: none; font-family: inherit; color: var(--ink); background: #fff;
+        }
+        .af-field input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.08); }
+        .af-date-range { display: flex; align-items: center; gap: 6px; }
+        .af-date-range span { color: #c0c5cf; font-size: 12px; flex-shrink: 0; }
+
+        /* 月份区间：单框 + 日期控件弹层 */
+        .af-month-range { position: relative; }
+        .af-month-range .af-mr-input {
+            width: 100%; height: 34px; border: 1px solid var(--border); border-radius: 8px;
+            padding: 0 28px 0 10px; font-size: 13px; outline: none; cursor: pointer;
+            font-family: inherit; color: var(--ink); background: #fff; box-sizing: border-box;
+        }
+        .af-mr-input::placeholder { color: #c0c5cf; }
+        .af-mr-input.filled { color: var(--accent); font-weight: 600; }
+        .af-month-range .af-mr-caret {
+            position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+            color: #b6bcc7; font-size: 11px; pointer-events: none;
+        }
+        .af-month-pop {
+            display: none; position: absolute; z-index: 30; top: calc(100% + 6px); left: 0;
+            width: 260px; background: #fff; border: 1px solid var(--border); border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(20, 40, 80, 0.12); padding: 12px 14px 10px;
+        }
+        .af-month-pop.show { display: block; }
+        .af-pop-title { font-size: 12px; font-weight: 600; color: var(--ink); margin-bottom: 10px; }
+        .af-pop-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .af-pop-row span { font-size: 12px; color: var(--ink-subtle); width: 40px; flex-shrink: 0; }
+        .af-pop-row input[type="month"] {
+            flex: 1; min-width: 0; height: 32px; border: 1px solid var(--border); border-radius: 8px;
+            font-size: 12px; padding: 0 8px; font-family: inherit; color: var(--ink); outline: none; background: #fff;
+        }
+        .af-pop-row input[type="month"]:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.08); }
+        .af-pop-foot { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+        .af-pop-btn {
+            height: 30px; padding: 0 16px; border-radius: var(--radius-pill); font-size: 12px;
+            border: none; cursor: pointer; font-family: inherit;
+        }
+        .af-pop-btn.clear { background: #f5f6f8; color: var(--ink-subtle); }
+        .af-pop-btn.clear:hover { color: var(--ink); }
+        .af-pop-btn.ok { background: var(--accent); color: #fff; }
+        .af-pop-btn.ok:hover { background: var(--accent-hover); }
+        .af-chips { display: flex; flex-wrap: wrap; gap: 8px; min-height: 34px; align-items: center; }
+        .af-chip { position: relative; }
+        .af-chip input { position: absolute; opacity: 0; pointer-events: none; }
+        .af-chip span {
+            display: inline-block; padding: 5px 12px; border-radius: var(--radius-pill); font-size: 12px;
+            border: 1px solid var(--border); color: var(--ink-subtle); cursor: pointer; transition: all 0.18s; background: #fff;
+        }
+        .af-chip span:hover { border-color: var(--accent); color: var(--accent); }
+        .af-chip input:checked + span {
+            background: rgba(0, 102, 204, 0.08); border-color: var(--accent); color: var(--accent); font-weight: 600;
+        }
+        .af-actions { display: flex; align-items: center; gap: 10px; margin-top: 14px; }
+        .af-actions .btn {
+            height: 34px; padding: 0 20px; border: none; border-radius: var(--radius-pill); font-size: 13px;
+            font-weight: 500; cursor: pointer; font-family: inherit; transition: all 0.2s;
+        }
+        .af-actions .btn.primary { background: var(--accent); color: #fff; }
+        .af-actions .btn.primary:hover { background: var(--accent-hover); }
+        .af-actions .btn.ghost { background: #fff; border: 1px solid var(--border); color: var(--ink-subtle); }
+        .af-actions .btn.ghost:hover { border-color: var(--accent); color: var(--accent); }
+        .af-right { margin-left: auto; }
+        @media (max-width: 1200px) { .af-grid { grid-template-columns: repeat(2, 1fr); } }
+
+        /* ── 区间佣金统计总额条（表格上方，选择时间后展示） ── */
+        .com-sum {
+            display: none; align-items: center;
+            background: linear-gradient(135deg, #eef5fe, #f7faff);
+            border: 1px solid #d9e6f8; border-radius: var(--radius-card);
+            padding: 13px 18px; margin-bottom: 16px;
+        }
+        .com-sum.show { display: flex; flex-wrap: wrap; }
+        .com-sum .cs-title { font-size: 13px; font-weight: 700; color: var(--accent); margin-right: 20px; white-space: nowrap; }
+        .com-sum .cs-item { flex: 1; min-width: 110px; }
+        .com-sum .cs-item + .cs-item { border-left: 1px solid #dbe7f6; padding-left: 18px; margin-left: 18px; }
+        .com-sum .cs-lbl { font-size: 12px; color: var(--ink-subtle); }
+        .com-sum .cs-val { font-size: 17px; font-weight: 700; color: var(--ink); margin-top: 2px; letter-spacing: -0.2px; }
+        .com-sum .cs-val.green { color: #34c759; }
+        .com-sum .cs-val.orange { color: #ff9500; }
+        .com-sum .cs-val.red { color: #e5484d; }
+        .com-sum .cs-note { margin-left: 14px; font-size: 11px; color: #9aa0ac; white-space: nowrap; }
 
         /* 表格 */
         .table-wrap {
@@ -360,22 +476,57 @@
 <div class="main">
 
     <!-- 统计卡片 -->
-    <div class="stat-row">
-        <div class="stat-card">
-            <div class="sc-label">分销员总数</div>
-            <div class="sc-value blue">128</div>
+    <div class="stat-group">
+        <div class="stat-group-title">分销员</div>
+        <div class="stat-row">
+            <div class="stat-card">
+                <div class="sc-label">分销员总数</div>
+                <div class="sc-value blue">128</div>
+            </div>
+            <div class="stat-card">
+                <div class="sc-label">本月新增分销员</div>
+                <div class="sc-value green">12</div>
+            </div>
         </div>
-        <div class="stat-card">
-            <div class="sc-label">本月新增分销员</div>
-            <div class="sc-value green">12</div>
+    </div>
+
+    <div class="stat-group">
+        <div class="stat-group-title">佣金总额</div>
+        <div class="stat-row row-4">
+            <div class="stat-card">
+                <div class="sc-label">已结算佣金总额</div>
+                <div class="sc-value blue">¥42,380.00</div>
+            </div>
+            <div class="stat-card">
+                <div class="sc-label">待结算佣金总额</div>
+                <div class="sc-value orange">¥3,180.00</div>
+            </div>
+            <div class="stat-card">
+                <div class="sc-label">已作废佣金总额</div>
+                <div class="sc-value red">¥1,286.50</div>
+            </div>
+            <div class="stat-card">
+                <div class="sc-label">已提现佣金总额</div>
+                <div class="sc-value green">¥37,240.30</div>
+            </div>
         </div>
-        <div class="stat-card">
-            <div class="sc-label">本月佣金支出</div>
-            <div class="sc-value orange">¥8,620.50</div>
-        </div>
-        <div class="stat-card">
-            <div class="sc-label">待结算佣金</div>
-            <div class="sc-value">¥1,720.00</div>
+    </div>
+
+    <div class="stat-group">
+        <div class="stat-group-title">本月</div>
+        <div class="stat-row">
+            <div class="stat-card">
+                <div class="sc-label">本月已结算佣金总额</div>
+                <div class="sc-value blue">¥9,320.50</div>
+            </div>
+            <div class="stat-card">
+                <div class="sc-label">本月待结算佣金总额</div>
+                <div class="sc-value orange">¥2,110.00</div>
+            </div>
+            <div class="stat-card">
+                <div class="sc-label">本月已作废佣金总额</div>
+                <div class="sc-value red">¥486.00</div>
+            </div>
         </div>
     </div>
 
@@ -393,16 +544,77 @@
 
     <!-- ============ TAB 1: 分销订单 ============ -->
     <div class="tab-panel active" id="panel-orders">
-        <div class="filter-bar">
-            <input class="search-input" id="orderSearch" placeholder="搜索订单名称、分销员姓名、手机号..." oninput="filterOrders()">
-            <select id="orderStatusFilter" onchange="filterOrders()">
-                <option value="all">全部状态</option>
-                <option value="done">已结算</option>
-                <option value="pending">待结算</option>
-                <option value="refund">已作废</option>
-            </select>
-            <button class="btn primary" onclick="alert('导出成功')">导出</button>
+        <!-- 独立筛选面板 -->
+        <div class="adv-filter">
+            <div class="af-title">筛选条件</div>
+            <div class="af-grid">
+                <div class="af-field">
+                    <label>订单编号</label>
+                    <input type="text" id="oId" placeholder="输入订单编号" oninput="filterOrders()">
+                </div>
+                <div class="af-field">
+                    <label>订单名称</label>
+                    <input type="text" id="oName" placeholder="输入订单名称" oninput="filterOrders()">
+                </div>
+                <div class="af-field">
+                    <label>分销员账号</label>
+                    <input type="text" id="oDistAcct" placeholder="输入分销员手机号" oninput="filterOrders()">
+                </div>
+                <div class="af-field">
+                    <label>分销员姓名</label>
+                    <input type="text" id="oDistName" placeholder="输入分销员姓名" oninput="filterOrders()">
+                </div>
+                <div class="af-field">
+                    <label>下单人账号</label>
+                    <input type="text" id="oBuyer" placeholder="输入下单人手机号" oninput="filterOrders()">
+                </div>
+                <div class="af-field">
+                    <label>下单时间（区间）</label>
+                    <div class="af-date-range">
+                        <input type="date" id="oOrderStart" onchange="filterOrders()">
+                        <span>至</span>
+                        <input type="date" id="oOrderEnd" onchange="filterOrders()">
+                    </div>
+                </div>
+                <div class="af-field">
+                    <label>结算时间（区间）</label>
+                    <div class="af-date-range">
+                        <input type="date" id="oSettleStart" onchange="filterOrders()">
+                        <span>至</span>
+                        <input type="date" id="oSettleEnd" onchange="filterOrders()">
+                    </div>
+                </div>
+                <div class="af-field">
+                    <label>状态（多选）</label>
+                    <div class="af-chips" id="oStatusChips">
+                        <label class="af-chip"><input type="checkbox" name="oStatus" value="all" checked onchange="syncStatusChips(this)"><span>全部状态</span></label>
+                        <label class="af-chip"><input type="checkbox" name="oStatus" value="done" checked onchange="syncStatusChips(this)"><span>已结算</span></label>
+                        <label class="af-chip"><input type="checkbox" name="oStatus" value="pending" checked onchange="syncStatusChips(this)"><span>待结算</span></label>
+                        <label class="af-chip"><input type="checkbox" name="oStatus" value="refund" checked onchange="syncStatusChips(this)"><span>已作废</span></label>
+                    </div>
+                </div>
+            </div>
+            <div class="af-actions">
+                <button class="btn primary" onclick="filterOrders()">查询</button>
+                <button class="btn ghost" onclick="resetOrderFilter()">重置</button>
+                <div class="af-right">
+                    <button class="btn primary" onclick="alert('导出成功')">导出</button>
+                </div>
+            </div>
         </div>
+
+        <!-- 区间佣金统计总额：按所选时间区间汇总，展示在表格上方 -->
+        <div class="com-sum" id="comSum">
+            <div class="cs-title">佣金统计总额</div>
+            <div class="cs-item"><div class="cs-lbl">筛选订单</div><div class="cs-val" id="csCount">0 单</div></div>
+            <div class="cs-item"><div class="cs-lbl">订单金额合计</div><div class="cs-val" id="csAmount">¥0.00</div></div>
+            <div class="cs-item"><div class="cs-lbl">佣金总额</div><div class="cs-val" id="csComm">¥0.00</div></div>
+            <div class="cs-item"><div class="cs-lbl">已结算佣金</div><div class="cs-val green" id="csDone">¥0.00</div></div>
+            <div class="cs-item"><div class="cs-lbl">待结算佣金</div><div class="cs-val orange" id="csPending">¥0.00</div></div>
+            <div class="cs-item"><div class="cs-lbl">已作废佣金</div><div class="cs-val red" id="csRefund">¥0.00</div></div>
+            <div class="cs-note">按所选下单 / 结算时间区间内的订单汇总，随筛选实时更新</div>
+        </div>
+
         <div class="table-wrap">
             <table>
                 <thead>
@@ -429,17 +641,50 @@
 
     <!-- ============ TAB 2: 提现管理 ============ -->
     <div class="tab-panel" id="panel-withdraw">
-        <div class="filter-bar">
-            <input class="search-input" id="withdrawSearch" placeholder="搜索分销员姓名、手机号..." oninput="filterWithdraws()">
-            <select id="withdrawMonthFilter" onchange="filterWithdraws()">
-                <option value="all">全部月份</option>
-            </select>
-            <select id="withdrawStatusFilter" onchange="filterWithdraws()">
-                <option value="all">全部状态</option>
-                <option value="pending">待提现</option>
-                <option value="success">提现成功</option>
-                <option value="failed">提现失败</option>
-            </select>
+        <!-- 独立筛选面板 -->
+        <div class="adv-filter">
+            <div class="af-title">筛选条件</div>
+            <div class="af-grid">
+                <div class="af-field">
+                    <label>分销员姓名</label>
+                    <input type="text" id="wName" placeholder="输入分销员姓名" oninput="filterWithdraws()">
+                </div>
+                <div class="af-field">
+                    <label>分销员账号</label>
+                    <input type="text" id="wPhone" placeholder="输入分销员手机号" oninput="filterWithdraws()">
+                </div>
+                <div class="af-field" style="grid-column: span 2;">
+                    <label>月份（区间 · 点击选择）</label>
+                    <div class="af-month-range">
+                        <input type="text" id="wMonthDisplay" class="af-mr-input" readonly placeholder="全部月份" onclick="toggleMonthPop()">
+                        <span class="af-mr-caret">▾</span>
+                        <input type="hidden" id="wMonthStart" value="">
+                        <input type="hidden" id="wMonthEnd" value="">
+                        <div class="af-month-pop" id="wMonthPop">
+                            <div class="af-pop-title">选择月份区间</div>
+                            <div class="af-pop-row"><span>起始月</span><input type="month" id="wMpStart"></div>
+                            <div class="af-pop-row"><span>结束月</span><input type="month" id="wMpEnd"></div>
+                            <div class="af-pop-foot">
+                                <button type="button" class="af-pop-btn clear" onclick="clearMonthRange()">清空</button>
+                                <button type="button" class="af-pop-btn ok" onclick="applyMonthRange()">确定</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="af-field" style="grid-column: 1 / -1;">
+                    <label>状态（多选）</label>
+                    <div class="af-chips" id="wStatusChips">
+                        <label class="af-chip"><input type="checkbox" name="wStatus" value="all" checked onchange="syncStatusChipsWD(this)"><span>全部状态</span></label>
+                        <label class="af-chip"><input type="checkbox" name="wStatus" value="pending" checked onchange="syncStatusChipsWD(this)"><span>待提现</span></label>
+                        <label class="af-chip"><input type="checkbox" name="wStatus" value="success" checked onchange="syncStatusChipsWD(this)"><span>提现成功</span></label>
+                        <label class="af-chip"><input type="checkbox" name="wStatus" value="failed" checked onchange="syncStatusChipsWD(this)"><span>提现失败</span></label>
+                    </div>
+                </div>
+            </div>
+            <div class="af-actions">
+                <button class="btn primary" onclick="filterWithdraws()">查询</button>
+                <button class="btn ghost" onclick="resetWithdrawFilter()">重置</button>
+            </div>
         </div>
         <div id="withdrawList"></div>
         <div class="pagination" id="withdrawPagination"></div>
@@ -471,34 +716,12 @@
             </div>
             <div class="cfg-item">
                 <div class="cfg-info">
-                    <div class="cfg-name">默认佣金比例</div>
-                    <div class="cfg-desc">新分销员默认按此比例分佣，单个分销员可单独调整</div>
-                </div>
-                <div class="cfg-control cfg-input-box">
-                    <input type="number" id="cfgRate" min="0" max="100" step="0.5" value="15">
-                    <span class="cfg-unit">%</span>
-                </div>
-            </div>
-            <div class="cfg-item">
-                <div class="cfg-info">
                     <div class="cfg-name">最低提现金额</div>
                     <div class="cfg-desc">佣金累计未达该金额时自动结转至下期，达标后统一发起打款</div>
                 </div>
                 <div class="cfg-control cfg-input-box">
                     <span class="cfg-prefix">¥</span>
                     <input type="number" id="cfgMinAmount" min="0" step="0.01" value="50">
-                </div>
-            </div>
-            <div class="cfg-item">
-                <div class="cfg-info">
-                    <div class="cfg-name">自动打款时间</div>
-                    <div class="cfg-desc">达到最低提现金额的分销员佣金，将在此时间批量打款至其绑定的微信零钱</div>
-                </div>
-                <div class="cfg-control">
-                    <select class="cfg-select" id="cfgPayday">
-                        <option value="monthly" selected>每月末最后一天</option>
-                        <option value="quarterly">每季度末最后一天</option>
-                    </select>
                 </div>
             </div>
         </div>
@@ -562,23 +785,92 @@
         return '<span class="tag ' + m[0] + '">' + m[1] + '</span>';
     }
 
-    /* ===== 分销订单 ===== */
+    /* ===== 分销订单：独立多条件筛选 ===== */
     function filterOrders() {
         orderPage = 1;
         renderOrders();
     }
-    function renderOrders() {
-        var keyword = document.getElementById('orderSearch').value.trim().toLowerCase();
-        var statusFilter = document.getElementById('orderStatusFilter').value;
-        var filtered = orderData.filter(function(o) {
-            var matchStatus = statusFilter === 'all' || o.status === statusFilter;
-            var matchKw = keyword === '' || o.name.toLowerCase().indexOf(keyword) !== -1
-                        || o.distributor.indexOf(keyword) !== -1
-                        || o.phone.indexOf(keyword) !== -1
-                        || o.buyerPhone.indexOf(keyword) !== -1
-                        || o.id.toLowerCase().indexOf(keyword) !== -1;
-            return matchStatus && matchKw;
+    function resetOrderFilter() {
+        ['oId', 'oName', 'oDistAcct', 'oDistName', 'oBuyer',
+         'oOrderStart', 'oOrderEnd', 'oSettleStart', 'oSettleEnd'].forEach(function (id) {
+            document.getElementById(id).value = '';
         });
+        document.querySelectorAll('#oStatusChips input').forEach(function (cb) { cb.checked = true; });
+        filterOrders();
+    }
+    function syncStatusChips(cb) {
+        var all = document.querySelector('#oStatusChips input[value="all"]');
+        if (cb.value === 'all' && cb.checked) {
+            document.querySelectorAll('#oStatusChips input').forEach(function (c) { c.checked = true; });
+        } else if (cb.value !== 'all') {
+            var specific = Array.prototype.filter.call(
+                document.querySelectorAll('#oStatusChips input'),
+                function (c) { return c.value !== 'all'; });
+            all.checked = specific.every(function (c) { return c.checked; });
+        }
+        filterOrders();
+    }
+    function getStatusSelection() {
+        var checked = Array.prototype.filter.call(
+            document.querySelectorAll('#oStatusChips input:checked'),
+            function (c) { return c.value !== 'all'; }).map(function (c) { return c.value; });
+        return checked.length ? checked : ['done', 'pending', 'refund'];
+    }
+    function renderOrders() {
+        var val = function (id) { return document.getElementById(id).value.trim().toLowerCase(); };
+        var idKw = val('oId');
+        var nameKw = val('oName');
+        var distAcctKw = val('oDistAcct');
+        var distNameKw = val('oDistName');
+        var buyerKw = val('oBuyer');
+        var orderStart = document.getElementById('oOrderStart').value;
+        var orderEnd = document.getElementById('oOrderEnd').value;
+        var settleStart = document.getElementById('oSettleStart').value;
+        var settleEnd = document.getElementById('oSettleEnd').value;
+        var statuses = getStatusSelection();
+        var inRange = function (dateStr, start, end) {
+            if (!start && !end) return true;
+            var d = (dateStr || '').slice(0, 10);
+            if (!d) return false;
+            if (start && d < start) return false;
+            if (end && d > end) return false;
+            return true;
+        };
+        var filtered = orderData.filter(function (o) {
+            if (idKw && o.id.toLowerCase().indexOf(idKw) === -1) return false;
+            if (nameKw && o.name.toLowerCase().indexOf(nameKw) === -1) return false;
+            if (distAcctKw && o.phone.toLowerCase().indexOf(distAcctKw) === -1) return false;
+            if (distNameKw && o.distributor.toLowerCase().indexOf(distNameKw) === -1) return false;
+            if (buyerKw && o.buyerPhone.toLowerCase().indexOf(buyerKw) === -1) return false;
+            if (!inRange(o.time, orderStart, orderEnd)) return false;
+            if (!inRange(o.settleTime, settleStart, settleEnd)) return false;
+            if (statuses.indexOf(o.status) === -1) return false;
+            return true;
+        });
+
+        // 选择时间区间后：在表格上方展示佣金统计总额
+        var hasDate = !!(orderStart || orderEnd || settleStart || settleEnd);
+        var sumBox = document.getElementById('comSum');
+        if (hasDate) {
+            var amount = 0, comm = 0, doneC = 0, pendC = 0, refC = 0;
+            filtered.forEach(function (o) {
+                amount += o.amount;
+                comm += o.commission;
+                if (o.status === 'done') doneC += o.commission;
+                else if (o.status === 'pending') pendC += o.commission;
+                else if (o.status === 'refund') refC += o.commission;
+            });
+            document.getElementById('csCount').textContent = filtered.length + ' 单';
+            document.getElementById('csAmount').textContent = '¥' + amount.toFixed(2);
+            document.getElementById('csComm').textContent = '¥' + comm.toFixed(2);
+            document.getElementById('csDone').textContent = '¥' + doneC.toFixed(2);
+            document.getElementById('csPending').textContent = '¥' + pendC.toFixed(2);
+            document.getElementById('csRefund').textContent = '¥' + refC.toFixed(2);
+            sumBox.classList.add('show');
+        } else {
+            sumBox.classList.remove('show');
+        }
+
         var totalPages = Math.ceil(filtered.length / orderPageSize) || 1;
         var start = (orderPage - 1) * orderPageSize;
         var pageData = filtered.slice(start, start + orderPageSize);
@@ -601,34 +893,95 @@
         renderPagination('orderPagination', totalPages, orderPage, goOrderPage);
     }
 
-    /* ===== 获取所有月份（去重排序） ===== */
-    function getAllMonths() {
-        var map = {};
-        withdrawData.forEach(function(w) { map[w.month] = true; });
-        return Object.keys(map).sort().reverse();
-    }
-    function initMonthFilter() {
-        var sel = document.getElementById('withdrawMonthFilter');
-        getAllMonths().forEach(function(m) {
-            var opt = document.createElement('option');
-            opt.value = m; opt.textContent = m;
-            sel.appendChild(opt);
-        });
+    function monthKey(str) {
+        var m;
+        if (!str) return 0;
+        if ((m = /^(\d{4})-(\d{1,2})/.exec(str))) return (+m[1]) * 12 + (+m[2]);
+        if ((m = /(\d{4})年(\d{1,2})月/.exec(str))) return (+m[1]) * 12 + (+m[2]);
+        return 0;
     }
 
-    /* ===== 提现管理 ===== */
+    /* ===== 提现管理：独立多条件筛选 ===== */
     function filterWithdraws() {
         renderWithdraws();
     }
+    function toggleMonthPop() {
+        var pop = document.getElementById('wMonthPop');
+        pop.classList.toggle('show');
+        if (pop.classList.contains('show')) {
+            document.getElementById('wMpStart').value = document.getElementById('wMonthStart').value;
+            document.getElementById('wMpEnd').value = document.getElementById('wMonthEnd').value;
+        }
+    }
+    function closeMonthPop() {
+        document.getElementById('wMonthPop').classList.remove('show');
+    }
+    function fmtMonth(v) {
+        return v ? v.slice(0, 4) + '年' + (+v.slice(5, 7)) + '月' : '';
+    }
+    function setMonthDisplay(s, e) {
+        var box = document.getElementById('wMonthDisplay');
+        if (s || e) {
+            box.value = s === e || !s || !e ? fmtMonth(s || e) : fmtMonth(s) + ' ~ ' + fmtMonth(e);
+            box.classList.add('filled');
+        } else {
+            box.value = '';
+            box.classList.remove('filled');
+        }
+    }
+    function applyMonthRange() {
+        var s = document.getElementById('wMpStart').value;
+        var e = document.getElementById('wMpEnd').value;
+        if (!s && e) s = e;
+        if (s && !e) e = s;
+        if (s && e && s > e) { var t = s; s = e; e = t; }
+        document.getElementById('wMonthStart').value = s;
+        document.getElementById('wMonthEnd').value = e;
+        setMonthDisplay(s, e);
+        closeMonthPop();
+        filterWithdraws();
+    }
+    function clearMonthRange() {
+        ['wMonthStart', 'wMonthEnd', 'wMpStart', 'wMpEnd'].forEach(function (id) { document.getElementById(id).value = ''; });
+        setMonthDisplay('', '');
+        closeMonthPop();
+        filterWithdraws();
+    }
+    function resetWithdrawFilter() {
+        ['wName', 'wPhone'].forEach(function (id) { document.getElementById(id).value = ''; });
+        clearMonthRange();
+        document.querySelectorAll('#wStatusChips input').forEach(function (cb) { cb.checked = true; });
+        renderWithdraws();
+    }
+    function syncStatusChipsWD(cb) {
+        var all = document.querySelector('#wStatusChips input[value="all"]');
+        if (cb.value === 'all' && cb.checked) {
+            document.querySelectorAll('#wStatusChips input').forEach(function (c) { c.checked = true; });
+        } else if (cb.value !== 'all') {
+            var specific = Array.prototype.filter.call(
+                document.querySelectorAll('#wStatusChips input'),
+                function (c) { return c.value !== 'all'; });
+            all.checked = specific.every(function (c) { return c.checked; });
+        }
+        renderWithdraws();
+    }
     function renderWithdraws() {
-        var keyword = document.getElementById('withdrawSearch').value.trim().toLowerCase();
-        var monthFilter = document.getElementById('withdrawMonthFilter').value;
-        var statusFilter = document.getElementById('withdrawStatusFilter').value;
-        var filterFn = function(w) {
-            var matchMonth = monthFilter === 'all' || w.month === monthFilter;
-            var matchStatus = statusFilter === 'all' || w.status === statusFilter;
-            var matchKw = keyword === '' || w.name.indexOf(keyword) !== -1 || w.phone.indexOf(keyword) !== -1;
-            return matchMonth && matchStatus && matchKw;
+        var nameKw = document.getElementById('wName').value.trim().toLowerCase();
+        var phoneKw = document.getElementById('wPhone').value.trim().toLowerCase();
+        var mStart = monthKey(document.getElementById('wMonthStart').value);
+        var mEnd = monthKey(document.getElementById('wMonthEnd').value);
+        var statuses = Array.prototype.filter.call(
+            document.querySelectorAll('#wStatusChips input:checked'),
+            function (c) { return c.value !== 'all'; }).map(function (c) { return c.value; });
+        if (!statuses.length) statuses = ['pending', 'success', 'failed'];
+        var filterFn = function (w) {
+            var mk = monthKey(w.month);
+            if (mStart && mk < mStart) return false;
+            if (mEnd && mk > mEnd) return false;
+            if (statuses.indexOf(w.status) === -1) return false;
+            if (nameKw && w.name.toLowerCase().indexOf(nameKw) === -1) return false;
+            if (phoneKw && w.phone.toLowerCase().indexOf(phoneKw) === -1) return false;
+            return true;
         };
 
         var groups = {};
@@ -714,12 +1067,7 @@
         document.getElementById('cfgMask').classList.remove('show');
     }
     function saveConfig() {
-        var rate = parseFloat(document.getElementById('cfgRate').value);
         var minAmount = parseFloat(document.getElementById('cfgMinAmount').value);
-        if (isNaN(rate) || rate < 0 || rate > 100) {
-            showConfigToast('默认佣金比例需在 0 ~ 100 之间');
-            return;
-        }
         if (isNaN(minAmount) || minAmount < 0) {
             showConfigToast('最低提现金额不能小于 0');
             return;
@@ -742,7 +1090,6 @@
     });
 
     /* ===== 初始化 ===== */
-    initMonthFilter();
     renderOrders();
     renderWithdraws();
 </script>
@@ -755,16 +1102,36 @@
         </div>
         <div class="fp-body">
             <h4>一、统计概览</h4>
+            <p style="margin:2px 0 4px;">顶部按「分销员 / 佣金总额 / 本月」三组展示 9 张统计卡：</p>
             <ul>
-                <li><strong>分销员总数</strong>：当前平台注册的全部分销员数量；</li>
-                <li><strong>本月新增分销员</strong>：本自然月新加入的分销员人数；</li>
-                <li><strong>本月佣金支出</strong>：本月累计产生的分销佣金总额；</li>
-                <li><strong>待结算佣金</strong>：订单确认中、尚未完成结算的佣金合计。</li>
+                <li><b>分销员</b>
+                    <ul>
+                        <li><strong>分销员总数</strong>：当前平台注册的全部分销员数量，示例 <i>128</i>；</li>
+                        <li><strong>本月新增分销员</strong>：本自然月新加入的分销员人数，示例 <i>12</i>；</li>
+                    </ul>
+                </li>
+                <li><b>佣金总额</b>（全量累计口径）
+                    <ul>
+                        <li><strong>已结算佣金总额</strong>：历史累计完成结算并发放的佣金，示例 <i>¥42,380.00</i>；</li>
+                        <li><strong>待结算佣金总额</strong>：订单尚未完成结算的佣金合计，示例 <i>¥3,180.00</i>；</li>
+                        <li><strong>已作废佣金总额</strong>：因订单退单不计入结算的佣金合计，示例 <i>¥1,286.50</i>；</li>
+                        <li><strong>已提现佣金总额</strong>：分销员累计已发起提现的佣金金额，示例 <i>¥37,240.30</i>；</li>
+                    </ul>
+                </li>
+                <li><b>本月</b>
+                    <ul>
+                        <li><strong>这里的本月是下单时间，如果下单时间是本月，但是结算时间是下月，纳入统计；如果下单时间是上月，但是结算时间是本月，则不纳入统计</strong>
+                        <li><strong>本月已结算佣金总额</strong>：本月完成结算并发放的佣金，示例 <i>¥9,320.50</i>；</li>
+                        <li><strong>本月待结算佣金总额</strong>：本月产生、处于待结算状态的佣金，示例 <i>¥2,110.00</i>；</li>
+                        <li><strong>本月已作废佣金总额</strong>：本月因订单退单而不结算的佣金，示例 <i>¥486.00</i>；</li>
+                    </ul>
+                </li>
             </ul>
             <h4>二、分销订单（Tab 1）</h4>
             <ul>
-                <li><strong>搜索</strong>：支持按订单名称、分销员姓名、分销员 / 下单人手机号模糊查询；</li>
-                <li><strong>状态筛选</strong>：全部状态 / 已结算 / 待结算 / 已作废，已作废订单佣金不计入结算；</li>
+                <li><strong>独立筛选</strong>：支持按订单编号、订单名称、分销员账号 / 姓名、下单人账号、下单 / 结算时间区间、状态（可多选）组合筛选，各条件相互叠加；</li>
+                <li><strong>佣金统计总额</strong>：选择下单或结算时间区间后，表格上方自动汇总该区间内筛选订单数与订单金额、佣金总额及已结算 / 待结算 / 已作废佣金；</li>
+                <li><strong>状态含义</strong>：已结算 / 待结算 / 已作废，已作废订单佣金不计入结算；</li>
                 <li><strong>结算规则</strong>：订单成交后进入「待结算」，已核销/已过期且7天无退款的订单结算并发放佣金「已结算」；</li>
                 <li><strong>分销员姓名</strong>：点击跳转到对应分销员详情页查看其完整数据；</li>
                 <li><strong>导出</strong>：将当前筛选结果导出（原型中提示「导出成功」）。</li>
@@ -772,7 +1139,7 @@
             <h4>三、提现管理（Tab 2）</h4>
             <ul>
                 <li><strong>按月分组</strong>：按月份展示提现记录，头部汇总当月总额及成功 / 待提现 / 失败笔数；</li>
-                <li><strong>筛选</strong>：支持按分销员姓名 / 手机号、月份、状态（待提现 / 提现成功 / 提现失败）筛选；</li>
+                <li><strong>独立筛选</strong>：支持按分销员姓名、分销员账号、月份区间与状态（可多选）组合筛选；月份为一个合并输入框，点击调用日期控件选择起始 / 结束月，只填单侧则按单月筛选，倒序自动纠正；</li>
                 <li><strong>身份信息</strong>：列表展示分销员姓名、手机号及身份证号，供打款实名核验与税务申报使用；</li>
                 <li><strong>失败原因</strong>：鼠标悬停「提现失败」标签可查看具体失败原因；</li>
                 <li><strong>重新打款</strong>：仅「提现失败」的记录显示，点击二次确认后转回「待提现」重新发起打款。</li>
@@ -781,9 +1148,7 @@
             <ul>
                 <li><strong>入口</strong>：两个 Tab 右上角的「⚙️ 分销配置」按钮，打开参数设置弹窗（原型演示）；</li>
                 <li><strong>启用分销推广</strong>：总开关，关闭后新订单不再产生分销佣金，历史数据保留；</li>
-                <li><strong>默认佣金比例</strong>：新分销员默认分佣比例，单个分销员可在详情中单独调整；</li>
                 <li><strong>最低提现金额</strong>：佣金累计未达该金额自动结转下期，达标后统一批量打款；</li>
-                <li><strong>自动打款时间</strong>：支持每月末 / 每季度末最后一天，打款至分销员绑定的微信零钱账户；</li>
                 <li><strong>保存</strong>：保存后提示「分销配置已保存」并关闭弹窗。</li>
             </ul>
         </div>

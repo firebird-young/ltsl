@@ -39,48 +39,35 @@
         }
 
         /* 统计卡片 */
-        .stat-row { display: flex; gap: 16px; margin-bottom: 20px; }
+        .stat-row { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; }
         .stat-card {
-            flex: 1; background: #fff; border-radius: 18px; padding: 18px 20px;
+            flex: 1 1 0; min-width: 156px; background: #fff; border-radius: 18px; padding: 16px;
             box-shadow: 0 0 0 1px rgba(0,0,0,0.06);
         }
-        .stat-card .sc-label { font-size: 13px; color: #86868b; }
-        .stat-card .sc-value { font-size: 24px; font-weight: 700; color: #1d1d1f; margin-top: 4px; }
+        .stat-card .sc-label { font-size: 12px; color: #86868b; white-space: nowrap; }
+        .stat-card .sc-value { font-size: 21px; font-weight: 700; color: #1d1d1f; margin-top: 6px; white-space: nowrap; }
         .stat-card .sc-value.blue { color: #0066cc; }
         .stat-card .sc-value.green { color: #34c759; }
         .stat-card .sc-value.orange { color: #ff9500; }
 
-        /* 余额卡片 */
-        .balance-card {
-            background: #fff; border-radius: 18px; padding: 18px 20px; margin-bottom: 20px;
-            box-shadow: 0 0 0 1px rgba(0,0,0,0.06);
-        }
-        .balance-card .bc-title { font-size: 14px; font-weight: 600; color: #1d1d1f; margin-bottom: 12px; }
-        .balance-card .bc-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f5f5f5; }
-        .balance-card .bc-row:last-child { border-bottom: none; }
-        .balance-card .bc-row .bc-label { font-size: 13px; color: #86868b; }
-        .balance-card .bc-row .bc-value { font-size: 15px; font-weight: 600; }
-        .balance-card .bc-row .bc-value.blue { color: #0066cc; }
-        .balance-card .bc-row .bc-value.green { color: #34c759; }
-        .balance-card .bc-row .bc-value.orange { color: #ff9500; }
-
-        /* 订单列表 */
+        /* 分销订单表格（与「分销管理 - 分销订单」同构，去掉分销员 / 分销员账号列） */
         .section-title {
             font-size: 15px; font-weight: 600; color: #1d1d1f; margin-bottom: 12px;
             display: flex; align-items: center; justify-content: space-between;
         }
-        .order-list { background: #fff; border-radius: 18px; overflow: hidden; box-shadow: 0 0 0 1px rgba(0,0,0,0.06); }
-        .order-item {
-            display: flex; align-items: center; padding: 14px 18px; border-bottom: 1px solid #f5f5f5;
+        .table-wrap {
+            background: #fff; border-radius: 18px; overflow-x: auto; box-shadow: 0 0 0 1px rgba(0,0,0,0.06);
         }
-        .order-item:last-child { border-bottom: none; }
-        .order-item .oi-info { flex: 1; }
-        .order-item .oi-info .oi-name { font-size: 14px; font-weight: 500; color: #1d1d1f; }
-        .order-item .oi-info .oi-meta { font-size: 12px; color: #86868b; margin-top: 2px; }
-        .order-item .oi-amount { text-align: right; }
-        .order-item .oi-amount .oi-price { font-size: 15px; font-weight: 600; color: #1d1d1f; }
-        .order-item .oi-amount .oi-commission { font-size: 12px; color: #ff9500; margin-top: 2px; }
-        .order-item .oi-status { margin-left: 16px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1040px; }
+        thead th {
+            font-size: 12px; font-weight: 600; color: #86868b; text-align: left;
+            padding: 14px 16px; border-bottom: 1px solid #f0f1f4; background: #fafafc;
+        }
+        tbody td {
+            font-size: 13px; color: #1d1d1f; padding: 14px 16px; border-bottom: 1px solid #f5f5f5;
+        }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: #FAFBFF; }
 
         .tag {
             display: inline-block; padding: 3px 12px; border-radius: 6px; font-size: 11px; font-weight: 500;
@@ -177,32 +164,24 @@
             <div class="sc-value" id="statAmount">¥0</div>
         </div>
         <div class="stat-card">
-            <div class="sc-label">总佣金收入</div>
-            <div class="sc-value green" id="statCommission">¥0</div>
+            <div class="sc-label">累计收益</div>
+            <div class="sc-value green" id="statEarn">¥0.00</div>
         </div>
         <div class="stat-card">
-            <div class="sc-label">分佣比例</div>
+            <div class="sc-label">已提现总额</div>
+            <div class="sc-value" id="statWithdrawn">¥0.00</div>
+        </div>
+        <div class="stat-card">
+            <div class="sc-label">当前余额（已结算）</div>
+            <div class="sc-value blue" id="statBalance">¥0.00</div>
+        </div>
+        <div class="stat-card">
+            <div class="sc-label">待结算</div>
+            <div class="sc-value orange" id="statPending">¥0.00</div>
+        </div>
+        <div class="stat-card">
+            <div class="sc-label">当前分佣比例</div>
             <div class="sc-value orange" id="statRate">-</div>
-        </div>
-    </div>
-
-    <div class="balance-card">
-        <div class="bc-title">💰 收益概览</div>
-        <div class="bc-row">
-            <span class="bc-label">累计收益</span>
-            <span class="bc-value blue" id="totalEarn">¥0.00</span>
-        </div>
-        <div class="bc-row">
-            <span class="bc-label">已提现总额</span>
-            <span class="bc-value green" id="withdrawn">¥0.00</span>
-        </div>
-        <div class="bc-row">
-            <span class="bc-label">当前余额（已结算）</span>
-            <span class="bc-value" id="settledBal">¥0.00</span>
-        </div>
-        <div class="bc-row">
-            <span class="bc-label">待结算</span>
-            <span class="bc-value orange" id="pendingBal">¥0.00</span>
         </div>
     </div>
 
@@ -210,19 +189,36 @@
         <span>📋 分销订单</span>
         <span style="font-size:12px;color:#999;" id="orderCount">共 0 笔</span>
     </div>
-    <div class="order-list" id="orderList"></div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>订单编号</th>
+                    <th>订单名称</th>
+                    <th>订单金额</th>
+                    <th>下单人账号</th>
+                    <th>分佣比例</th>
+                    <th>佣金</th>
+                    <th>下单时间</th>
+                    <th>结算时间</th>
+                    <th>状态</th>
+                </tr>
+            </thead>
+            <tbody id="orderTableBody"></tbody>
+        </table>
+    </div>
 </div>
 
 <script>
     var allOrders = [
-        { id: 'YX20260602001', name: '盆景美学·指尖山水', amount: 373.33, phone: '13812345678', distributor: '王小明', rate: '15%', commission: 56.00, time: '2026-06-02 10:30', status: 'done' },
-        { id: 'YX20260601002', name: '诗界无心·草堂寻心', amount: 200.00, phone: '13812345678', distributor: '王小明', rate: '15%', commission: 30.00, time: '2026-06-01 14:20', status: 'done' },
-        { id: 'YX20260530003', name: '搭建小茅屋', amount: 150.00, phone: '18698765432', distributor: '李大力', rate: '15%', commission: 22.50, time: '2026-05-30 09:15', status: 'pending' },
-        { id: 'YX20260522004', name: '自然探索营', amount: 298.00, phone: '18698765432', distributor: '李大力', rate: '15%', commission: 44.70, time: '2026-05-22 08:30', status: 'done' },
-        { id: 'YX20260520005', name: '我为杜甫建茅屋', amount: 586.67, phone: '13655667788', distributor: '张小红', rate: '15%', commission: 88.00, time: '2026-05-20 16:00', status: 'done' },
-        { id: 'YX20260518006', name: '盆景美学·指尖山水', amount: 373.33, phone: '15099887766', distributor: '赵思远', rate: '15%', commission: 56.00, time: '2026-05-18 11:20', status: 'refund' },
-        { id: 'YX20260515007', name: '诗界无心·草堂寻心', amount: 200.00, phone: '17712340987', distributor: '刘佳', rate: '15%', commission: 30.00, time: '2026-05-15 09:00', status: 'done' },
-        { id: 'YX20260512008', name: '搭建小茅屋', amount: 150.00, phone: '18856781234', distributor: '陈伟', rate: '15%', commission: 22.50, time: '2026-05-12 14:30', status: 'pending' },
+        { id: 'YX20260602001', name: '盆景美学·指尖山水', amount: 373.33, phone: '13812345678', distributor: '王小明', buyerPhone: '13900001111', rate: '15%', commission: 56.00, time: '2026-06-02 10:30', settleTime: '2026-06-02 23:00', status: 'done' },
+        { id: 'YX20260601002', name: '诗界无心·草堂寻心', amount: 200.00, phone: '13812345678', distributor: '王小明', buyerPhone: '13900002222', rate: '15%', commission: 30.00, time: '2026-06-01 14:20', settleTime: '2026-06-01 23:00', status: 'done' },
+        { id: 'YX20260530003', name: '搭建小茅屋', amount: 150.00, phone: '18698765432', distributor: '李大力', buyerPhone: '15811113333', rate: '15%', commission: 22.50, time: '2026-05-30 09:15', settleTime: null, status: 'pending' },
+        { id: 'YX20260522004', name: '自然探索营', amount: 298.00, phone: '18698765432', distributor: '李大力', buyerPhone: '13722224444', rate: '15%', commission: 44.70, time: '2026-05-22 08:30', settleTime: '2026-05-22 23:00', status: 'done' },
+        { id: 'YX20260520005', name: '我为杜甫建茅屋', amount: 586.67, phone: '13655667788', distributor: '张小红', buyerPhone: '13533335555', rate: '15%', commission: 88.00, time: '2026-05-20 16:00', settleTime: '2026-05-20 23:00', status: 'done' },
+        { id: 'YX20260518006', name: '盆景美学·指尖山水', amount: 373.33, phone: '15099887766', distributor: '赵思远', buyerPhone: '15944446666', rate: '15%', commission: 56.00, time: '2026-05-18 11:20', settleTime: null, status: 'refund' },
+        { id: 'YX20260515007', name: '诗界无心·草堂寻心', amount: 200.00, phone: '17712340987', distributor: '刘佳', buyerPhone: '13655557777', rate: '15%', commission: 30.00, time: '2026-05-15 09:00', settleTime: '2026-05-15 23:00', status: 'done' },
+        { id: 'YX20260512008', name: '搭建小茅屋', amount: 150.00, phone: '18856781234', distributor: '陈伟', buyerPhone: '13166668888', rate: '15%', commission: 22.50, time: '2026-05-12 14:30', settleTime: null, status: 'pending' },
     ];
 
     // 提现数据用于计算余额
@@ -240,7 +236,7 @@
     function fmt(n) { return n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
 
     function statusTag(status) {
-        var map = { done: ['green', '已结算'], pending: ['orange', '待结算'], refund: ['red', '已退款'] };
+        var map = { done: ['green', '已结算'], pending: ['orange', '待结算'], refund: ['red', '已作废'] };
         var m = map[status] || ['gray', status];
         return '<span class="tag ' + m[0] + '">' + m[1] + '</span>';
     }
@@ -281,42 +277,38 @@
         var totalCommission = orders.reduce(function(s, o) { return s + o.commission; }, 0);
         var rate = orders.length > 0 ? orders[0].rate : '-';
 
-        document.getElementById('statOrders').textContent = totalOrders;
-        document.getElementById('statAmount').textContent = '¥' + fmt(totalAmount);
-        document.getElementById('statCommission').textContent = '¥' + fmt(totalCommission);
-        document.getElementById('statRate').textContent = rate;
-
-        // 收益概览
         var withdrawnTotal = allWithdraws.filter(function(w) { return w.name === name && w.status === 'success'; })
             .reduce(function(s, w) { return s + w.amount; }, 0);
         var settled = orders.filter(function(o) { return o.status === 'done'; })
             .reduce(function(s, o) { return s + o.commission; }, 0);
         var pending = orders.filter(function(o) { return o.status === 'pending'; })
             .reduce(function(s, o) { return s + o.commission; }, 0);
-        var totalEarn = totalCommission;
 
-        document.getElementById('totalEarn').textContent = '¥' + fmt(totalEarn);
-        document.getElementById('withdrawn').textContent = '¥' + fmt(withdrawnTotal);
-        document.getElementById('settledBal').textContent = '¥' + fmt(Math.max(0, settled - withdrawnTotal));
-        document.getElementById('pendingBal').textContent = '¥' + fmt(pending);
+        document.getElementById('statOrders').textContent = totalOrders;
+        document.getElementById('statAmount').textContent = '¥' + fmt(totalAmount);
+        document.getElementById('statEarn').textContent = '¥' + fmt(totalCommission);
+        document.getElementById('statWithdrawn').textContent = '¥' + fmt(withdrawnTotal);
+        document.getElementById('statBalance').textContent = '¥' + fmt(Math.max(0, settled - withdrawnTotal));
+        document.getElementById('statPending').textContent = '¥' + fmt(pending);
+        document.getElementById('statRate').textContent = rate;
 
-        // 订单列表
+        // 分销订单表格（与分销管理 - 分销订单列一致，省略分销员 / 分销员账号）
         document.getElementById('orderCount').textContent = '共 ' + totalOrders + ' 笔';
         var html = '';
         orders.forEach(function(o) {
-            html += '<div class="order-item">'
-                 + '<div class="oi-info">'
-                 + '<div class="oi-name">' + o.name + '</div>'
-                 + '<div class="oi-meta">' + o.time + ' · ' + o.id + '</div>'
-                 + '</div>'
-                 + '<div class="oi-amount">'
-                 + '<div class="oi-price">¥' + o.amount.toFixed(2) + '</div>'
-                 + '<div class="oi-commission">佣金 ¥' + o.commission.toFixed(2) + '</div>'
-                 + '</div>'
-                 + '<div class="oi-status">' + statusTag(o.status) + '</div>'
-                 + '</div>';
+            html += '<tr>'
+                 + '<td style="font-size:12px;color:#86868b;">' + o.id + '</td>'
+                 + '<td>' + o.name + '</td>'
+                 + '<td>¥' + o.amount.toFixed(2) + '</td>'
+                 + '<td style="font-family:monospace;">' + o.buyerPhone + '</td>'
+                 + '<td>' + o.rate + '</td>'
+                 + '<td><b>¥' + o.commission.toFixed(2) + '</b></td>'
+                 + '<td style="font-size:12px;color:#86868b;">' + o.time + '</td>'
+                 + '<td style="font-size:12px;color:#86868b;">' + (o.settleTime || '-') + '</td>'
+                 + '<td>' + statusTag(o.status) + '</td></tr>';
         });
-        document.getElementById('orderList').innerHTML = html || '<div style="text-align:center;padding:40px;color:#999;">暂无订单</div>';
+        document.getElementById('orderTableBody').innerHTML = html
+            || '<tr><td colspan="9" style="text-align:center;color:#999;padding:40px;">暂无数据</td></tr>';
     }
 
     init();
@@ -338,20 +330,17 @@
             <ul>
                 <li><strong>分销订单总数</strong>：该分销员推广成交的订单笔数；</li>
                 <li><strong>总订单金额</strong>：推广订单金额合计；</li>
-                <li><strong>总佣金收入</strong>：累计产生的佣金（已退款订单不计入）；</li>
-                <li><strong>分佣比例</strong>：当前等级对应的佣金计提比例。</li>
-            </ul>
-            <h4>三、收益概览</h4>
-            <ul>
-                <li><strong>累计收益</strong> = 已提现总额 + 当前余额（已结算）+ 待结算；</li>
+                <li><strong>累计收益</strong>：累计产生的佣金合计（含已结算与待结算）；</li>
                 <li><strong>已提现总额</strong>：提现成功到账的金额合计；</li>
                 <li><strong>当前余额（已结算）</strong>：已结算佣金扣除已提现后的余额，每月末自动打款；</li>
-                <li><strong>待结算</strong>：订单确认中，暂不可提现的佣金。</li>
+                <li><strong>待结算</strong>：订单确认中，暂不可提现的佣金；</li>
+                <li><strong>当前分佣比例</strong>：该分销员当前等级对应的佣金计提比例。</li>
             </ul>
-            <h4>四、分销订单列表</h4>
+            <h4>三、分销订单表格</h4>
             <ul>
-                <li>展示该分销员全部推广订单，按时间倒序；</li>
-                <li>每条包含：订单名称、下单时间与订单编号、订单金额、佣金、状态（已结算 / 待结算 / 已退款）。</li>
+                <li>采用与「分销管理 - 分销订单」一致的表格结构，列出该分销员的推广订单；</li>
+                <li>列含：订单编号、订单名称、订单金额、下单人账号、分佣比例、佣金、下单时间、结算时间、状态（已结算 / 待结算 / 已作废）；</li>
+                <li>详情页已锁定分销员，故省略「分销员 / 分销员账号」列，暂不提供查询条件。</li>
             </ul>
         </div>
     </div>

@@ -34,18 +34,6 @@
 
         .main { padding: 16px 24px 40px; }
 
-        /* 统计卡片 */
-        .stat-row { display: flex; gap: 16px; margin-bottom: 20px; }
-        .stat-card {
-            flex: 1; background: #fff; border-radius: var(--radius-card); padding: 18px 20px;
-            box-shadow: var(--shadow-card);
-        }
-        .stat-card .sc-label { font-size: 13px; color: var(--ink-subtle); }
-        .stat-card .sc-value { font-size: 24px; font-weight: 700; color: var(--ink); margin-top: 4px; }
-        .stat-card .sc-value.blue { color: var(--accent); }
-        .stat-card .sc-value.green { color: #34c759; }
-        .stat-card .sc-value.orange { color: #ff9500; }
-
         /* 规则提示条 */
         .rule-banner {
             display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
@@ -55,18 +43,9 @@
         .rule-banner .rb-title { font-weight: 600; flex-shrink: 0; }
         .rule-banner .rb-arrow { color: var(--accent); font-weight: 700; margin: 0 2px; }
 
-        /* 筛选 / 操作栏 */
+        /* 操作栏 */
         .filter-bar {
-            display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;
-        }
-        .filter-bar .search-input {
-            flex: 1; min-width: 220px; height: 38px; border: 1px solid var(--border); border-radius: var(--radius-pill);
-            padding: 0 16px; font-size: 13px; outline: none; transition: border-color 0.2s; font-family: inherit;
-        }
-        .filter-bar .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,102,204,0.08); }
-        .filter-bar select {
-            height: 38px; border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 0 14px;
-            font-size: 13px; color: var(--ink); outline: none; background: #fff; font-family: inherit;
+            display: flex; justify-content: flex-end; gap: 12px; align-items: center; margin-bottom: 16px;
         }
         .filter-bar .btn {
             height: 38px; padding: 0 22px; border: none; border-radius: var(--radius-pill); font-size: 13px;
@@ -271,40 +250,14 @@
 </div>
 
 <div class="main">
-    <!-- 统计卡片 -->
-    <div class="stat-row">
-        <div class="stat-card">
-            <div class="sc-label">等级总数</div>
-            <div class="sc-value blue" id="statTotal">0</div>
-        </div>
-        <div class="stat-card">
-            <div class="sc-label">启用等级</div>
-            <div class="sc-value green" id="statEnabled">0</div>
-        </div>
-        <div class="stat-card">
-            <div class="sc-label">最高分佣比例</div>
-            <div class="sc-value orange" id="statMaxComm">-</div>
-        </div>
-        <div class="stat-card">
-            <div class="sc-label">等级覆盖分销员</div>
-            <div class="sc-value" id="statMembers">0</div>
-        </div>
-    </div>
-
     <!-- 升级规则说明 -->
     <div class="rule-banner">
         <span class="rb-title">💡 自动升级规则</span>
         <span>分销员按「累计有效成交订单」或「累计成交金额」任达其一自动升级，T+1 生效；有效订单指已结算且未退款的推广订单。</span>
     </div>
 
-    <!-- 筛选 / 操作栏 -->
+    <!-- 操作栏 -->
     <div class="filter-bar">
-        <input class="search-input" id="searchInput" placeholder="搜索等级名称..." oninput="render()">
-        <select id="statusFilter" onchange="render()">
-            <option value="all">全部状态</option>
-            <option value="enabled">已启用</option>
-            <option value="disabled">已停用</option>
-        </select>
         <button class="btn primary" onclick="openModal(-1)">＋ 新增等级</button>
     </div>
 
@@ -411,27 +364,8 @@
 
     /* ===== 渲染 ===== */
     function render() {
-        var keyword = document.getElementById('searchInput').value.trim().toLowerCase();
-        var statusFilter = document.getElementById('statusFilter').value;
-
-        var filtered = levelData.filter(function(l) {
-            var okKw = keyword === '' || l.name.toLowerCase().indexOf(keyword) !== -1;
-            var okSt = statusFilter === 'all' || (statusFilter === 'enabled') === l.enabled;
-            return okKw && okSt;
-        });
-
-        // 统计
-        document.getElementById('statTotal').textContent = levelData.length;
-        document.getElementById('statEnabled').textContent = levelData.filter(function(l) { return l.enabled; }).length;
-        var maxComm = levelData.reduce(function(m, l) { return l.enabled && l.comm > m ? l.comm : m; }, 0);
-        document.getElementById('statMaxComm').innerHTML = maxComm ? maxComm + '%' : '-';
-        document.getElementById('statMembers').textContent = levelData.reduce(function(s, l) { return s + l.member; }, 0);
-
         var html = '';
-        if (!filtered.length) {
-            html = '<tr><td colspan="7" style="text-align:center;color:var(--ink-subtle);padding:46px 0;">暂无匹配等级</td></tr>';
-        }
-        filtered.forEach(function(l) {
+        levelData.forEach(function(l) {
             var sysTag = l.system ? '<span class="tag gray">系统默认</span>' : '<span class="tag blue">自定义</span>';
             var gate = gateText(l);
             var ops = '<button class="op-btn blue" onclick="openModal(' + levelData.indexOf(l) + ')">编辑</button>'
@@ -549,12 +483,7 @@
                 <li>内置 5 级体系：<strong>铜牌 Lv.1 → 银牌 Lv.2 → 金牌 Lv.3 → 铂金 Lv.4 → 钻石 Lv.5</strong>，等级越高佣金比例越高（8% → 18%）；</li>
                 <li><strong>自动升级</strong>：达到「累计有效订单」或「累计成交金额」任一门槛即自动升级，订单需为已核销/已过期且7天内未退款。</li>
             </ul>
-            <h4>三、统计与筛选</h4>
-            <ul>
-                <li>顶部统计：<strong>等级总数 / 启用等级 / 最高分佣比例 / 等级覆盖分销员总数</strong>，随列表联动；</li>
-                <li>支持按<strong>等级名称</strong>模糊搜索，按「已启用 / 已停用」状态筛选。</li>
-            </ul>
-            <h4>四、等级列表</h4>
+            <h4>三、等级列表</h4>
             <ul>
                 <li><strong>等级</strong>：徽记 + 名称，系统内置等级带「系统默认」标识不可删除；</li>
                 <li><strong>升级门槛</strong>：展示两条件，满足其一即可；</li>
@@ -564,7 +493,7 @@
                 <li><strong>状态</strong>：开关一键<strong>启用 / 停用</strong>等级，停用后新成员不再自动获得该等级；</li>
                 <li><strong>操作</strong>：<strong>编辑</strong>等级配置；系统默认等级<strong>删除按钮置灰</strong>，仅自定义等级可删除。</li>
             </ul>
-            <h4>五、新增 / 编辑等级</h4>
+            <h4>四、新增 / 编辑等级</h4>
             <ul>
                 <li>点「＋ 新增等级」弹出表单：可配置<strong>徽记配色、等级名称、等级编号、佣金比例、双项升级门槛、权益说明</strong>及启用状态；</li>
                 <li>内置 5 个等级的<strong>编号固定不可调整</strong>（编辑时置灰），仅自定义新增等级可修改编号；</li>

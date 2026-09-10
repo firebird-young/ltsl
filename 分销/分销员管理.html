@@ -36,11 +36,22 @@
         .filter-bar {
             display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;
         }
-        .filter-bar .search-input {
-            flex: 1; min-width: 200px; height: 38px; border: 1px solid #e0e0e0; border-radius: 9999px;
+        .filter-bar .fb-input {
+            width: 220px; height: 38px; border: 1px solid #e0e0e0; border-radius: 9999px;
             padding: 0 16px; font-size: 13px; outline: none; transition: border-color 0.2s;
+            background: #fff; font-family: inherit; color: #333;
         }
-        .filter-bar .search-input:focus { border-color: #0066cc; box-shadow: 0 0 0 2px rgba(0,102,204,0.08); }
+        .filter-bar .fb-input::placeholder { color: #aaa; }
+        .filter-bar .fb-input:focus { border-color: #0066cc; box-shadow: 0 0 0 2px rgba(0,102,204,0.08); }
+        .filter-bar select.fb-input { width: 132px; padding: 0 12px; cursor: pointer; color: #555; }
+        .filter-bar .fb-btn {
+            height: 38px; border-radius: 9999px; padding: 0 22px; font-size: 13px;
+            cursor: pointer; border: none; font-family: inherit; transition: all 0.2s; flex-shrink: 0;
+        }
+        .filter-bar .fb-btn.primary { background: #0066cc; color: #fff; }
+        .filter-bar .fb-btn.primary:hover { background: #0055b3; }
+        .filter-bar .fb-btn.plain { background: #fff; color: #555; border: 1px solid #e0e0e0; }
+        .filter-bar .fb-btn.plain:hover { color: #0066cc; border-color: #0066cc; }
 
         /* 表格 */
         .table-wrap {
@@ -155,8 +166,8 @@
             <div class="sc-value green" id="newThisMonth">0</div>
         </div>
         <div class="stat-card">
-            <div class="sc-label">本月总佣金</div>
-            <div class="sc-value orange" id="monthCommission">¥0</div>
+            <div class="sc-label">沉睡分销员</div>
+            <div class="sc-value orange" id="inactiveCount">0</div>
         </div>
         <div class="stat-card">
             <div class="sc-label">活跃分销员</div>
@@ -165,7 +176,15 @@
     </div>
 
     <div class="filter-bar">
-        <input class="search-input" id="searchInput" placeholder="搜索分销员姓名、手机号..." oninput="doSearch()">
+        <input class="fb-input" id="searchName" placeholder="分销员姓名" oninput="doSearch()">
+        <input class="fb-input" id="searchAccount" placeholder="分销员账号（手机号）" oninput="doSearch()">
+        <select class="fb-input" id="statusFilter" onchange="doSearch()">
+            <option value="">全部状态</option>
+            <option value="active">活跃</option>
+            <option value="sleep">沉睡</option>
+        </select>
+        <button class="fb-btn primary" onclick="doSearch()">搜索</button>
+        <button class="fb-btn plain" onclick="resetFilter()">重置</button>
     </div>
 
     <div class="table-wrap">
@@ -173,11 +192,13 @@
             <thead>
                 <tr>
                     <th>分销员</th>
-                    <th>手机号</th>
+                    <th>分销员账号</th>
                     <th>等级</th>
                     <th>分销订单</th>
                     <th>订单总额</th>
-                    <th>总佣金</th>
+                    <th>累计收益</th>
+                    <th>已提现总额</th>
+                    <th>待结算金额</th>
                     <th>分佣比例</th>
                     <th>当前余额</th>
                     <th>状态</th>
@@ -191,12 +212,12 @@
 
 <script>
     var distData = [
-        { name: '王小明', phone: '13812345678', level: '金牌分销员', levelTag: 'Lv.3', orders: 9, orderAmount: 1723.33, commission: 258.50, rate: '15%', balance: 86.00, monthNew: true, monthActive: true },
-        { name: '李大力', phone: '18698765432', level: '银牌分销员', levelTag: 'Lv.2', orders: 6, orderAmount: 1130.00, commission: 169.50, rate: '15%', balance: 67.20, monthNew: false, monthActive: true },
-        { name: '张小红', phone: '13655667788', level: '金牌分销员', levelTag: 'Lv.3', orders: 4, orderAmount: 1120.00, commission: 168.00, rate: '15%', balance: 880.00, monthNew: true, monthActive: true },
-        { name: '赵思远', phone: '15099887766', level: '铜牌分销员', levelTag: 'Lv.1', orders: 2, orderAmount: 373.33, commission: 56.00, rate: '15%', balance: 0.00, monthNew: false, monthActive: false },
-        { name: '刘佳', phone: '17712340987', level: '银牌分销员', levelTag: 'Lv.2', orders: 5, orderAmount: 890.00, commission: 133.50, rate: '15%', balance: 0.00, monthNew: false, monthActive: true },
-        { name: '陈伟', phone: '18856781234', level: '铜牌分销员', levelTag: 'Lv.1', orders: 1, orderAmount: 150.00, commission: 22.50, rate: '15%', balance: 22.50, monthNew: true, monthActive: false },
+        { name: '王小明', phone: '13812345678', level: '金牌分销员', levelTag: 'Lv.3', orders: 9, orderAmount: 1723.33, commission: 258.50, withdrawn: 172.50, pending: 0.00, rate: '15%', balance: 86.00, monthNew: true, monthActive: true },
+        { name: '李大力', phone: '18698765432', level: '银牌分销员', levelTag: 'Lv.2', orders: 6, orderAmount: 1130.00, commission: 169.50, withdrawn: 102.30, pending: 0.00, rate: '15%', balance: 67.20, monthNew: false, monthActive: true },
+        { name: '张小红', phone: '13655667788', level: '金牌分销员', levelTag: 'Lv.3', orders: 4, orderAmount: 1120.00, commission: 168.00, withdrawn: 0.00, pending: 88.00, rate: '15%', balance: 880.00, monthNew: true, monthActive: true },
+        { name: '赵思远', phone: '15099887766', level: '铜牌分销员', levelTag: 'Lv.1', orders: 2, orderAmount: 373.33, commission: 56.00, withdrawn: 0.00, pending: 0.00, rate: '15%', balance: 0.00, monthNew: false, monthActive: false },
+        { name: '刘佳', phone: '17712340987', level: '银牌分销员', levelTag: 'Lv.2', orders: 5, orderAmount: 890.00, commission: 133.50, withdrawn: 120.00, pending: 13.50, rate: '15%', balance: 0.00, monthNew: false, monthActive: true },
+        { name: '陈伟', phone: '18856781234', level: '铜牌分销员', levelTag: 'Lv.1', orders: 1, orderAmount: 150.00, commission: 22.50, withdrawn: 0.00, pending: 22.50, rate: '15%', balance: 22.50, monthNew: true, monthActive: false },
     ];
 
     var page = 1, pageSize = 8;
@@ -205,20 +226,32 @@
 
     function doSearch() { page = 1; render(); }
 
+    function resetFilter() {
+        document.getElementById('searchName').value = '';
+        document.getElementById('searchAccount').value = '';
+        document.getElementById('statusFilter').value = '';
+        doSearch();
+    }
+
     function render() {
-        var keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+        var kwName = document.getElementById('searchName').value.trim().toLowerCase();
+        var kwAcc = document.getElementById('searchAccount').value.trim().toLowerCase();
+        var status = document.getElementById('statusFilter').value;
         var filtered = distData.filter(function(d) {
-            return keyword === '' || d.name.indexOf(keyword) !== -1 || d.phone.indexOf(keyword) !== -1;
+            var okName = kwName === '' || d.name.toLowerCase().indexOf(kwName) !== -1;
+            var okAcc = kwAcc === '' || d.phone.indexOf(kwAcc) !== -1;
+            var okStatus = status === '' || (status === 'active' ? d.monthActive : !d.monthActive);
+            return okName && okAcc && okStatus;
         });
 
         // 统计
         var total = distData.length;
         var monthNew = distData.filter(function(d) { return d.monthNew; }).length;
-        var monthComm = distData.reduce(function(s, d) { return s + d.commission; }, 0);
         var active = distData.filter(function(d) { return d.monthActive; }).length;
+        var inactive = distData.filter(function(d) { return !d.monthActive; }).length;
         document.getElementById('totalCount').textContent = total;
         document.getElementById('newThisMonth').textContent = monthNew;
-        document.getElementById('monthCommission').textContent = '¥' + fmt(monthComm);
+        document.getElementById('inactiveCount').textContent = inactive;
         document.getElementById('activeCount').textContent = active;
 
         var totalPages = Math.ceil(filtered.length / pageSize) || 1;
@@ -236,13 +269,15 @@
                 + '<td>' + d.level + ' <span style="font-size:11px;color:#999;">' + d.levelTag + '</span></td>'
                 + '<td><b>' + d.orders + '</b></td>'
                 + '<td>¥' + fmt(d.orderAmount) + '</td>'
-                + '<td>¥' + fmt(d.commission) + '</td>'
+                + '<td><b>¥' + fmt(d.commission) + '</b></td>'
+                + '<td>' + (d.withdrawn > 0 ? '¥' + fmt(d.withdrawn) : '<span style="color:#ccc;">¥0.00</span>') + '</td>'
+                + '<td><b>' + (d.pending > 0 ? '¥' + fmt(d.pending) : '<span style="color:#ccc;">¥0.00</span>') + '</b></td>'
                 + '<td>' + d.rate + '</td>'
                 + '<td><b>' + (d.balance > 0 ? '¥' + fmt(d.balance) : '<span style="color:#ccc;">¥0.00</span>') + '</b></td>'
                 + '<td>' + statusTag + '</td>'
                 + '</tr>';
         });
-        if (!html) html = '<tr><td colspan="9" style="text-align:center;color:#999;padding:40px;">暂无数据</td></tr>';
+        if (!html) html = '<tr><td colspan="11" style="text-align:center;color:#999;padding:40px;">暂无数据</td></tr>';
         document.getElementById('tableBody').innerHTML = html;
 
         // 分页
@@ -271,21 +306,25 @@
             <ul>
                 <li><strong>分销员总数</strong>：当前平台全部注册分销员人数；</li>
                 <li><strong>本月新增</strong>：本月新加入的分销员人数；</li>
-                <li><strong>本月总佣金</strong>：本月累计发放的分销佣金总额；</li>
+                <li><strong>沉睡分销员</strong>：三个月内无推广订单的分销员数量；</li>
                 <li><strong>活跃分销员</strong>：近期有推广订单的分销员（活跃）数量。</li>
             </ul>
             <h4>二、搜索筛选</h4>
             <ul>
-                <li>顶部搜索框支持按分销员<strong>姓名、手机号</strong>实时模糊查询，输入即过滤；</li>
-                <li>统计卡片数字随列表筛选自动联动，但统计的是全量数据。</li>
+                <li><strong>分销员姓名</strong>与<strong>分销员账号</strong>分为两个独立输入框，均实时模糊查询，输入即过滤，条件相互叠加；</li>
+                <li><strong>状态</strong>下拉可选全部状态 / 活跃 / 沉睡，与姓名、账号条件叠加生效；</li>
+                <li><strong>搜索 / 重置</strong>：输入框已实时过滤，点「搜索」再次应用当前条件；点「重置」一键清空姓名、账号并恢复全部状态；</li>
+                <li>统计卡片基于全量数据统计，不随筛选条件变化。</li>
             </ul>
             <h4>三、分销员列表</h4>
             <ul>
                 <li><strong>分销员姓名</strong>：蓝色链接，点击进入该分销员的详情页（带个人佣金与推广订单数据）；</li>
+                <li><strong>分销员账号</strong>：注册手机号，即分销员登录账号，支持在顶部账号框模糊查询；</li>
                 <li><strong>等级</strong>：钻石/钻石/金牌/银牌/铜牌，对应 Lv.1~Lv.5，等级决定佣金比例；</li>
                 <li><strong>分销订单 / 订单总额</strong>：该分销员推广成交的订单数与订单金额合计；</li>
-                <li><strong>总佣金</strong>：累计产生佣金；<strong>分佣比例</strong>：当前按订单金额计提的比例；</li>
-                <li><strong>当前余额</strong>：已结算待打款金额；</li>
+                <li><strong>累计收益</strong>：累计产生的佣金合计；<strong>已提现总额</strong>：历史提现成功到账金额合计；</li>
+                <li><strong>待结算金额</strong>：订单尚未完成结算、暂不可提现的佣金；<strong>分佣比例</strong>：当前按订单金额计提的比例；</li>
+                <li><strong>当前余额</strong>：已结算佣金扣除已提现后、月末待打款金额；</li>
                 <li><strong>状态</strong>：活跃（绿）/ 沉睡（橙，三个月内无推广）；</li>
                 <li><strong>分页</strong>：每页 8 条，支持前后翻页。</li>
             </ul>
