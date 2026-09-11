@@ -107,6 +107,40 @@
         .upload-box img { width: 100%; height: 100%; object-fit: cover; position: absolute; }
         .upload-box input { display: none; }
 
+        /* 分享封面裁剪（1:1 方图） */
+        .crop-stage {
+            width: 340px; height: 340px; margin: 0 auto; position: relative; overflow: hidden;
+            background: #f2f4f7; border-radius: 6px; cursor: move; user-select: none;
+            background-image:
+                linear-gradient(45deg, #eaeef3 25%, transparent 25%, transparent 75%, #eaeef3 75%),
+                linear-gradient(45deg, #eaeef3 25%, transparent 25%, transparent 75%, #eaeef3 75%);
+            background-size: 20px 20px; background-position: 0 0, 10px 10px;
+        }
+        .crop-stage img {
+            position: absolute; left: 0; top: 0; max-width: none; pointer-events: none;
+        }
+        .crop-grid {
+            position: absolute; inset: 0; pointer-events: none;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.55) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.55) 1px, transparent 1px);
+            background-size: 33.333% 33.333%;
+        }
+        .crop-zoom {
+            display: flex; align-items: center; gap: 12px; width: 340px; margin: 18px auto 0;
+        }
+        .crop-zoom span { font-size: 16px; color: #666; cursor: pointer; width: 16px; text-align: center; }
+        .crop-zoom span:hover { color: #0669FF; }
+        .crop-zoom input[type="range"] { flex: 1; accent-color: #0669FF; cursor: pointer; }
+        .crop-preview-row {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            margin-top: 16px; font-size: 12px; color: #999; text-align: left; line-height: 1.6;
+        }
+        .crop-preview-row img {
+            width: 56px; height: 56px; border-radius: 6px; object-fit: cover;
+            border: 1px solid #eee; background: #fafafa; flex-shrink: 0;
+        }
+
         /* 标签输入 */
         .tag-input-box {
             display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
@@ -565,6 +599,22 @@
                     </div>
 
                     <div class="form-row">
+                        <label class="form-label">分享封面：<span style="display:inline-flex;width:18px;height:18px;border-radius:50%;background:#E91E63;color:#fff;font-size:11px;font-weight:700;align-items:center;justify-content:center;margin-left:4px;vertical-align:middle;">1</span></label>
+                        <div class="form-control">
+                            <div class="upload-box" onclick="document.getElementById('shareCoverInput').click()">
+                                <span>+</span>
+                                <img id="shareCoverPreview" style="display:none;">
+                                <input type="file" id="shareCoverInput" accept="image/*" onchange="pickShareCover(this)">
+                            </div>
+                            <div class="rule-hint" style="margin-top:8px;">选填，建议上传 1:1 方图，上传后可拖动、缩放裁剪</div>
+                            <div class="rule-hint" style="margin-top:6px; display:none;" id="shareCoverActions">
+                                <a href="javascript:;" style="color:#0669FF;" onclick="reopenShareCrop()">重新裁剪</a>
+                                <a href="javascript:;" style="color:#ff4d4f; margin-left:14px;" onclick="clearShareCover()">删除</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
                         <label class="form-label">课程时间：</label>
                         <div class="form-control">
                             <div class="input-wrap">
@@ -946,6 +996,38 @@
         </div>
     </div>
 
+    <!-- 分享封面裁剪弹窗（1:1 方图） -->
+    <div class="modal" id="shareCropModal" style="z-index:300;">
+        <div class="modal-content" style="max-width:440px;">
+            <div class="modal-header">
+                <div class="title-wrap">
+                    <span class="title-bar"></span>
+                    <h3>裁剪分享封面</h3>
+                </div>
+                <button type="button" class="close" onclick="closeShareCrop()">×</button>
+            </div>
+            <div class="modal-body" style="text-align:center;">
+                <div class="crop-stage" id="cropStage">
+                    <img id="cropImage" alt="待裁剪图片" draggable="false">
+                    <div class="crop-grid"></div>
+                </div>
+                <div class="crop-zoom">
+                    <span onclick="zoomCrop(-0.1)">−</span>
+                    <input type="range" id="cropZoom" min="100" max="300" value="100" oninput="setZoom(this.value / 100)">
+                    <span onclick="zoomCrop(0.1)">+</span>
+                </div>
+                <div class="crop-preview-row">
+                    <img id="cropPreviewThumb" alt="裁剪预览" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+                    <span>1:1 方图预览（输出 400 × 400 px）<br>拖动图片调整位置，滚轮或滑块缩放</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="closeShareCrop()">取消</button>
+                <button type="button" class="btn-ok" onclick="confirmShareCrop()">确定</button>
+            </div>
+        </div>
+    </div>
+
 <script>
     /* ================= 通用表单交互 ================= */
     function countInput(inputId, countId, max) {
@@ -974,6 +1056,157 @@
             reader.readAsDataURL(file);
         }
     }
+
+    /* ================= 分享封面（选填）：上传 + 1:1 方图裁剪 ================= */
+    var CROP_STAGE = 340;      /* 裁剪框尺寸（px），与 CSS .crop-stage 保持一致 */
+    var CROP_OUTPUT = 400;     /* 导出方图尺寸（px） */
+    var shareCoverSrc = null;  /* 原图 dataURL，用于「重新裁剪」 */
+    var cropState = { base: 1, zoom: 1, dx: 0, dy: 0 };
+
+    /* 选择图片后打开裁剪弹窗 */
+    function pickShareCover(input) {
+        var file = input.files && input.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            input.value = '';   /* 允许重复选择同一张图片 */
+            openShareCrop(e.target.result);
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function openShareCrop(src) {
+        shareCoverSrc = src;
+        var img = document.getElementById('cropImage');
+        img.onload = function() {
+            /* 初始按短边填满裁剪框，居中显示 */
+            cropState.base = Math.max(CROP_STAGE / img.naturalWidth, CROP_STAGE / img.naturalHeight);
+            cropState.zoom = 1;
+            cropState.dx = 0;
+            cropState.dy = 0;
+            document.getElementById('cropZoom').value = 100;
+            renderCrop();
+            updateCropPreview();
+            document.getElementById('shareCropModal').classList.add('show');
+        };
+        img.src = src;
+    }
+
+    /* 按当前缩放/位移渲染裁剪框内的图片 */
+    function renderCrop() {
+        var img = document.getElementById('cropImage');
+        if (!img.naturalWidth) return;
+        var scale = cropState.base * cropState.zoom;
+        var w = img.naturalWidth * scale;
+        var h = img.naturalHeight * scale;
+        /* 限制拖动范围，保证裁剪框始终被图片铺满 */
+        var maxX = Math.max(0, (w - CROP_STAGE) / 2);
+        var maxY = Math.max(0, (h - CROP_STAGE) / 2);
+        cropState.dx = Math.min(maxX, Math.max(-maxX, cropState.dx));
+        cropState.dy = Math.min(maxY, Math.max(-maxY, cropState.dy));
+        img.style.width = w + 'px';
+        img.style.height = h + 'px';
+        img.style.left = (CROP_STAGE / 2 + cropState.dx - w / 2) + 'px';
+        img.style.top = (CROP_STAGE / 2 + cropState.dy - h / 2) + 'px';
+    }
+
+    function setZoom(z) {
+        cropState.zoom = Math.min(3, Math.max(1, z));
+        document.getElementById('cropZoom').value = Math.round(cropState.zoom * 100);
+        renderCrop();
+        updateCropPreview();
+    }
+    function zoomCrop(step) { setZoom(cropState.zoom + step); }
+
+    /* 把当前裁剪区域绘制为正方形画布 */
+    function cropToCanvas(outSize) {
+        var img = document.getElementById('cropImage');
+        var out = outSize || CROP_OUTPUT;
+        var k = out / CROP_STAGE;
+        var scale = cropState.base * cropState.zoom;
+        var w = img.naturalWidth * scale;
+        var h = img.naturalHeight * scale;
+        var x = CROP_STAGE / 2 + cropState.dx - w / 2;
+        var y = CROP_STAGE / 2 + cropState.dy - h / 2;
+        var canvas = document.createElement('canvas');
+        canvas.width = out;
+        canvas.height = out;
+        var ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, 0, out, out);
+        ctx.drawImage(img, x * k, y * k, w * k, h * k);
+        return canvas;
+    }
+
+    /* 弹窗内的实时方图预览 */
+    function updateCropPreview() {
+        var thumb = document.getElementById('cropPreviewThumb');
+        if (thumb) thumb.src = cropToCanvas(112).toDataURL('image/jpeg', 0.85);
+    }
+
+    function confirmShareCrop() {
+        var dataUrl = cropToCanvas(CROP_OUTPUT).toDataURL('image/jpeg', 0.92);
+        var preview = document.getElementById('shareCoverPreview');
+        preview.src = dataUrl;
+        preview.style.display = 'block';
+        document.getElementById('shareCoverActions').style.display = 'block';
+        closeShareCrop();
+    }
+
+    function closeShareCrop() {
+        document.getElementById('shareCropModal').classList.remove('show');
+    }
+
+    /* 重新裁剪：沿用原图，重新调整位置与缩放 */
+    function reopenShareCrop() {
+        if (shareCoverSrc) openShareCrop(shareCoverSrc);
+    }
+
+    function clearShareCover() {
+        var preview = document.getElementById('shareCoverPreview');
+        preview.src = '';
+        preview.style.display = 'none';
+        document.getElementById('shareCoverActions').style.display = 'none';
+        shareCoverSrc = null;
+    }
+
+    /* 裁剪框交互：拖动（鼠标 / 触摸）+ 滚轮缩放 */
+    (function bindCropStage() {
+        var stage = document.getElementById('cropStage');
+        if (!stage) return;
+        var dragging = false, lastX = 0, lastY = 0;
+        var start = function(x, y) { dragging = true; lastX = x; lastY = y; };
+        var move = function(x, y) {
+            if (!dragging) return;
+            cropState.dx += x - lastX;
+            cropState.dy += y - lastY;
+            lastX = x;
+            lastY = y;
+            renderCrop();
+        };
+        var end = function() {
+            if (!dragging) return;
+            dragging = false;
+            updateCropPreview();
+        };
+        stage.addEventListener('mousedown', function(e) { e.preventDefault(); start(e.clientX, e.clientY); });
+        document.addEventListener('mousemove', function(e) { move(e.clientX, e.clientY); });
+        document.addEventListener('mouseup', end);
+        stage.addEventListener('touchstart', function(e) {
+            var t = e.touches[0];
+            start(t.clientX, t.clientY);
+        }, { passive: true });
+        stage.addEventListener('touchmove', function(e) {
+            var t = e.touches[0];
+            move(t.clientX, t.clientY);
+            if (dragging) e.preventDefault();
+        }, { passive: false });
+        stage.addEventListener('touchend', end);
+        stage.addEventListener('wheel', function(e) {
+            e.preventDefault();
+            setZoom(cropState.zoom + (e.deltaY < 0 ? 0.05 : -0.05));
+        }, { passive: false });
+    })();
 
     /* 地址 */
     var addressCount = 1;
@@ -1551,6 +1784,13 @@
                     </ul>
                 </li>
             </ul>
+            <h4>p1需求：</h4>
+            <ol style="padding-left:0;margin:0 0 8px;">
+                <li style="margin-bottom:6px;list-style:none;">
+                    <span style="display:inline-flex;width:18px;height:18px;border-radius:50%;background:#E91E63;color:#fff;font-size:11px;font-weight:700;align-items:center;justify-content:center;margin-right:6px;vertical-align:middle;">1</span>
+                    <strong>分享封面（选填，1:1 方图可裁剪）</strong>：位于「课程封面」下方，非必传，用于课程分享场景的方形封面图。如果不配，分享时默认取课程封面。
+                </li>
+            </ol>
         </div>
     </div>
     <button class="fp-open" onclick="toggleFuncPanel()" title="展开功能说明">功能说明‹</button>
