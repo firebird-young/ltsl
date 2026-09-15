@@ -520,9 +520,19 @@ var SECTIONS = [
     },
     {
         title: "分销（tbd）",
-        flat: true,
-        items: [
-            { label: "分销入口", href: "分销/我的主页.html", tags: [{t:"待开发",c:"gray"}] }
+        groups: [
+            { name: "移动端", items: [
+                { label: "我的主页", href: "分销/我的主页.html", tags: [{t:"待开发",c:"gray"}] },
+                { label: "我的推广", href: "分销/我的推广.html", tags: [{t:"待开发",c:"gray"}] },
+                { label: "分销中心", href: "分销/分销.html", tags: [{t:"待开发",c:"gray"}] },
+                { label: "分销记账", href: "分销/分销记账.html", tags: [{t:"待开发",c:"gray"}] },
+                { label: "分销提现", href: "分销/分销提现.html", tags: [{t:"待开发",c:"gray"}] }
+            ]},
+            { name: "管理端", items: [
+                { label: "分销管理", href: "分销/分销管理.html", tags: [{t:"待开发",c:"gray"}] },
+                { label: "分销员管理", href: "分销/分销员管理.html", tags: [{t:"待开发",c:"gray"}] },
+                { label: "分销等级管理", href: "分销/分销等级管理.html", tags: [{t:"待开发",c:"gray"}] }
+            ]}
         ]
     }
 ];
