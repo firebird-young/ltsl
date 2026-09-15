@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>课程详情 - 离泰数链</title>
+    <link rel="stylesheet" href="asset/admin-sidebar.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', 'Microsoft YaHei', Arial, sans-serif;
+            background: #eef1f6;
+            min-height: 100vh;
+            color: #1d1d1f;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== 主色 ===== */
+        :root {
+            --accent: #2E6BE6;
+            --accent-dark: #1E4FC4;
+            --price: #E0343C;
+        }
+
+        /* ===== 舞台说明（仅宽屏预览用，真机宽度隐藏） ===== */
+        .main { padding: 16px 24px 48px; }
+        .stage-tip {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 12px; margin-bottom: 12px; flex-wrap: wrap;
+        }
+        .stage-tip .st-label { font-size: 13px; color: #86868b; }
+        .stage-tip .st-badge {
+            font-size: 12px; font-weight: 600; color: var(--accent);
+            background: #fff; border: 1px solid #b8d5ff; border-radius: 9999px;
+            padding: 4px 14px;
+        }
+
+        /* ===== 手机页面容器（无外框，平铺预览） ===== */
+        .app-container {
+            width: 100%; max-width: 430px; margin: 0 auto;
+            background: #f5f5f5; border-radius: 18px;
+            box-shadow: 0 10px 34px rgba(30, 60, 120, 0.14);
+            position: relative;
+        }
+        @media (max-width: 540px) {
+            .main { padding: 0; }
+            .stage-tip { display: none; }
+            .app-container { border-radius: 0; box-shadow: none; }
+            .page-top { border-radius: 0; }
+        }
+
+        /* ===== 顶部状态栏 ===== */
+        .page-top {
+            position: sticky; top: 0; z-index: 80;
+            border-radius: 18px 18px 0 0; overflow: hidden;
+            box-shadow: 0 2px 10px rgba(20, 40, 90, 0.08);
+        }
+        .status-bar {
+            height: 44px; background: #fff; color: #1d1d1f;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px;
+        }
+        .status-bar .sb-left { display: flex; align-items: baseline; gap: 8px; }
+        .status-bar .sb-time { font-size: 15px; font-weight: 600; letter-spacing: 0.3px; }
+        .status-bar .sb-date { font-size: 12px; color: #666; }
+        .status-bar .sb-right { display: flex; align-items: center; gap: 7px; }
+        .status-bar .sb-signal { display: inline-flex; align-items: flex-end; gap: 1.5px; height: 11px; }
+        .status-bar .sb-signal i { width: 3px; border-radius: 1px; background: currentColor; }
+        .status-bar .sb-signal i:nth-child(1) { height: 4px; }
+        .status-bar .sb-signal i:nth-child(2) { height: 6px; }
+        .status-bar .sb-signal i:nth-child(3) { height: 8px; }
+        .status-bar .sb-signal i:nth-child(4) { height: 11px; }
+        .status-bar .sb-wifi { width: 15px; height: 11px; position: relative; display: inline-block; }
+        .status-bar .sb-wifi::before {
+            content: ''; position: absolute; left: 50%; bottom: 0;
+            transform: translateX(-50%);
+            width: 5px; height: 5px; border-radius: 50%; background: currentColor;
+        }
+        .status-bar .sb-wifi::after {
+            content: ''; position: absolute; left: 50%; bottom: 2px;
+            transform: translateX(-50%);
+            width: 14px; height: 14px; box-sizing: border-box;
+            border-top: 2px solid currentColor; border-radius: 50%;
+        }
+        .status-bar .sb-batt {
+            width: 25px; height: 12px; border: 1.4px solid currentColor;
+            border-radius: 3px; padding: 1.5px; box-sizing: border-box; position: relative;
+        }
+        .status-bar .sb-batt::after {
+            content: ''; position: absolute; right: -3.5px; top: 50%;
+            transform: translateY(-50%);
+            width: 2px; height: 5px; background: currentColor; border-radius: 0 1px 1px 0;
+        }
+        .status-bar .sb-batt i { display: block; height: 100%; width: 78%; background: currentColor; border-radius: 1px; }
+
+        /* ===== 标题栏（白底 + 返回 + 小程序胶囊） ===== */
+        .top-nav {
+            height: 50px; background: #fff;
+            display: flex; align-items: center; padding: 0 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .top-nav .back-btn {
+            width: 32px; height: 32px; padding: 0; border: none; background: none;
+            display: flex; align-items: center; justify-content: flex-start;
+            color: #1d1d1f; font-size: 28px; line-height: 1; cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .top-nav .top-nav-title {
+            flex: 1; text-align: center; font-size: 17px; font-weight: 600; color: #1d1d1f;
+        }
+        .mp-capsule {
+            width: 88px; height: 32px; border-radius: 9999px;
+            border: 1px solid #e5e5e5; background: rgba(255,255,255,.9);
+            display: flex; align-items: center; flex-shrink: 0;
+        }
+        .mp-capsule .cap-cell {
+            flex: 1; height: 100%; display: flex; align-items: center; justify-content: center;
+            color: #1d1d1f; cursor: pointer; -webkit-tap-highlight-color: transparent;
+        }
+        .mp-capsule .cap-cell:first-child { border-right: 1px solid #e5e5e5; }
+        .mp-capsule .cap-dots { display: flex; gap: 3px; }
+        .mp-capsule .cap-dots i { width: 4px; height: 4px; border-radius: 50%; background: #1d1d1f; }
+        .mp-capsule .cap-dot { width: 16px; height: 16px; border: 1.6px solid #1d1d1f; border-radius: 50%; position: relative; }
+        .mp-capsule .cap-dot::after {
+            content: ''; position: absolute; left: 50%; top: 50%;
+            transform: translate(-50%, -50%);
+            width: 6px; height: 6px; border-radius: 50%; background: #1d1d1f;
+        }
+
+        /* ===== 头图（课程主视觉，纯 CSS 绘制） ===== */
+        .hero {
+            position: relative; height: 300px; overflow: hidden;
+            background:
+                radial-gradient(ellipse 90% 60% at 85% 10%, rgba(120,150,110,.28), transparent 60%),
+                radial-gradient(ellipse 70% 50% at 10% 90%, rgba(60,90,55,.45), transparent 65%),
+                linear-gradient(160deg, #2F4034 0%, #222D24 55%, #1A231C 100%);
+        }
+        .hero::before {
+            content: ''; position: absolute; inset: 0;
+            background-image:
+                repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, transparent 1px 26px),
+                repeating-linear-gradient(90deg, rgba(255,255,255,.025) 0 1px, transparent 1px 26px);
+        }
+        .hero-inner {
+            position: relative; height: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 12px; text-align: center; padding: 0 24px;
+        }
+        .hero-tag {
+            font-size: 11px; letter-spacing: 2px;
+            color: #D8C48E; border: 1px solid rgba(216,196,142,.55);
+            padding: 4px 14px; border-radius: 9999px;
+        }
+        .hero-title {
+            font-family: 'Songti SC', 'STSong', SimSun, serif;
+            font-weight: 700; line-height: 1.18;
+            background: linear-gradient(180deg, #F3E2AC 0%, #E7CE8B 55%, #C9A85C 100%);
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent; color: #E7CE8B;
+        }
+        .hero-title .t1 { display: block; font-size: 42px; letter-spacing: 6px; }
+        .hero-title .t2 { display: block; font-size: 34px; letter-spacing: 10px; margin-top: 4px; }
+        .hero-sub { font-size: 12.5px; color: rgba(235,225,195,.82); letter-spacing: 1px; margin-top: 6px; }
+
+        /* ===== 课程信息卡（上叠头图） ===== */
+        .info-card {
+            position: relative; z-index: 2;
+            background: #fff; border-radius: 16px;
+            margin: -76px 12px 0; padding: 16px;
+            box-shadow: 0 6px 20px rgba(0,0,0,.08);
+        }
+        .info-title { font-size: 18px; font-weight: 700; color: #1d1d1f; }
+        .price-row {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-top: 10px;
+        }
+        .price { color: var(--price); font-weight: 700; display: flex; align-items: baseline; }
+        .price .rmb { font-size: 15px; }
+        .price .num { font-size: 30px; letter-spacing: -0.5px; }
+        .price .qi { font-size: 14px; margin-left: 3px; font-weight: 600; }
+        .group-tag {
+            font-size: 12px; font-weight: 600; color: var(--accent);
+            background: #EAF1FF; border-radius: 6px; padding: 4px 10px;
+        }
+        .tag-row { display: flex; gap: 8px; margin-top: 12px; }
+        .tag {
+            font-size: 11.5px; color: #B07A1E; background: #FDF4DF;
+            border-radius: 4px; padding: 3px 9px;
+        }
+        .info-desc { font-size: 13px; color: #666; line-height: 1.7; margin-top: 12px; }
+
+        .meta-list { margin-top: 14px; }
+        .meta-item { margin-top: 12px; }
+        .meta-item:first-child { margin-top: 0; }
+        .meta-label {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 14.5px; font-weight: 700; color: #1d1d1f;
+        }
+        .meta-label svg { flex-shrink: 0; }
+        .meta-value {
+            margin-top: 8px; background: #F6F7F9; border-radius: 10px;
+            padding: 13px 14px; font-size: 14px; color: #333;
+            display: flex; align-items: center; justify-content: space-between;
+            cursor: pointer; transition: background .15s;
+        }
+        .meta-value:active { background: #EEF0F3; }
+        .meta-value .chev { color: #C4C7CC; font-size: 16px; line-height: 1; }
+
+        /* ===== 详情 Tabs ===== */
+        .detail-tabs {
+            position: sticky; top: 94px; z-index: 60;
+            background: #fff; margin-top: 12px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+        }
+        .detail-tab {
+            flex: 1; text-align: center; padding: 13px 0 11px;
+            font-size: 14.5px; color: #666; cursor: pointer;
+            position: relative; -webkit-tap-highlight-color: transparent;
+            background: none; border: none; font-family: inherit;
+        }
+        .detail-tab.active { color: var(--accent); font-weight: 700; }
+        .detail-tab.active::after {
+            content: ''; position: absolute; left: 50%; bottom: 0;
+            transform: translateX(-50%);
+            width: 28px; height: 3px; border-radius: 2px; background: var(--accent);
+        }
+        .tab-panel { display: none; padding-bottom: 86px; }
+        .tab-panel.active { display: block; }
+
+        .tab-banner {
+            position: relative; margin: 12px 12px 0; height: 120px; border-radius: 12px;
+            overflow: hidden;
+            background:
+                radial-gradient(ellipse 80% 70% at 80% 15%, rgba(120,150,110,.25), transparent 60%),
+                linear-gradient(150deg, #33452F 0%, #222D24 100%);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .tab-banner .ribbon {
+            position: absolute; left: -34px; top: 12px;
+            transform: rotate(-45deg);
+            background: #C0392B; color: #F6E7C8;
+            font-size: 11px; font-weight: 600; letter-spacing: 2px;
+            padding: 4px 40px;
+        }
+        .tab-banner .bn-text {
+            font-family: 'Songti SC', 'STSong', SimSun, serif;
+            background: linear-gradient(180deg, #F3E2AC, #C9A85C);
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 22px; font-weight: 700; letter-spacing: 5px;
+        }
+        .tab-section { margin: 14px 16px 0; }
+        .tab-section h5 {
+            font-size: 15px; font-weight: 700; color: #1d1d1f; margin-bottom: 8px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .tab-section h5::before {
+            content: ''; width: 4px; height: 14px; border-radius: 2px;
+            background: var(--accent);
+        }
+        .tab-section p { font-size: 13px; color: #666; line-height: 1.9; }
+        .tab-section ul { padding-left: 18px; }
+        .tab-section li { font-size: 13px; color: #666; line-height: 1.9; }
+
+        /* ===== 底部操作栏 ===== */
+        .bottom-bar {
+            position: sticky; bottom: 0; z-index: 70;
+            background: #fff; border-top: 1px solid #f0f0f0;
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+        }
+        .bb-service {
+            display: flex; flex-direction: column; align-items: center; gap: 2px;
+            color: #444; font-size: 11px; background: none; border: none;
+            cursor: pointer; font-family: inherit; flex-shrink: 0;
+            padding: 0 4px; -webkit-tap-highlight-color: transparent;
+        }
+        .bb-btn {
+            height: 42px; border-radius: 10px; border: none;
+            font-size: 15px; font-weight: 700; font-family: inherit;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            cursor: pointer; -webkit-tap-highlight-color: transparent;
+        }
+        .bb-btn:active { opacity: .88; }
+        .bb-share { width: 108px; background: #232A45; color: #fff; }
+        .bb-buy { flex: 1; background: #EDEEF0; color: #1d1d1f; }
+        .bb-buy .bb-price { color: #1d1d1f; }
+        .bb-buy .bb-price .rmb { font-size: 13px; font-weight: 700; }
+        .bb-buy .bb-price .num { font-size: 17px; }
+
+        /* ===== 右侧功能说明面板 ===== */
+        .func-panel {
+            position: fixed; top: 0; right: 0; bottom: 0;
+            width: 340px; z-index: 890;
+            background: #fff; border-left: 1px solid #e3e6eb;
+            box-shadow: -1px 0 12px rgba(20, 30, 60, 0.04);
+            display: flex; flex-direction: column;
+        }
+        .func-panel .fp-inner { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+        .func-panel .fp-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px 14px 13px 18px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
+        }
+        .func-panel .fp-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: #1d1d1f; }
+        .func-panel .fp-title::before {
+            content: ''; width: 8px; height: 8px; border-radius: 50%;
+            background: var(--accent); box-shadow: 0 0 0 4px rgba(46, 107, 230, 0.12);
+        }
+        .func-panel .fp-fold-btn {
+            width: 28px; height: 28px; border: 1px solid #e0e0e0; background: #fff;
+            border-radius: 50%; color: #86868b; font-size: 15px; line-height: 1;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+        }
+        .func-panel .fp-fold-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .func-panel .fp-body {
+            flex: 1; overflow-y: auto; padding: 4px 18px 40px;
+            font-size: 13px; color: #555; line-height: 1.9;
+        }
+        .func-panel .fp-body::-webkit-scrollbar { width: 5px; }
+        .func-panel .fp-body::-webkit-scrollbar-thumb { background: #d8dce3; border-radius: 3px; }
+        .func-panel .fp-body h4 { font-size: 14px; font-weight: 600; color: #1d1d1f; margin: 18px 0 6px; }
+        .func-panel .fp-body h4:first-child { margin-top: 12px; }
+        .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .func-panel .fp-body li { margin-bottom: 6px; }
+        .func-panel .fp-body strong { color: #333; }
+        .func-panel .fp-body a { color: var(--accent); }
+        .func-panel .fp-open {
+            display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+            border: none; background: transparent; cursor: pointer;
+            writing-mode: vertical-rl; text-orientation: upright;
+            font-size: 13px; font-weight: 600; letter-spacing: 6px; color: #86868b;
+            align-items: center; justify-content: center; font-family: inherit; transition: all 0.2s;
+        }
+        .func-panel .fp-open:hover { color: var(--accent); background: #fafbfc; }
+
+        @media (min-width: 1024px) {
+            .main { margin-right: 340px; }
+            body.fp-collapsed .main { margin-right: 40px; }
+            body.fp-collapsed .func-panel { width: 40px; }
+            body.fp-collapsed .fp-inner { display: none; }
+            body.fp-collapsed .fp-open { display: flex; }
+        }
+        @media (max-width: 1023.98px) {
+            .func-panel { display: none; }
+            .main { margin-right: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="main">
+    <!-- 舞台说明：宽屏预览身份用，真机宽度自动隐藏 -->
+    <div class="stage-tip">
+        <span class="st-label">分销 · 课程详情手机端页面</span>
+        <span class="st-badge">📱 移动端页面</span>
+    </div>
+
+    <div class="app-container">
+
+        <!-- 顶部：状态栏 + 标题栏（白底 + 小程序胶囊） -->
+        <header class="page-top">
+            <div class="status-bar">
+                <span class="sb-left">
+                    <span class="sb-time" id="sbTime">16:23</span>
+                    <span class="sb-date" id="sbDate">9月15日 星期二</span>
+                </span>
+                <span class="sb-right">
+                    <span class="sb-signal"><i></i><i></i><i></i><i></i></span>
+                    <span class="sb-wifi"></span>
+                    <span class="sb-batt"><i></i></span>
+                </span>
+            </div>
+            <div class="top-nav">
+                <button class="back-btn" onclick="goBack()" aria-label="返回">‹</button>
+                <div class="top-nav-title">课程详情</div>
+                <div class="mp-capsule">
+                    <div class="cap-cell" title="更多"><span class="cap-dots"><i></i><i></i><i></i></span></div>
+                    <div class="cap-cell" title="关闭/返回首页"><span class="cap-dot"></span></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 头图：课程主视觉 -->
+        <div class="hero">
+            <div class="hero-inner">
+                <span class="hero-tag">文教融合 · 研学AI+</span>
+                <div class="hero-title">
+                    <span class="t1">省博探秘</span>
+                    <span class="t2">AI 赋活</span>
+                </div>
+                <div class="hero-sub">让三千年巴蜀文明，在指尖 AI 里活起来。</div>
+            </div>
+        </div>
+
+        <!-- 课程信息卡 -->
+        <div class="info-card">
+            <div class="info-title">省博探秘 · AI赋活</div>
+
+            <div class="price-row">
+                <div class="price">
+                    <span class="rmb">¥</span>
+                    <span class="num">98.00</span>
+                    <span class="qi">起</span>
+                </div>
+                <span class="group-tag">拼团成行</span>
+            </div>
+
+            <div class="tag-row">
+                <span class="tag">博物馆</span>
+                <span class="tag">研学</span>
+            </div>
+
+            <div class="info-desc">响应政策号召，以四川博物院为场景，落地“用AI、创AI”行动</div>
+
+            <div class="meta-list">
+                <div class="meta-item">
+                    <div class="meta-label">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1d1d1f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                        课程地点
+                    </div>
+                    <div class="meta-value" onclick="toast('查看地图位置')">
+                        四川博物院
+                        <span class="chev">›</span>
+                    </div>
+                </div>
+
+                <div class="meta-item">
+                    <div class="meta-label">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1d1d1f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                        课程时间
+                    </div>
+                    <div class="meta-value">2026年8月18日</div>
+                </div>
+
+                <div class="meta-item">
+                    <div class="meta-label">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1d1d1f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        适用人群
+                    </div>
+                    <div class="meta-value">8-13岁青少年，家长可陪同</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 详情 Tabs -->
+        <div class="detail-tabs" id="detailTabs">
+            <button class="detail-tab active" data-tab="intro">课程简介</button>
+            <button class="detail-tab" data-tab="fee">费用说明</button>
+            <button class="detail-tab" data-tab="notice">预定须知</button>
+            <button class="detail-tab" data-tab="cancel">取消政策</button>
+        </div>
+
+        <!-- 课程简介 -->
+        <div class="tab-panel active" id="panel-intro">
+            <div class="tab-banner">
+                <span class="ribbon">福利专属</span>
+                <span class="bn-text">省博探秘 · AI 赋活</span>
+            </div>
+            <div class="tab-section">
+                <h5>课程介绍</h5>
+                <p>以四川博物院馆藏文物为线索，孩子们将化身“小小策展人”，在导师带领下走进青铜、陶俑与书画展厅；再借助 AI 绘画与语音交互工具，把观察到的文物“复活”成自己的数字作品，完成一次从“看文物”到“讲文物”的完整研学闭环。</p>
+            </div>
+            <div class="tab-section">
+                <h5>课程亮点</h5>
+                <ul>
+                    <li>一线文博导师带队，展厅实景授课；</li>
+                    <li>AIGC 工具实操，人人产出专属数字文创；</li>
+                    <li>任务式研学手册，输出个人研学成果报告；</li>
+                    <li>小班教学，每班不超过 20 人。</li>
+                </ul>
+            </div>
+            <div class="tab-section">
+                <h5>行程安排</h5>
+                <ul>
+                    <li>09:30 集合签到，领取研学任务手册；</li>
+                    <li>10:00 展厅探秘：青铜馆 · 陶俑馆 · 书画馆；</li>
+                    <li>12:00 午餐休整；</li>
+                    <li>13:30 AI 工作坊：文物数字复活创作；</li>
+                    <li>16:00 成果分享，颁发研学证书。</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 费用说明 -->
+        <div class="tab-panel" id="panel-fee">
+            <div class="tab-section">
+                <h5>费用包含</h5>
+                <ul>
+                    <li>课程导师费、研学手册与创作材料；</li>
+                    <li>四川博物院门票及专属讲解设备使用；</li>
+                    <li>当日午餐及饮用水；</li>
+                    <li>研学证书与数字作品输出服务。</li>
+                </ul>
+            </div>
+            <div class="tab-section">
+                <h5>费用不包含</h5>
+                <ul>
+                    <li>往返课程地点的交通费用；</li>
+                    <li>行程之外的个人消费。</li>
+                </ul>
+            </div>
+            <div class="tab-section">
+                <h5>拼团优惠</h5>
+                <p>本课程为拼团成行模式：满 12 人成团开课；3 人拼团每人立减 ¥20，成团后费用多退少不补。</p>
+            </div>
+        </div>
+
+        <!-- 预定须知 -->
+        <div class="tab-panel" id="panel-notice">
+            <div class="tab-section">
+                <h5>报名须知</h5>
+                <ul>
+                    <li>适用年龄 8-13 岁青少年，家长可陪同（陪同家长门票自理）；</li>
+                    <li>请至少提前 1 天完成报名，成团后开课前一天短信通知集合信息；</li>
+                    <li>请穿着舒适的鞋子，建议携带水杯与防晒用品；</li>
+                    <li>馆内请勿使用闪光灯拍摄，听从导师与场馆工作人员安排。</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 取消政策 -->
+        <div class="tab-panel" id="panel-cancel">
+            <div class="tab-section">
+                <h5>取消与退款</h5>
+                <ul>
+                    <li>开课前 3 天（含）以上取消：全额退款；</li>
+                    <li>开课前 1-2 天取消：退还 50% 费用；</li>
+                    <li>开课当天取消：不予退款，可转让给同龄儿童；</li>
+                    <li>未成团或因不可抗力取消：费用全额原路退回。</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 底部操作栏 -->
+        <div class="bottom-bar">
+            <button class="bb-service" onclick="toast('联系客服')">
+                <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13a8 8 0 0 1 16 0"/><path d="M3 15a2 2 0 0 1 2-2h1v6H5a2 2 0 0 1-2-2v-2Z"/><path d="M21 15a2 2 0 0 0-2-2h-1v6h1a2 2 0 0 0 2-2v-2Z"/><path d="M19 19a4 4 0 0 1-4 3h-2"/></svg>
+                客服
+            </button>
+            <button class="bb-btn bb-share" onclick="toast('分享课程')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+                分享
+            </button>
+            <button class="bb-btn bb-buy" onclick="toast('立即购买')">
+                <span class="bb-price"><span class="rmb">¥</span><span class="num"> 98.00</span></span>
+                立即购买
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<!-- 轻提示 -->
+<div id="toast" style="display:none; position:fixed; left:50%; bottom:120px; transform:translateX(-50%); background:rgba(17,17,17,.78); color:#fff; font-size:13px; padding:9px 18px; border-radius:9999px; z-index:2000;"></div>
+
+<!-- ===== 右侧功能说明面板 ===== -->
+<aside class="func-panel">
+    <div class="fp-inner">
+        <div class="fp-header">
+            <span class="fp-title">功能说明</span>
+            <button class="fp-fold-btn" onclick="toggleFuncPanel()" title="收起功能说明">›</button>
+        </div>
+        <div class="fp-body">
+            <h4>一、页面概述</h4>
+            <ul>
+                <li>「课程详情」为研学课程的对外展示页（手机端），面向家长与分销员，用于了解课程信息、分享推广并完成下单。</li>
+                <li>页面结构：课程主视觉头图 → 课程信息卡 → 详情 Tab（吸顶） → 底部固定操作栏。</li>
+            </ul>
+            <h4>二、课程信息</h4>
+            <ul>
+                <li><strong>头图</strong>：课程主视觉（深绿底 + 金色主标题「省博探秘 / AI 赋活」）与一句话副标；</li>
+                <li><strong>标题价格区</strong>：课程名称、价格 <i>¥98.00 起</i> 与右侧「拼团成行」标签；</li>
+                <li><strong>标签</strong>：博物馆、研学，标识课程品类；</li>
+                <li><strong>一句话卖点</strong>：响应政策号召，以四川博物院为场景，落地“用AI、创AI”行动；</li>
+                <li><strong>课程地点</strong>：四川博物院，点击可查看地图位置；</li>
+                <li><strong>课程时间</strong>：2026年8月18日；</li>
+                <li><strong>适用人群</strong>：8-13岁青少年，家长可陪同。</li>
+            </ul>
+            <h4>三、详情 Tab</h4>
+            <ul>
+                <li>四个 Tab：<strong>课程简介 / 费用说明 / 预定须知 / 取消政策</strong>，点击切换对应内容并自动滚动到 Tab 顶部；</li>
+                <li><strong>课程简介</strong>：福利专属横幅 + 课程介绍、课程亮点、行程安排；</li>
+                <li><strong>费用说明</strong>：费用包含 / 不包含 / 拼团优惠（满 12 人成团，3 人拼团每人减 ¥20）；</li>
+                <li><strong>预定须知</strong>：年龄与陪同要求、报名截止时间、集合通知与馆内注意事项；</li>
+                <li><strong>取消政策</strong>：按开课前时间分段退款规则，未成团或不可抗力全额退款。</li>
+            </ul>
+            <h4>四、底部操作栏</h4>
+            <ul>
+                <li><strong>客服</strong>：咨询入口；</li>
+                <li><strong>分享</strong>：把课程分享给好友，用于分销推广获客；</li>
+                <li><strong>立即购买</strong>：显示价格并进入下单流程。</li>
+            </ul>
+        </div>
+    </div>
+    <button class="fp-open" onclick="toggleFuncPanel()" title="展开功能说明">功能说明‹</button>
+</aside>
+
+<script>
+    /* ── 返回：有历史则回退，否则回模块首页 ── */
+    function goBack() {
+        if (history.length > 1) { history.back(); }
+        else { location.href = '分销.html'; }
+    }
+
+    /* ── 详情 Tabs 切换 ── */
+    (function () {
+        var tabs = document.querySelectorAll('.detail-tab');
+        tabs.forEach(function (tab) {
+            tab.addEventListener('click', function () {
+                tabs.forEach(function (t) { t.classList.remove('active'); });
+                tab.classList.add('active');
+                document.querySelectorAll('.tab-panel').forEach(function (p) { p.classList.remove('active'); });
+                document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+                var tabsEl = document.getElementById('detailTabs');
+                var top = tabsEl.getBoundingClientRect().top + window.scrollY - 94;
+                window.scrollTo({ top: top, behavior: 'smooth' });
+            });
+        });
+    })();
+
+    /* ── 右侧功能说明面板：收起 / 展开 ── */
+    function toggleFuncPanel() {
+        document.body.classList.toggle('fp-collapsed');
+    }
+
+    /* ── 轻提示 ── */
+    var toastTimer = null;
+    function toast(msg) {
+        var el = document.getElementById('toast');
+        el.textContent = msg;
+        el.style.display = 'block';
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { el.style.display = 'none'; }, 1500);
+    }
+
+    /* ── 状态栏实时时间/日期 ── */
+    (function () {
+        var d = new Date();
+        var w = ['日', '一', '二', '三', '四', '五', '六'];
+        function pad(n) { return n < 10 ? '0' + n : n; }
+        var t = document.getElementById('sbTime');
+        if (t) t.textContent = pad(d.getHours()) + ':' + pad(d.getMinutes());
+        var dateEl = document.getElementById('sbDate');
+        if (dateEl) dateEl.textContent = (d.getMonth() + 1) + '月' + d.getDate() + '日 星期' + w[d.getDay()];
+    })();
+</script>
+<script src="asset/admin-sidebar.js"></script>
+</body>
+</html>
