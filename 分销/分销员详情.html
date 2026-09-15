@@ -274,7 +274,6 @@
         // 统计
         var totalOrders = orders.length;
         var totalAmount = orders.reduce(function(s, o) { return s + o.amount; }, 0);
-        var totalCommission = orders.reduce(function(s, o) { return s + o.commission; }, 0);
         var rate = orders.length > 0 ? orders[0].rate : '-';
 
         var withdrawnTotal = allWithdraws.filter(function(w) { return w.name === name && w.status === 'success'; })
@@ -284,11 +283,16 @@
         var pending = orders.filter(function(o) { return o.status === 'pending'; })
             .reduce(function(s, o) { return s + o.commission; }, 0);
 
+        // 当前余额（已结算）= 已结算佣金 - 已提现总额
+        var balance = Math.max(0, settled - withdrawnTotal);
+        // 累计收益 = 已提现总额 + 当前余额 + 待结算金额
+        var totalCommission = withdrawnTotal + balance + pending;
+
         document.getElementById('statOrders').textContent = totalOrders;
         document.getElementById('statAmount').textContent = '¥' + fmt(totalAmount);
         document.getElementById('statEarn').textContent = '¥' + fmt(totalCommission);
         document.getElementById('statWithdrawn').textContent = '¥' + fmt(withdrawnTotal);
-        document.getElementById('statBalance').textContent = '¥' + fmt(Math.max(0, settled - withdrawnTotal));
+        document.getElementById('statBalance').textContent = '¥' + fmt(balance);
         document.getElementById('statPending').textContent = '¥' + fmt(pending);
         document.getElementById('statRate').textContent = rate;
 
@@ -330,17 +334,16 @@
             <ul>
                 <li><strong>分销订单总数</strong>：该分销员推广成交的订单笔数；</li>
                 <li><strong>总订单金额</strong>：推广订单金额合计；</li>
-                <li><strong>累计收益</strong>：累计产生的佣金合计（含已结算与待结算）；</li>
+                <li><strong>累计收益</strong>：= 已提现总额 + 当前余额 + 待结算金额；</li>
                 <li><strong>已提现总额</strong>：提现成功到账的金额合计；</li>
-                <li><strong>当前余额（已结算）</strong>：已结算佣金扣除已提现后的余额，每月末自动打款；</li>
-                <li><strong>待结算</strong>：订单确认中，暂不可提现的佣金；</li>
+                <li><strong>当前余额（已结算）</strong>：已结算佣金余额；</li>
+                <li><strong>待结算金额</strong>：订单暂未结算的佣金；</li>
                 <li><strong>当前分佣比例</strong>：该分销员当前等级对应的佣金计提比例。</li>
             </ul>
             <h4>三、分销订单表格</h4>
             <ul>
                 <li>采用与「分销管理 - 分销订单」一致的表格结构，列出该分销员的推广订单；</li>
                 <li>列含：订单编号、订单名称、订单金额、下单人账号、分佣比例、佣金、下单时间、结算时间、状态（已结算 / 待结算 / 已作废）；</li>
-                <li>详情页已锁定分销员，故省略「分销员 / 分销员账号」列，暂不提供查询条件。</li>
             </ul>
         </div>
     </div>
