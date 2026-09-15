@@ -22,7 +22,9 @@
                 { name: '分销中心',     href: '分销.html' },
                 { name: '分销记账',     href: '分销记账.html' },
                 { name: '分销提现',     href: '分销提现.html' },
+                { name: '课程发布',     href: '课程发布.html' },
                 { name: '课程详情',     href: '课程详情.html' },
+                { name: '课程推广',     href: '课程推广.html' }
             ]
         },
         {

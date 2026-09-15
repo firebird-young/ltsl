@@ -538,7 +538,7 @@
                 <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13a8 8 0 0 1 16 0"/><path d="M3 15a2 2 0 0 1 2-2h1v6H5a2 2 0 0 1-2-2v-2Z"/><path d="M21 15a2 2 0 0 0-2-2h-1v6h1a2 2 0 0 0 2-2v-2Z"/><path d="M19 19a4 4 0 0 1-4 3h-2"/></svg>
                 客服
             </button>
-            <button class="bb-btn bb-share" onclick="toast('分享课程')">
+            <button class="bb-btn bb-share" onclick="location.href='课程推广.html'">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
                 分享
             </button>
@@ -564,32 +564,11 @@
         <div class="fp-body">
             <h4>一、页面概述</h4>
             <ul>
-                <li>「课程详情」为研学课程的对外展示页（手机端），面向家长与分销员，用于了解课程信息、分享推广并完成下单。</li>
-                <li>页面结构：课程主视觉头图 → 课程信息卡 → 详情 Tab（吸顶） → 底部固定操作栏。</li>
+                <li>「课程详情」为研学课程的对外展示页（手机端），面向家长与分销员，用于了解课程信息、分享推广并完成下单。本次修改底部分享按钮相关逻辑</li>
             </ul>
-            <h4>二、课程信息</h4>
+            <h4>二、底部操作栏</h4>
             <ul>
-                <li><strong>头图</strong>：课程主视觉（深绿底 + 金色主标题「省博探秘 / AI 赋活」）与一句话副标；</li>
-                <li><strong>标题价格区</strong>：课程名称、价格 <i>¥98.00 起</i> 与右侧「拼团成行」标签；</li>
-                <li><strong>标签</strong>：博物馆、研学，标识课程品类；</li>
-                <li><strong>一句话卖点</strong>：响应政策号召，以四川博物院为场景，落地“用AI、创AI”行动；</li>
-                <li><strong>课程地点</strong>：四川博物院，点击可查看地图位置；</li>
-                <li><strong>课程时间</strong>：2026年8月18日；</li>
-                <li><strong>适用人群</strong>：8-13岁青少年，家长可陪同。</li>
-            </ul>
-            <h4>三、详情 Tab</h4>
-            <ul>
-                <li>四个 Tab：<strong>课程简介 / 费用说明 / 预定须知 / 取消政策</strong>，点击切换对应内容并自动滚动到 Tab 顶部；</li>
-                <li><strong>课程简介</strong>：福利专属横幅 + 课程介绍、课程亮点、行程安排；</li>
-                <li><strong>费用说明</strong>：费用包含 / 不包含 / 拼团优惠（满 12 人成团，3 人拼团每人减 ¥20）；</li>
-                <li><strong>预定须知</strong>：年龄与陪同要求、报名截止时间、集合通知与馆内注意事项；</li>
-                <li><strong>取消政策</strong>：按开课前时间分段退款规则，未成团或不可抗力全额退款。</li>
-            </ul>
-            <h4>四、底部操作栏</h4>
-            <ul>
-                <li><strong>客服</strong>：咨询入口；</li>
-                <li><strong>分享</strong>：把课程分享给好友，用于分销推广获客；</li>
-                <li><strong>立即购买</strong>：显示价格并进入下单流程。</li>
+                <li><strong>分享</strong>：需要判断下当前分享用户的类型，如果是分销员，跳转到课程推广页；否则，直接分享课程到微信好友。</li>
             </ul>
         </div>
     </div>

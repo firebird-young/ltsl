@@ -15,13 +15,17 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* ===== 主色（沿用分销模块既有 #2E6BE6） ===== */
+        /* ===== 主色 ===== */
         :root {
-            --accent: #2E6BE6;
-            --accent-dark: #1E4FC4;
+            --accent: #0E9F6E;
+            --accent-dark: #0B7A55;
+            --accent-light: #E6F7F0;
             --price: #E0343C;
             --wechat: #07C160;
             --wechat-dark: #06AE5A;
+            --poster: #FF7A3C;
+            --poster-dark: #F25F1C;
+            --poster-light: #FFF0E6;
         }
 
         /* ===== 舞台说明 ===== */
@@ -33,15 +37,16 @@
         .stage-tip .st-label { font-size: 13px; color: #86868b; }
         .stage-tip .st-badge {
             font-size: 12px; font-weight: 600; color: var(--accent);
-            background: #fff; border: 1px solid #b8d5ff; border-radius: 9999px;
+            background: #fff; border: 1px solid #b3e5d3; border-radius: 9999px;
             padding: 4px 14px;
         }
 
-        /* ===== 手机页面容器（无外框，平铺预览） ===== */
+        /* ===== 手机页面容器 ===== */
         .app-container {
             width: 100%; max-width: 430px; margin: 0 auto;
-            background: #f5f5f5; border-radius: 18px;
-            box-shadow: 0 10px 34px rgba(30, 60, 120, 0.14);
+            background: #f4f7f9;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(30, 60, 120, 0.12);
             position: relative; overflow: hidden;
         }
         @media (max-width: 540px) {
@@ -123,23 +128,24 @@
         /* 推广提示条 */
         .share-hint {
             margin: 0 16px;
-            background: linear-gradient(135deg, #EAF1FF 0%, #F1ECFF 100%);
-            border-radius: 12px; padding: 12px 14px;
-            font-size: 12.5px; color: #4663B0;
+            background: var(--accent-light);
+            border-radius: 10px; padding: 11px 14px;
+            font-size: 12.5px; color: #0a7a55;
             display: flex; align-items: center; gap: 8px; line-height: 1.5;
         }
-        .share-hint svg { flex-shrink: 0; }
+        .share-hint svg { flex-shrink: 0; color: var(--accent); }
+        .share-hint .hint-arrow { margin-left: auto; font-size: 14px; color: var(--accent); }
 
         /* 课程横条 */
         .share-course {
-            margin: 12px 16px 0;
+            margin: 10px 16px 0;
             background: #fff; border-radius: 14px;
-            padding: 12px;
-            box-shadow: 0 4px 16px rgba(0,0,0,.06);
-            display: flex; gap: 12px;
+            padding: 14px 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,.04);
+            display: flex; gap: 12px; align-items: center;
         }
         .sc-cover {
-            flex-shrink: 0; width: 80px; height: 80px; border-radius: 10px;
+            flex-shrink: 0; width: 78px; height: 78px; border-radius: 10px;
             overflow: hidden;
             background:
                 radial-gradient(ellipse 80% 60% at 80% 15%, rgba(120,150,110,.35), transparent 60%),
@@ -152,88 +158,75 @@
             font-family: 'Songti SC', serif; color: #D8C48E; font-size: 18px;
             letter-spacing: 2px;
         }
-        .sc-meta { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: space-between; }
+        .sc-meta { flex: 1; min-width: 0; }
         .sc-name {
-            font-size: 14.5px; font-weight: 700; color: #1d1d1f;
+            font-size: 15px; font-weight: 700; color: #1d1d1f;
             overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
-        .sc-sub { font-size: 11.5px; color: #999; margin-top: 4px; }
-        .sc-price-row { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; }
+        .sc-sub { font-size: 12px; color: #999; margin-top: 4px; }
+        .sc-price-row { display: flex; align-items: baseline; gap: 4px; margin-top: 8px; }
         .sc-price { color: var(--price); font-weight: 700; }
-        .sc-price .num { font-size: 17px; }
-        .sc-price .rmb { font-size: 12px; }
-        .sc-tag {
-            font-size: 11px; color: var(--accent); background: #EAF1FF;
-            padding: 3px 9px; border-radius: 6px;
+        .sc-price .num { font-size: 20px; }
+        .sc-price .rmb { font-size: 13px; }
+        .sc-price-qi { font-size: 12px; color: #f08a8e; font-weight: 500; }
+        .sc-tag-btn {
+            flex-shrink: 0;
+            font-size: 13px; font-weight: 600; color: var(--accent);
+            background: var(--accent-light); border: none; cursor: pointer;
+            padding: 9px 14px; border-radius: 9999px; font-family: inherit;
+            display: flex; align-items: center; gap: 2px;
         }
 
         /* 分享方式区 */
-        .share-section { margin: 22px 16px 0; }
+        .share-section { margin: 20px 16px 0; }
         .ss-title {
-            font-size: 14px; font-weight: 700; color: #1d1d1f; margin-bottom: 12px;
+            font-size: 16px; font-weight: 700; color: #1d1d1f; margin-bottom: 12px;
             display: flex; align-items: center; gap: 8px;
         }
         .ss-title::before {
-            content: ''; width: 4px; height: 14px; border-radius: 2px; background: var(--accent);
+            content: ''; width: 4px; height: 16px; border-radius: 2px; background: var(--accent);
         }
-        .ss-title .ss-tip { font-size: 11.5px; color: #999; font-weight: 400; margin-left: auto; }
+        .ss-title .ss-tip { font-size: 13px; color: #b0b0b0; font-weight: 400; margin-left: auto; }
 
-        .share-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
-        }
+        .share-list { display: flex; flex-direction: column; gap: 12px; }
         .share-card {
             background: #fff; border-radius: 14px;
-            padding: 20px 14px 16px;
-            box-shadow: 0 4px 16px rgba(0,0,0,.06);
-            display: flex; flex-direction: column; align-items: center; gap: 10px;
+            padding: 16px 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,.04);
+            display: flex; align-items: center; gap: 14px;
+            width: 100%; text-align: left;
             border: none; cursor: pointer; font-family: inherit;
             -webkit-tap-highlight-color: transparent; transition: transform .12s;
-            text-align: center;
         }
-        .share-card:active { transform: scale(.97); }
+        .share-card:active { transform: scale(.98); }
         .sc-ic {
-            width: 56px; height: 56px; border-radius: 16px;
+            flex-shrink: 0;
+            width: 56px; height: 56px; border-radius: 14px;
             display: flex; align-items: center; justify-content: center;
-            color: #fff;
         }
-        .sc-ic svg { width: 32px; height: 32px; display: block; }
-        .sc-ic.wx { background: linear-gradient(135deg, #1AAD19, var(--wechat)); }
-        .sc-ic.pt { background: linear-gradient(135deg, #FF8A4C, #FF5722); }
+        .sc-ic svg { width: 30px; height: 30px; display: block; }
+        .sc-ic.wx { background: #E7F9EE; color: var(--wechat); }
+        .sc-ic.pt { background: var(--poster-light); color: var(--poster); }
         .sc-ic.wx::after, .sc-ic.pt::after { display: none; }
-        .sc-name-2 { font-size: 14.5px; font-weight: 700; color: #1d1d1f; }
+        .sc-text { flex: 1; min-width: 0; }
+        .sc-name-2 { font-size: 15.5px; font-weight: 700; color: #1d1d1f; }
         .sc-desc {
-            font-size: 11.5px; color: #999; line-height: 1.45;
+            font-size: 12.5px; color: #999; line-height: 1.45; margin-top: 4px;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
-        .sc-card-arrow {
-            margin-top: auto; padding-top: 6px;
-            font-size: 11px; color: var(--accent);
+        .sc-tags-line {
+            font-size: 11.5px; color: #c2c2c2; margin-top: 5px;
         }
+        .sc-go {
+            flex-shrink: 0;
+            font-size: 13.5px; font-weight: 600;
+            padding: 10px 18px; border-radius: 9999px; cursor: pointer;
+            display: flex; align-items: center; gap: 2px; font-family: inherit;
+        }
+        .sc-go.wx { background: var(--accent); color: #fff; border: none; }
+        .sc-go.pt { background: var(--poster-light); color: var(--poster); border: 1px solid #ffdcc4; }
+        .share-card:active .sc-go { opacity: .85; }
 
-        /* 推广说明 */
-        .promo-card {
-            margin: 22px 16px 0;
-            background: #fff; border-radius: 14px;
-            padding: 14px 16px 16px;
-            box-shadow: 0 4px 16px rgba(0,0,0,.06);
-        }
-        .promo-title {
-            font-size: 14px; font-weight: 700; color: #1d1d1f;
-            margin-bottom: 10px;
-            display: flex; align-items: center; gap: 6px;
-        }
-        .promo-title::before {
-            content: ''; width: 4px; height: 14px; border-radius: 2px; background: var(--accent);
-        }
-        .promo-list { display: flex; flex-direction: column; gap: 9px; }
-        .promo-item {
-            display: flex; align-items: flex-start; gap: 8px;
-            font-size: 12.5px; color: #555; line-height: 1.6;
-        }
-        .promo-item .pi-dot {
-            flex-shrink: 0; margin-top: 7px;
-            width: 5px; height: 5px; border-radius: 50%; background: var(--accent);
-        }
-        .promo-item b { color: #1d1d1f; font-weight: 700; }
 
         /* ===== 微信分享底部弹层 ===== */
         .sheet {
@@ -270,6 +263,10 @@
         .sheet-grid {
             display: grid; grid-template-columns: repeat(4, 1fr);
             gap: 18px 8px; margin-bottom: 18px;
+        }
+        .sheet-grid-center {
+            grid-template-columns: 1fr; justify-items: center;
+            padding: 8px 0 12px;
         }
         .sheet-item {
             display: flex; flex-direction: column; align-items: center; gap: 8px;
@@ -358,49 +355,44 @@
         .p-sub { font-size: 11.5px; color: rgba(235,225,195,.82); letter-spacing: 1px; margin-top: 12px; }
 
         .p-mid {
-            padding: 18px 18px 14px;
-            display: flex; gap: 14px; align-items: flex-start;
+            padding: 16px 20px 14px;
         }
-        .p-info { flex: 1; min-width: 0; }
+        .p-info { display: flex; flex-direction: column; gap: 8px; }
         .p-meta {
-            font-size: 12px; color: #666; line-height: 1.8;
-            display: flex; align-items: center; gap: 6px;
+            font-size: 13px; color: #555; line-height: 1.5;
+            display: flex; align-items: center; gap: 8px;
         }
-        .p-meta + .p-meta { margin-top: 2px; }
-        .p-meta svg { flex-shrink: 0; color: #999; }
-        .p-meta b { color: #1d1d1f; font-weight: 700; }
-        .p-price-box {
-            margin-top: 12px; padding-top: 12px;
-            border-top: 1px dashed #eee;
-            display: flex; align-items: baseline; gap: 8px;
-        }
-        .p-price-label { font-size: 11.5px; color: #999; }
-        .p-price {
-            color: var(--price); font-weight: 700;
-            display: flex; align-items: baseline;
-        }
-        .p-price .rmb { font-size: 12px; }
-        .p-price .num { font-size: 22px; }
-        .p-price .qi { font-size: 11px; margin-left: 2px; color: #999; font-weight: 500; }
+        .p-meta svg { flex-shrink: 0; color: #888; }
+        .p-meta b { color: #555; font-weight: 600; }
 
+        .p-qr-section {
+            padding: 16px 20px 20px;
+            border-top: 1px solid #f0f0f0; margin-top: 4px;
+            display: flex; align-items: center; justify-content: space-between; gap: 14px;
+        }
+        .p-brand {
+            display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;
+        }
+        .p-brand img {
+            width: 40px; height: 40px; border-radius: 8px; flex-shrink: 0; object-fit: cover;
+        }
+        .p-brand-name {
+            font-size: 15px; font-weight: 700; color: #333; letter-spacing: 1px;
+        }
+        .p-brand-cap {
+            font-size: 11px; color: #999; margin-top: 2px;
+        }
+        .p-qr-wrap { flex-shrink: 0; text-align: center; }
         .p-qr {
-            flex-shrink: 0; width: 98px; height: 98px;
-            border-radius: 10px; padding: 5px; background: #fff;
+            width: 96px; height: 96px;
+            border-radius: 10px; padding: 4px; background: #fff;
             border: 1px solid #eee;
         }
         .p-qr svg { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
         .p-qr-cap {
-            margin-top: 4px; text-align: right;
-            font-size: 10px; color: #999;
+            margin-top: 6px;
+            font-size: 11px; color: #999;
         }
-
-        .p-bottom {
-            padding: 0 18px 18px;
-            text-align: center;
-            font-size: 11.5px; color: #999;
-            letter-spacing: 1px;
-        }
-        .p-bottom b { color: var(--accent); font-weight: 700; }
 
         /* 海报操作按钮 */
         .poster-ops {
@@ -527,8 +519,9 @@
 
             <!-- 顶部推广提示 -->
             <div class="share-hint">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-                <span>当前推广佣金比例 <b style="color: var(--accent);">15%</b>，分享给好友下单即享分销收益</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 11-5.8-1.6"/></svg>
+                <span>当前推广佣金比例 <b style="color: var(--accent);">15%</b>，分享给好友下单即可拿推广收益</span>
+                <span class="hint-arrow">›</span>
             </div>
 
             <!-- 课程信息横条 -->
@@ -538,10 +531,11 @@
                     <div class="sc-name">省博探秘 · AI 赋活</div>
                     <div class="sc-sub">四川博物院</div>
                     <div class="sc-price-row">
-                        <div class="sc-price"><span class="rmb">¥</span><span class="num">98.00</span> 起</div>
-                        <span class="sc-tag">拼团成行</span>
+                        <span class="sc-price"><span class="rmb">¥</span><span class="num">98.00</span></span>
+                        <span class="sc-price-qi">起</span>
                     </div>
                 </div>
+                <button class="sc-tag-btn">拼团成行 ›</button>
             </div>
 
             <!-- 分享方式 -->
@@ -550,26 +544,30 @@
                     选择分享方式
                     <span class="ss-tip">共 2 种</span>
                 </div>
-                <div class="share-grid">
+                <div class="share-list">
 
-                    <button class="share-card" onclick="openWechat()">
+                    <button class="share-card">
                         <div class="sc-ic wx">
                             <svg viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M9.5 4C5.36 4 2 6.69 2 10c0 1.74.95 3.31 2.47 4.4-.13.49-.41 1.55-.47 1.78-.07.27.1.27.21.19.09-.06 1.39-.91 1.66-1.09.81.21 1.68.32 2.62.32.16 0 .32 0 .48-.01-.13-.42-.21-.86-.21-1.31 0-2.91 2.71-5.28 6.04-5.28.16 0 .32.01.48.02C14.7 6.36 12.36 4 9.5 4Zm-2 3a1 1 0 110 2 1 1 0 010-2Zm4 0a1 1 0 110 2 1 1 0 010-2ZM14.8 10c-3.04 0-5.5 1.94-5.5 4.33 0 1.21.62 2.3 1.62 3.06-.1.39-.32 1.21-.37 1.39-.06.21.08.21.17.15.07-.05 1.08-.71 1.29-.85.61.17 1.27.27 1.96.27 3.04 0 5.5-1.94 5.5-4.33 0-2.39-2.46-4.33-5.5-4.33Zm-1.8 2.7a.8.8 0 110 1.6.8.8 0 010-1.6Zm3.4 0a.8.8 0 110 1.6.8.8 0 010-1.6Z"/>
                             </svg>
                         </div>
-                        <div class="sc-name-2">分享到微信</div>
-                        <div class="sc-desc">发送给好友<br>或分享至朋友圈</div>
-                        <div class="sc-card-arrow">立即分享 ›</div>
+                        <div class="sc-text">
+                            <div class="sc-name-2">分享到微信</div>
+                            <div class="sc-desc">发送给微信好友</div>
+                        </div>
+                        <div class="sc-go wx">立即分享 ›</div>
                     </button>
 
                     <button class="share-card" onclick="openPoster()">
                         <div class="sc-ic pt">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h7v7h-7z"/><path d="M14 17.5h7M17.5 14v7"/></svg>
                         </div>
-                        <div class="sc-name-2">生成分享海报</div>
-                        <div class="sc-desc">海报含专属二维码<br>保存到相册后分享</div>
-                        <div class="sc-card-arrow">立即生成 ›</div>
+                        <div class="sc-text">
+                            <div class="sc-name-2">生成分享海报</div>
+                            <div class="sc-desc">海报含专属二维码，保存到相册后分享</div>
+                        </div>
+                        <div class="sc-go pt">立即生成 ›</div>
                     </button>
 
                 </div>
@@ -586,7 +584,7 @@
     <div class="sheet-panel">
         <div class="sheet-handle"></div>
         <div class="sheet-title">分享到微信</div>
-        <div class="sheet-grid">
+        <div class="sheet-grid sheet-grid-center">
 
             <div class="sheet-item" onclick="shareTo('微信好友')">
                 <div class="sheet-ic friend">
@@ -595,22 +593,6 @@
                     </svg>
                 </div>
                 <div class="sheet-name">微信好友</div>
-            </div>
-
-            
-
-            <div class="sheet-item" onclick="shareTo('复制链接')">
-                <div class="sheet-ic copylink">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007 0l3-3a5 5 0 00-7-7l-1 1"/><path d="M14 11a5 5 0 00-7 0l-3 3a5 5 0 007 7l1-1"/></svg>
-                </div>
-                <div class="sheet-name">复制链接</div>
-            </div>
-
-            <div class="sheet-item" onclick="openPoster()">
-                <div class="sheet-ic saveimg">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                </div>
-                <div class="sheet-name">保存图片</div>
             </div>
 
         </div>
@@ -640,34 +622,34 @@
                 <div class="p-info">
                     <div class="p-meta">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                        <span><b>四川博物院</b> · 8-13 岁</span>
-                    </div>
-                    <div class="p-meta">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-                        <span><b>2026.08.18</b> 开课 · 全天</span>
+                        <span><b>四川博物院</b></span>
                     </div>
                     <div class="p-meta">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
-                        <span>邀请人：<b>小柚同学</b></span>
+                        <span>8-13 岁青少年，家长可陪同</span>
                     </div>
-                    <div class="p-price-box">
-                        <span class="p-price-label">到手价</span>
-                        <div class="p-price">
-                            <span class="rmb">¥</span>
-                            <span class="num">98</span>
-                            <span class="qi">起</span>
-                        </div>
+                    <div class="p-meta">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                        <span><b>2026 年 8 月 18 日</b></span>
                     </div>
-                </div>
-                <!-- 右下角二维码 -->
-                <div>
-                    <div class="p-qr" id="qrBox"></div>
-                    <div class="p-qr-cap">扫码查看详情</div>
+                    <div class="p-meta">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M15 8l-2 8h-3l2-8z"/></svg>
+                        <span>邀请人：<b>user_2980</b></span>
+                    </div>
                 </div>
             </div>
 
-            <div class="p-bottom">
-                长按或扫码 · 报名享分销 <b>邀请有奖</b>
+            <div class="p-qr-section">
+                <div class="p-brand">
+                    <img src="../asset/litailogo.png" alt="离泰数链">
+                    <div>
+                        <div class="p-brand-name">离泰数链</div>
+                        <div class="p-brand-cap">长按二维码加入</div>
+                    </div>
+                </div>
+                <div class="p-qr-wrap">
+                    <div class="p-qr" id="qrBox"></div>
+                </div>
             </div>
         </div>
 
@@ -710,20 +692,19 @@
             <h4>三、分享到微信</h4>
             <ul>
                 <li>点击「分享到微信」卡片，底部弹出微信风格操作面板；</li>
-                <li>面板提供 4 个动作：<strong>微信好友</strong> / <strong>朋友圈</strong> / <strong>复制链接</strong> / <strong>保存图片</strong>（保存图片直接跳到海报预览）；</li>
-                <li>每个动作点击后，自动关闭面板并 toast 提示处理进度。</li>
+                <li>面板仅提供「发送给好友」一个动作，点击后自动关闭面板并 toast 提示处理进度。</li>
             </ul>
             <h4>四、生成分享海报</h4>
             <ul>
-                <li>点击「生成分享海报」卡片或微信面板的「保存图片」，打开海报预览层；</li>
+                <li>点击「生成分享海报」卡片，打开海报预览层；</li>
                 <li>海报内容由三部分组成：
                     <ul>
-                        <li>顶部主视觉：与课程详情头图一致的深绿渐变 + 金色「省博探秘 / AI 赋活」标题；</li>
-                        <li>中部信息区：地点 + 时间 + 邀请人 + 到手价，右下角二维码（自动生成 25×25 模块的伪二维码图案）；</li>
-                        <li>底部引导：扫码提示与「邀请有奖」激励语；</li>
+                        <li>顶部主视觉：深绿渐变 + 金色「省博探秘 / AI 赋活」标题；</li>
+                        <li>中部信息区：地点（四川博物院）、人群（8-13 岁青少年，家长可陪同）、时间（2026 年 8 月 18 日）、邀请人（user_2980）；</li>
+                        <li>底部二维码：居中展示，标注「长按二维码加入」；</li>
                     </ul>
                 </li>
-                <li><strong>保存到相册</strong> 按钮：将当前海报页打包为 HTML 文件下载到本地，原型阶段以「下载海报 .html」的形式呈现可保存、可再次打开查看。</li>
+                <li><strong>保存到相册</strong> 按钮：将当前海报页打包为 HTML 文件下载到本地。</li>
             </ul>
             <h4>五、关闭与返回</h4>
             <ul>
@@ -760,13 +741,6 @@
         setTimeout(function () {
             if (target === '微信好友') {
                 toast('已发送至微信好友');
-            } else if (target === '朋友圈') {
-                toast('已分享到朋友圈');
-            } else if (target === '复制链接') {
-                if (navigator.clipboard) {
-                    navigator.clipboard.writeText('https://litai.example/course/省博探秘AI赋活?invite=xyz123').catch(function () {});
-                }
-                toast('链接已复制，去粘贴给好友吧');
             }
         }, 180);
     }
@@ -809,22 +783,20 @@
             + '.p-name .l1 { display:block; font-size:28px; letter-spacing:6px; }'
             + '.p-name .l2 { display:block; font-size:22px; letter-spacing:9px; margin-top:8px; }'
             + '.p-sub { font-size:11.5px; color:rgba(235,225,195,.82); letter-spacing:1px; margin-top:12px; }'
-            + '.p-mid { padding:18px 18px 14px; display:flex; gap:14px; align-items:flex-start; }'
-            + '.p-info { flex:1; min-width:0; }'
-            + '.p-meta { font-size:12px; color:#666; line-height:1.8; display:flex; align-items:center; gap:6px; }'
-            + '.p-meta+.p-meta { margin-top:2px; } p-meta svg{ flex-shrink:0; color:#999; }'
-            + '.p-meta b { color:#1d1d1f; font-weight:700; }'
-            + '.p-price-box { margin-top:12px; padding-top:12px; border-top:1px dashed #eee;'
-            + 'display:flex; align-items:baseline; gap:8px; }'
-            + '.p-price-label { font-size:11.5px; color:#999; }'
-            + '.p-price { color:#E0343C; font-weight:700; display:flex; align-items:baseline; }'
-            + '.p-price .rmb { font-size:12px; } .p-price .num { font-size:22px; }'
-            + '.p-price .qi { font-size:11px; margin-left:2px; color:#999; font-weight:500; }'
-            + '.p-qr { flex-shrink:0; width:98px; height:98px; border-radius:10px; padding:5px; background:#fff; border:1px solid #eee; }'
+            + '.p-mid { padding:16px 20px 14px; }'
+            + '.p-info { display:flex; flex-direction:column; gap:8px; }'
+            + '.p-meta { font-size:13px; color:#555; line-height:1.5; display:flex; align-items:center; gap:8px; }'
+            + '.p-meta svg{ flex-shrink:0; color:#888; }'
+            + '.p-meta b { color:#555; font-weight:600; }'
+            + '.p-qr-section { padding:16px 20px 20px; border-top:1px solid #f0f0f0; margin-top:4px; display:flex; align-items:center; justify-content:space-between; gap:14px; }'
+            + '.p-brand { display:flex; align-items:center; gap:10px; flex:1; min-width:0; }'
+            + '.p-brand img { width:40px; height:40px; border-radius:8px; flex-shrink:0; object-fit:cover; }'
+            + '.p-brand-name { font-size:15px; font-weight:700; color:#333; letter-spacing:1px; }'
+            + '.p-brand-cap { font-size:11px; color:#999; margin-top:2px; }'
+            + '.p-qr-wrap { flex-shrink:0; text-align:center; }'
+            + '.p-qr { width:96px; height:96px; border-radius:10px; padding:4px; background:#fff; border:1px solid #eee; }'
             + '.p-qr svg { width:100%; height:100%; display:block; }'
-            + '.p-qr-cap { margin-top:4px; text-align:right; font-size:10px; color:#999; }'
-            + '.p-bottom { padding:0 18px 18px; text-align:center; font-size:11.5px; color:#999; letter-spacing:1px; }'
-            + '.p-bottom b { color:#2E6BE6; font-weight:700; }';
+            + '.p-qr-cap { margin-top:6px; font-size:11px; color:#999; }';
 
         var cardHtml = card.outerHTML
             /* 内联 SVG viewBox 是视觉一致的；但克隆出来的 whiteRect/rects 维持原始样式即可 */
