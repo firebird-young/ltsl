@@ -1,0 +1,255 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - img "离泰数链" [ref=e4]
+      - generic [ref=e5]: 离泰数链
+      - generic [ref=e7]: 产品需求原型目录
+    - generic [ref=e9]:
+      - img "木易卡卡" [ref=e10]
+      - generic [ref=e11]: 木易卡卡
+  - main [ref=e12]:
+    - complementary [ref=e13]:
+      - generic [ref=e14]: 迭代目录
+      - link "AI创作和研学报告 1" [ref=e15] [cursor=pointer]:
+        - /url: "#sec_0"
+        - generic [ref=e16]: AI创作和研学报告
+        - generic [ref=e17]: "1"
+      - link "2026.7.7 迭代 7" [ref=e18] [cursor=pointer]:
+        - /url: "#sec_1"
+        - generic [ref=e19]: 2026.7.7 迭代
+        - generic [ref=e20]: "7"
+      - link "2026.7.27 迭代 1" [ref=e21] [cursor=pointer]:
+        - /url: "#sec_2"
+        - generic [ref=e22]: 2026.7.27 迭代
+        - generic [ref=e23]: "1"
+      - link "2026.8.19 迭代 26" [ref=e24] [cursor=pointer]:
+        - /url: "#sec_3"
+        - generic [ref=e25]: 2026.8.19 迭代
+        - generic [ref=e26]: "26"
+      - link "分销（tbd） 1" [ref=e27] [cursor=pointer]:
+        - /url: "#sec_4"
+        - generic [ref=e28]: 分销（tbd）
+        - generic [ref=e29]: "1"
+    - generic [ref=e30]:
+      - generic [ref=e31]:
+        - generic [ref=e32]: 迭代概览
+        - generic [ref=e33]:
+          - generic [ref=e34]: 2026.8.19 迭代
+          - button "1 需求变更记录" [ref=e35] [cursor=pointer]:
+            - generic [ref=e36]: "1"
+            - text: 需求变更记录
+        - generic [ref=e38]: 共 26 项 · 4 个子模块
+      - generic [ref=e39]:
+        - generic [ref=e40]:
+          - generic [ref=e41]: 优先级
+          - button "全部" [ref=e43] [cursor=pointer]
+        - generic [ref=e44]:
+          - generic [ref=e45]: 状态
+          - combobox [ref=e46] [cursor=pointer]:
+            - option "全部" [selected]
+            - option "待开发"
+            - option "已完成"
+        - button "确定" [disabled] [ref=e47]
+        - button "重置" [disabled] [ref=e48]
+      - generic [ref=e49]:
+        - generic [ref=e50]:
+          - generic [ref=e51]: 用户小程序
+          - generic [ref=e52]: 7 项
+        - generic [ref=e53]:
+          - link "选择场次 P0 已完成 ›" [ref=e54] [cursor=pointer]:
+            - /url: 2026819需求/app/选择场次.html
+            - generic [ref=e55]: 选择场次
+            - generic [ref=e56]:
+              - generic [ref=e57]: P0
+              - generic [ref=e58]: 已完成
+            - generic [ref=e59]: ›
+          - link "填写购买信息 P0 已完成 ›" [ref=e60] [cursor=pointer]:
+            - /url: 2026819需求/app/填写购买信息.html
+            - generic [ref=e61]: 填写购买信息
+            - generic [ref=e62]:
+              - generic [ref=e63]: P0
+              - generic [ref=e64]: 已完成
+            - generic [ref=e65]: ›
+          - link "选择出行人 P0 已完成 ›" [ref=e66] [cursor=pointer]:
+            - /url: 2026819需求/app/选择出行人.html
+            - generic [ref=e67]: 选择出行人
+            - generic [ref=e68]:
+              - generic [ref=e69]: P0
+              - generic [ref=e70]: 已完成
+            - generic [ref=e71]: ›
+          - link "购买成功 P1 待开发 ›" [ref=e72] [cursor=pointer]:
+            - /url: 2026819需求/app/购买成功.html
+            - generic [ref=e73]: 购买成功
+            - generic [ref=e74]:
+              - generic [ref=e75]: P1
+              - generic [ref=e76]: 待开发
+            - generic [ref=e77]: ›
+          - link "订单详情（待核销） P0 已完成 ›" [ref=e78] [cursor=pointer]:
+            - /url: 2026819需求/app/订单详情（待核销）.html
+            - generic [ref=e79]: 订单详情（待核销）
+            - generic [ref=e80]:
+              - generic [ref=e81]: P0
+              - generic [ref=e82]: 已完成
+            - generic [ref=e83]: ›
+          - link "消息短信 P1 待开发 ›" [ref=e84] [cursor=pointer]:
+            - /url: 2026819需求/app/消息短信.html
+            - generic [ref=e85]: 消息短信
+            - generic [ref=e86]:
+              - generic [ref=e87]: P1
+              - generic [ref=e88]: 待开发
+            - generic [ref=e89]: ›
+          - link "AI创作 P1 待开发 ›" [ref=e90] [cursor=pointer]:
+            - /url: 2026819需求/app/AI创作_v4.html
+            - generic [ref=e91]: AI创作
+            - generic [ref=e92]:
+              - generic [ref=e93]: P1
+              - generic [ref=e94]: 待开发
+            - generic [ref=e95]: ›
+      - generic [ref=e96]:
+        - generic [ref=e97]:
+          - generic [ref=e98]: 后台
+          - generic [ref=e99]: 7 项
+        - generic [ref=e100]:
+          - link "课程发布 P0 已完成 ›" [ref=e101] [cursor=pointer]:
+            - /url: 2026819需求/admin/课程发布.html
+            - generic [ref=e102]: 课程发布
+            - generic [ref=e103]:
+              - generic [ref=e104]: P0
+              - generic [ref=e105]: 已完成
+            - generic [ref=e106]: ›
+          - link "拼团订单管理 P0 已完成 ›" [ref=e107] [cursor=pointer]:
+            - /url: 2026819需求/admin/拼团订单管理.html
+            - generic [ref=e108]: 拼团订单管理
+            - generic [ref=e109]:
+              - generic [ref=e110]: P0
+              - generic [ref=e111]: 已完成
+            - generic [ref=e112]: ›
+          - link "用户订单管理 P0 已完成 ›" [ref=e113] [cursor=pointer]:
+            - /url: 2026819需求/admin/用户订单管理.html
+            - generic [ref=e114]: 用户订单管理
+            - generic [ref=e115]:
+              - generic [ref=e116]: P0
+              - generic [ref=e117]: 已完成
+            - generic [ref=e118]: ›
+          - link "研学手记配置 P1 待开发 ›" [ref=e119] [cursor=pointer]:
+            - /url: 2026819需求/admin/研学手记配置_v5.html
+            - generic [ref=e120]: 研学手记配置
+            - generic [ref=e121]:
+              - generic [ref=e122]: P1
+              - generic [ref=e123]: 待开发
+            - generic [ref=e124]: ›
+          - link "AI创作销售配置 P1 待开发 ›" [ref=e125] [cursor=pointer]:
+            - /url: 2026819需求/admin/AI创作销售配置_v3.html
+            - generic [ref=e126]: AI创作销售配置
+            - generic [ref=e127]:
+              - generic [ref=e128]: P1
+              - generic [ref=e129]: 待开发
+            - generic [ref=e130]: ›
+          - link "课程管理 P1 待开发 ›" [ref=e131] [cursor=pointer]:
+            - /url: 2026819需求/admin/课程管理_v2.html
+            - generic [ref=e132]: 课程管理
+            - generic [ref=e133]:
+              - generic [ref=e134]: P1
+              - generic [ref=e135]: 待开发
+            - generic [ref=e136]: ›
+          - link "课程发布 P1 待开发 ›" [ref=e137] [cursor=pointer]:
+            - /url: 2026819需求/admin/课程发布.html
+            - generic [ref=e138]: 课程发布
+            - generic [ref=e139]:
+              - generic [ref=e140]: P1
+              - generic [ref=e141]: 待开发
+            - generic [ref=e142]: ›
+      - generic [ref=e143]:
+        - generic [ref=e144]:
+          - generic [ref=e145]: 机构端
+          - generic [ref=e146]: 6 项
+        - generic [ref=e147]:
+          - link "订单详情 P0 已完成 ›" [ref=e148] [cursor=pointer]:
+            - /url: 2026819需求/organization/订单详情.html
+            - generic [ref=e149]: 订单详情
+            - generic [ref=e150]:
+              - generic [ref=e151]: P0
+              - generic [ref=e152]: 已完成
+            - generic [ref=e153]: ›
+          - link "研学用户评价 P2 待开发 ›" [ref=e154] [cursor=pointer]:
+            - /url: 2026819需求/organization/研学用户评价.html
+            - generic [ref=e155]: 研学用户评价
+            - generic [ref=e156]:
+              - generic [ref=e157]: P2
+              - generic [ref=e158]: 待开发
+            - generic [ref=e159]: ›
+          - link "AI作品 P2 待开发 ›" [ref=e160] [cursor=pointer]:
+            - /url: 2026819需求/organization/AI作品.html
+            - generic [ref=e161]: AI作品
+            - generic [ref=e162]:
+              - generic [ref=e163]: P2
+              - generic [ref=e164]: 待开发
+            - generic [ref=e165]: ›
+          - link "专属精彩 P2 待开发 ›" [ref=e166] [cursor=pointer]:
+            - /url: 2026819需求/organization/专属精彩.html
+            - generic [ref=e167]: 专属精彩
+            - generic [ref=e168]:
+              - generic [ref=e169]: P2
+              - generic [ref=e170]: 待开发
+            - generic [ref=e171]: ›
+          - link "研学信息 P2 待开发 ›" [ref=e172] [cursor=pointer]:
+            - /url: 2026819需求/organization/研学信息.html
+            - generic [ref=e173]: 研学信息
+            - generic [ref=e174]:
+              - generic [ref=e175]: P2
+              - generic [ref=e176]: 待开发
+            - generic [ref=e177]: ›
+          - link "研学现场 P2 待开发 ›" [ref=e178] [cursor=pointer]:
+            - /url: 2026819需求/organization/研学现场.html
+            - generic [ref=e179]: 研学现场
+            - generic [ref=e180]:
+              - generic [ref=e181]: P2
+              - generic [ref=e182]: 待开发
+            - generic [ref=e183]: ›
+      - generic [ref=e184]:
+        - generic [ref=e185]:
+          - generic [ref=e186]: 社区
+          - generic [ref=e187]: 6 项
+        - generic [ref=e188]:
+          - link "社区 P3 待开发 ›" [ref=e189] [cursor=pointer]:
+            - /url: 2026819需求/社区/社区.html
+            - generic [ref=e190]: 社区
+            - generic [ref=e191]:
+              - generic [ref=e192]: P3
+              - generic [ref=e193]: 待开发
+            - generic [ref=e194]: ›
+          - link "视频详情 P3 待开发 ›" [ref=e195] [cursor=pointer]:
+            - /url: 2026819需求/社区/视频详情.html
+            - generic [ref=e196]: 视频详情
+            - generic [ref=e197]:
+              - generic [ref=e198]: P3
+              - generic [ref=e199]: 待开发
+            - generic [ref=e200]: ›
+          - link "我的视频详情 P3 待开发 ›" [ref=e201] [cursor=pointer]:
+            - /url: 2026819需求/社区/视频详情_自己.html
+            - generic [ref=e202]: 我的视频详情
+            - generic [ref=e203]:
+              - generic [ref=e204]: P3
+              - generic [ref=e205]: 待开发
+            - generic [ref=e206]: ›
+          - link "我的作品 P3 待开发 ›" [ref=e207] [cursor=pointer]:
+            - /url: 2026819需求/社区/我的作品.html
+            - generic [ref=e208]: 我的作品
+            - generic [ref=e209]:
+              - generic [ref=e210]: P3
+              - generic [ref=e211]: 待开发
+            - generic [ref=e212]: ›
+          - link "我的 P3 待开发 ›" [ref=e213] [cursor=pointer]:
+            - /url: 2026819需求/社区/我的.html
+            - generic [ref=e214]: 我的
+            - generic [ref=e215]:
+              - generic [ref=e216]: P3
+              - generic [ref=e217]: 待开发
+            - generic [ref=e218]: ›
+          - link "社区视频管理（后台） P3 待开发 ›" [ref=e219] [cursor=pointer]:
+            - /url: 2026819需求/社区/社区管理.html
+            - generic [ref=e220]: 社区视频管理（后台）
+            - generic [ref=e221]:
+              - generic [ref=e222]: P3
+              - generic [ref=e223]: 待开发
+            - generic [ref=e224]: ›

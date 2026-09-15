@@ -56,13 +56,24 @@
         }
         .topbar-divider { width: 1px; height: 22px; background: var(--border); }
         .topbar-sub { font-size: 14px; color: var(--ink-subtle); }
-        .topbar-actions { margin-left: auto; display: flex; gap: 10px; }
+        .topbar-actions { margin-left: auto; display: flex; gap: 10px; align-items: center; }
         .topbar-btn {
             font-size: 14px; padding: 8px 16px; border-radius: 9px;
             border: 1px solid var(--border); background: #fff; color: var(--ink-muted);
             cursor: pointer; font-family: inherit; transition: all 0.15s;
         }
         .topbar-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-bg); }
+        .topbar-author {
+            display: flex; align-items: center; gap: 10px;
+            padding: 4px 12px 4px 4px; border-radius: 999px;
+            background: #fff; border: 1px solid var(--border);
+        }
+        .topbar-author .avatar {
+            width: 32px; height: 32px; border-radius: 50%;
+            object-fit: cover; display: block;
+            box-shadow: 0 1px 4px rgba(15,23,42,.08);
+        }
+        .topbar-author .author-name { font-size: 14px; font-weight: 600; color: var(--ink); }
 
         /* ===== 主布局：后台外壳 ===== */
         .layout {
@@ -151,7 +162,9 @@
         .content {
             min-width: 0;
             padding: 36px 40px 80px;
-            background: var(--bg);
+            background:
+                linear-gradient(rgba(255,255,255,.72), rgba(255,255,255,.72)),
+                var(--bg) url('asset/bg.png') center top / cover no-repeat;
         }
         .content-head { margin-bottom: 24px; }
         .content-head .eyebrow {
@@ -159,18 +172,16 @@
             text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600;
             margin-bottom: 8px;
         }
-        .content-head .title-row {
-            display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
-        }
+        .content-head .title-row { position: relative; }
         .content-head .section-title {
             font-size: 38px; font-weight: 700;
             color: var(--ink); letter-spacing: -0.8px;
             line-height: 1.2;
         }
         .content-head .changelog-entry {
-            flex-shrink: 0;
+            position: absolute;
+            top: 12px; right: 0;
             display: inline-flex; align-items: center; gap: 6px;
-            margin-top: 8px;
             padding: 8px 14px; border-radius: 8px;
             background: #fff7ed; color: #c2410c;
             border: 1px solid #fed7aa;
@@ -199,8 +210,8 @@
             display: flex; align-items: center; flex-wrap: wrap; gap: 14px;
             margin: 18px 0 4px;
             padding: 12px 16px;
-            background: var(--surface);
-            border: 1px solid var(--border);
+            background: var(--accent-bg);
+            border: 1px solid #dbe5f4;
             border-radius: var(--radius);
             box-shadow: var(--shadow-sm);
         }
@@ -381,7 +392,12 @@
         <div class="topbar-divider"></div>
         <span class="topbar-sub">产品需求原型目录</span>
     </div>
-    <div class="topbar-actions"></div>
+    <div class="topbar-actions">
+        <div class="topbar-author">
+            <img class="avatar" src="asset/头像.jpg" alt="木易卡卡">
+            <span class="author-name">木易卡卡</span>
+        </div>
+    </div>
 </header>
 
 <main class="layout">
