@@ -483,10 +483,6 @@
                 <div class="sc-label">分销员总数</div>
                 <div class="sc-value blue">128</div>
             </div>
-            <div class="stat-card">
-                <div class="sc-label">本月新增分销员</div>
-                <div class="sc-value green">12</div>
-            </div>
         </div>
     </div>
 
@@ -494,8 +490,12 @@
         <div class="stat-group-title">佣金总额</div>
         <div class="stat-row row-4">
             <div class="stat-card">
-                <div class="sc-label">已结算佣金总额</div>
+                <div class="sc-label">当前佣金余额总额</div>
                 <div class="sc-value blue">¥42,380.00</div>
+            </div>
+            <div class="stat-card">
+                <div class="sc-label">已提现佣金总额</div>
+                <div class="sc-value green">¥37,240.30</div>
             </div>
             <div class="stat-card">
                 <div class="sc-label">待结算佣金总额</div>
@@ -504,28 +504,6 @@
             <div class="stat-card">
                 <div class="sc-label">已作废佣金总额</div>
                 <div class="sc-value red">¥1,286.50</div>
-            </div>
-            <div class="stat-card">
-                <div class="sc-label">已提现佣金总额</div>
-                <div class="sc-value green">¥37,240.30</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="stat-group">
-        <div class="stat-group-title">本月</div>
-        <div class="stat-row">
-            <div class="stat-card">
-                <div class="sc-label">本月已结算佣金总额</div>
-                <div class="sc-value blue">¥9,320.50</div>
-            </div>
-            <div class="stat-card">
-                <div class="sc-label">本月待结算佣金总额</div>
-                <div class="sc-value orange">¥2,110.00</div>
-            </div>
-            <div class="stat-card">
-                <div class="sc-label">本月已作废佣金总额</div>
-                <div class="sc-value red">¥486.00</div>
             </div>
         </div>
     </div>
@@ -1102,28 +1080,19 @@
         </div>
         <div class="fp-body">
             <h4>一、统计概览</h4>
-            <p style="margin:2px 0 4px;">顶部按「分销员 / 佣金总额 / 本月」三组展示 9 张统计卡：</p>
+            <p style="margin:2px 0 4px;">顶部按「分销员 / 佣金总额」两组共 5 张统计卡：</p>
             <ul>
                 <li><b>分销员</b>
                     <ul>
-                        <li><strong>分销员总数</strong>：当前平台注册的全部分销员数量，示例 <i>128</i>；</li>
-                        <li><strong>本月新增分销员</strong>：本自然月新加入的分销员人数，示例 <i>12</i>；</li>
+                        <li><strong>分销员总数</strong>：当前平台注册的全部分销员数量，示例 <i>128</i>。</li>
                     </ul>
                 </li>
                 <li><b>佣金总额</b>（全量累计口径）
                     <ul>
-                        <li><strong>已结算佣金总额</strong>：历史累计完成结算并发放的佣金，示例 <i>¥42,380.00</i>；</li>
-                        <li><strong>待结算佣金总额</strong>：订单尚未完成结算的佣金合计，示例 <i>¥3,180.00</i>；</li>
-                        <li><strong>已作废佣金总额</strong>：因订单退单不计入结算的佣金合计，示例 <i>¥1,286.50</i>；</li>
-                        <li><strong>已提现佣金总额</strong>：分销员累计已发起提现的佣金金额，示例 <i>¥37,240.30</i>；</li>
-                    </ul>
-                </li>
-                <li><b>本月</b>
-                    <ul>
-                        <li><strong>这里的本月是下单时间，如果下单时间是本月，但是结算时间是下月，纳入统计；如果下单时间是上月，但是结算时间是本月，则不纳入统计</strong>
-                        <li><strong>本月已结算佣金总额</strong>：本月完成结算并发放的佣金，示例 <i>¥9,320.50</i>；</li>
-                        <li><strong>本月待结算佣金总额</strong>：本月产生、处于待结算状态的佣金，示例 <i>¥2,110.00</i>；</li>
-                        <li><strong>本月已作废佣金总额</strong>：本月因订单退单而不结算的佣金，示例 <i>¥486.00</i>；</li>
+                        <li><strong>当前佣金余额总额</strong>：当前所有分销员账户中已结算但尚未提现的佣金余额合计；</li>
+                        <li><strong>已提现佣金总额</strong>：分销员累计已发起提现的佣金金额；</li>
+                        <li><strong>待结算佣金总额</strong>：订单尚未完成结算的佣金合计；</li>
+                        <li><strong>已作废佣金总额</strong>：因订单退单不计入结算的佣金合计。</li>
                     </ul>
                 </li>
             </ul>
