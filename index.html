@@ -381,6 +381,43 @@
         .chg-table tr:last-child td { border-bottom: none; }
         .chg-table .col-date { white-space: nowrap; font-weight: 500; }
         .chg-table .col-module { white-space: nowrap; color: var(--accent); font-weight: 500; }
+
+        /* ===== 需求说明型板块 ===== */
+        .req-note {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            padding: 24px 28px 28px;
+        }
+        .req-note ol {
+            list-style: none; counter-reset: rn;
+            display: flex; flex-direction: column; gap: 14px;
+        }
+        .req-note li {
+            counter-increment: rn; position: relative;
+            padding: 16px 20px 16px 56px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 15px; line-height: 1.8; color: var(--ink-muted);
+        }
+        .req-note li::before {
+            content: counter(rn);
+            position: absolute; left: 18px; top: 17px;
+            width: 24px; height: 24px; border-radius: 50%;
+            background: var(--accent-bg); color: var(--accent-strong);
+            font-size: 13px; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .req-note li p { margin: 0; }
+        .req-note li p + p { margin-top: 6px; }
+        .req-note .rn-sub {
+            font-size: 15px; font-weight: 600; color: var(--ink);
+            margin-bottom: 8px;
+        }
+        .req-note b { color: var(--ink); font-weight: 600; }
+        .req-note .rn-modules { color: var(--accent-strong); }
     </style>
 </head>
 <body>
@@ -541,11 +578,28 @@ var SECTIONS = [
                 { label: "banner管理", href: "分销/banner管理.html", tags: [{t:"已完成",c:"green"}] }
             ]}
         ]
+    },
+    {
+        title: "商城多租户",
+        note: '<ol>'
+            + '<li>'
+            + '<div class="rn-sub">多租户需求</div>'
+            + '<p>商城管理里<b class="rn-modules">商品管理、订单管理、批量发货、运费模版、退货地址</b>需要实现租户级别的数据隔离，不同的租户只能看到自己的数据。</p>'
+            + '<p>平台超级租户可以看到和管理所有数据。</p>'
+            + '</li>'
+            + '<li>'
+            + '<div class="rn-sub">新增「商家」列</div>'
+            + '<p><b class="rn-modules">商品管理、订单管理、批量发货、运费模版、退货地址</b>都需要新增一列叫<b>商家</b>，默认填入该登录租户的名称。</p>'
+            + '<p>此信息只在后台展示，小程序暂时不需要展示。</p>'
+            + '<p><b class="rn-modules">平台超级租户发布商品时可以选择其他租户名称。</b></p>'
+            + '</li>'
+            + '</ol>'
     }
 ];
 
 /* ===== 工具 ===== */
 function countItems(sec) {
+    if (sec.note) return 0;
     if (sec.flat) return sec.items.length;
     var n = 0;
     sec.groups.forEach(function(g) { n += g.items.length; });
@@ -752,9 +806,10 @@ function renderFilterBar() {
 function renderSidebar() {
     var html = '';
     SECTIONS.forEach(function(sec) {
+        var cnt = countItems(sec);
         html += '<a class="nav-item" data-id="' + sec.id + '" href="#' + sec.id + '" onclick="selectSection(event,\'' + sec.id + '\')">'
             + '<span class="nav-label">' + sec.title + '</span>'
-            + '<span class="nav-count">' + countItems(sec) + '</span>'
+            + (cnt ? '<span class="nav-count">' + cnt + '</span>' : '')
             + '</a>';
     });
     document.getElementById('sidebar').insertAdjacentHTML('beforeend', html);
@@ -765,7 +820,9 @@ function renderRightPane(sec) {
     var visible = 0;
     var groupsHtml = '';
 
-    if (sec.flat) {
+    if (sec.note) {
+        groupsHtml = '<div class="req-note">' + sec.note + '</div>';
+    } else if (sec.flat) {
         visible = filterItems(sec.items).length;
         groupsHtml = '<div class="list">' + renderItems(sec.items) + '</div>';
     } else {
@@ -787,16 +844,21 @@ function renderRightPane(sec) {
         if (!groupsHtml && !sec.groups.length) visible = 0;
     }
 
-    var meta = sec.flat
-        ? (isFilterActive()
+    var meta;
+    if (sec.note) {
+        meta = '共 2 条需求说明';
+    } else if (sec.flat) {
+        meta = isFilterActive()
             ? '匹配 ' + visible + ' / ' + total + ' 项'
-            : '共 ' + total + ' 项')
-        : (isFilterActive()
+            : '共 ' + total + ' 项';
+    } else {
+        meta = isFilterActive()
             ? '匹配 ' + visible + ' / ' + total + ' 项 · ' + sec.groups.length + ' 个子模块'
-            : '共 ' + total + ' 项 · ' + sec.groups.length + ' 个子模块');
+            : '共 ' + total + ' 项 · ' + sec.groups.length + ' 个子模块';
+    }
 
     var html = '<div class="content-head">'
-        + '<div class="eyebrow">迭代概览</div>'
+        + '<div class="eyebrow">' + (sec.note ? '需求说明' : '迭代概览') + '</div>'
         + '<div class="title-row">'
         + '<div class="section-title">' + sec.title + '</div>'
         + (sec.changelog
@@ -807,7 +869,7 @@ function renderRightPane(sec) {
         + '</div>'
         + '<div class="section-meta"><span>' + meta + '</span></div>'
         + '</div>'
-        + renderFilterBar()
+        + (sec.note ? '' : renderFilterBar())
         + (groupsHtml || '<div class="list"><div class="empty-hint" style="padding:40px;text-align:center;">当前筛选条件下无匹配项</div></div>');
 
     return html;
