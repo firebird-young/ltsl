@@ -98,7 +98,8 @@
             font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 12px;
         }
         .af-title::before { content: ""; width: 3px; height: 13px; border-radius: 2px; background: var(--accent); flex-shrink: 0; }
-        .af-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px 14px; }
+        .af-grid { display: flex; gap: 12px 14px; align-items: stretch; }
+        .af-grid .af-field { flex: 1 1 0; min-width: 0; }
         .af-field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
         .af-field > label { font-size: 12px; color: var(--ink-subtle); }
         .af-field input[type="text"], .af-field input[type="date"], .af-field select {
@@ -162,6 +163,8 @@
         .af-actions .btn.primary:hover { background: var(--accent-hover); }
         .af-actions .btn.ghost { background: #fff; border: 1px solid var(--border); color: var(--ink-subtle); }
         .af-actions .btn.ghost:hover { border-color: var(--accent); color: var(--accent); }
+        .af-actions .btn.export { background: #34c759; color: #fff; }
+        .af-actions .btn.export:hover { background: #2cb14e; }
         @media (max-width: 1200px) { .af-grid { grid-template-columns: repeat(2, 1fr); } }
 
         .tag {
@@ -350,7 +353,7 @@
                     <label>分销员账号</label>
                     <input type="text" id="wPhone" placeholder="输入分销员手机号" oninput="filterWithdraws()">
                 </div>
-                <div class="af-field" style="grid-column: span 2;">
+                <div class="af-field">
                     <label>月份（区间 · 点击选择）</label>
                     <div class="af-month-range">
                         <input type="text" id="wMonthDisplay" class="af-mr-input" readonly placeholder="全部月份" onclick="toggleMonthPop()">
@@ -368,7 +371,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="af-field" style="grid-column: 1 / -1;">
+                <div class="af-field">
                     <label>状态（多选）</label>
                     <div class="af-chips" id="wStatusChips">
                         <label class="af-chip"><input type="checkbox" name="wStatus" value="all" checked onchange="syncStatusChipsWD(this)"><span>全部状态</span></label>
@@ -380,6 +383,7 @@
             <div class="af-actions">
                 <button class="btn primary" onclick="filterWithdraws()">查询</button>
                 <button class="btn ghost" onclick="resetWithdrawFilter()">重置</button>
+                <button class="btn export" onclick="exportWithdraws()">导出</button>
             </div>
         </div>
         <div id="withdrawList"></div>
@@ -392,14 +396,14 @@
 <script>
     /* ===== 模拟数据 ===== */
     var withdrawData = [
-        { month: '2026年6月', name: '王小明', phone: '13812345678', idcard: '330110199003124512', amount: 1560.00, account: '微信零钱', time: '2026-06-01', status: 'success' },
-        { month: '2026年5月', name: '李大力', phone: '18698765432', idcard: '330110198812052316', amount: 2300.00, account: '微信零钱', time: '2026-05-31', status: 'success' },
-        { month: '2026年5月', name: '张小红', phone: '13655667788', idcard: '330110199507220021', amount: 880.00, account: '微信零钱', time: '2026-05-31', status: 'success' },
+        { month: '2026年6月', name: '王小明', phone: '13812345678', idcard: '330110199003124512', amount: 1560.00, account: '微信零钱', time: '2026-06-01 09:23:45', status: 'success' },
+        { month: '2026年5月', name: '李大力', phone: '18698765432', idcard: '330110198812052316', amount: 2300.00, account: '微信零钱', time: '2026-05-31 14:55:33', status: 'success' },
+        { month: '2026年5月', name: '张小红', phone: '13655667788', idcard: '330110199507220021', amount: 880.00, account: '微信零钱', time: '2026-05-31 16:08:12', status: 'success' },
         { month: '2026年5月', name: '赵思远', phone: '15099887766', idcard: '330110199204166738', amount: 500.00, account: '微信零钱', time: '', status: 'failed', failReason: '实名姓名与微信零钱账户持有人不一致，请核对实名信息后重新打款' },
-        { month: '2026年5月', name: '刘佳', phone: '17712340987', idcard: '330110199811301122', amount: 1200.00, account: '微信零钱', time: '2026-05-31', status: 'success' },
+        { month: '2026年5月', name: '刘佳', phone: '17712340987', idcard: '330110199811301122', amount: 1200.00, account: '微信零钱', time: '2026-05-31 18:42:07', status: 'success' },
         { month: '2026年5月', name: '陈伟', phone: '18856781234', idcard: '330110199001085588', amount: 3200.00, account: '微信零钱', time: '', status: 'failed', failReason: '微信支付风控拦截，疑似收款账户状态异常，请核实账户后重新打款' },
-        { month: '2026年4月', name: '王小明', phone: '13812345678', idcard: '330110199003124512', amount: 1640.00, account: '微信零钱', time: '2026-04-30', status: 'success' },
-        { month: '2026年4月', name: '李大力', phone: '18698765432', idcard: '330110198812052316', amount: 1400.00, account: '微信零钱', time: '2026-04-30', status: 'success' },
+        { month: '2026年4月', name: '王小明', phone: '13812345678', idcard: '330110199003124512', amount: 1640.00, account: '微信零钱', time: '2026-04-30 10:11:25', status: 'success' },
+        { month: '2026年4月', name: '李大力', phone: '18698765432', idcard: '330110198812052316', amount: 1400.00, account: '微信零钱', time: '2026-04-30 15:36:48', status: 'success' },
         { month: '2026年4月', name: '刘佳', phone: '17712340987', idcard: '330110199811301122', amount: 800.00, account: '微信零钱', time: '', status: 'failed', failReason: '身份证实名核验未通过，打款被微信支付拒绝，请确认实名信息后重试' },
     ];
     var statusLabels = { success: '提现成功', failed: '提现失败' };
@@ -488,7 +492,7 @@
         }
         renderWithdraws();
     }
-    function renderWithdraws() {
+    function getFilteredWithdraws() {
         var nameKw = document.getElementById('wName').value.trim().toLowerCase();
         var phoneKw = document.getElementById('wPhone').value.trim().toLowerCase();
         var mStart = monthKey(document.getElementById('wMonthStart').value);
@@ -497,7 +501,7 @@
             document.querySelectorAll('#wStatusChips input:checked'),
             function (c) { return c.value !== 'all'; }).map(function (c) { return c.value; });
         if (!statuses.length) statuses = ['success', 'failed'];
-        var filterFn = function (w) {
+        return withdrawData.filter(function (w) {
             var mk = monthKey(w.month);
             if (mStart && mk < mStart) return false;
             if (mEnd && mk > mEnd) return false;
@@ -505,11 +509,14 @@
             if (nameKw && w.name.toLowerCase().indexOf(nameKw) === -1) return false;
             if (phoneKw && w.phone.toLowerCase().indexOf(phoneKw) === -1) return false;
             return true;
-        };
+        });
+    }
+
+    function renderWithdraws() {
+        var filtered = getFilteredWithdraws();
 
         var groups = {};
-        withdrawData.forEach(function(w) {
-            if (!filterFn(w)) return;
+        filtered.forEach(function(w) {
             if (!groups[w.month]) groups[w.month] = [];
             groups[w.month].push(w);
         });
@@ -563,11 +570,97 @@
             var d = new Date();
             var pad = function (n) { return (n < 10 ? '0' : '') + n; };
             withdrawData[idx].status = 'success';
-            withdrawData[idx].time = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+            withdrawData[idx].time = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate())
+                + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
             withdrawData[idx].failReason = '';
             renderWithdraws();
             showToast('已重新发起打款，打款成功');
         }
+    }
+
+    /* ===== 导出 Excel (.xls) — 表格样式 + 列宽设置 + 数字右对齐 ===== */
+    function exportWithdraws() {
+        var rows = getFilteredWithdraws();
+        if (!rows.length) { showToast('当前筛选下无数据可导出'); return; }
+
+        function fmtAmount(n) {
+            return Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+        function esc(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        var headers = ['月份', '分销员姓名', '手机号', '身份证号', '提现金额', '到账方式', '打款时间', '状态', '失败原因'];
+        /* 手机号、提现金额加宽，确保默认列宽下不被截断 */
+        var widths  = [96, 100, 130, 180, 120, 100, 160, 90, 260];
+        var aligns  = ['left', 'left', 'left', 'left', 'right', 'left', 'left', 'left', 'left'];
+
+        /* Excel 文本标记：单元格内容以单引号开头会被强制视为文本，且前缀单引号默认隐藏 */
+        var textMark = String.fromCharCode(39);
+
+        var headRow = '<tr>' + headers.map(function (h, i) {
+            return '<th style="width:' + widths[i] + 'px;">' + esc(h) + '</th>';
+        }).join('') + '</tr>';
+
+        var bodyRows = rows.map(function (w) {
+            var cells = [
+                w.month,
+                w.name,
+                w.phone,
+                w.idcard,
+                fmtAmount(w.amount),
+                w.account,
+                w.time || '-',
+                statusLabels[w.status] || w.status,
+                w.failReason || ''
+            ];
+            return '<tr>' + cells.map(function (c, i) {
+                var align = ' align="' + aligns[i] + '"';
+                var cls = i === 4 ? ' class="num"' : '';
+                /* 手机号、身份证号：前置单引号 + mso-number-format:'\\@' 双保险，避免长数字变成 3.3011E+17 */
+                if (i === 2 || i === 3) {
+                    return '<td' + cls + ' style="width:' + widths[i] + 'px; mso-number-format:\\\@ ;"' + align + '>' + textMark + esc(c) + '</td>';
+                }
+                return '<td' + cls + ' style="width:' + widths[i] + 'px;"' + align + '>' + esc(c) + '</td>';
+            }).join('') + '</tr>';
+        }).join('');
+
+        var totalAmount = rows.reduce(function (s, w) { return s + w.amount; }, 0);
+        var exportTime = new Date().toLocaleString('zh-CN', { hour12: false });
+
+        var html = ''
+            + '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel">'
+            + '<head><meta charset="UTF-8">'
+            + '<style>'
+            + 'body { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; }'
+            + '.title { font-size: 15px; font-weight: 700; color: #1d1d1f; margin-bottom: 4px; }'
+            + '.meta { font-size: 11px; color: #86868b; margin-bottom: 10px; }'
+            + 'table { border-collapse: collapse; table-layout: fixed; }'
+            + 'th { background: #f5f6f8; color: #333; font-weight: 600; font-size: 12px; padding: 8px 10px; border: 1px solid #d8dce3; }'
+            + 'td { font-size: 12px; padding: 7px 10px; border: 1px solid #ebedf0; color: #1d1d1f; word-break: break-all; }'
+            + 'tr:nth-child(even) td { background: #fafbfc; }'
+            + 'td.num { font-variant-numeric: tabular-nums; }'
+            + '.sumrow td { background: #f5f6f8; font-weight: 600; color: #1d1d1f; }'
+            + '</style></head><body>'
+            + '<div class="title">提现记录</div>'
+            + '<div class="meta">导出时间：' + esc(exportTime) + ' · 共 ' + rows.length + ' 条 · 合计金额 ¥' + fmtAmount(totalAmount) + '</div>'
+            + '<table><thead>' + headRow + '</thead><tbody>' + bodyRows + '</tbody></table>'
+            + '</body></html>';
+
+        var d = new Date();
+        function p(n) { return (n < 10 ? '0' : '') + n; }
+        var stamp = d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + '_' + p(d.getHours()) + p(d.getMinutes());
+        var blob = new Blob(['﻿' + html], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = '提现记录_' + stamp + '.xls';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('已导出 ' + rows.length + ' 条提现记录');
     }
 
     /* ===== 分页 ===== */
@@ -610,13 +703,14 @@
                 <li><strong>提现失败待重发金额</strong>：因实名不一致、风控拦截等原因打款失败、需重新发起打款的金额合计，示例 <i>¥4,500.00</i>。</li>
             </ul>
             <h4>二、提现记录</h4>
-            <p style="margin:2px 0 4px;">业务规则：佣金累计达到「最低提现金额」后自动发起提现，因此每条记录均已有明确打款结果，只有「提现成功 / 提现失败」两种状态；未发起提现的佣金仍留存于分销员余额中，不属于本页业务范围。</p>
+            <p style="margin:2px 0 4px;">业务规则：佣金累计达到「最低提现金额」后自动发起提现，因此每条记录均已有明确打款结果，只有「提现成功 / 提现失败」两种状态；未发起提现的佣金仍留存于分销员余额中</p>
             <ul>
                 <li><strong>按月分组</strong>：按月份展示提现记录，头部汇总当月总额及成功 / 失败笔数；</li>
                 <li><strong>独立筛选</strong>：支持按分销员姓名、分销员账号、月份区间与状态（可多选）组合筛选；月份为一个合并输入框，点击调用日期控件选择起始 / 结束月，只填单侧则按单月筛选，倒序自动纠正；</li>
                 <li><strong>身份信息</strong>：列表展示分销员姓名、手机号及身份证号，供打款实名核验与税务申报使用；</li>
                 <li><strong>失败原因</strong>：鼠标悬停「提现失败」标签可查看具体失败原因；</li>
-                <li><strong>重新打款</strong>：仅「提现失败」的记录显示，点击二次确认后重新发起打款，打款成功即更新为「提现成功」并记录打款时间。</li>
+                <li><strong>重新打款</strong>：仅「提现失败」的记录显示，点击二次确认后重新发起打款，打款成功即更新为「提现成功」并记录打款时间；</li>
+                <li><strong>导出</strong>：将当前筛选条件下的全部提现记录导出为 Excel</li>
             </ul>
         </div>
     </div>
