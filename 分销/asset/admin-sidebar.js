@@ -17,7 +17,7 @@
         {
             group: '移动端',
             items: [
-                { name: '首页',         href: '首页.html' },
+                /* { name: '首页',         href: '首页.html' }, */
                 { name: '我的主页',     href: '我的主页.html' },
                 { name: '我的推广',     href: '我的推广.html' },
                 { name: '分销中心',     href: '分销.html' },
@@ -34,7 +34,9 @@
                 { name: '分销订单管理', href: '分销订单管理.html' },
                 { name: '分销提现管理', href: '分销提现管理.html' },
                 { name: '分销员管理',   href: '分销员管理.html' },
-                { name: '分销等级管理', href: '分销等级管理.html' }
+                { name: '分销员详情',   href: '分销员详情.html' },
+                { name: '分销等级管理', href: '分销等级管理.html' },
+                { name: 'banner管理',   href: 'banner管理.html' }
             ]
         }
     ];

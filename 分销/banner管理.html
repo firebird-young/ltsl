@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>banner管理 - 管理后台</title>
+    <link rel="stylesheet" href="asset/admin-sidebar.css">
+    <style>
+        :root {
+            --bg: #ffffff;
+            --accent: #0066cc;
+            --accent-hover: #0071e3;
+            --ink: #1d1d1f;
+            --ink-muted: #3f424b;
+            --ink-subtle: #86868b;
+            --border: #e0e0e0;
+            --radius-pill: 9999px;
+            --radius-card: 18px;
+            --radius-tag: 6px;
+            --shadow-card: 0 0 0 1px rgba(0,0,0,0.06);
+            --font: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font);
+            background: #f5f5f7;
+            min-height: 100vh;
+            color: var(--ink);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .breadcrumb { padding: 16px 24px 0; font-size: 13px; color: var(--ink-subtle); }
+        .breadcrumb a { color: var(--ink-subtle); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--accent); }
+        .breadcrumb .current { color: var(--ink); font-weight: 500; }
+
+        .main { padding: 16px 24px 40px; }
+
+        /* ── 搜索筛选栏 ── */
+        .filter-card {
+            background: #fff; border-radius: var(--radius-card); box-shadow: var(--shadow-card);
+            padding: 14px 18px; margin-bottom: 16px;
+            display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+        }
+        .fc-field { display: flex; align-items: center; gap: 8px; }
+        .fc-field > label { font-size: 13px; color: var(--ink-muted); white-space: nowrap; }
+        .fc-field input[type="text"] {
+            width: 200px; height: 34px; border: 1px solid var(--border); border-radius: 8px;
+            padding: 0 10px; font-size: 13px; outline: none; font-family: inherit; color: var(--ink); background: #fff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .fc-field select {
+            width: 168px; height: 34px; border: 1px solid var(--border); border-radius: 8px;
+            padding: 0 10px; font-size: 13px; outline: none; font-family: inherit; color: var(--ink); background: #fff;
+            transition: border-color 0.2s;
+        }
+        .fc-field input:focus, .fc-field select:focus {
+            border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,102,204,0.08);
+        }
+        .fc-actions { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+        .btn {
+            height: 34px; padding: 0 20px; border: none; border-radius: var(--radius-pill);
+            font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer;
+            transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn:active { opacity: 0.85; }
+        .btn.green  { background: #34c759; color: #fff; }
+        .btn.green:hover { background: #2cb14e; }
+        .btn.yellow { background: #f7b500; color: #fff; }
+        .btn.yellow:hover { background: #e0a400; }
+        .btn.primary { background: var(--accent); color: #fff; }
+        .btn.primary:hover { background: var(--accent-hover); }
+
+        /* ── 表格 ── */
+        .table-wrap {
+            background: #fff; border-radius: var(--radius-card); overflow-x: auto; box-shadow: var(--shadow-card);
+        }
+        table { width: 100%; border-collapse: collapse; min-width: 1140px; }
+        thead th {
+            font-size: 12px; font-weight: 600; color: var(--ink-subtle); text-align: left;
+            padding: 14px 16px; border-bottom: 1px solid var(--border); background: #fafafc; white-space: nowrap;
+        }
+        tbody td {
+            font-size: 13px; color: var(--ink); padding: 14px 16px; border-bottom: 1px solid #f5f5f5;
+            vertical-align: middle;
+        }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: #FAFBFF; }
+
+        .tag { display: inline-block; padding: 3px 12px; border-radius: var(--radius-tag); font-size: 11px; font-weight: 500; white-space: nowrap; }
+        .tag.green { background: #E8F5E9; color: #34c759; }
+        .tag.gray  { background: #f5f5f7; color: var(--ink-subtle); }
+
+        /* 图片概图占位（原型用渐变块代替真实图片） */
+        .thumb {
+            width: 156px; height: 52px; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 12px; font-weight: 600; letter-spacing: 1px;
+            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.06); white-space: nowrap; overflow: hidden;
+        }
+        .thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; }
+        .t1 { background: linear-gradient(135deg, #1e3c72, #2a5298); }
+        .t2 { background: linear-gradient(135deg, #ff9966, #ff5e62); }
+        .t3 { background: linear-gradient(135deg, #11998e, #38ef7d); }
+        .t4 { background: linear-gradient(135deg, #7f00ff, #e100ff); }
+        .t5 { background: linear-gradient(135deg, #f7971e, #ffd200); }
+        .t6 { background: linear-gradient(135deg, #0066cc, #00c6ff); }
+
+        .link-cell { color: var(--ink-muted); font-size: 12px; font-family: monospace; word-break: break-all; max-width: 220px; }
+        .time-cell { font-size: 12px; color: var(--ink-subtle); white-space: nowrap; }
+
+        /* 操作按钮 */
+        .action-btn {
+            padding: 5px 14px; border: none; border-radius: var(--radius-pill); font-size: 12px; font-weight: 500;
+            cursor: pointer; transition: all 0.2s; margin: 0 3px; white-space: nowrap; font-family: inherit;
+        }
+        .action-btn:active { opacity: 0.8; }
+        .action-btn.blue   { background: #E8F0FE; color: var(--accent); }
+        .action-btn.blue:hover { background: #d6e6fd; }
+        .action-btn.yellow { background: #FFF6DC; color: #d99a00; }
+        .action-btn.yellow:hover { background: #ffedb8; }
+        .action-btn.red    { background: #FFF0F0; color: #ff3b30; }
+        .action-btn.red:hover { background: #ffdcd6; }
+
+        /* ── 分页 ── */
+        .page-bar { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+        .page-info { font-size: 13px; color: var(--ink-subtle); }
+        .page-ctrl { display: flex; align-items: center; gap: 6px; }
+        .page-btn {
+            min-width: 34px; height: 34px; padding: 0 8px; border: 1px solid var(--border); border-radius: var(--radius-pill);
+            display: flex; align-items: center; justify-content: center; font-size: 13px;
+            color: var(--ink-subtle); cursor: pointer; background: #fff; transition: all 0.2s; font-family: inherit;
+        }
+        .page-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .page-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .page-btn.disabled { opacity: 0.4; cursor: default; }
+        .page-size {
+            height: 34px; border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 0 12px;
+            font-size: 13px; color: var(--ink); background: #fff; outline: none; font-family: inherit; cursor: pointer;
+        }
+
+        /* ===== 弹窗：新增 / 修改 banner ===== */
+        .modal-mask {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(20, 26, 38, 0.5); z-index: 1200;
+            align-items: center; justify-content: center;
+        }
+        .modal-mask.show { display: flex; }
+        .dialog {
+            width: 560px; max-width: calc(100vw - 32px); background: #fff;
+            border-radius: 16px; overflow: hidden;
+            box-shadow: 0 24px 60px rgba(15, 25, 50, 0.25);
+            animation: dialogIn 0.22s ease;
+        }
+        @keyframes dialogIn {
+            from { opacity: 0; transform: translateY(16px) scale(0.98); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .dlg-head {
+            display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+            padding: 20px 24px 14px; border-bottom: 1px solid #f0f1f4;
+        }
+        .dlg-title { font-size: 18px; font-weight: 700; color: var(--ink); }
+        .dlg-sub { font-size: 12px; color: var(--ink-subtle); margin-top: 5px; line-height: 1.6; }
+        .dlg-close {
+            width: 28px; height: 28px; border: none; border-radius: 50%; background: #f2f3f7;
+            color: var(--ink-subtle); font-size: 13px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0;
+        }
+        .dlg-close:hover { background: #e8e9ee; color: var(--ink); }
+        .dlg-body { padding: 8px 24px 8px; max-height: 64vh; overflow-y: auto; }
+
+        .form-item { display: flex; align-items: flex-start; gap: 16px; padding: 12px 0; border-bottom: 1px solid #f7f7f9; }
+        .form-item:last-child { border-bottom: none; }
+        .form-item > label { width: 84px; flex-shrink: 0; font-size: 13px; color: var(--ink-muted); padding-top: 8px; }
+        .form-item > label em { color: #ff3b30; font-style: normal; margin-right: 2px; }
+        .form-ctrl { flex: 1; min-width: 0; }
+        .form-ctrl input[type="text"] {
+            width: 100%; height: 36px; border: 1px solid var(--border); border-radius: 8px; padding: 0 12px;
+            font-size: 13px; outline: none; font-family: inherit; color: var(--ink); background: #fff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-ctrl input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,102,204,0.08); }
+        .form-ctrl select {
+            width: 100%; height: 36px; border: 1px solid var(--border); border-radius: 8px; padding: 0 12px;
+            font-size: 13px; outline: none; font-family: inherit; color: var(--ink); background: #fff;
+        }
+        .form-tip { font-size: 12px; color: var(--ink-subtle); margin-top: 5px; line-height: 1.6; }
+
+        /* 图片上传 */
+        .cu-box {
+            position: relative; display: flex; align-items: center; justify-content: center;
+            min-height: 110px; padding: 12px; text-align: center;
+            background: #fafbfd; border: 1px dashed #cfd4de; border-radius: 12px;
+            cursor: pointer; overflow: hidden; transition: border-color 0.2s, background 0.2s;
+        }
+        .cu-box:hover { border-color: var(--accent); background: #f5f9ff; }
+        .cu-box input[type="file"] { display: none; }
+        .cu-box .cu-ph { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .cu-box .cu-ph svg { color: #b0b6c1; }
+        .cu-box .cu-ph b { font-size: 13px; font-weight: 600; color: var(--ink-muted); }
+        .cu-box .cu-ph em { font-style: normal; font-size: 12px; color: var(--ink-subtle); }
+        .cu-box.has-img { padding: 6px; border-style: solid; border-color: var(--border); background: #fff; }
+        .cu-box.has-img .cu-ph { display: none; }
+        .cu-box .cu-prev { display: none; width: 100%; }
+        .cu-box.has-img .cu-prev { display: block; }
+        .cu-prev .thumb { margin: 0 auto; }
+        .cu-meta { display: none; align-items: center; justify-content: space-between; gap: 12px; margin-top: 8px; }
+        .cu-meta.show { display: flex; }
+        .cu-meta .cu-name { font-size: 12px; color: var(--ink-subtle); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .cu-meta .cu-remove {
+            flex-shrink: 0; border: none; background: none; padding: 2px 4px;
+            font-family: inherit; font-size: 12.5px; color: var(--accent); cursor: pointer;
+        }
+        .cu-meta .cu-remove:hover { text-decoration: underline; }
+
+        /* 状态单选胶囊 */
+        .status-chips { display: flex; gap: 8px; }
+        .status-chip { position: relative; }
+        .status-chip input { position: absolute; opacity: 0; pointer-events: none; }
+        .status-chip span {
+            display: inline-block; padding: 7px 18px; border-radius: var(--radius-pill); font-size: 12.5px;
+            border: 1px solid var(--border); color: var(--ink-subtle); cursor: pointer; transition: all 0.18s; background: #fff;
+        }
+        .status-chip span:hover { border-color: var(--accent); color: var(--accent); }
+        /* 所属模块级联选择（用户小程序应用类型 / 首页） */
+        .cascader { position: relative; width: 220px; }
+        .cascader-input {
+            width: 100%; height: 36px; border: 1px solid var(--border); border-radius: 8px; padding: 0 30px 0 12px;
+            font-size: 13px; outline: none; font-family: inherit; color: var(--ink); background: #fff; cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .cascader-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,102,204,0.08); }
+        .cascader-arrow {
+            position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+            color: var(--ink-subtle); font-size: 12px; pointer-events: none; transition: transform 0.2s;
+        }
+        .cascader.open .cascader-arrow { transform: translateY(-50%) rotate(180deg); }
+        .cascader-panel {
+            display: none; position: absolute; top: calc(100% + 4px); left: 0; width: 340px;
+            background: #fff; border: 1px solid var(--border); border-radius: 10px;
+            box-shadow: 0 12px 32px rgba(15, 25, 50, 0.14); z-index: 60; overflow: hidden;
+        }
+        .cascader.open .cascader-panel { display: flex; }
+        .cascader-col { flex: 1; max-height: 220px; overflow-y: auto; padding: 6px 0; }
+        .cascader-col + .cascader-col { border-left: 1px solid #f0f1f4; }
+        .cascader-opt {
+            display: flex; align-items: center; justify-content: space-between; gap: 8px;
+            padding: 8px 14px; font-size: 13px; color: var(--ink); cursor: pointer; white-space: nowrap;
+        }
+        .cascader-opt:hover { background: #f5f9ff; color: var(--accent); }
+        .cascader-opt .arrow { color: var(--ink-subtle); font-size: 12px; }
+        .cascader-opt.selected { color: var(--accent); background: rgba(0, 102, 204, 0.06); font-weight: 600; }
+
+        /* banner图：多图上传（最多9张） */
+        .img-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; }
+        .img-grid:empty { margin-bottom: 0; }
+        .img-item {
+            position: relative; width: 120px; height: 56px; border-radius: 6px; overflow: hidden;
+            box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+        }
+        .img-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .img-item .thumb { width: 100%; height: 100%; font-size: 11px; }
+        .img-item .img-del {
+            position: absolute; top: 3px; right: 3px; width: 18px; height: 18px; padding: 0;
+            border: none; border-radius: 50%; background: rgba(0, 0, 0, 0.55); color: #fff;
+            font-size: 11px; line-height: 18px; text-align: center; cursor: pointer;
+        }
+        .img-item .img-del:hover { background: rgba(0, 0, 0, 0.78); }
+        .cu-box.sm { width: 96px; min-height: 60px; padding: 8px; flex-shrink: 0; }
+        .cu-box.sm .cu-ph b, .cu-box.sm .cu-ph em { display: none; }
+        .cu-box.sm.hide { display: none; }
+
+        .dlg-foot {
+            display: flex; justify-content: flex-end; align-items: center; gap: 10px;
+            padding: 14px 24px; border-top: 1px solid #f0f1f4; background: #fff;
+        }
+        .btn-dlg {
+            height: 36px; padding: 0 20px; border-radius: var(--radius-pill);
+            font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer;
+            transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-dlg.ghost { background: #fff; border: 1px solid var(--border); color: var(--ink); }
+        .btn-dlg.ghost:hover { border-color: #c5c8cf; background: #fafafc; }
+        .btn-dlg.primary { background: var(--accent); border: none; color: #fff; }
+        .btn-dlg.primary:hover { background: var(--accent-hover); }
+
+        /* Toast */
+        .toast {
+            position: fixed; top: 64px; left: 50%; transform: translate(-50%, -12px);
+            z-index: 1500; background: rgba(28, 32, 40, 0.92); color: #fff;
+            font-size: 13px; font-weight: 500; padding: 10px 22px; border-radius: 999px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            opacity: 0; pointer-events: none; transition: all 0.25s ease;
+        }
+        .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+        /* ===== 右侧功能说明面板 ===== */
+        .func-panel {
+            position: fixed; top: 0; right: 0; bottom: 0;
+            width: 340px; z-index: 890;
+            background: #fff; border-left: 1px solid #e3e6eb;
+            box-shadow: -1px 0 12px rgba(20, 30, 60, 0.04);
+            display: flex; flex-direction: column;
+        }
+        .func-panel .fp-inner { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+        .func-panel .fp-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px 14px 13px 18px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
+        }
+        .func-panel .fp-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: #1d1d1f; }
+        .func-panel .fp-title::before {
+            content: ''; width: 8px; height: 8px; border-radius: 50%;
+            background: var(--accent); box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.12);
+        }
+        .func-panel .fp-fold-btn {
+            width: 28px; height: 28px; border: 1px solid var(--border); background: #fff;
+            border-radius: 50%; color: var(--ink-subtle); font-size: 15px; line-height: 1;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+        }
+        .func-panel .fp-fold-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .func-panel .fp-body {
+            flex: 1; overflow-y: auto; padding: 4px 18px 40px;
+            font-size: 13px; color: #555; line-height: 1.9;
+        }
+        .func-panel .fp-body::-webkit-scrollbar { width: 5px; }
+        .func-panel .fp-body::-webkit-scrollbar-thumb { background: #d8dce3; border-radius: 3px; }
+        .func-panel .fp-body h4 { font-size: 14px; font-weight: 600; color: #1d1d1f; margin: 18px 0 6px; }
+        .func-panel .fp-body h4:first-child { margin-top: 12px; }
+        .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .func-panel .fp-body li { margin-bottom: 6px; }
+        .func-panel .fp-body strong { color: #333; }
+        .func-panel .fp-open {
+            display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+            border: none; background: transparent; cursor: pointer;
+            writing-mode: vertical-rl; text-orientation: upright;
+            font-size: 13px; font-weight: 600; letter-spacing: 6px; color: var(--ink-subtle);
+            align-items: center; justify-content: center; font-family: inherit; transition: all 0.2s;
+        }
+        .func-panel .fp-open:hover { color: var(--accent); background: #fafbfc; }
+
+        @media (min-width: 1024px) {
+            .main, .breadcrumb { margin-right: 340px; }
+            body.fp-collapsed .main,
+            body.fp-collapsed .breadcrumb { margin-right: 40px; }
+            body.fp-collapsed .func-panel { width: 40px; }
+            body.fp-collapsed .fp-inner { display: none; }
+            body.fp-collapsed .fp-open { display: flex; }
+        }
+        @media (max-width: 1023.98px) {
+            .func-panel { display: none; }
+            .main, .breadcrumb { margin-right: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="breadcrumb">
+    <a href="分销.html">分销中心</a>
+    <span> / </span>
+    <span class="current">banner管理</span>
+</div>
+
+<div class="main">
+
+    <!-- 搜索筛选栏 -->
+    <div class="filter-card">
+        <div class="fc-field">
+            <label>图片名称</label>
+            <input type="text" id="fName" placeholder="输入图片名称" oninput="filterBanners()">
+        </div>
+        <div class="fc-field">
+            <label>状态</label>
+            <select id="fStatus" onchange="filterBanners()">
+                <option value="">请选择上架状态</option>
+                <option value="online">已上线</option>
+                <option value="offline">未上线</option>
+            </select>
+        </div>
+        <div class="fc-actions">
+            <button class="btn green" onclick="filterBanners()">🔍 搜索</button>
+            <button class="btn yellow" onclick="resetFilter()">重置</button>
+            <button class="btn primary" onclick="openAdd()">新增banner</button>
+        </div>
+    </div>
+
+    <!-- banner 列表 -->
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:5%">序号</th>
+                    <th style="width:10%">图片名称</th>
+                    <th style="width:16%">图片概图</th>
+                    <th style="width:13%">关联链接</th>
+                    <th style="width:14%">所属模块</th>
+                    <th style="width:6%">序列</th>
+                    <th style="width:7%">状态</th>
+                    <th style="width:10%">创建时间</th>
+                    <th style="width:9%">修改时间</th>
+                    <th style="width:10%">操作</th>
+                </tr>
+            </thead>
+            <tbody id="bannerTableBody"></tbody>
+        </table>
+    </div>
+
+    <!-- 分页 -->
+    <div class="page-bar">
+        <span class="page-info" id="pageInfo">共 1 页</span>
+        <div class="page-ctrl" id="pageCtrl"></div>
+        <select class="page-size" id="pageSizeSel" onchange="changePageSize(this.value)">
+            <option value="10">10条/页</option>
+            <option value="20" selected>20条/页</option>
+            <option value="50">50条/页</option>
+        </select>
+    </div>
+
+</div>
+
+<!-- ===== 新增 / 修改 banner 弹窗 ===== -->
+<div class="modal-mask" id="dlgMask">
+    <div class="dialog" role="dialog" aria-label="banner编辑">
+        <div class="dlg-head">
+            <div>
+                <div class="dlg-title" id="dlgTitle">新增banner图片</div>
+                <div class="dlg-sub">配置「用户小程序应用类型 / 首页」模块展示的 banner 图片</div>
+            </div>
+            <button class="dlg-close" onclick="closeDlg()" aria-label="关闭">✕</button>
+        </div>
+        <div class="dlg-body">
+            <input type="hidden" id="dlgId">
+            <div class="form-item">
+                <label><em>*</em>图片名称</label>
+                <div class="form-ctrl">
+                    <input type="text" id="dlgName" placeholder="请输入图片名称" maxlength="20">
+                </div>
+            </div>
+            <div class="form-item">
+                <label><em>*</em>所属模块</label>
+                <div class="form-ctrl">
+                    <div class="cascader" id="moduleCascader">
+                        <input type="text" id="moduleInput" class="cascader-input" placeholder="请选择" readonly onclick="toggleCascader(event)">
+                        <span class="cascader-arrow">⌄</span>
+                        <div class="cascader-panel" onclick="event.stopPropagation()">
+                            <div class="cascader-col">
+                                <div class="cascader-opt">用户小程序应用类型 <span class="arrow">›</span></div>
+                            </div>
+                            <div class="cascader-col">
+                                <div class="cascader-opt" id="cascaderOptHome" onclick="pickModule()">首页</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-item">
+                <label><em>*</em>banner图</label>
+                <div class="form-ctrl">
+                    <div class="img-grid" id="imgGrid"></div>
+                    <label class="cu-box sm" id="cuBox">
+                        <input type="file" id="cuInput" accept=".jpg,.jpeg,.png" onchange="onPickFile(event)">
+                        <span class="cu-ph">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
+                        </span>
+                    </label>
+                    <div class="form-tip">*仅支持 jpg、jpeg、png 格式的图片，大小不能超过10M！</div>
+                </div>
+            </div>
+            <div class="form-item">
+                <label>关联链接</label>
+                <div class="form-ctrl">
+                    <input type="text" id="dlgLink" placeholder="请输入关联链接">
+                </div>
+            </div>
+            <div class="form-item">
+                <label><em>*</em>序列</label>
+                <div class="form-ctrl">
+                    <input type="text" id="dlgSeq" placeholder="请输入序列" style="width:180px;">
+                </div>
+            </div>
+        </div>
+        <div class="dlg-foot">
+            <button class="btn-dlg ghost" onclick="closeDlg()">取消</button>
+            <button class="btn-dlg primary" onclick="saveDlg()">确定</button>
+        </div>
+    </div>
+</div>
+<div class="toast" id="pageToast"></div>
+
+<script>
+    /* ===== 模拟数据（原型用渐变色块代替真实图片） ===== */
+    var MODULE_PATH = '用户小程序应用类型/首页';   /* 当前所属模块仅此一个 */
+    var bannerData = [
+        { id: 1, name: '广告1',      cls: 't1', seq: 1, link: 'pages/course/list?from=banner',  module: MODULE_PATH, status: 'online',  create: '2026-07-25 16:04:50', update: '2026-07-28 13:28:41' },
+        { id: 2, name: '7开花学',    cls: 't2', seq: 2, link: 'pages/index/index',              module: MODULE_PATH, status: 'offline', create: '2026-07-26 19:15:20', update: '2026-07-26 19:15:20' },
+        { id: 3, name: 'cpc 广告',   cls: 't3', seq: 3, link: 'pages/course/detail?id=1024',    module: MODULE_PATH, status: 'online',  create: '2026-07-26 11:06:10', update: '2026-07-26 22:28:04' },
+        { id: 4, name: '暑期招生',   cls: 't4', seq: 4, link: 'pages/index/index?tab=summer',   module: MODULE_PATH, status: 'online',  create: '2026-08-02 09:40:12', update: '2026-08-05 15:02:33' },
+        { id: 5, name: '开学季活动', cls: 't5', seq: 5, link: 'pages/activity/open?act=2026',   module: MODULE_PATH, status: 'offline', create: '2026-08-10 14:22:08', update: '2026-08-12 10:11:47' },
+        { id: 6, name: '品牌宣传',   cls: 't6', seq: 6, link: 'pages/about/index',              module: MODULE_PATH, status: 'online',  create: '2026-08-15 17:35:29', update: '2026-08-18 09:26:55' }
+    ];
+
+    var curPage = 1, pageSize = 20;
+    var thumbCls = ['t1', 't2', 't3', 't4', 't5', 't6'];
+    var dlgImgs = [];   /* 弹窗中已选择的图片（最多9张，原型仅前端演示，不真实上传） */
+
+    /* ===== 列表渲染 ===== */
+    function renderBanners() {
+        var kw = document.getElementById('fName').value.trim().toLowerCase();
+        var st = document.getElementById('fStatus').value;
+
+        var filtered = bannerData.filter(function (b) {
+            if (kw && b.name.toLowerCase().indexOf(kw) === -1) return false;
+            if (st && b.status !== st) return false;
+            return true;
+        });
+
+        var totalPages = Math.ceil(filtered.length / pageSize) || 1;
+        if (curPage > totalPages) curPage = totalPages;
+        var rows = filtered.slice((curPage - 1) * pageSize, curPage * pageSize);
+
+        var html = '';
+        rows.forEach(function (b, i) {
+            html += '<tr>'
+                + '<td style="color:var(--ink-subtle);">' + ((curPage - 1) * pageSize + i + 1) + '</td>'
+                + '<td>' + b.name + '</td>'
+                + '<td><div class="thumb ' + b.cls + '">' + b.name + '</div></td>'
+                + '<td class="link-cell">' + b.link + '</td>'
+                + '<td>' + b.module + '</td>'
+                + '<td>' + b.seq + '</td>'
+                + '<td>' + (b.status === 'online' ? '<span class="tag green">已上线</span>' : '<span class="tag gray">未上线</span>') + '</td>'
+                + '<td class="time-cell">' + b.create + '</td>'
+                + '<td class="time-cell">' + b.update + '</td>'
+                + '<td>'
+                +   '<button class="action-btn blue" onclick="openEdit(' + b.id + ')">修改</button>'
+                +   (b.status === 'online'
+                        ? '<button class="action-btn yellow" onclick="toggleStatus(' + b.id + ')">下线</button>'
+                        : '<button class="action-btn yellow" onclick="toggleStatus(' + b.id + ')">上线</button>')
+                +   '<button class="action-btn red" onclick="delBanner(' + b.id + ')">删除banner</button>'
+                + '</td>'
+                + '</tr>';
+        });
+        if (!html) html = '<tr><td colspan="9" style="text-align:center;color:var(--ink-subtle);padding:40px;">暂无数据</td></tr>';
+        document.getElementById('bannerTableBody').innerHTML = html;
+
+        document.getElementById('pageInfo').textContent = '共 ' + totalPages + ' 页';
+        var ctrl = '';
+        ctrl += curPage > 1 ? '<div class="page-btn" onclick="goPage(' + (curPage - 1) + ')">‹</div>' : '<div class="page-btn disabled">‹</div>';
+        for (var p = 1; p <= totalPages; p++) {
+            ctrl += '<div class="page-btn' + (p === curPage ? ' active' : '') + '" onclick="goPage(' + p + ')">' + p + '</div>';
+        }
+        ctrl += curPage < totalPages ? '<div class="page-btn" onclick="goPage(' + (curPage + 1) + ')">›</div>' : '<div class="page-btn disabled">›</div>';
+        document.getElementById('pageCtrl').innerHTML = ctrl;
+    }
+
+    /* ===== 搜索 / 重置 / 分页 ===== */
+    function filterBanners() { curPage = 1; renderBanners(); }
+    function resetFilter() {
+        document.getElementById('fName').value = '';
+        document.getElementById('fStatus').value = '';
+        filterBanners();
+    }
+    function goPage(p) { curPage = p; renderBanners(); }
+    function changePageSize(v) { pageSize = parseInt(v, 10); curPage = 1; renderBanners(); }
+
+    /* ===== 新增 / 修改弹窗 ===== */
+    function openAdd() {
+        document.getElementById('dlgTitle').textContent = '新增banner图片';
+        document.getElementById('dlgId').value = '';
+        document.getElementById('dlgName').value = '';
+        document.getElementById('dlgLink').value = '';
+        document.getElementById('dlgSeq').value = '';
+        resetModule();
+        dlgImgs = [];
+        renderImgGrid();
+        document.getElementById('dlgMask').classList.add('show');
+    }
+
+    function openEdit(id) {
+        var b = bannerData.filter(function (x) { return x.id === id; })[0];
+        if (!b) return;
+        document.getElementById('dlgTitle').textContent = '修改banner图片';
+        document.getElementById('dlgId').value = b.id;
+        document.getElementById('dlgName').value = b.name;
+        document.getElementById('dlgLink').value = b.link;
+        document.getElementById('dlgSeq').value = b.seq;
+        resetModule();
+        document.getElementById('moduleInput').value = b.module;
+        document.getElementById('moduleInput').classList.add('filled');
+        if (b.module) document.getElementById('cascaderOptHome').classList.add('selected');
+        /* 回填已有图片（渐变占位） */
+        dlgImgs = [{ name: b.name + '.png', cls: b.cls }];
+        renderImgGrid();
+        document.getElementById('dlgMask').classList.add('show');
+    }
+
+    function closeDlg() { document.getElementById('dlgMask').classList.remove('show'); }
+
+    /* ===== 所属模块级联选择（用户小程序应用类型 / 首页） ===== */
+    function toggleCascader(e) {
+        e.stopPropagation();
+        document.getElementById('moduleCascader').classList.toggle('open');
+    }
+    function closeCascader() {
+        var c = document.getElementById('moduleCascader');
+        if (c) c.classList.remove('open');
+    }
+    function pickModule() {
+        var inp = document.getElementById('moduleInput');
+        inp.value = MODULE_PATH;
+        inp.classList.add('filled');
+        document.getElementById('cascaderOptHome').classList.add('selected');
+        closeCascader();
+    }
+    function resetModule() {
+        var inp = document.getElementById('moduleInput');
+        inp.value = '';
+        inp.classList.remove('filled');
+        document.getElementById('cascaderOptHome').classList.remove('selected');
+        closeCascader();
+    }
+
+    /* ===== banner图：单张，jpg / jpeg / png，≤ 10M ===== */
+    function onPickFile(e) {
+        var input = e.target;
+        var f = input.files && input.files[0];
+        input.value = '';
+        if (!f) return;
+        if (!/\.(jpg|jpeg|png)$/i.test(f.name)) { showToast('仅支持 jpg、jpeg、png 格式：' + f.name); return; }
+        if (f.size > 10 * 1024 * 1024) { showToast('「' + f.name + '」大小不能超过10M'); return; }
+        var reader = new FileReader();
+        reader.onload = function (ev) {
+            dlgImgs = [{ name: f.name, dataUrl: ev.target.result }];
+            renderImgGrid();
+        };
+        reader.readAsDataURL(f);
+    }
+
+    function removeImgAt() {
+        dlgImgs = [];
+        renderImgGrid();
+    }
+
+    function renderImgGrid() {
+        var html = '';
+        dlgImgs.forEach(function (im, i) {
+            html += '<div class="img-item">'
+                + (im.dataUrl
+                    ? '<img src="' + im.dataUrl + '" alt="预览">'
+                    : '<div class="thumb ' + im.cls + '">' + (im.name || 'banner') + '</div>')
+                + '<button type="button" class="img-del" title="移除" onclick="removeImgAt(' + i + ')">×</button>'
+                + '</div>';
+        });
+        document.getElementById('imgGrid').innerHTML = html;
+        var box = document.getElementById('cuBox');
+        if (dlgImgs.length >= 1) box.classList.add('hide'); else box.classList.remove('hide');
+    }
+
+    function now() {
+        var d = new Date();
+        function p(n) { return n < 10 ? '0' + n : n; }
+        return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' '
+             + p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds());
+    }
+
+    function saveDlg() {
+        var id = document.getElementById('dlgId').value;
+        var name = document.getElementById('dlgName').value.trim();
+        var seqStr = document.getElementById('dlgSeq').value.trim();
+        var link = document.getElementById('dlgLink').value.trim();
+        if (!name) { showToast('请输入图片名称'); return; }
+        if (!document.getElementById('moduleInput').value) { showToast('请选择所属模块'); return; }
+        if (!dlgImgs.length) { showToast('请上传banner图'); return; }
+        if (!/^\d+$/.test(seqStr) || parseInt(seqStr, 10) < 1) { showToast('请输入正确的序列（正整数）'); return; }
+        var seq = parseInt(seqStr, 10);
+
+        var module = document.getElementById('moduleInput').value;
+        var ts = now();
+
+        if (id) {
+            bannerData.forEach(function (b) {
+                if (String(b.id) === id) {
+                    b.name = name; b.seq = seq; b.link = link;
+                    b.module = module; b.update = ts;
+                }
+            });
+            showToast('banner图片 已保存');
+        } else {
+            var nextId = bannerData.reduce(function (m, b) { return Math.max(m, b.id); }, 0) + 1;
+            bannerData.unshift({
+                id: nextId, name: name,
+                cls: thumbCls[nextId % thumbCls.length],
+                seq: seq, link: link, module: module,
+                status: 'offline', create: ts, update: ts
+            });
+            showToast('banner图片 已创建');
+        }
+        closeDlg();
+        renderBanners();
+    }
+
+    /* ===== 上线 / 下线 ===== */
+    function toggleStatus(id) {
+        bannerData.forEach(function (b) {
+            if (b.id === id) {
+                b.status = b.status === 'online' ? 'offline' : 'online';
+                b.update = now();
+                showToast(b.name + (b.status === 'online' ? ' 已上线' : ' 已下线'));
+            }
+        });
+        renderBanners();
+    }
+
+    /* ===== 删除 ===== */
+    function delBanner(id) {
+        var b = bannerData.filter(function (x) { return x.id === id; })[0];
+        if (!b) return;
+        if (confirm('确定删除 banner「' + b.name + '」吗？删除后不可恢复。')) {
+            bannerData = bannerData.filter(function (x) { return x.id !== id; });
+            showToast('banner 已删除');
+            renderBanners();
+        }
+    }
+
+    /* ===== Toast ===== */
+    function showToast(msg) {
+        var t = document.getElementById('pageToast');
+        t.textContent = msg;
+        t.classList.add('show');
+        clearTimeout(showToast._timer);
+        showToast._timer = setTimeout(function () { t.classList.remove('show'); }, 1800);
+    }
+
+    document.getElementById('dlgMask').addEventListener('click', function (e) {
+        if (e.target === this) closeDlg();
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && document.getElementById('dlgMask').classList.contains('show')) closeDlg();
+    });
+    document.addEventListener('click', function () { closeCascader(); });
+
+    /* ===== 初始化 ===== */
+    renderBanners();
+</script>
+
+<!-- ===== 右侧功能说明面板 ===== -->
+<aside class="func-panel">
+    <div class="fp-inner">
+        <div class="fp-header">
+            <span class="fp-title">功能说明</span>
+            <button class="fp-fold-btn" onclick="toggleFuncPanel()" title="收起功能说明">›</button>
+        </div>
+        <div class="fp-body">
+            <h4>banner关联链接</h4>
+            <ul>
+                <li>实现点击banner图进行小程序内跳转</li>
+            </ul>
+        </div>
+    </div>
+    <button class="fp-open" onclick="toggleFuncPanel()" title="展开功能说明">功能说明‹</button>
+</aside>
+
+<script>
+    /* ── 右侧功能说明面板：收起 / 展开 ── */
+    function toggleFuncPanel() {
+        document.body.classList.toggle('fp-collapsed');
+    }
+</script>
+<script src="asset/admin-sidebar.js"></script>
+</body>
+</html>
