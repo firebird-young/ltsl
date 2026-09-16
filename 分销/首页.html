@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<!-- ============================================================
+  原型风格 · 模式B：移动端平铺手机页 —— 分销 · 首页
+  结构：.main > .stage-tip + .app-container(page-top + page-body + bottom-tab) + .func-panel
+  ============================================================ -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首页 - 原型</title>
+    <link rel="stylesheet" href="asset/admin-sidebar.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', 'Microsoft YaHei', Arial, sans-serif;
+            background: #f5f5f7;
+            min-height: 100vh;
+            color: #1d1d1f;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== 主色（沿用分销模块移动端已有用色） ===== */
+        :root {
+            --accent: #0066FF;
+            --accent-dark: #0047B3;
+            --accent-light: #E8F0FE;
+            --line: #f0f0f0;
+            --text-sub: #666;
+            --text-weak: #999;
+        }
+
+        /* ===== 舞台说明（仅宽屏预览用，真机宽度隐藏） ===== */
+        .main { padding: 16px 24px 48px; }
+        .stage-tip {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 12px; margin-bottom: 12px; flex-wrap: wrap;
+        }
+        .stage-tip .st-label { font-size: 13px; color: #86868b; }
+        .stage-tip .st-badge {
+            font-size: 12px; font-weight: 600; color: var(--accent);
+            background: #fff; border: 1px solid #b8d5ff; border-radius: 9999px;
+            padding: 4px 14px;
+        }
+
+        /* ===== 手机页面容器（无外框，平铺预览） ===== */
+        .app-container {
+            position: relative;
+            width: 100%; max-width: 430px; margin: 0 auto;
+            background: #ffffff; border-radius: 18px;
+            box-shadow: 0 10px 34px rgba(30, 60, 120, 0.14);
+            overflow: hidden;
+        }
+        @media (max-width: 540px) {
+            .main { padding: 0; }
+            .stage-tip { display: none; }
+            .app-container { border-radius: 0; box-shadow: none; }
+            .page-top { border-radius: 0 !important; }
+            .bottom-tab { border-radius: 0 !important; }
+        }
+
+        /* ===== 顶部：状态栏 + 标题栏 + 搜索栏（吸顶） ===== */
+        .page-top {
+            position: sticky; top: 0; z-index: 80; background: #fff;
+            border-radius: 18px 18px 0 0; overflow: hidden;
+            box-shadow: 0 2px 10px rgba(20, 40, 90, 0.08);
+        }
+        .status-bar {
+            height: 44px; background: #fff; color: #1d1d1f;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px;
+        }
+        .status-bar .sb-left { display: flex; align-items: baseline; gap: 8px; }
+        .status-bar .sb-time { font-size: 15px; font-weight: 600; letter-spacing: 0.3px; }
+        .status-bar .sb-date { font-size: 12px; color: var(--text-sub); }
+        .status-bar .sb-right { display: flex; align-items: center; gap: 7px; }
+        .status-bar .sb-signal { display: inline-flex; align-items: flex-end; gap: 1.5px; height: 11px; }
+        .status-bar .sb-signal i { width: 3px; border-radius: 1px; background: currentColor; }
+        .status-bar .sb-signal i:nth-child(1) { height: 4px; }
+        .status-bar .sb-signal i:nth-child(2) { height: 6px; }
+        .status-bar .sb-signal i:nth-child(3) { height: 8px; }
+        .status-bar .sb-signal i:nth-child(4) { height: 11px; }
+        .status-bar .sb-wifi { width: 15px; height: 11px; position: relative; display: inline-block; }
+        .status-bar .sb-wifi::before {
+            content: ''; position: absolute; left: 50%; bottom: 0;
+            transform: translateX(-50%);
+            width: 5px; height: 5px; border-radius: 50%; background: currentColor;
+        }
+        .status-bar .sb-wifi::after {
+            content: ''; position: absolute; left: 50%; bottom: 2px;
+            transform: translateX(-50%);
+            width: 14px; height: 14px; box-sizing: border-box;
+            border-top: 2px solid currentColor; border-radius: 50%;
+        }
+        .status-bar .sb-batt {
+            width: 25px; height: 12px; border: 1.4px solid currentColor;
+            border-radius: 3px; padding: 1.5px; box-sizing: border-box; position: relative;
+        }
+        .status-bar .sb-batt::after {
+            content: ''; position: absolute; right: -3.5px; top: 50%;
+            transform: translateY(-50%);
+            width: 2px; height: 5px; background: currentColor; border-radius: 0 1px 1px 0;
+        }
+        .status-bar .sb-batt i { display: block; height: 100%; width: 78%; background: currentColor; border-radius: 1px; }
+        .status-bar .sb-batt.low { border-color: #ff9500; color: #ff9500; }
+        .status-bar .sb-batt.low i { width: 28%; }
+
+        /* 菜单按钮（白底，置于搜索栏左侧） */
+        .nav-icon-btn {
+            width: 32px; height: 32px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            border: none; background: transparent; color: #1d1d1f;
+            cursor: pointer; font-family: inherit; border-radius: 8px;
+            transition: background 0.2s; -webkit-tap-highlight-color: transparent;
+        }
+        .nav-icon-btn:hover { background: #F2F3F7; }
+        .nav-icon-btn:active { background: #E5E7EC; }
+
+        /* 搜索栏（吸顶区顶部） */
+        .search-bar {
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 14px 12px 10px; background: #fff;
+        }
+        .search-box {
+            flex: 1; display: flex; align-items: center; gap: 6px;
+            height: 40px; background: #F2F3F7; border-radius: 12px; padding: 0 5px 0 12px;
+        }
+        .search-box svg { flex-shrink: 0; color: #86868b; }
+        .search-box input {
+            flex: 1; min-width: 0; border: none; outline: none; background: transparent;
+            font-size: 14px; font-family: inherit; color: #1d1d1f;
+        }
+        .search-box input::placeholder { color: #b0b4bd; }
+        .search-btn {
+            flex-shrink: 0; height: 32px; padding: 0 16px; border: none; border-radius: 9px;
+            background: var(--accent); color: #fff; font-size: 14px; font-weight: 500;
+            font-family: inherit; cursor: pointer;
+        }
+        .search-btn:active { opacity: 0.85; }
+        /* 小程序胶囊 */
+        .mini-capsule {
+            flex-shrink: 0; display: flex; align-items: center;
+            height: 32px; border-radius: 9999px; background: rgba(240, 241, 245, 0.95);
+            border: 1px solid #E5E6EB; overflow: hidden;
+        }
+        .mini-capsule span {
+            flex: 1; display: flex; align-items: center; justify-content: center;
+            width: 38px; height: 100%; color: #1d1d1f;
+        }
+        .mini-capsule span + span { border-left: 1px solid #E0E1E6; }
+        .mini-capsule .mc-dots { letter-spacing: 2px; font-weight: 700; font-size: 14px; }
+        .mini-capsule .mc-circle {
+            width: 15px; height: 15px; border: 1.8px solid #1d1d1f; border-radius: 50%; position: relative;
+        }
+        .mini-capsule .mc-circle::after {
+            content: ''; position: absolute; inset: 2.5px; border-radius: 50%;
+            border: 1.2px solid #1d1d1f;
+        }
+
+        /* ===== 内容区 ===== */
+        .page-body { padding-bottom: 24px; background: #fff; }
+
+        /* 金刚区 */
+        .kingkong {
+            display: flex; justify-content: space-around;
+            padding: 12px 10px 18px; background: #fff;
+        }
+        .kk-item {
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            cursor: pointer; -webkit-tap-highlight-color: transparent;
+        }
+        .kk-item:active { opacity: 0.75; }
+        .kk-item .kk-icon { font-size: 46px; line-height: 1; }
+        .kk-item .kk-name { font-size: 13px; color: #1d1d1f; font-weight: 500; }
+
+        /* Banner */
+        .banner-wrap { padding: 0 12px; }
+        .banner {
+            position: relative; border-radius: 16px; overflow: hidden;
+            background: linear-gradient(160deg, #DCE9FB 0%, #C4DAF8 55%, #AECDF6 100%);
+            padding: 26px 18px 20px; text-align: center;
+            cursor: pointer;
+        }
+        .banner:active { opacity: 0.92; }
+        .banner .bn-org {
+            display: inline-block; font-size: 11px; color: #3D6FBF;
+            background: rgba(255,255,255,0.65); border-radius: 9999px;
+            padding: 3px 12px; margin-bottom: 12px; letter-spacing: 1px;
+        }
+        .banner .bn-title { font-size: 27px; font-weight: 800; color: #123B7D; letter-spacing: 1px; }
+        .banner .bn-title em { font-style: normal; color: #1F7BFF; }
+        .banner .bn-sub { font-size: 13px; color: #2C5AA0; margin-top: 10px; letter-spacing: 0.5px; }
+        .banner .bn-tags { font-size: 11px; color: #4E77B8; margin-top: 12px; letter-spacing: 0.5px; }
+        .banner-dots { display: flex; justify-content: center; gap: 6px; margin-top: 14px; }
+        .banner-dots i { width: 16px; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.6); }
+        .banner-dots i.active { background: #2E6BE6; }
+
+        /* 分销横幅（图片，点击进入分销中心） */
+        .promo-banner {
+            margin: 14px 12px 0; border-radius: 16px; overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+            cursor: pointer; -webkit-tap-highlight-color: transparent;
+            line-height: 0;
+        }
+        .promo-banner:active { opacity: 0.92; }
+        .promo-banner img { display: block; width: 100%; height: auto; }
+
+        /* 区块标题 */
+        .sec-title {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 17px; font-weight: 700; color: #1d1d1f;
+            margin: 22px 16px 12px;
+        }
+        .sec-title::before {
+            content: ''; width: 4px; height: 17px; border-radius: 2px;
+            background: var(--accent); flex-shrink: 0;
+        }
+
+        /* 课程卡片 */
+        .course-card {
+            background: #fff; border-radius: 14px; margin: 0 12px 14px;
+            overflow: hidden; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+            cursor: pointer;
+        }
+        .course-card:active { opacity: 0.9; }
+        .course-cover {
+            position: relative; height: 200px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 16px;
+        }
+        .course-cover.cover-ai {
+            background:
+                radial-gradient(circle at 82% 18%, rgba(214,158,90,0.35) 0%, rgba(214,158,90,0) 42%),
+                linear-gradient(150deg, #FBF3E4 0%, #F6EBD6 60%, #F0E2C6 100%);
+        }
+        .course-cover.cover-feiyi {
+            background:
+                radial-gradient(circle at 18% 20%, rgba(196,80,80,0.22) 0%, rgba(196,80,80,0) 45%),
+                linear-gradient(150deg, #FBEDE7 0%, #F6E0D6 60%, #EFD2C4 100%);
+        }
+        .course-cover .cc-org {
+            position: absolute; top: 12px; left: 16px;
+            font-size: 10px; color: #9A7B4F; letter-spacing: 1px;
+        }
+        .course-cover .cc-org i {
+            font-style: normal; display: inline-block; width: 14px; height: 14px; border-radius: 3px;
+            background: #B4553F; color: #fff; text-align: center; line-height: 14px;
+            font-size: 9px; margin-right: 4px;
+        }
+        .course-cover .cc-motto {
+            position: absolute; top: 12px; right: 16px;
+            font-size: 10px; color: #B79B72; letter-spacing: 2px;
+        }
+        .course-cover .cc-line { font-size: 10px; color: #A98C5F; letter-spacing: 6px; margin-bottom: 10px; }
+        .course-cover .cc-title { font-size: 23px; font-weight: 800; color: #2B2B2B; letter-spacing: 1px; }
+        .course-cover .cc-title em { font-style: normal; }
+        .course-cover.cover-ai .cc-title em { color: #B4553F; }
+        .course-cover.cover-feiyi .cc-title em { color: #3E6FA8; }
+        .course-cover .cc-sub { font-size: 12px; color: #8A7A5C; margin-top: 12px; letter-spacing: 1px; }
+        .course-cover .cc-chips { display: flex; gap: 6px; margin-top: 16px; flex-wrap: wrap; justify-content: center; }
+        .course-cover .cc-chips span {
+            font-size: 10px; color: #6B5B3E; background: rgba(255,255,255,0.85);
+            border: 1px solid rgba(160,135,90,0.35); border-radius: 9999px; padding: 3px 10px;
+        }
+        .course-cover .cc-strip {
+            position: absolute; left: 0; right: 0; bottom: 0;
+            font-size: 11px; color: rgba(120, 100, 65, 0.55);
+            background: rgba(255,255,255,0.4); padding: 5px 12px; letter-spacing: 1px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .course-info { padding: 13px 15px 0; }
+        .course-info .ci-name { font-size: 15.5px; font-weight: 600; color: #1d1d1f; line-height: 1.5; }
+        .course-info .ci-date { font-size: 12px; color: var(--text-weak); margin-top: 7px; }
+        .course-foot {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-top: 12px; padding: 11px 0;
+            border-top: 1px solid var(--line);
+        }
+        .course-foot .cf-addr { display: flex; align-items: center; gap: 4px; font-size: 12.5px; color: var(--text-sub); }
+        .course-foot .cf-addr svg { color: var(--text-sub); flex-shrink: 0; }
+        .course-foot .cf-price { font-size: 17px; font-weight: 700; color: var(--accent); }
+        .course-foot .cf-price small { font-size: 12px; font-weight: 600; }
+
+        /* ===== 底部导航 ===== */
+        .bottom-tab {
+            position: sticky; bottom: 0; z-index: 90;
+            background: #fff; border-top: 1px solid var(--line);
+            display: flex; justify-content: space-around; align-items: center;
+            padding: 6px 0 10px;
+            border-radius: 0 0 18px 18px;
+            box-shadow: 0 -2px 12px rgba(20, 50, 110, 0.06);
+        }
+        .tab-item {
+            flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+            font-size: 11px; color: #8a8f99; cursor: pointer;
+            background: none; border: none; font-family: inherit;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .tab-item svg { width: 23px; height: 23px; }
+        .tab-item.active { color: var(--accent); font-weight: 600; }
+        .tab-item:active { opacity: 0.8; }
+
+        /* ===== 左侧抽屉菜单 ===== */
+        .menu-mask {
+            position: absolute; inset: 0; z-index: 190;
+            background: rgba(15, 25, 50, 0.45);
+            opacity: 0; visibility: hidden; transition: opacity 0.28s ease, visibility 0.28s;
+        }
+        .menu-mask.show { opacity: 1; visibility: visible; }
+
+        .side-menu {
+            position: absolute; top: 0; bottom: 0; left: 0; z-index: 200;
+            width: 276px; max-width: 80%;
+            display: flex; flex-direction: column;
+            background: #fff; border-radius: 0 18px 18px 0;
+            box-shadow: 6px 0 26px rgba(15, 25, 50, 0.22);
+            transform: translateX(-102%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .side-menu.show { transform: translateX(0); }
+        body.menu-open { overflow: hidden; }
+
+        /* 抽屉：用户信息头 */
+        .side-menu .sm-user {
+            flex-shrink: 0; padding: 22px 18px 18px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: #fff; border-radius: 0 18px 0 0;
+        }
+        .sm-user-row { display: flex; align-items: center; gap: 12px; }
+        .sm-user-row .sm-avatar {
+            width: 48px; height: 48px; flex-shrink: 0; border-radius: 50%;
+            background: rgba(255, 255, 255, 0.22);
+            border: 1px solid rgba(255, 255, 255, 0.45);
+            display: flex; align-items: center; justify-content: center; font-size: 24px;
+        }
+        .sm-user-info { min-width: 0; }
+        .sm-user-info .sm-name {
+            font-size: 16px; font-weight: 600; letter-spacing: 0.3px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .sm-user-info .sm-name .sm-arrow { font-size: 15px; opacity: 0.85; }
+        .sm-user-info .sm-role { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
+        .sm-user-info .sm-role span { font-size: 11px; }
+        .sm-user-info .sm-role .sm-badge {
+            background: rgba(255, 255, 255, 0.9); color: var(--accent-dark);
+            font-weight: 700; border-radius: 999px; padding: 1px 8px;
+        }
+
+        /* 抽屉：菜单滚动区 */
+        .sm-scroll { flex: 1; overflow-y: auto; padding: 6px 10px 14px; }
+        .sm-scroll::-webkit-scrollbar { width: 5px; }
+        .sm-scroll::-webkit-scrollbar-thumb { background: #d8dce3; border-radius: 3px; }
+        .sm-group-title {
+            font-size: 11px; color: #9aa0ac; font-weight: 600; letter-spacing: 1px;
+            padding: 14px 10px 6px;
+        }
+        .sm-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 11px 12px; border-radius: 12px; cursor: pointer;
+            font-size: 14px; color: #1d1d1f; transition: background 0.18s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .sm-item + .sm-item { margin-top: 2px; }
+        .sm-item:hover { background: #f5f7fa; }
+        .sm-item.active { background: var(--accent-light); color: var(--accent); font-weight: 600; }
+        .sm-item .sm-ic { font-size: 18px; line-height: 1; width: 22px; text-align: center; flex-shrink: 0; }
+        .sm-item .sm-label { flex: 1; min-width: 0; }
+        .sm-item .sm-tip { font-size: 11px; color: var(--text-weak); flex-shrink: 0; }
+
+        /* 抽屉：底部 */
+        .sm-foot {
+            flex-shrink: 0; border-top: 1px solid var(--line);
+            padding: 12px 18px 16px; font-size: 11px; color: #b0b4bd;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .sm-foot .sm-logout { color: var(--text-sub); font-size: 12px; cursor: pointer; }
+        .sm-foot .sm-logout:hover { color: var(--accent); }
+
+        /* ===== 右侧功能说明面板 ===== */
+        .func-panel {
+            position: fixed; top: 0; right: 0; bottom: 0;
+            width: 340px; z-index: 890;
+            background: #fff; border-left: 1px solid #e3e6eb;
+            box-shadow: -1px 0 12px rgba(20, 30, 60, 0.04);
+            display: flex; flex-direction: column;
+        }
+        .func-panel .fp-inner { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+        .func-panel .fp-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px 14px 13px 18px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
+        }
+        .func-panel .fp-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: #1d1d1f; }
+        .func-panel .fp-title::before {
+            content: ''; width: 8px; height: 8px; border-radius: 50%;
+            background: var(--accent); box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.12);
+        }
+        .func-panel .fp-fold-btn {
+            width: 28px; height: 28px; border: 1px solid #e0e0e0; background: #fff;
+            border-radius: 50%; color: #86868b; font-size: 15px; line-height: 1;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+        }
+        .func-panel .fp-fold-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .func-panel .fp-body {
+            flex: 1; overflow-y: auto; padding: 4px 18px 40px;
+            font-size: 13px; color: #555; line-height: 1.9;
+        }
+        .func-panel .fp-body::-webkit-scrollbar { width: 5px; }
+        .func-panel .fp-body::-webkit-scrollbar-thumb { background: #d8dce3; border-radius: 3px; }
+        .func-panel .fp-body h4 { font-size: 14px; font-weight: 600; color: #1d1d1f; margin: 18px 0 6px; }
+        .func-panel .fp-body h4:first-child { margin-top: 12px; }
+        .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .func-panel .fp-body li { margin-bottom: 6px; }
+        .func-panel .fp-body strong { color: #333; }
+        .func-panel .fp-body a { color: var(--accent); text-decoration: none; }
+        .func-panel .fp-body a:hover { text-decoration: underline; }
+        .func-panel .fp-open {
+            display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+            border: none; background: transparent; cursor: pointer;
+            writing-mode: vertical-rl; text-orientation: upright;
+            font-size: 13px; font-weight: 600; letter-spacing: 6px; color: #86868b;
+            align-items: center; justify-content: center; font-family: inherit; transition: all 0.2s;
+        }
+        .func-panel .fp-open:hover { color: var(--accent); background: #fafbfc; }
+
+        @media (min-width: 1024px) {
+            .main { margin-right: 340px; }
+            body.fp-collapsed .main { margin-right: 40px; }
+            body.fp-collapsed .func-panel { width: 40px; }
+            body.fp-collapsed .fp-inner { display: none; }
+            body.fp-collapsed .fp-open { display: flex; }
+        }
+        @media (max-width: 1023.98px) {
+            .func-panel { display: none; }
+            .main { margin-right: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="main">
+    <!-- 舞台说明：宽屏预览身份用，真机宽度自动隐藏 -->
+    <div class="stage-tip">
+        <span class="st-label">分销中心 · 手机端首页</span>
+        <span class="st-badge">📱 移动端页面</span>
+    </div>
+
+    <div class="app-container">
+
+        <!-- ===== 顶部：状态栏 + 搜索栏 ===== -->
+        <header class="page-top">
+            <div class="status-bar">
+                <span class="sb-left">
+                    <span class="sb-time" id="sbTime">9:41</span>
+                    <span class="sb-date" id="sbDate">9月16日 星期三</span>
+                </span>
+                <span class="sb-right">
+                    <span class="sb-signal"><i></i><i></i><i></i><i></i></span>
+                    <span class="sb-wifi"></span>
+                    <span class="sb-batt low"><i></i></span>
+                </span>
+            </div>
+            <div class="search-bar">
+                <button class="nav-icon-btn" onclick="openMenu()" aria-label="打开侧边栏菜单">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3.5" y1="6.5" x2="20.5" y2="6.5"></line><line x1="3.5" y1="12" x2="20.5" y2="12"></line><line x1="3.5" y1="17.5" x2="20.5" y2="17.5"></line></svg>
+                </button>
+                <div class="search-box">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><line x1="16.5" y1="16.5" x2="21" y2="21"></line></svg>
+                    <input type="text" placeholder="搜索~~" aria-label="搜索">
+                    <button class="search-btn" onclick="doSearch()">搜索</button>
+                </div>
+                <div class="mini-capsule" title="小程序胶囊">
+                    <span class="mc-dots">•••</span>
+                    <span><i class="mc-circle"></i></span>
+                </div>
+            </div>
+        </header>
+
+        <!-- ===== 内容区 ===== -->
+        <div class="page-body">
+
+            <!-- 金刚区 -->
+            <nav class="kingkong">
+                <div class="kk-item" onclick="go('课程详情.html')">
+                    <span class="kk-icon">🎓</span>
+                    <span class="kk-name">OPC创业</span>
+                </div>
+                <div class="kk-item" onclick="go('课程详情.html')">
+                    <span class="kk-icon">🏛️</span>
+                    <span class="kk-name">文博研学</span>
+                </div>
+                <div class="kk-item" onclick="go('课程详情.html')">
+                    <span class="kk-icon">🏮</span>
+                    <span class="kk-name">非遗文化</span>
+                </div>
+                <div class="kk-item" onclick="go('课程详情.html')">
+                    <span class="kk-icon">📜</span>
+                    <span class="kk-name">艺术臻品</span>
+                </div>
+            </nav>
+
+            <!-- Banner -->
+            <div class="banner-wrap">
+                <div class="banner" onclick="go('课程推广.html')">
+                    <span class="bn-org">✳ 高泰OPC培训认证中心</span>
+                    <div class="bn-title">抢占 <em>AI时代</em> 职业先机</div>
+                    <div class="bn-sub">从「学」到「赚」全链路陪跑 · 学完就能接单变现</div>
+                    <div class="bn-tags">✳ 双证加持 · 三重补贴 · 有偿练手 · 边学边赚 · 多元变现 · 生态共享</div>
+                    <div class="banner-dots"><i class="active"></i><i></i><i></i></div>
+                </div>
+            </div>
+
+            <!-- 分销横幅 -->
+            <div class="promo-banner" onclick="go('分销.html')" title="查看分销中心">
+                <img src="../asset/tgy.png" alt="分销推广横幅">
+            </div>
+
+            <!-- 推荐课程 -->
+            <div class="sec-title">推荐课程</div>
+
+            <!-- 课程卡片 1 -->
+            <div class="course-card" onclick="go('课程详情.html')">
+                <div class="course-cover cover-ai">
+                    <span class="cc-org"><i>泰</i>离泰文脉 OPC 培训认证中心</span>
+                    <span class="cc-motto">文脉如水 · 笔墨传承</span>
+                    <div class="cc-line">执于妙笔 · 成事</div>
+                    <div class="cc-title">以 <em>AI 之力</em>，行文博之事</div>
+                    <div class="cc-sub">工具流跑一遍，一天的事变几十分钟</div>
+                    <div class="cc-chips">
+                        <span>自媒体</span><span>短报提效</span><span>自动剪辑</span><span>研学讲解</span><span>文旅交付</span>
+                    </div>
+                    <div class="cc-strip">当对手还在手写讲稿词 / 海报 / 复盘，90 分钟把工具流跑通带走</div>
+                </div>
+                <div class="course-info">
+                    <div class="ci-name">文博研学导游-跑通 AI 工具流 带走 4 大 SOP</div>
+                    <div class="ci-date">2026年9月19日</div>
+                    <div class="course-foot">
+                        <span class="cf-addr">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            高泰OPC实训基地
+                        </span>
+                        <span class="cf-price">¥99.00 <small>起</small></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 课程卡片 2 -->
+            <div class="course-card" onclick="go('课程详情.html')">
+                <div class="course-cover cover-feiyi">
+                    <span class="cc-org"><i>泰</i>离泰文脉 OPC 培训认证中心</span>
+                    <span class="cc-motto">指尖山水 · 匠心传承</span>
+                    <div class="cc-line">执于匠心 · 成艺</div>
+                    <div class="cc-title">从 <em>0 到 1</em>，非遗手作变现</div>
+                    <div class="cc-sub">一门手艺 · 一套内容打法 · 一条接单渠道</div>
+                    <div class="cc-chips">
+                        <span>手作体验</span><span>短视频</span><span>直播带练</span><span>接单陪跑</span>
+                    </div>
+                    <div class="cc-strip">非遗手作体验师认证班 · 学完即接单，边学边赚不空转</div>
+                </div>
+                <div class="course-info">
+                    <div class="ci-name">非遗手作体验师-从 0 到 1 打通内容与接单变现</div>
+                    <div class="ci-date">2026年9月26日</div>
+                    <div class="course-foot">
+                        <span class="cf-addr">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            高泰OPC实训基地
+                        </span>
+                        <span class="cf-price">¥199.00 <small>起</small></span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ===== 底部导航 ===== -->
+        <nav class="bottom-tab">
+            <button class="tab-item active" onclick="switchTab(this, '首页')">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3.2 3.5 10v10a1 1 0 0 0 1 1H9v-6a3 3 0 0 1 6 0v6h4.5a1 1 0 0 0 1-1V10L12 3.2z"></path></svg>
+                首页
+            </button>
+            <button class="tab-item" onclick="switchTab(this, '研学日历')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"></rect><line x1="8" y1="3" x2="8" y2="7"></line><line x1="16" y1="3" x2="16" y2="7"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                研学日历
+            </button>
+            <button class="tab-item" onclick="switchTab(this, '高泰甄选')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l1.5 12.5a1 1 0 0 1-1 1.1H5.5a1 1 0 0 1-1-1.1L6 8z"></path><path d="M9 10V6a3 3 0 0 1 6 0v4"></path></svg>
+                高泰甄选
+            </button>
+            <button class="tab-item" onclick="switchTab(this, '我的')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 21a7.5 7.5 0 0 1 15 0"></path></svg>
+                我的
+            </button>
+        </nav>
+
+        <!-- ===== 左侧抽屉菜单 ===== -->
+        <div class="menu-mask" id="menuMask" onclick="closeMenu()"></div>
+        <aside class="side-menu" id="sideMenu" aria-label="侧边栏菜单">
+            <div class="sm-user">
+                <div class="sm-user-row" onclick="menuGo('我的主页.html')">
+                    <div class="sm-avatar">👤</div>
+                    <div class="sm-user-info">
+                        <div class="sm-name">木易卡卡 <span class="sm-arrow">›</span></div>
+                        <div class="sm-role">
+                            <span>金牌分销员</span>
+                            <span class="sm-badge">Lv.3</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sm-scroll">
+                <div class="sm-group-title">学习服务</div>
+                <div class="sm-item active" onclick="closeMenu()">
+                    <span class="sm-ic">🏠</span><span class="sm-label">首页</span>
+                </div>
+                <div class="sm-item" onclick="menuTodo('研学日历')">
+                    <span class="sm-ic">📅</span><span class="sm-label">研学日历</span>
+                </div>
+                <div class="sm-item" onclick="menuTodo('我的报名')">
+                    <span class="sm-ic">📝</span><span class="sm-label">我的报名</span>
+                </div>
+                <div class="sm-item" onclick="menuTodo('我的证书')">
+                    <span class="sm-ic">🏅</span><span class="sm-label">我的证书</span>
+                </div>
+
+                <div class="sm-group-title">销售与分销</div>
+                <div class="sm-item" onclick="menuTodo('高泰甄选')">
+                    <span class="sm-ic">🛍️</span><span class="sm-label">高泰甄选</span>
+                </div>
+                <div class="sm-item" onclick="menuGo('分销.html')">
+                    <span class="sm-ic">📣</span><span class="sm-label">分销中心</span><span class="sm-tip">佣金 15%</span>
+                </div>
+                <div class="sm-item" onclick="menuGo('我的推广.html')">
+                    <span class="sm-ic">🔗</span><span class="sm-label">我的推广</span>
+                </div>
+                <div class="sm-item" onclick="menuGo('分销记账.html')">
+                    <span class="sm-ic">📋</span><span class="sm-label">记账明细</span>
+                </div>
+
+                <div class="sm-group-title">其他</div>
+                <div class="sm-item" onclick="menuTodo('消息通知')">
+                    <span class="sm-ic">🔔</span><span class="sm-label">消息通知</span><span class="sm-tip">2</span>
+                </div>
+                <div class="sm-item" onclick="menuTodo('联系客服')">
+                    <span class="sm-ic">🎧</span><span class="sm-label">联系客服</span>
+                </div>
+                <div class="sm-item" onclick="menuTodo('设置')">
+                    <span class="sm-ic">⚙️</span><span class="sm-label">设置</span>
+                </div>
+            </div>
+
+            <div class="sm-foot">
+                <span>离泰数链 v1.0.0</span>
+                <span class="sm-logout" onclick="menuTodo('退出登录')">退出登录</span>
+            </div>
+        </aside>
+
+    </div>
+</div>
+
+<!-- ===== 右侧功能说明面板 ===== -->
+<aside class="func-panel">
+    <div class="fp-inner">
+        <div class="fp-header">
+            <span class="fp-title">功能说明</span>
+            <button class="fp-fold-btn" onclick="toggleFuncPanel()" title="收起功能说明">›</button>
+        </div>
+        <div class="fp-body">
+            <h4>分销推广横幅</h4>
+            <ul>
+                <li>Banner 下方为<strong>分销推广横幅</strong>（图片 tgy.png），点击进入<a href="分销.html">分销中心</a>，由后台开关控制是否展现。</li>
+            </ul>
+        </div>
+    </div>
+    <button class="fp-open" onclick="toggleFuncPanel()" title="展开功能说明">功能说明‹</button>
+</aside>
+
+<script>
+    /* ── 页面跳转 ── */
+    function go(url) { location.href = url; }
+
+    /* ── 左侧抽屉菜单：开 / 关 ── */
+    function openMenu() {
+        document.getElementById('sideMenu').classList.add('show');
+        document.getElementById('menuMask').classList.add('show');
+        document.body.classList.add('menu-open');
+    }
+    function closeMenu() {
+        document.getElementById('sideMenu').classList.remove('show');
+        document.getElementById('menuMask').classList.remove('show');
+        document.body.classList.remove('menu-open');
+    }
+    /* 菜单内跳转（先关菜单再跳转） */
+    function menuGo(url) { closeMenu(); location.href = url; }
+    /* 菜单内未实现项 */
+    function menuTodo(name) { closeMenu(); alert(name + '（原型演示，暂未实现）'); }
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeMenu();
+    });
+
+    /* ── 搜索 ── */
+    function doSearch() {
+        var kw = document.querySelector('.search-box input').value.trim();
+        alert(kw ? '搜索：' + kw + '（原型演示）' : '请输入搜索关键词（原型演示）');
+    }
+
+    /* ── 底部导航切换 ── */
+    function switchTab(el, name) {
+        if (name === '首页') {
+            document.querySelectorAll('.tab-item').forEach(function (t) { t.classList.remove('active'); });
+            el.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
+        }
+        alert(name + '（原型演示，暂未实现）');
+    }
+
+    /* ── 状态栏实时时间/日期 ── */
+    function refreshStatusBar() {
+        var now = new Date();
+        var pad = function (n) { return n < 10 ? '0' + n : '' + n; };
+        var week = ['日', '一', '二', '三', '四', '五', '六'];
+        var t = document.getElementById('sbTime');
+        var d = document.getElementById('sbDate');
+        if (t) t.textContent = pad(now.getHours()) + ':' + pad(now.getMinutes());
+        if (d) d.textContent = (now.getMonth() + 1) + '月' + now.getDate() + '日 星期' + week[now.getDay()];
+    }
+    refreshStatusBar();
+    setInterval(refreshStatusBar, 30000);
+
+    /* ── 右侧功能说明面板：收起 / 展开 ── */
+    function toggleFuncPanel() {
+        document.body.classList.toggle('fp-collapsed');
+    }
+</script>
+<script src="asset/admin-sidebar.js"></script>
+</body>
+</html>

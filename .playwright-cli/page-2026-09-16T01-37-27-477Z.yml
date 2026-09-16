@@ -1,0 +1,158 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e6]:
+      - generic [ref=e7]: 09:37
+      - generic [ref=e8]: 9月16日 星期三
+    - generic [ref=e18]:
+      - button "打开侧边栏菜单" [active] [ref=e19] [cursor=pointer]:
+        - img [ref=e20]
+      - generic [ref=e21]: 离泰 OPC
+    - generic [ref=e22]:
+      - generic [ref=e23]:
+        - img [ref=e24]
+        - textbox "搜索" [ref=e27]:
+          - /placeholder: 搜索~~
+        - button "搜索" [ref=e28] [cursor=pointer]
+      - generic "小程序胶囊" [ref=e29]:
+        - generic [ref=e30]: •••
+  - generic [ref=e33]:
+    - navigation [ref=e34]:
+      - generic [ref=e35] [cursor=pointer]:
+        - generic [ref=e36]: 🎓
+        - generic [ref=e37]: OPC创业
+      - generic [ref=e38] [cursor=pointer]:
+        - generic [ref=e39]: 🏛️
+        - generic [ref=e40]: 文博研学
+      - generic [ref=e41] [cursor=pointer]:
+        - generic [ref=e42]: 🏮
+        - generic [ref=e43]: 非遗文化
+      - generic [ref=e44] [cursor=pointer]:
+        - generic [ref=e45]: 📜
+        - generic [ref=e46]: 艺术臻品
+    - generic [ref=e48] [cursor=pointer]:
+      - generic [ref=e49]: ✳ 高泰OPC培训认证中心
+      - generic [ref=e50]:
+        - text: 抢占
+        - emphasis [ref=e51]: AI时代
+        - text: 职业先机
+      - generic [ref=e52]: 从「学」到「赚」全链路陪跑 · 学完就能接单变现
+      - generic [ref=e53]: ✳ 双证加持 · 三重补贴 · 有偿练手 · 边学边赚 · 多元变现 · 生态共享
+    - generic [ref=e58]: 推荐课程
+    - generic [ref=e59] [cursor=pointer]:
+      - generic [ref=e60]:
+        - generic [ref=e61]:
+          - generic [ref=e62]: 泰
+          - text: 离泰文脉 OPC 培训认证中心
+        - generic [ref=e63]: 文脉如水 · 笔墨传承
+        - generic [ref=e64]: 执于妙笔 · 成事
+        - generic [ref=e65]:
+          - text: 以
+          - emphasis [ref=e66]: AI 之力
+          - text: ，行文博之事
+        - generic [ref=e67]: 工具流跑一遍，一天的事变几十分钟
+        - generic [ref=e68]:
+          - generic [ref=e69]: 自媒体
+          - generic [ref=e70]: 短报提效
+          - generic [ref=e71]: 自动剪辑
+          - generic [ref=e72]: 研学讲解
+          - generic [ref=e73]: 文旅交付
+        - generic [ref=e74]: 当对手还在手写讲稿词 / 海报 / 复盘，90 分钟把工具流跑通带走
+      - generic [ref=e75]:
+        - generic [ref=e76]: 文博研学导游-跑通 AI 工具流 带走 4 大 SOP
+        - generic [ref=e77]: 2026年9月19日
+        - generic [ref=e78]:
+          - generic [ref=e79]:
+            - img [ref=e80]
+            - text: 高泰OPC实训基地
+          - generic [ref=e83]: ¥99.00 起
+    - generic [ref=e84] [cursor=pointer]:
+      - generic [ref=e85]:
+        - generic [ref=e86]:
+          - generic [ref=e87]: 泰
+          - text: 离泰文脉 OPC 培训认证中心
+        - generic [ref=e88]: 指尖山水 · 匠心传承
+        - generic [ref=e89]: 执于匠心 · 成艺
+        - generic [ref=e90]:
+          - text: 从
+          - emphasis [ref=e91]: 0 到 1
+          - text: ，非遗手作变现
+        - generic [ref=e92]: 一门手艺 · 一套内容打法 · 一条接单渠道
+        - generic [ref=e93]:
+          - generic [ref=e94]: 手作体验
+          - generic [ref=e95]: 短视频
+          - generic [ref=e96]: 直播带练
+          - generic [ref=e97]: 接单陪跑
+        - generic [ref=e98]: 非遗手作体验师认证班 · 学完即接单，边学边赚不空转
+      - generic [ref=e99]:
+        - generic [ref=e100]: 非遗手作体验师-从 0 到 1 打通内容与接单变现
+        - generic [ref=e101]: 2026年9月26日
+        - generic [ref=e102]:
+          - generic [ref=e103]:
+            - img [ref=e104]
+            - text: 高泰OPC实训基地
+          - generic [ref=e107]: ¥199.00 起
+  - navigation [ref=e108]:
+    - button "首页" [ref=e109] [cursor=pointer]:
+      - img [ref=e110]
+      - text: 首页
+    - button "研学日历" [ref=e112] [cursor=pointer]:
+      - img [ref=e113]
+      - text: 研学日历
+    - button "高泰甄选" [ref=e115] [cursor=pointer]:
+      - img [ref=e116]
+      - text: 高泰甄选
+    - button "我的" [ref=e119] [cursor=pointer]:
+      - img [ref=e120]
+      - text: 我的
+  - complementary "侧边栏菜单" [ref=e123]:
+    - generic [ref=e125]:
+      - generic [ref=e126]: 👤
+      - generic [ref=e127]:
+        - generic [ref=e128]:
+          - text: 木易卡卡
+          - generic [ref=e129]: ›
+        - generic [ref=e130]:
+          - generic [ref=e131]: 金牌分销员
+          - generic [ref=e132]: Lv.3
+    - generic [ref=e133]:
+      - generic [ref=e134]: 学习服务
+      - generic [ref=e135] [cursor=pointer]:
+        - generic [ref=e136]: 🏠
+        - generic [ref=e137]: 首页
+      - generic [ref=e138] [cursor=pointer]:
+        - generic [ref=e139]: 📅
+        - generic [ref=e140]: 研学日历
+      - generic [ref=e141] [cursor=pointer]:
+        - generic [ref=e142]: 📝
+        - generic [ref=e143]: 我的报名
+      - generic [ref=e144] [cursor=pointer]:
+        - generic [ref=e145]: 🏅
+        - generic [ref=e146]: 我的证书
+      - generic [ref=e147]: 销售与分销
+      - generic [ref=e148] [cursor=pointer]:
+        - generic [ref=e149]: 🛍️
+        - generic [ref=e150]: 高泰甄选
+      - generic [ref=e151] [cursor=pointer]:
+        - generic [ref=e152]: 📣
+        - generic [ref=e153]: 分销中心
+        - generic [ref=e154]: 佣金 15%
+      - generic [ref=e155] [cursor=pointer]:
+        - generic [ref=e156]: 🔗
+        - generic [ref=e157]: 我的推广
+      - generic [ref=e158] [cursor=pointer]:
+        - generic [ref=e159]: 📋
+        - generic [ref=e160]: 记账明细
+      - generic [ref=e161]: 其他
+      - generic [ref=e162] [cursor=pointer]:
+        - generic [ref=e163]: 🔔
+        - generic [ref=e164]: 消息通知
+        - generic [ref=e165]: "2"
+      - generic [ref=e166] [cursor=pointer]:
+        - generic [ref=e167]: 🎧
+        - generic [ref=e168]: 联系客服
+      - generic [ref=e169] [cursor=pointer]:
+        - generic [ref=e170]: ⚙️
+        - generic [ref=e171]: 设置
+    - generic [ref=e172]:
+      - generic [ref=e173]: 离泰数链 v1.0.0
+      - generic [ref=e174] [cursor=pointer]: 退出登录

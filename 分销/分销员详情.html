@@ -50,7 +50,7 @@
         .stat-card .sc-value.green { color: #34c759; }
         .stat-card .sc-value.orange { color: #ff9500; }
 
-        /* 分销订单表格（与「分销管理 - 分销订单」同构，去掉分销员 / 分销员账号列） */
+        /* 分销订单表格（与「分销订单管理」同构，去掉分销员 / 分销员账号列） */
         .section-title {
             font-size: 15px; font-weight: 600; color: #1d1d1f; margin-bottom: 12px;
             display: flex; align-items: center; justify-content: space-between;
@@ -221,12 +221,10 @@
         { id: 'YX20260512008', name: '搭建小茅屋', amount: 150.00, phone: '18856781234', distributor: '陈伟', buyerPhone: '13166668888', rate: '15%', commission: 22.50, time: '2026-05-12 14:30', settleTime: null, status: 'pending' },
     ];
 
-    // 提现数据用于计算余额
+    // 提现数据用于计算余额（提现只有成功 / 失败两种结果）
     var allWithdraws = [
-        { name: '王小明', amount: 1560.00, time: '2026-06-01', status: 'pending' },
         { name: '李大力', amount: 2300.00, time: '2026-05-31', status: 'success' },
         { name: '李大力', amount: 1400.00, time: '2026-04-30', status: 'success' },
-        { name: '张小红', amount: 880.00, time: '2026-05-31', status: 'pending' },
         { name: '赵思远', amount: 500.00, time: '', status: 'failed' },
         { name: '刘佳', amount: 1200.00, time: '2026-05-31', status: 'success' },
         { name: '刘佳', amount: 800.00, time: '', status: 'failed' },
@@ -296,7 +294,7 @@
         document.getElementById('statPending').textContent = '¥' + fmt(pending);
         document.getElementById('statRate').textContent = rate;
 
-        // 分销订单表格（与分销管理 - 分销订单列一致，省略分销员 / 分销员账号）
+        // 分销订单表格（与分销订单管理列一致，省略分销员 / 分销员账号）
         document.getElementById('orderCount').textContent = '共 ' + totalOrders + ' 笔';
         var html = '';
         orders.forEach(function(o) {
@@ -328,7 +326,7 @@
             <h4>一、分销员信息</h4>
             <ul>
                 <li>展示所选分销员的<strong>头像、姓名、手机号、身份证号</strong>与<strong>分销等级</strong>徽章（金牌 / 银牌 / 铜牌）；</li>
-                <li>姓名与手机号由「分销管理 / 分销员管理」页面点击带入，身份证号用于打款实名核验与税务申报。</li>
+                <li>姓名与手机号由「分销订单管理 / 分销提现管理 / 分销员管理」页面点击带入，身份证号用于打款实名核验与税务申报。</li>
             </ul>
             <h4>二、统计概览</h4>
             <ul>
@@ -342,7 +340,7 @@
             </ul>
             <h4>三、分销订单表格</h4>
             <ul>
-                <li>采用与「分销管理 - 分销订单」一致的表格结构，列出该分销员的推广订单；</li>
+                <li>采用与「分销订单管理」一致的表格结构，列出该分销员的推广订单；</li>
                 <li>列含：订单编号、订单名称、订单金额、下单人账号、分佣比例、佣金、下单时间、结算时间、状态（已结算 / 待结算 / 已作废）；</li>
             </ul>
         </div>

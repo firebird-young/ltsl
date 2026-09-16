@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分销提现管理 - 管理后台</title>
+    <link rel="stylesheet" href="asset/admin-sidebar.css">
+    <style>
+        :root {
+            --bg: #ffffff;
+            --accent: #0066cc;
+            --accent-hover: #0071e3;
+            --link: #0071e3;
+            --ink: #1d1d1f;
+            --ink-muted: #3f424b;
+            --ink-subtle: #86868b;
+            --border: #e0e0e0;
+            --card-bg: #ffffff;
+            --radius-sm: 9999px;
+            --radius-card: 18px;
+            --radius-pill: 9999px;
+            --radius-tag: 6px;
+            --shadow-card: 0 0 0 1px rgba(0,0,0,0.06);
+            --font: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font);
+            background: #f5f5f7;
+            min-height: 100vh;
+            color: var(--ink);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .breadcrumb { padding: 16px 24px 0; font-size: 13px; color: var(--ink-subtle); }
+        .breadcrumb a { color: var(--ink-subtle); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--accent); }
+        .breadcrumb .current { color: var(--ink); font-weight: 500; }
+
+        .main { padding: 16px 24px 40px; }
+
+        /* 统计卡片 */
+        .stat-group { margin-bottom: 22px; }
+        .stat-group-title {
+            display: flex; align-items: center; gap: 7px;
+            font-size: 13px; font-weight: 600; color: var(--ink-muted);
+            margin: 2px 2px 10px;
+        }
+        .stat-group-title::before {
+            content: ""; width: 3px; height: 13px; border-radius: 2px;
+            background: var(--accent); flex-shrink: 0;
+        }
+        .stat-row { display: flex; flex-wrap: wrap; gap: 16px; }
+        .stat-card {
+            flex: 1 1 calc(33.333% - 11px); min-width: 240px;
+            background: #fff; border-radius: var(--radius-card); padding: 18px 20px;
+            box-shadow: var(--shadow-card);
+        }
+        .stat-card .sc-label { font-size: 13px; color: var(--ink-subtle); font-weight: 400; }
+        .stat-card .sc-value { font-size: 23px; font-weight: 700; color: var(--ink); margin-top: 5px; letter-spacing: -0.2px; }
+        .stat-card .sc-value.blue { color: var(--accent); }
+        .stat-card .sc-value.green { color: #34c759; }
+        .stat-card .sc-value.orange { color: #ff9500; }
+        .stat-card .sc-value.red { color: #e5484d; }
+        @media (max-width: 1100px) {
+            .stat-card { flex-basis: calc(50% - 8px); }
+        }
+
+        /* 搜索/筛选栏 */
+        .filter-bar {
+            display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;
+        }
+        .filter-bar .search-input {
+            flex: 1; min-width: 200px; height: 38px; border: 1px solid var(--border); border-radius: var(--radius-pill);
+            padding: 0 16px; font-size: 13px; outline: none; transition: border-color 0.2s; font-family: inherit;
+        }
+        .filter-bar .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,102,204,0.08); }
+        .filter-bar select {
+            height: 38px; border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 0 14px;
+            font-size: 13px; color: var(--ink); outline: none; background: #fff; font-family: inherit;
+        }
+        .filter-bar select:focus { border-color: var(--accent); }
+        .filter-bar .btn {
+            height: 38px; padding: 0 22px; border: none; border-radius: var(--radius-pill); font-size: 13px;
+            font-weight: 500; cursor: pointer; transition: all 0.2s; font-family: inherit;
+        }
+        .filter-bar .btn.primary { background: var(--accent); color: #fff; }
+        .filter-bar .btn.primary:hover { background: var(--accent-hover); }
+
+        /* ── 独立筛选面板（分销订单） ── */
+        .adv-filter {
+            background: #fff; border-radius: var(--radius-card); box-shadow: var(--shadow-card);
+            padding: 16px 18px 14px; margin-bottom: 16px;
+        }
+        .af-title {
+            display: flex; align-items: center; gap: 7px;
+            font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 12px;
+        }
+        .af-title::before { content: ""; width: 3px; height: 13px; border-radius: 2px; background: var(--accent); flex-shrink: 0; }
+        .af-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px 14px; }
+        .af-field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+        .af-field > label { font-size: 12px; color: var(--ink-subtle); }
+        .af-field input[type="text"], .af-field input[type="date"], .af-field select {
+            width: 100%; height: 34px; border: 1px solid var(--border); border-radius: 8px; padding: 0 10px;
+            font-size: 13px; outline: none; font-family: inherit; color: var(--ink); background: #fff;
+        }
+        .af-field input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.08); }
+        /* 月份区间：单框 + 日期控件弹层 */
+        .af-month-range { position: relative; }
+        .af-month-range .af-mr-input {
+            width: 100%; height: 34px; border: 1px solid var(--border); border-radius: 8px;
+            padding: 0 28px 0 10px; font-size: 13px; outline: none; cursor: pointer;
+            font-family: inherit; color: var(--ink); background: #fff; box-sizing: border-box;
+        }
+        .af-mr-input::placeholder { color: #c0c5cf; }
+        .af-mr-input.filled { color: var(--accent); font-weight: 600; }
+        .af-month-range .af-mr-caret {
+            position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+            color: #b6bcc7; font-size: 11px; pointer-events: none;
+        }
+        .af-month-pop {
+            display: none; position: absolute; z-index: 30; top: calc(100% + 6px); left: 0;
+            width: 260px; background: #fff; border: 1px solid var(--border); border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(20, 40, 80, 0.12); padding: 12px 14px 10px;
+        }
+        .af-month-pop.show { display: block; }
+        .af-pop-title { font-size: 12px; font-weight: 600; color: var(--ink); margin-bottom: 10px; }
+        .af-pop-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .af-pop-row span { font-size: 12px; color: var(--ink-subtle); width: 40px; flex-shrink: 0; }
+        .af-pop-row input[type="month"] {
+            flex: 1; min-width: 0; height: 32px; border: 1px solid var(--border); border-radius: 8px;
+            font-size: 12px; padding: 0 8px; font-family: inherit; color: var(--ink); outline: none; background: #fff;
+        }
+        .af-pop-row input[type="month"]:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.08); }
+        .af-pop-foot { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+        .af-pop-btn {
+            height: 30px; padding: 0 16px; border-radius: var(--radius-pill); font-size: 12px;
+            border: none; cursor: pointer; font-family: inherit;
+        }
+        .af-pop-btn.clear { background: #f5f6f8; color: var(--ink-subtle); }
+        .af-pop-btn.clear:hover { color: var(--ink); }
+        .af-pop-btn.ok { background: var(--accent); color: #fff; }
+        .af-pop-btn.ok:hover { background: var(--accent-hover); }
+        .af-chips { display: flex; flex-wrap: wrap; gap: 8px; min-height: 34px; align-items: center; }
+        .af-chip { position: relative; }
+        .af-chip input { position: absolute; opacity: 0; pointer-events: none; }
+        .af-chip span {
+            display: inline-block; padding: 5px 12px; border-radius: var(--radius-pill); font-size: 12px;
+            border: 1px solid var(--border); color: var(--ink-subtle); cursor: pointer; transition: all 0.18s; background: #fff;
+        }
+        .af-chip span:hover { border-color: var(--accent); color: var(--accent); }
+        .af-chip input:checked + span {
+            background: rgba(0, 102, 204, 0.08); border-color: var(--accent); color: var(--accent); font-weight: 600;
+        }
+        .af-actions { display: flex; align-items: center; gap: 10px; margin-top: 14px; }
+        .af-actions .btn {
+            height: 34px; padding: 0 20px; border: none; border-radius: var(--radius-pill); font-size: 13px;
+            font-weight: 500; cursor: pointer; font-family: inherit; transition: all 0.2s;
+        }
+        .af-actions .btn.primary { background: var(--accent); color: #fff; }
+        .af-actions .btn.primary:hover { background: var(--accent-hover); }
+        .af-actions .btn.ghost { background: #fff; border: 1px solid var(--border); color: var(--ink-subtle); }
+        .af-actions .btn.ghost:hover { border-color: var(--accent); color: var(--accent); }
+        @media (max-width: 1200px) { .af-grid { grid-template-columns: repeat(2, 1fr); } }
+
+        .tag {
+            display: inline-block; padding: 3px 12px; border-radius: var(--radius-tag); font-size: 11px; font-weight: 500;
+        }
+        .tag.green { background: #E8F5E9; color: #34c759; }
+        .tag.orange { background: #FFF3E0; color: #ff9500; }
+        .tag.blue { background: #E8F0FE; color: var(--accent); }
+        .tag.red { background: #FFF0F0; color: #ff3b30; }
+        .tag.gray { background: #f5f5f7; color: var(--ink-subtle); }
+
+        /* 提现失败标签 hover 失败原因 */
+        .wd-fail { position: relative; cursor: help; }
+        .wd-fail .wd-fail-tip {
+            position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+            z-index: 30; display: none; width: max-content; max-width: 260px;
+            background: rgba(35, 35, 38, 0.95); color: #fff;
+            padding: 7px 11px; border-radius: 8px; font-size: 12px; line-height: 1.55;
+            font-weight: 400; text-align: left; white-space: normal;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
+        }
+        .wd-fail .wd-fail-tip::after {
+            content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+            border: 5px solid transparent; border-top-color: rgba(35, 35, 38, 0.95);
+        }
+        .wd-fail:hover .wd-fail-tip { display: block; }
+
+        /* 操作按钮 */
+        .action-btn {
+            padding: 5px 14px; border: none; border-radius: var(--radius-pill); font-size: 12px; font-weight: 500;
+            cursor: pointer; transition: all 0.2s; margin: 0 3px;
+        }
+        .action-btn:active { opacity: 0.8; }
+        .action-btn.green { background: #E8F5E9; color: #34c759; }
+        .action-btn.blue { background: #E8F0FE; color: var(--accent); }
+        .action-btn.red { background: #FFF0F0; color: #ff3b30; }
+        .action-btn.gray { background: #f5f5f7; color: var(--ink-subtle); cursor: default; }
+
+        /* 月份分组 */
+        .wd-group { background: #fff; border-radius: var(--radius-card); margin-bottom: 16px; box-shadow: var(--shadow-card); overflow: hidden; }
+        .wd-group .wdg-header { padding: 14px 20px; background: #fafafc; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+        .wd-group .wdg-header .wdg-month { font-size: 14px; font-weight: 600; color: var(--ink); }
+        .wd-group .wdg-header .wdg-summary { font-size: 12px; color: var(--ink-subtle); }
+        .wd-group .wdg-header .wdg-summary strong { color: var(--ink); }
+        .wd-group .wdg-header .wdg-summary .red { color: #ff3b30; }
+        .wd-group .wdg-item { display: flex; align-items: center; padding: 14px 20px; border-bottom: 1px solid #f5f5f5; }
+        .wd-group .wdg-item:last-child { border-bottom: none; }
+        .wd-group .wdg-item .wdg-info { flex: 2; min-width: 0; }
+        .wd-group .wdg-item .wdg-info .wdg-name { font-size: 14px; font-weight: 500; color: var(--ink); }
+        .wd-group .wdg-item .wdg-info .wdg-name a { color: var(--accent); text-decoration: none; }
+        .wd-group .wdg-item .wdg-info .wdg-name a:hover { text-decoration: underline; }
+        .wd-group .wdg-item .wdg-info .wdg-phone { font-size: 11px; color: var(--ink-subtle); font-family: monospace; margin-top: 1px; }
+        .wd-group .wdg-item .wdg-info .wdg-idcard { font-size: 11px; color: var(--ink-subtle); margin-top: 2px; }
+        .wd-group .wdg-item .wdg-info .wdg-idcard i {
+            font-style: normal; font-family: monospace; color: var(--ink); letter-spacing: 0.3px;
+        }
+        .wd-group .wdg-item .wdg-amount { flex: 1; font-size: 16px; font-weight: 700; color: var(--ink); text-align: center; }
+        .wd-group .wdg-item .wdg-meta { flex: 1.5; font-size: 12px; color: var(--ink-subtle); text-align: center; }
+        .wd-group .wdg-item .wdg-meta .wdg-acct { margin-bottom: 2px; }
+        .wd-group .wdg-item .wdg-status { flex: 0.8; text-align: center; }
+        .wd-group .wdg-item .wdg-action { flex: 1; text-align: center; }
+        .wd-group .wdg-item .wdg-action .btn-retry {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 6px 16px; border-radius: var(--radius-pill); border: none; cursor: pointer;
+            font-size: 12px; font-weight: 500; transition: all 0.2s; font-family: inherit;
+            background: var(--accent); color: #fff;
+        }
+        .wd-group .wdg-item .wdg-action .btn-retry:hover { background: var(--accent-hover); }
+        .wd-group .wdg-item .wdg-action .btn-retry:active { opacity: 0.8; }
+
+        /* 分页 */
+        .pagination { display: flex; justify-content: center; gap: 6px; margin-top: 20px; }
+        .pagination .page-btn {
+            width: 34px; height: 34px; border: 1px solid var(--border); border-radius: var(--radius-pill);
+            display: flex; align-items: center; justify-content: center; font-size: 13px;
+            color: var(--ink-subtle); cursor: pointer; background: #fff; transition: all 0.2s;
+        }
+        .pagination .page-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .pagination .page-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .pagination .page-btn.disabled { opacity: 0.4; cursor: default; }
+
+        /* ===== 右侧功能说明面板 ===== */
+        .func-panel {
+            position: fixed; top: 0; right: 0; bottom: 0;
+            width: 340px; z-index: 890;
+            background: #fff; border-left: 1px solid #e3e6eb;
+            box-shadow: -1px 0 12px rgba(20, 30, 60, 0.04);
+            display: flex; flex-direction: column;
+        }
+        .func-panel .fp-inner { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+        .func-panel .fp-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px 14px 13px 18px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
+        }
+        .func-panel .fp-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: #1d1d1f; }
+        .func-panel .fp-title::before {
+            content: ''; width: 8px; height: 8px; border-radius: 50%;
+            background: var(--accent); box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.12);
+        }
+        .func-panel .fp-fold-btn {
+            width: 28px; height: 28px; border: 1px solid var(--border); background: #fff;
+            border-radius: 50%; color: var(--ink-subtle); font-size: 15px; line-height: 1;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+        }
+        .func-panel .fp-fold-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .func-panel .fp-body {
+            flex: 1; overflow-y: auto; padding: 4px 18px 40px;
+            font-size: 13px; color: #555; line-height: 1.9;
+        }
+        .func-panel .fp-body::-webkit-scrollbar { width: 5px; }
+        .func-panel .fp-body::-webkit-scrollbar-thumb { background: #d8dce3; border-radius: 3px; }
+        .func-panel .fp-body h4 { font-size: 14px; font-weight: 600; color: #1d1d1f; margin: 18px 0 6px; }
+        .func-panel .fp-body h4:first-child { margin-top: 12px; }
+        .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .func-panel .fp-body li { margin-bottom: 6px; }
+        .func-panel .fp-body strong { color: #333; }
+        .func-panel .fp-open {
+            display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+            border: none; background: transparent; cursor: pointer;
+            writing-mode: vertical-rl; text-orientation: upright;
+            font-size: 13px; font-weight: 600; letter-spacing: 6px; color: var(--ink-subtle);
+            align-items: center; justify-content: center; font-family: inherit; transition: all 0.2s;
+        }
+        .func-panel .fp-open:hover { color: var(--accent); background: #fafbfc; }
+
+        @media (min-width: 1024px) {
+            .main, .breadcrumb { margin-right: 340px; }
+            body.fp-collapsed .main,
+            body.fp-collapsed .breadcrumb { margin-right: 40px; }
+            body.fp-collapsed .func-panel { width: 40px; }
+            body.fp-collapsed .fp-inner { display: none; }
+            body.fp-collapsed .fp-open { display: flex; }
+        }
+        /* 操作反馈 Toast */
+        .toast {
+            position: fixed; top: 64px; left: 50%; transform: translate(-50%, -12px);
+            z-index: 1500; background: rgba(28, 32, 40, 0.92); color: #fff;
+            font-size: 13px; font-weight: 500; padding: 10px 22px; border-radius: 999px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            opacity: 0; pointer-events: none; transition: all 0.25s ease;
+        }
+        .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+        @media (max-width: 1023.98px) {
+            .func-panel { display: none; }
+            .main, .breadcrumb { margin-right: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="breadcrumb">
+    <a href="分销.html">分销中心</a>
+    <span> / </span>
+    <span class="current">分销提现管理</span>
+</div>
+
+<div class="main">
+
+    <!-- 统计卡片 -->
+    <div class="stat-group">
+        <div class="stat-group-title">提现概览</div>
+        <div class="stat-row">
+            <div class="stat-card">
+                <div class="sc-label">已提现佣金总额</div>
+                <div class="sc-value green">¥37,240.30</div>
+            </div>
+            <div class="stat-card">
+                <div class="sc-label">提现失败待重发金额</div>
+                <div class="sc-value red">¥4,500.00</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ 提现管理 ============ -->
+    <div id="panel-withdraw">
+        <!-- 独立筛选面板 -->
+        <div class="adv-filter">
+            <div class="af-title">筛选条件</div>
+            <div class="af-grid">
+                <div class="af-field">
+                    <label>分销员姓名</label>
+                    <input type="text" id="wName" placeholder="输入分销员姓名" oninput="filterWithdraws()">
+                </div>
+                <div class="af-field">
+                    <label>分销员账号</label>
+                    <input type="text" id="wPhone" placeholder="输入分销员手机号" oninput="filterWithdraws()">
+                </div>
+                <div class="af-field" style="grid-column: span 2;">
+                    <label>月份（区间 · 点击选择）</label>
+                    <div class="af-month-range">
+                        <input type="text" id="wMonthDisplay" class="af-mr-input" readonly placeholder="全部月份" onclick="toggleMonthPop()">
+                        <span class="af-mr-caret">▾</span>
+                        <input type="hidden" id="wMonthStart" value="">
+                        <input type="hidden" id="wMonthEnd" value="">
+                        <div class="af-month-pop" id="wMonthPop">
+                            <div class="af-pop-title">选择月份区间</div>
+                            <div class="af-pop-row"><span>起始月</span><input type="month" id="wMpStart"></div>
+                            <div class="af-pop-row"><span>结束月</span><input type="month" id="wMpEnd"></div>
+                            <div class="af-pop-foot">
+                                <button type="button" class="af-pop-btn clear" onclick="clearMonthRange()">清空</button>
+                                <button type="button" class="af-pop-btn ok" onclick="applyMonthRange()">确定</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="af-field" style="grid-column: 1 / -1;">
+                    <label>状态（多选）</label>
+                    <div class="af-chips" id="wStatusChips">
+                        <label class="af-chip"><input type="checkbox" name="wStatus" value="all" checked onchange="syncStatusChipsWD(this)"><span>全部状态</span></label>
+                        <label class="af-chip"><input type="checkbox" name="wStatus" value="success" checked onchange="syncStatusChipsWD(this)"><span>提现成功</span></label>
+                        <label class="af-chip"><input type="checkbox" name="wStatus" value="failed" checked onchange="syncStatusChipsWD(this)"><span>提现失败</span></label>
+                    </div>
+                </div>
+            </div>
+            <div class="af-actions">
+                <button class="btn primary" onclick="filterWithdraws()">查询</button>
+                <button class="btn ghost" onclick="resetWithdrawFilter()">重置</button>
+            </div>
+        </div>
+        <div id="withdrawList"></div>
+        <div class="pagination" id="withdrawPagination"></div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    /* ===== 模拟数据 ===== */
+    var withdrawData = [
+        { month: '2026年6月', name: '王小明', phone: '13812345678', idcard: '330110199003124512', amount: 1560.00, account: '微信零钱', time: '2026-06-01', status: 'success' },
+        { month: '2026年5月', name: '李大力', phone: '18698765432', idcard: '330110198812052316', amount: 2300.00, account: '微信零钱', time: '2026-05-31', status: 'success' },
+        { month: '2026年5月', name: '张小红', phone: '13655667788', idcard: '330110199507220021', amount: 880.00, account: '微信零钱', time: '2026-05-31', status: 'success' },
+        { month: '2026年5月', name: '赵思远', phone: '15099887766', idcard: '330110199204166738', amount: 500.00, account: '微信零钱', time: '', status: 'failed', failReason: '实名姓名与微信零钱账户持有人不一致，请核对实名信息后重新打款' },
+        { month: '2026年5月', name: '刘佳', phone: '17712340987', idcard: '330110199811301122', amount: 1200.00, account: '微信零钱', time: '2026-05-31', status: 'success' },
+        { month: '2026年5月', name: '陈伟', phone: '18856781234', idcard: '330110199001085588', amount: 3200.00, account: '微信零钱', time: '', status: 'failed', failReason: '微信支付风控拦截，疑似收款账户状态异常，请核实账户后重新打款' },
+        { month: '2026年4月', name: '王小明', phone: '13812345678', idcard: '330110199003124512', amount: 1640.00, account: '微信零钱', time: '2026-04-30', status: 'success' },
+        { month: '2026年4月', name: '李大力', phone: '18698765432', idcard: '330110198812052316', amount: 1400.00, account: '微信零钱', time: '2026-04-30', status: 'success' },
+        { month: '2026年4月', name: '刘佳', phone: '17712340987', idcard: '330110199811301122', amount: 800.00, account: '微信零钱', time: '', status: 'failed', failReason: '身份证实名核验未通过，打款被微信支付拒绝，请确认实名信息后重试' },
+    ];
+    var statusLabels = { success: '提现成功', failed: '提现失败' };
+
+    var withdrawPage = 1, withdrawPageSize = 6;
+
+    /* ===== 状态标签 ===== */
+    function wdStatusTag(status, reason) {
+        var map = { success: ['green', '提现成功'], failed: ['red', '提现失败'] };
+        var m = map[status] || ['gray', status];
+        if (status === 'failed' && reason) {
+            return '<span class="tag ' + m[0] + ' wd-fail">' + m[1] + '<span class="wd-fail-tip">' + reason + '</span></span>';
+        }
+        return '<span class="tag ' + m[0] + '">' + m[1] + '</span>';
+    }
+
+    function monthKey(str) {
+        var m;
+        if (!str) return 0;
+        if ((m = /^(\d{4})-(\d{1,2})/.exec(str))) return (+m[1]) * 12 + (+m[2]);
+        if ((m = /(\d{4})年(\d{1,2})月/.exec(str))) return (+m[1]) * 12 + (+m[2]);
+        return 0;
+    }
+
+    /* ===== 提现管理：独立多条件筛选 ===== */
+    function filterWithdraws() {
+        renderWithdraws();
+    }
+    function toggleMonthPop() {
+        var pop = document.getElementById('wMonthPop');
+        pop.classList.toggle('show');
+        if (pop.classList.contains('show')) {
+            document.getElementById('wMpStart').value = document.getElementById('wMonthStart').value;
+            document.getElementById('wMpEnd').value = document.getElementById('wMonthEnd').value;
+        }
+    }
+    function closeMonthPop() {
+        document.getElementById('wMonthPop').classList.remove('show');
+    }
+    function fmtMonth(v) {
+        return v ? v.slice(0, 4) + '年' + (+v.slice(5, 7)) + '月' : '';
+    }
+    function setMonthDisplay(s, e) {
+        var box = document.getElementById('wMonthDisplay');
+        if (s || e) {
+            box.value = s === e || !s || !e ? fmtMonth(s || e) : fmtMonth(s) + ' ~ ' + fmtMonth(e);
+            box.classList.add('filled');
+        } else {
+            box.value = '';
+            box.classList.remove('filled');
+        }
+    }
+    function applyMonthRange() {
+        var s = document.getElementById('wMpStart').value;
+        var e = document.getElementById('wMpEnd').value;
+        if (!s && e) s = e;
+        if (s && !e) e = s;
+        if (s && e && s > e) { var t = s; s = e; e = t; }
+        document.getElementById('wMonthStart').value = s;
+        document.getElementById('wMonthEnd').value = e;
+        setMonthDisplay(s, e);
+        closeMonthPop();
+        filterWithdraws();
+    }
+    function clearMonthRange() {
+        ['wMonthStart', 'wMonthEnd', 'wMpStart', 'wMpEnd'].forEach(function (id) { document.getElementById(id).value = ''; });
+        setMonthDisplay('', '');
+        closeMonthPop();
+        filterWithdraws();
+    }
+    function resetWithdrawFilter() {
+        ['wName', 'wPhone'].forEach(function (id) { document.getElementById(id).value = ''; });
+        clearMonthRange();
+        document.querySelectorAll('#wStatusChips input').forEach(function (cb) { cb.checked = true; });
+        renderWithdraws();
+    }
+    function syncStatusChipsWD(cb) {
+        var all = document.querySelector('#wStatusChips input[value="all"]');
+        if (cb.value === 'all' && cb.checked) {
+            document.querySelectorAll('#wStatusChips input').forEach(function (c) { c.checked = true; });
+        } else if (cb.value !== 'all') {
+            var specific = Array.prototype.filter.call(
+                document.querySelectorAll('#wStatusChips input'),
+                function (c) { return c.value !== 'all'; });
+            all.checked = specific.every(function (c) { return c.checked; });
+        }
+        renderWithdraws();
+    }
+    function renderWithdraws() {
+        var nameKw = document.getElementById('wName').value.trim().toLowerCase();
+        var phoneKw = document.getElementById('wPhone').value.trim().toLowerCase();
+        var mStart = monthKey(document.getElementById('wMonthStart').value);
+        var mEnd = monthKey(document.getElementById('wMonthEnd').value);
+        var statuses = Array.prototype.filter.call(
+            document.querySelectorAll('#wStatusChips input:checked'),
+            function (c) { return c.value !== 'all'; }).map(function (c) { return c.value; });
+        if (!statuses.length) statuses = ['success', 'failed'];
+        var filterFn = function (w) {
+            var mk = monthKey(w.month);
+            if (mStart && mk < mStart) return false;
+            if (mEnd && mk > mEnd) return false;
+            if (statuses.indexOf(w.status) === -1) return false;
+            if (nameKw && w.name.toLowerCase().indexOf(nameKw) === -1) return false;
+            if (phoneKw && w.phone.toLowerCase().indexOf(phoneKw) === -1) return false;
+            return true;
+        };
+
+        var groups = {};
+        withdrawData.forEach(function(w) {
+            if (!filterFn(w)) return;
+            if (!groups[w.month]) groups[w.month] = [];
+            groups[w.month].push(w);
+        });
+
+        var months = Object.keys(groups).sort().reverse();
+        var html = '';
+        months.forEach(function(month) {
+            var items = groups[month];
+            var total = items.reduce(function(s, w) { return s + w.amount; }, 0);
+            var successCount = items.filter(function(w) { return w.status === 'success'; }).length;
+            var failCount = items.filter(function(w) { return w.status === 'failed'; }).length;
+
+            var summaryParts = [];
+            summaryParts.push('总额 <strong>¥' + total.toFixed(2) + '</strong>');
+            if (successCount) summaryParts.push('成功 <strong>' + successCount + '</strong> 笔');
+            if (failCount) summaryParts.push('失败 <strong class="red">' + failCount + '</strong> 笔');
+
+            html += '<div class="wd-group">'
+                 + '<div class="wdg-header">'
+                 + '<span class="wdg-month">' + month + '</span>'
+                 + '<span class="wdg-summary">' + summaryParts.join(' · ') + '</span>'
+                 + '</div>';
+
+            items.forEach(function(w) {
+                html += '<div class="wdg-item">'
+                     + '<div class="wdg-info">'
+                     + '<div class="wdg-name"><a href="分销员详情.html?name=' + encodeURIComponent(w.name) + '&phone=' + w.phone + '">' + w.name + '</a></div>'
+                     + '<div class="wdg-phone">' + w.phone + '</div>'
+                     + '<div class="wdg-idcard">身份证 <i>' + w.idcard + '</i></div>'
+                     + '</div>'
+                     + '<div class="wdg-amount">¥' + w.amount.toFixed(2) + '</div>'
+                     + '<div class="wdg-meta">'
+                     + '<div class="wdg-acct">' + w.account + '</div>'
+                     + '<div>' + (w.time || '<span style="color:#ccc;">-</span>') + '</div>'
+                     + '</div>'
+                     + '<div class="wdg-status">' + wdStatusTag(w.status, w.failReason) + '</div>'
+                     + '<div class="wdg-action">' + (w.status === 'failed' ? '<button class="btn-retry" onclick="retryWithdraw(' + withdrawData.indexOf(w) + ')">↻ 重新打款</button>' : '') + '</div>'
+                     + '</div>';
+            });
+
+            html += '</div>';
+        });
+
+        if (!html) html = '<div style="text-align:center;color:var(--ink-subtle);padding:60px 0;">暂无数据</div>';
+        document.getElementById('withdrawList').innerHTML = html;
+        document.getElementById('withdrawPagination').innerHTML = '';
+    }
+
+    function retryWithdraw(idx) {
+        if (confirm('确认重新打款给该分销员？')) {
+            var d = new Date();
+            var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+            withdrawData[idx].status = 'success';
+            withdrawData[idx].time = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+            withdrawData[idx].failReason = '';
+            renderWithdraws();
+            showToast('已重新发起打款，打款成功');
+        }
+    }
+
+    /* ===== 分页 ===== */
+    function goWithdrawPage(p) { withdrawPage = p; renderWithdraws(); }
+    function renderPagination(containerId, total, current, pageFn) {
+        var html = '';
+        var fnName = pageFn.name;
+        html += current > 1 ? '<div class="page-btn" onclick="' + fnName + '(' + (current-1) + ')">‹</div>' : '<div class="page-btn disabled">‹</div>';
+        for (var i = 1; i <= total; i++) {
+            html += '<div class="page-btn' + (i === current ? ' active' : '') + '" onclick="' + fnName + '(' + i + ')">' + i + '</div>';
+        }
+        html += current < total ? '<div class="page-btn" onclick="' + fnName + '(' + (current+1) + ')">›</div>' : '<div class="page-btn disabled">›</div>';
+        document.getElementById(containerId).innerHTML = html;
+    }
+
+    /* ===== 操作反馈提示 ===== */
+    function showToast(msg) {
+        var t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        clearTimeout(showToast._timer);
+        showToast._timer = setTimeout(function () { t.classList.remove('show'); }, 1800);
+    }
+
+    /* ===== 初始化 ===== */
+    renderWithdraws();
+</script>
+<!-- ===== 右侧功能说明面板 ===== -->
+<aside class="func-panel">
+    <div class="fp-inner">
+        <div class="fp-header">
+            <span class="fp-title">功能说明</span>
+            <button class="fp-fold-btn" onclick="toggleFuncPanel()" title="收起功能说明">›</button>
+        </div>
+        <div class="fp-body">
+            <h4>一、提现概览</h4>
+            <p style="margin:2px 0 4px;">顶部「提现概览」两张统计卡（提现数据口径）：</p>
+            <ul>
+                <li><strong>已提现佣金总额</strong>：分销员累计已成功打款到账的佣金金额，示例 <i>¥37,240.30</i>；</li>
+                <li><strong>提现失败待重发金额</strong>：因实名不一致、风控拦截等原因打款失败、需重新发起打款的金额合计，示例 <i>¥4,500.00</i>。</li>
+            </ul>
+            <h4>二、提现记录</h4>
+            <p style="margin:2px 0 4px;">业务规则：佣金累计达到「最低提现金额」后自动发起提现，因此每条记录均已有明确打款结果，只有「提现成功 / 提现失败」两种状态；未发起提现的佣金仍留存于分销员余额中，不属于本页业务范围。</p>
+            <ul>
+                <li><strong>按月分组</strong>：按月份展示提现记录，头部汇总当月总额及成功 / 失败笔数；</li>
+                <li><strong>独立筛选</strong>：支持按分销员姓名、分销员账号、月份区间与状态（可多选）组合筛选；月份为一个合并输入框，点击调用日期控件选择起始 / 结束月，只填单侧则按单月筛选，倒序自动纠正；</li>
+                <li><strong>身份信息</strong>：列表展示分销员姓名、手机号及身份证号，供打款实名核验与税务申报使用；</li>
+                <li><strong>失败原因</strong>：鼠标悬停「提现失败」标签可查看具体失败原因；</li>
+                <li><strong>重新打款</strong>：仅「提现失败」的记录显示，点击二次确认后重新发起打款，打款成功即更新为「提现成功」并记录打款时间。</li>
+            </ul>
+        </div>
+    </div>
+    <button class="fp-open" onclick="toggleFuncPanel()" title="展开功能说明">功能说明‹</button>
+</aside>
+
+<script>
+    /* ── 右侧功能说明面板：收起 / 展开 ── */
+    function toggleFuncPanel() {
+        document.body.classList.toggle('fp-collapsed');
+    }
+</script>
+<script src="asset/admin-sidebar.js"></script>
+</body>
+</html>
