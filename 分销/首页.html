@@ -172,37 +172,45 @@
         .kk-item .kk-icon { font-size: 46px; line-height: 1; }
         .kk-item .kk-name { font-size: 13px; color: #1d1d1f; font-weight: 500; }
 
-        /* Banner */
+        /* Banner：轮播（分销推广 + 录播，3.5s 自动切换） */
         .banner-wrap { padding: 0 12px; }
-        .banner {
+        .banner-carousel {
             position: relative; border-radius: 16px; overflow: hidden;
-            background: linear-gradient(160deg, #DCE9FB 0%, #C4DAF8 55%, #AECDF6 100%);
-            padding: 26px 18px 20px; text-align: center;
-            cursor: pointer;
-        }
-        .banner:active { opacity: 0.92; }
-        .banner .bn-org {
-            display: inline-block; font-size: 11px; color: #3D6FBF;
-            background: rgba(255,255,255,0.65); border-radius: 9999px;
-            padding: 3px 12px; margin-bottom: 12px; letter-spacing: 1px;
-        }
-        .banner .bn-title { font-size: 27px; font-weight: 800; color: #123B7D; letter-spacing: 1px; }
-        .banner .bn-title em { font-style: normal; color: #1F7BFF; }
-        .banner .bn-sub { font-size: 13px; color: #2C5AA0; margin-top: 10px; letter-spacing: 0.5px; }
-        .banner .bn-tags { font-size: 11px; color: #4E77B8; margin-top: 12px; letter-spacing: 0.5px; }
-        .banner-dots { display: flex; justify-content: center; gap: 6px; margin-top: 14px; }
-        .banner-dots i { width: 16px; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.6); }
-        .banner-dots i.active { background: #2E6BE6; }
-
-        /* 分销横幅（图片，点击进入分销中心） */
-        .promo-banner {
-            margin: 14px 12px 0; border-radius: 16px; overflow: hidden;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-            cursor: pointer; -webkit-tap-highlight-color: transparent;
-            line-height: 0;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: pan-y;
         }
-        .promo-banner:active { opacity: 0.92; }
-        .promo-banner img { display: block; width: 100%; height: auto; }
+        .banner-track {
+            display: flex;
+            transition: transform .4s cubic-bezier(.22,.61,.36,1);
+            will-change: transform;
+        }
+        .banner-slide {
+            flex: 0 0 100%; min-width: 100%;
+            cursor: pointer; line-height: 0;
+        }
+        .banner-slide:active { opacity: 0.92; }
+        .banner-slide img {
+            display: block; width: 100%; height: auto;
+            pointer-events: none; user-select: none;
+            -webkit-user-drag: none;
+        }
+        .banner-dots {
+            position: absolute; left: 0; right: 0; bottom: 10px;
+            display: flex; justify-content: center; gap: 6px;
+            pointer-events: none;
+        }
+        .banner-dots .dot {
+            pointer-events: auto;
+            width: 6px; height: 6px; border-radius: 50%;
+            background: rgba(255,255,255,0.55);
+            transition: width .25s ease, background .25s ease;
+        }
+        .banner-dots .dot.active {
+            width: 18px; border-radius: 4px; background: #fff;
+        }
+
+        
 
         /* 区块标题 */
         .sec-title {
@@ -497,21 +505,25 @@
                 </div>
             </nav>
 
-            <!-- Banner -->
+            <!-- Banner：轮播（分销推广 + 录播，3.5s 自动切换） -->
             <div class="banner-wrap">
-                <div class="banner" onclick="go('课程推广.html')">
-                    <span class="bn-org">✳ 高泰OPC培训认证中心</span>
-                    <div class="bn-title">抢占 <em>AI时代</em> 职业先机</div>
-                    <div class="bn-sub">从「学」到「赚」全链路陪跑 · 学完就能接单变现</div>
-                    <div class="bn-tags">✳ 双证加持 · 三重补贴 · 有偿练手 · 边学边赚 · 多元变现 · 生态共享</div>
-                    <div class="banner-dots"><i class="active"></i><i></i><i></i></div>
+                <div class="banner-carousel" id="bannerCarousel">
+                    <div class="banner-track" id="bannerTrack">
+                        <div class="banner-slide" data-href="分销.html">
+                            <img src="../asset/离泰数链推广邀请.png" alt="离泰数链分销推广邀请">
+                        </div>
+                        <div class="banner-slide" data-href="课程详情.html">
+                            <img src="../asset/banner1.png" alt="录播课">
+                        </div>
+                    </div>
+                    <div class="banner-dots" id="bannerDots">
+                        <span class="dot active"></span>
+                        <span class="dot"></span>
+                    </div>
                 </div>
             </div>
 
-            <!-- 分销横幅 -->
-            <div class="promo-banner" onclick="go('分销.html')" title="查看分销中心">
-                <img src="../asset/tgy.png" alt="分销推广横幅">
-            </div>
+            
 
             <!-- 推荐课程 -->
             <div class="sec-title">推荐课程</div>
@@ -664,9 +676,9 @@
             <button class="fp-fold-btn" onclick="toggleFuncPanel()" title="收起功能说明">›</button>
         </div>
         <div class="fp-body">
-            <h4>分销推广横幅</h4>
+            <h4>顶部 Banner 轮播</h4>
             <ul>
-                <li>Banner 下方为<strong>分销推广横幅</strong>（图片 tgy.png），点击进入<a href="分销.html">分销中心</a>，由后台开关控制是否展现。</li>
+                <li>轮播图支持页面跳转</li>
             </ul>
         </div>
     </div>
@@ -725,6 +737,64 @@
     }
     refreshStatusBar();
     setInterval(refreshStatusBar, 30000);
+
+    /* ── Banner 轮播：自动切换 + 触摸滑动 + 点击跳转 ── */
+    (function () {
+        var carousel = document.getElementById('bannerCarousel');
+        var track = document.getElementById('bannerTrack');
+        if (!carousel || !track) return;
+        var slides = track.querySelectorAll('.banner-slide');
+        var dotsBox = document.getElementById('bannerDots');
+        var dots = dotsBox ? dotsBox.querySelectorAll('.dot') : [];
+        var idx = 0, timer = null, INTERVAL = 3500;
+
+        function goTo(n) {
+            idx = (n + slides.length) % slides.length;
+            track.style.transform = 'translateX(' + (-idx * 100) + '%)';
+            dots.forEach(function (d, i) { d.classList.toggle('active', i === idx); });
+        }
+        function start() { stop(); timer = setInterval(function () { goTo(idx + 1); }, INTERVAL); }
+        function stop() { if (timer) { clearInterval(timer); timer = null; } }
+
+        // 点击 slide 跳转（移动端 tap 不会触发 touchend 后的 click，仅手动绑定）
+        slides.forEach(function (s) {
+            s.addEventListener('click', function () {
+                var href = s.getAttribute('data-href');
+                if (href) go(href);
+            });
+        });
+        // 点击指示点
+        dots.forEach(function (d, i) {
+            d.addEventListener('click', function (e) {
+                e.stopPropagation();
+                goTo(i); start();
+            });
+        });
+        // 触摸滑动
+        var startX = 0, dx = 0, dragging = false;
+        carousel.addEventListener('touchstart', function (e) {
+            dragging = true; startX = e.touches[0].clientX; dx = 0; stop();
+        }, { passive: true });
+        carousel.addEventListener('touchmove', function (e) {
+            if (!dragging) return;
+            dx = e.touches[0].clientX - startX;
+            track.style.transition = 'none';
+            track.style.transform = 'translateX(' + (-idx * carousel.clientWidth + dx) + 'px)';
+        }, { passive: true });
+        carousel.addEventListener('touchend', function () {
+            if (!dragging) return;
+            dragging = false;
+            track.style.transition = '';
+            if (Math.abs(dx) > 50) goTo(dx < 0 ? idx + 1 : idx - 1);
+            else goTo(idx);
+            start();
+        });
+        // PC 悬停暂停
+        carousel.addEventListener('mouseenter', stop);
+        carousel.addEventListener('mouseleave', start);
+
+        goTo(0); start();
+    })();
 
     /* ── 右侧功能说明面板：收起 / 展开 ── */
     function toggleFuncPanel() {

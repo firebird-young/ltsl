@@ -17,7 +17,7 @@
         {
             group: '移动端',
             items: [
-                /* { name: '首页',         href: '首页.html' }, */
+                { name: '首页',         href: '首页.html' }, 
                 { name: '我的主页',     href: '我的主页.html' },
                 { name: '我的推广',     href: '我的推广.html' },
                 { name: '分销中心',     href: '分销.html' },
