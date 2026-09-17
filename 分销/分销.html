@@ -127,6 +127,19 @@
             flex-shrink: 0;
         }
         .dist-user-info { flex: 1; }
+        /* 微信小程序导航栏右侧为系统胶囊区，「常见问题说明」入口下移至用户信息行右侧 */
+        .faq-btn {
+            flex-shrink: 0;
+            display: inline-flex; align-items: center; gap: 4px;
+            height: 27px; padding: 0 12px; border-radius: 14px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.45);
+            color: #fff; font-size: 12px; font-weight: 600; font-family: inherit;
+            line-height: 1; cursor: pointer; white-space: nowrap;
+            -webkit-tap-highlight-color: transparent;
+            transition: background 0.2s;
+        }
+        .faq-btn:active { background: rgba(255, 255, 255, 0.36); }
         .dist-user-info .du-name { font-size: 16px; font-weight: 600; color: #fff; }
         .dist-user-info .du-role {
             font-size: 12px; color: rgba(255,255,255,0.85); margin-top: 2px;
@@ -335,6 +348,7 @@
                                 <span class="role-badge">Lv.3</span>
                             </div>
                         </div>
+                        <button class="faq-btn" onclick="goFaq()" title="查看常见问题说明">❓ 常见问题说明</button>
                     </div>
                 </div>
 
@@ -479,6 +493,11 @@
                 <li>展示最近收益记录（来源订单、时间、金额、状态），最近的最多5条记录，没有则展示“暂无收益记录”；</li>
                 <li>状态：已到账（已结算订单计提的佣金，绿）/ 待结算（未达结算条件的预计佣金，橙）/ 已作废（订单退款或未达结算条件，该笔预计佣金作废，灰，不计入收益）；</li>
             </ul>
+            <h4>六、常见问题</h4>
+            <ul>
+                <li>页面头部用户信息行右侧提供<strong>「常见问题说明」</strong>入口（导航栏右侧为微信小程序系统胶囊区，故入口下移一层），点击后新开页面，展示后台配置的富文本说明；</li>
+                <li>内容由后台富文本编辑器统一维护，修改后即时生效，无需小程序发版。</li>
+            </ul>
         </div>
     </div>
     <button class="fp-open" onclick="toggleFuncPanel()" title="展开功能说明">功能说明‹</button>
@@ -504,6 +523,8 @@
     });
     function goLedger() { window.location.href = '分销记账.html'; }
     function goWithdraw() { window.location.href = '分销提现.html'; }
+    /* ── 常见问题：新开页面展示后台配置的富文本说明 ── */
+    function goFaq() { window.location.href = '常见问题.html'; }
     /* ── 右侧功能说明面板：收起 / 展开 ── */
     function toggleFuncPanel() {
         document.body.classList.toggle('fp-collapsed');

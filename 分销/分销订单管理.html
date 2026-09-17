@@ -251,147 +251,6 @@
             body.fp-collapsed .fp-inner { display: none; }
             body.fp-collapsed .fp-open { display: flex; }
         }
-        /* ===== 工具栏：Tab + 分销配置按钮 ===== */
-        .toolbar { display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-bottom: 16px; }
-        .btn-config {
-            flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px;
-            height: 44px; padding: 0 18px; border: 1px solid var(--border);
-            border-radius: var(--radius-pill); background: #fff; color: var(--ink);
-            font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer;
-            box-shadow: var(--shadow-card); transition: all 0.2s;
-        }
-        .btn-config:hover { border-color: var(--accent); color: var(--accent); background: #f7faff; }
-        .btn-config:active { opacity: 0.8; }
-
-        /* ===== 弹窗通用 ===== */
-        .modal-mask {
-            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(20, 26, 38, 0.5); z-index: 1200;
-            align-items: center; justify-content: center;
-        }
-        .modal-mask.show { display: flex; }
-        .dialog {
-            width: 560px; max-width: calc(100vw - 32px); background: #fff;
-            border-radius: 16px; overflow: hidden;
-            box-shadow: 0 24px 60px rgba(15, 25, 50, 0.25);
-            animation: dialogIn 0.22s ease;
-        }
-        @keyframes dialogIn {
-            from { opacity: 0; transform: translateY(16px) scale(0.98); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        .dlg-head {
-            display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
-            padding: 20px 24px 14px; border-bottom: 1px solid #f0f1f4;
-        }
-        .dlg-title { font-size: 18px; font-weight: 700; color: var(--ink); }
-        .dlg-sub { font-size: 12px; color: var(--ink-subtle); margin-top: 5px; line-height: 1.6; }
-        .dlg-close {
-            width: 28px; height: 28px; border: none; border-radius: 50%; background: #f2f3f7;
-            color: var(--ink-subtle); font-size: 13px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            transition: all 0.2s; font-family: inherit; flex-shrink: 0;
-        }
-        .dlg-close:hover { background: #e8e9ee; color: var(--ink); }
-        .dlg-body { padding: 4px 24px 8px; max-height: 62vh; overflow-y: auto; }
-
-        .cfg-item {
-            display: flex; align-items: center; justify-content: space-between; gap: 20px;
-            padding: 16px 0; border-bottom: 1px solid #f5f5f7;
-        }
-        .cfg-item:last-child { border-bottom: none; }
-        .cfg-info { flex: 1; min-width: 0; }
-        .cfg-name { font-size: 14px; font-weight: 600; color: var(--ink); }
-        .cfg-desc { font-size: 12px; color: var(--ink-subtle); margin-top: 4px; line-height: 1.6; }
-        .cfg-control { flex-shrink: 0; display: flex; align-items: center; }
-
-        .cfg-input-box {
-            display: flex; align-items: center; gap: 4px; width: 148px; height: 38px;
-            border: 1px solid var(--border); border-radius: 10px; padding: 0 12px; background: #fff;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-        .cfg-input-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,102,204,0.1); }
-        .cfg-input-box .cfg-prefix { font-size: 13px; color: var(--ink-subtle); }
-        .cfg-input-box .cfg-unit { font-size: 12px; color: var(--ink-subtle); }
-        .cfg-input-box input {
-            width: 100%; min-width: 0; border: none; outline: none;
-            font-family: inherit; font-size: 15px; font-weight: 600; color: var(--ink); background: transparent;
-        }
-        .cfg-select {
-            height: 38px; padding: 0 12px; border: 1px solid var(--border); border-radius: 10px;
-            font-family: inherit; font-size: 13px; color: var(--ink); background: #fff; outline: none;
-        }
-        .cfg-select:focus { border-color: var(--accent); }
-
-        /* 开关 */
-        .switch { position: relative; display: inline-block; width: 46px; height: 26px; flex-shrink: 0; }
-        .switch input { position: absolute; opacity: 0; width: 0; height: 0; }
-        .switch i {
-            position: absolute; inset: 0; background: #d7dae0; border-radius: 999px;
-            cursor: pointer; transition: background 0.25s;
-        }
-        .switch i::before {
-            content: ''; position: absolute; width: 20px; height: 20px; left: 3px; top: 3px;
-            background: #fff; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.22);
-            transition: transform 0.25s;
-        }
-        .switch input:checked + i { background: var(--accent); }
-        .switch input:checked + i::before { transform: translateX(20px); }
-
-        /* 首页横幅：图片上传 */
-        .cfg-item.no-line { border-bottom: none; padding-bottom: 0; }
-        .cfg-upload { padding: 12px 0 16px; border-bottom: 1px solid #f5f5f7; }
-        .cfg-upload.hide { display: none; }
-        .cu-box {
-            position: relative; display: flex; align-items: center; justify-content: center;
-            min-height: 132px; padding: 12px; text-align: center;
-            background: #fafbfd; border: 1px dashed #cfd4de; border-radius: 12px;
-            cursor: pointer; overflow: hidden; transition: border-color 0.2s, background 0.2s;
-        }
-        .cu-box:hover { border-color: var(--accent); background: #f5f9ff; }
-        .cu-box input[type="file"] { display: none; }
-        .cu-box .cu-ph { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-        .cu-box .cu-ph svg { color: #b0b6c1; }
-        .cu-box .cu-ph b { font-size: 13.5px; font-weight: 600; color: var(--ink-muted); }
-        .cu-box .cu-ph em { font-style: normal; font-size: 12px; color: var(--ink-subtle); line-height: 1.6; }
-        .cu-box .cu-img { display: none; width: 100%; height: auto; border-radius: 8px; }
-        .cu-box.has-img { padding: 8px; border-style: solid; border-color: var(--border); background: #fff; }
-        .cu-box.has-img .cu-ph { display: none; }
-        .cu-box.has-img .cu-img { display: block; }
-        .cu-meta { display: none; align-items: center; justify-content: space-between; gap: 12px; margin-top: 8px; }
-        .cu-meta.show { display: flex; }
-        .cu-meta .cu-name { font-size: 12px; color: var(--ink-subtle); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .cu-meta .cu-remove {
-            flex-shrink: 0; border: none; background: none; padding: 2px 4px;
-            font-family: inherit; font-size: 12.5px; color: var(--accent); cursor: pointer;
-        }
-        .cu-meta .cu-remove:hover { text-decoration: underline; }
-
-        .dlg-foot {
-            display: flex; justify-content: flex-end; align-items: center; gap: 10px;
-            padding: 14px 24px; border-top: 1px solid #f0f1f4; background: #fff;
-        }
-        .btn-dlg {
-            height: 36px; padding: 0 20px; border-radius: var(--radius-pill);
-            font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer;
-            transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;
-        }
-        .btn-dlg.ghost { background: #fff; border: 1px solid var(--border); color: var(--ink); }
-        .btn-dlg.ghost:hover { border-color: #c5c8cf; background: #fafafc; }
-        .btn-dlg.primary { background: var(--accent); border: none; color: #fff; }
-        .btn-dlg.primary:hover { background: var(--accent-hover); }
-        .btn-dlg.primary:active { opacity: 0.85; }
-
-        /* 保存反馈 Toast */
-        .toast {
-            position: fixed; top: 64px; left: 50%; transform: translate(-50%, -12px);
-            z-index: 1500; background: rgba(28, 32, 40, 0.92); color: #fff;
-            font-size: 13px; font-weight: 500; padding: 10px 22px; border-radius: 999px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-            opacity: 0; pointer-events: none; transition: all 0.25s ease;
-        }
-        .toast.show { opacity: 1; transform: translate(-50%, 0); }
-
         @media (max-width: 1023.98px) {
             .func-panel { display: none; }
             .main, .breadcrumb { margin-right: 0; }
@@ -429,13 +288,6 @@
                 <div class="sc-value red">¥1,286.50</div>
             </div>
         </div>
-    </div>
-
-    <div class="toolbar">
-        <button class="btn-config" onclick="openConfig()">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-            分销配置
-        </button>
     </div>
 
     <!-- ============ 分销订单 ============ -->
@@ -536,89 +388,6 @@
     </div>
 
 </div>
-
-<!-- ===== 分销配置弹窗 ===== -->
-<div class="modal-mask" id="cfgMask">
-    <div class="dialog" role="dialog" aria-label="分销配置">
-        <div class="dlg-head">
-            <div>
-                <div class="dlg-title">⚙️ 分销配置</div>
-                <div class="dlg-sub">配置分销推广与自动打款规则，保存后立即生效</div>
-            </div>
-            <button class="dlg-close" onclick="closeConfig()" aria-label="关闭">✕</button>
-        </div>
-        <div class="dlg-body">
-            <div class="cfg-item">
-                <div class="cfg-info">
-                    <div class="cfg-name">启用分销推广</div>
-                    <div class="cfg-desc">关闭后新订单不再产生分销佣金，历史数据保留</div>
-                </div>
-                <div class="cfg-control">
-                    <label class="switch">
-                        <input type="checkbox" id="cfgEnabled" checked>
-                        <i></i>
-                    </label>
-                </div>
-            </div>
-            <!--
-            <div class="cfg-item no-line">
-                <div class="cfg-info">
-                    <div class="cfg-name">启用首页横幅</div>
-                    <div class="cfg-desc">开启后小程序首页展示分销推广横幅，需上传横幅图片；关闭后立即下线</div>
-                </div>
-                <div class="cfg-control">
-                    <label class="switch">
-                        <input type="checkbox" id="cfgBanner" onchange="toggleBannerUpload()">
-                        <i></i>
-                    </label>
-                </div>
-            </div>
-           -->
-            <div class="cfg-upload hide" id="cfgBannerUpload">
-                <label class="cu-box" id="cuBox">
-                    <input type="file" id="cuInput" accept="image/*" onchange="onBannerFile(event)">
-                    <span class="cu-ph">
-                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"></path><path d="M7.5 8.5 12 4l4.5 4.5"></path><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"></path></svg>
-                        <b>点击上传横幅图片</b>
-                        <em>建议尺寸 1409 × 516 px，支持 PNG / JPG，单张不超过 2MB</em>
-                    </span>
-                    <img class="cu-img" id="cuImg" alt="横幅预览">
-                </label>
-                <div class="cu-meta" id="cuMeta">
-                    <span class="cu-name" id="cuName"></span>
-                    <button type="button" class="cu-remove" onclick="removeBanner()">移除</button>
-                </div>
-            </div>
-            <div class="cfg-item">
-                <div class="cfg-info">
-                    <div class="cfg-name">启用「我的主页 - 我的推广」按钮</div>
-                    <div class="cfg-desc">开启后可在我的主页看到「我的推广」入口</div>
-                </div>
-                <div class="cfg-control">
-                    <label class="switch">
-                        <input type="checkbox" id="cfgMyPromo" checked>
-                        <i></i>
-                    </label>
-                </div>
-            </div>
-            <div class="cfg-item">
-                <div class="cfg-info">
-                    <div class="cfg-name">最低提现金额</div>
-                    <div class="cfg-desc">佣金累计未达该金额时自动结转至下期，达标后统一发起打款</div>
-                </div>
-                <div class="cfg-control cfg-input-box">
-                    <span class="cfg-prefix">¥</span>
-                    <input type="number" id="cfgMinAmount" min="0" step="0.01" value="50">
-                </div>
-            </div>
-        </div>
-        <div class="dlg-foot">
-            <button class="btn-dlg ghost" onclick="closeConfig()">取消</button>
-            <button class="btn-dlg primary" onclick="saveConfig()">保存配置</button>
-        </div>
-    </div>
-</div>
-<div class="toast" id="cfgToast"></div>
 
 <script>
     /* ===== 模拟数据 ===== */
@@ -762,79 +531,6 @@
         document.getElementById(containerId).innerHTML = html;
     }
 
-    /* ===== 分销配置弹窗 ===== */
-    var bannerFile = null;      /* 已选择的首页横幅图片（原型仅做前端演示，不真实上传） */
-
-    function openConfig() {
-        document.getElementById('cfgMask').classList.add('show');
-    }
-    function closeConfig() {
-        document.getElementById('cfgMask').classList.remove('show');
-    }
-    /* 首页横幅开关：打开后才展示图片上传区 */
-    function toggleBannerUpload() {
-        var on = document.getElementById('cfgBanner').checked;
-        document.getElementById('cfgBannerUpload').classList.toggle('hide', !on);
-    }
-    /* 选择横幅图片：校验类型与大小，通过后生成预览 */
-    function onBannerFile(e) {
-        var input = e.target;
-        var f = input.files && input.files[0];
-        if (!f) return;
-        if (!/^image\//.test(f.type)) {
-            showConfigToast('请选择图片文件（PNG / JPG）');
-            input.value = '';
-            return;
-        }
-        if (f.size > 2 * 1024 * 1024) {
-            showConfigToast('图片大小不能超过 2MB');
-            input.value = '';
-            return;
-        }
-        var reader = new FileReader();
-        reader.onload = function (ev) {
-            document.getElementById('cuImg').src = ev.target.result;
-            document.getElementById('cuBox').classList.add('has-img');
-            document.getElementById('cuName').textContent = f.name + '（' + (f.size / 1024).toFixed(0) + ' KB）';
-            document.getElementById('cuMeta').classList.add('show');
-            bannerFile = f;
-        };
-        reader.readAsDataURL(f);
-    }
-    function removeBanner() {
-        bannerFile = null;
-        document.getElementById('cuInput').value = '';
-        document.getElementById('cuImg').removeAttribute('src');
-        document.getElementById('cuBox').classList.remove('has-img');
-        document.getElementById('cuMeta').classList.remove('show');
-    }
-    function saveConfig() {
-        var minAmount = parseFloat(document.getElementById('cfgMinAmount').value);
-        if (isNaN(minAmount) || minAmount < 0) {
-            showConfigToast('最低提现金额不能小于 0');
-            return;
-        }
-        if (document.getElementById('cfgBanner').checked && !bannerFile) {
-            showConfigToast('请先上传首页横幅图片');
-            return;
-        }
-        closeConfig();
-        showConfigToast('分销配置已保存');
-    }
-    function showConfigToast(msg) {
-        var t = document.getElementById('cfgToast');
-        t.textContent = msg;
-        t.classList.add('show');
-        clearTimeout(showConfigToast._timer);
-        showConfigToast._timer = setTimeout(function () { t.classList.remove('show'); }, 1800);
-    }
-    document.getElementById('cfgMask').addEventListener('click', function (e) {
-        if (e.target === this) closeConfig();
-    });
-    document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && document.getElementById('cfgMask').classList.contains('show')) closeConfig();
-    });
-
     /* ===== 初始化 ===== */
     renderOrders();
 </script>
@@ -861,16 +557,7 @@
                 <li><strong>状态含义</strong>：已结算 / 待结算 / 已作废，已作废订单佣金不计入结算；</li>
                 <li><strong>结算规则</strong>：订单成交后进入「待结算」，已核销/已过期且7天无退款的订单结算并发放佣金「已结算」；</li>
                 <li><strong>分销员姓名</strong>：点击跳转到对应分销员详情页查看其完整数据；</li>
-                <li><strong>导出</strong>：将当前筛选结果导出（原型中提示「导出成功」）。</li>
-            </ul>
-            <h4>三、分销配置</h4>
-            <ul>
-                <li><strong>入口</strong>：页面右上角的「⚙️ 分销配置」按钮，打开参数设置弹窗（原型演示）；</li>
-                <li><strong>启用分销推广</strong>：总开关，关闭后新订单不再产生分销佣金，历史数据保留；</li>
-                <!--<li><strong>启用首页横幅</strong>：打开后展示图片上传区，须上传横幅图片（PNG / JPG，≤ 2MB）方可保存；上传后即时预览，可「移除」重选；关闭则该横幅在移动端首页下线；</li>-->
-                <li><strong>启用「我的主页 - 我的推广」按钮</strong>：控制分销员「我的主页」中「我的推广」入口的显示；关闭后该入口隐藏，无法进入推广合作协议与实名认证流程；</li>
-                <li><strong>最低提现金额</strong>：佣金累计未达该金额自动结转下期，达标后统一批量打款；</li>
-                <li><strong>保存</strong>：保存后提示「分销配置已保存」并关闭弹窗。</li>
+                <li><strong>导出</strong>：将当前筛选结果导出）。</li>
             </ul>
         </div>
     </div>

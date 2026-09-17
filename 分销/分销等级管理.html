@@ -184,6 +184,144 @@
         .mbtn.primary { background: var(--accent); color: #fff; }
         .mbtn.primary:hover { background: var(--accent-hover); }
 
+        /* ===== 分销配置：入口按钮 ===== */
+        .filter-bar .btn-config {
+            height: 38px; padding: 0 20px; border: 1px solid var(--border); border-radius: var(--radius-pill);
+            background: #fff; color: var(--ink); font-family: inherit; font-size: 13px; font-weight: 500;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;
+        }
+        .filter-bar .btn-config:hover { border-color: var(--accent); color: var(--accent); background: #f7faff; }
+        .filter-bar .btn-config:active { opacity: 0.8; }
+
+        /* ===== 分销配置弹窗 ===== */
+        .cfg-dialog {
+            width: 760px; max-width: calc(100vw - 40px); max-height: calc(100vh - 60px);
+            background: #fff; border-radius: 18px; display: flex; flex-direction: column;
+            overflow: hidden; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            animation: cfgIn 0.22s ease;
+        }
+        @keyframes cfgIn {
+            from { opacity: 0; transform: translateY(16px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .cfg-dialog .dlg-head {
+            display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+            padding: 20px 24px 14px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
+        }
+        .cfg-dialog .dlg-title { font-size: 17px; font-weight: 700; color: var(--ink); }
+        .cfg-dialog .dlg-sub { font-size: 12px; color: var(--ink-subtle); margin-top: 5px; line-height: 1.6; }
+        .cfg-dialog .dlg-close {
+            width: 28px; height: 28px; border: none; border-radius: 50%; background: #f2f3f7;
+            color: var(--ink-subtle); font-size: 13px; cursor: pointer; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s; font-family: inherit;
+        }
+        .cfg-dialog .dlg-close:hover { background: #e8e9ee; color: var(--ink); }
+        .cfg-dialog .dlg-body { padding: 4px 24px 10px; overflow-y: auto; flex: 1; }
+        .cfg-dialog .dlg-foot {
+            display: flex; justify-content: flex-end; align-items: center; gap: 10px;
+            padding: 14px 24px; border-top: 1px solid #f0f1f4; background: #fff; flex-shrink: 0;
+        }
+        .cfg-dialog .btn-dlg {
+            height: 36px; padding: 0 20px; border-radius: var(--radius-pill);
+            font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer;
+            transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;
+        }
+        .cfg-dialog .btn-dlg.ghost { background: #fff; border: 1px solid var(--border); color: var(--ink); }
+        .cfg-dialog .btn-dlg.ghost:hover { border-color: #c5c8cf; background: #fafafc; }
+        .cfg-dialog .btn-dlg.primary { background: var(--accent); border: none; color: #fff; }
+        .cfg-dialog .btn-dlg.primary:hover { background: var(--accent-hover); }
+        .cfg-dialog .btn-dlg.primary:active { opacity: 0.85; }
+
+        .cfg-item {
+            display: flex; align-items: center; justify-content: space-between; gap: 20px;
+            padding: 15px 0; border-bottom: 1px solid #f5f5f7;
+        }
+        .cfg-item:last-child { border-bottom: none; }
+        .cfg-info { flex: 1; min-width: 0; }
+        .cfg-name { font-size: 14px; font-weight: 600; color: var(--ink); }
+        .cfg-desc { font-size: 12px; color: var(--ink-subtle); margin-top: 4px; line-height: 1.6; }
+        .cfg-control { flex-shrink: 0; display: flex; align-items: center; }
+        .cfg-input-box {
+            display: flex; align-items: center; gap: 4px; width: 148px; height: 38px;
+            border: 1px solid var(--border); border-radius: 10px; padding: 0 12px; background: #fff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .cfg-input-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,102,204,0.1); }
+        .cfg-input-box .cfg-prefix { font-size: 13px; color: var(--ink-subtle); }
+        .cfg-input-box input {
+            width: 100%; min-width: 0; border: none; outline: none;
+            font-family: inherit; font-size: 15px; font-weight: 600; color: var(--ink); background: transparent;
+        }
+
+        /* 配置弹窗内的开关（独立命名，避免与等级表格开关冲突） */
+        .cfg-switch { position: relative; display: inline-block; width: 46px; height: 26px; flex-shrink: 0; }
+        .cfg-switch input { position: absolute; opacity: 0; width: 0; height: 0; }
+        .cfg-switch i {
+            position: absolute; inset: 0; background: #d7dae0; border-radius: 999px;
+            cursor: pointer; transition: background 0.25s;
+        }
+        .cfg-switch i::before {
+            content: ''; position: absolute; width: 20px; height: 20px; left: 3px; top: 3px;
+            background: #fff; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.22);
+            transition: transform 0.25s;
+        }
+        .cfg-switch input:checked + i { background: var(--accent); }
+        .cfg-switch input:checked + i::before { transform: translateX(20px); }
+
+        /* ===== 常见问题说明：富文本编辑区 ===== */
+        .cfg-rich { padding: 16px 0 6px; border-top: 1px solid #f5f5f7; margin-top: 4px; }
+        .rt-wrap {
+            margin-top: 10px; border: 1px solid var(--border); border-radius: 12px;
+            overflow: hidden; background: #fff; transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .rt-wrap:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,102,204,0.1); }
+        .rt-toolbar {
+            display: flex; align-items: center; flex-wrap: wrap; gap: 2px;
+            padding: 6px 8px; background: #fafafc; border-bottom: 1px solid #f0f1f4;
+        }
+        .rt-sep { width: 1px; height: 18px; background: #e2e5ea; margin: 0 5px; flex-shrink: 0; }
+        .rt-btn {
+            min-width: 30px; height: 30px; padding: 0 6px; border: none; background: transparent;
+            border-radius: 7px; color: var(--ink-muted); font-size: 13px; font-family: inherit;
+            cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+            transition: all 0.15s;
+        }
+        .rt-btn:hover { background: #eceef2; color: var(--ink); }
+        .rt-btn.active { background: #e4edfb; color: var(--accent); }
+        .rt-editor {
+            min-height: 210px; max-height: 330px; overflow-y: auto; padding: 14px 16px;
+            font-size: 13px; line-height: 1.85; color: var(--ink); outline: none;
+        }
+        .rt-editor:empty::before { content: attr(data-ph); color: #b0b6c1; }
+        .rt-editor p { margin: 0 0 8px; }
+        .rt-editor h4 { font-size: 13.5px; font-weight: 600; color: var(--ink); margin: 14px 0 6px; }
+        .rt-editor h4:first-child { margin-top: 0; }
+        .rt-editor ul, .rt-editor ol { padding-left: 20px; margin: 6px 0 10px; }
+        .rt-editor li { margin-bottom: 4px; }
+        .rt-editor blockquote {
+            margin: 8px 0; padding: 8px 12px; background: #f7f8fa;
+            border-left: 3px solid #cfd6e4; border-radius: 0 8px 8px 0;
+            color: var(--ink-muted); font-size: 12.5px;
+        }
+        .rt-editor img { max-width: 100%; border-radius: 8px; }
+        .rt-editor a { color: var(--accent); }
+        .rt-foot {
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
+            padding: 0 16px 10px; font-size: 11.5px; color: var(--ink-subtle);
+        }
+        .rt-foot b { color: var(--ink-muted); font-weight: 600; }
+
+        /* 保存反馈 Toast */
+        .toast {
+            position: fixed; top: 64px; left: 50%; transform: translate(-50%, -12px);
+            z-index: 1500; background: rgba(28, 32, 40, 0.92); color: #fff;
+            font-size: 13px; font-weight: 500; padding: 10px 22px; border-radius: 999px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            opacity: 0; pointer-events: none; transition: all 0.25s ease;
+        }
+        .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
         /* ===== 右侧功能说明面板 ===== */
         .func-panel {
             position: fixed; top: 0; right: 0; bottom: 0;
@@ -258,6 +396,10 @@
 
     <!-- 操作栏 -->
     <div class="filter-bar">
+        <button class="btn-config" onclick="openConfig()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            分销配置
+        </button>
         <button class="btn primary" onclick="openModal(-1)">＋ 新增等级</button>
     </div>
 
@@ -337,6 +479,104 @@
         </div>
     </div>
 </div>
+
+<!-- ===== 分销配置弹窗 ===== -->
+<div class="modal-mask" id="cfgMask">
+    <div class="cfg-dialog" role="dialog" aria-label="分销配置">
+        <div class="dlg-head">
+            <div>
+                <div class="dlg-title">⚙️ 分销配置</div>
+                <div class="dlg-sub">配置分销推广规则、提现门槛与常见问题说明，保存后立即生效</div>
+            </div>
+            <button class="dlg-close" onclick="closeConfig()" aria-label="关闭">✕</button>
+        </div>
+        <div class="dlg-body">
+            <div class="cfg-item">
+                <div class="cfg-info">
+                    <div class="cfg-name">启用分销推广</div>
+                    <div class="cfg-desc">关闭后新订单不再产生分销佣金，历史数据保留</div>
+                </div>
+                <div class="cfg-control">
+                    <label class="cfg-switch">
+                        <input type="checkbox" id="cfgEnabled" checked>
+                        <i></i>
+                    </label>
+                </div>
+            </div>
+            <div class="cfg-item">
+                <div class="cfg-info">
+                    <div class="cfg-name">启用「我的主页 - 我的推广」按钮</div>
+                    <div class="cfg-desc">开启后可在我的主页看到「我的推广」入口；关闭则该入口隐藏，无法进入推广合作协议与实名认证流程</div>
+                </div>
+                <div class="cfg-control">
+                    <label class="cfg-switch">
+                        <input type="checkbox" id="cfgMyPromo" checked>
+                        <i></i>
+                    </label>
+                </div>
+            </div>
+            <div class="cfg-item">
+                <div class="cfg-info">
+                    <div class="cfg-name">最低提现金额</div>
+                    <div class="cfg-desc">佣金累计未达该金额时自动结转至下期，达标后统一发起打款</div>
+                </div>
+                <div class="cfg-control cfg-input-box">
+                    <span class="cfg-prefix">¥</span>
+                    <input type="number" id="cfgMinAmount" min="0" step="0.01" value="50">
+                </div>
+            </div>
+
+            <!-- ===== 常见问题说明：富文本编辑区 ===== -->
+            <div class="cfg-rich">
+                <div class="cfg-name">📖 常见问题说明</div>
+                <div class="cfg-desc">编辑分销员端「常见问题说明」页面的内容，保存后同步展示在小程序端</div>
+                <div class="rt-wrap">
+                    <div class="rt-toolbar">
+                        <button type="button" class="rt-btn" data-cmd="bold" title="加粗"><b>B</b></button>
+                        <button type="button" class="rt-btn" data-cmd="italic" title="斜体"><i>I</i></button>
+                        <button type="button" class="rt-btn" data-cmd="underline" title="下划线"><u>U</u></button>
+                        <button type="button" class="rt-btn" data-cmd="strikeThrough" title="删除线"><s>S</s></button>
+                        <span class="rt-sep"></span>
+                        <button type="button" class="rt-btn" data-block="h4" title="小标题">H</button>
+                        <button type="button" class="rt-btn" data-block="p" title="正文">正文</button>
+                        <span class="rt-sep"></span>
+                        <button type="button" class="rt-btn" data-cmd="insertUnorderedList" title="无序列表">•≡</button>
+                        <button type="button" class="rt-btn" data-cmd="insertOrderedList" title="有序列表">1.</button>
+                        <button type="button" class="rt-btn" data-block="blockquote" title="引用">❝</button>
+                        <span class="rt-sep"></span>
+                        <button type="button" class="rt-btn" data-cmd="createLink" title="插入链接">🔗</button>
+                        <button type="button" class="rt-btn" data-cmd="insertImage" title="插入图片">🖼</button>
+                        <span class="rt-sep"></span>
+                        <button type="button" class="rt-btn" data-cmd="removeFormat" title="清除格式">✕</button>
+                        <button type="button" class="rt-btn" data-cmd="undo" title="撤销">↶</button>
+                        <button type="button" class="rt-btn" data-cmd="redo" title="重做">↷</button>
+                    </div>
+                    <div class="rt-editor" id="rtEditor" contenteditable="true" data-ph="输入常见问题说明内容，可设置标题、列表、链接与图片…">
+                        <h4>一、佣金什么时候结算？</h4>
+                        <p>订单成交后佣金进入「待结算」，已核销 / 已过期且 7 天内未退款的订单，将在 T+1 结算为「已结算」。</p>
+                        <h4>二、什么时候可以提现？</h4>
+                        <ul>
+                            <li>佣金累计达到平台设置的最低提现金额后，可发起提现申请；</li>
+                            <li>未达最低金额的部分自动结转至下一期，达标后统一批量打款。</li>
+                        </ul>
+                        <h4>三、订单退款后佣金如何处理？</h4>
+                        <p>订单发生退款时，对应佣金计为「已作废」，不计入结算与提现。</p>
+                        <blockquote>如仍有疑问，可联系平台运营获取帮助。</blockquote>
+                    </div>
+                    <div class="rt-foot">
+                        <span>已输入 <b id="rtCount">0</b> 字</span>
+                        <span>支持标题、加粗 / 列表 / 链接 / 图片，保存后即时同步</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="dlg-foot">
+            <button class="btn-dlg ghost" onclick="closeConfig()">取消</button>
+            <button class="btn-dlg primary" onclick="saveConfig()">保存配置</button>
+        </div>
+    </div>
+</div>
+<div class="toast" id="cfgToast"></div>
 
 <script>
     /* ===== 等级数据 ===== */
@@ -464,6 +704,85 @@
 
     /* ===== 初始化 ===== */
     render();
+
+    /* ===== 分销配置弹窗 ===== */
+    function openConfig() {
+        document.getElementById('cfgMask').classList.add('show');
+        updateRichCount();
+    }
+    function closeConfig() {
+        document.getElementById('cfgMask').classList.remove('show');
+    }
+    function saveConfig() {
+        var minAmount = parseFloat(document.getElementById('cfgMinAmount').value);
+        if (isNaN(minAmount) || minAmount < 0) {
+            showConfigToast('最低提现金额不能小于 0');
+            return;
+        }
+        closeConfig();
+        showConfigToast('分销配置已保存');
+    }
+    function showConfigToast(msg) {
+        var t = document.getElementById('cfgToast');
+        t.textContent = msg;
+        t.classList.add('show');
+        clearTimeout(showConfigToast._timer);
+        showConfigToast._timer = setTimeout(function () { t.classList.remove('show'); }, 1800);
+    }
+
+    /* ===== 常见问题说明：富文本编辑区 ===== */
+    var rtEditor = document.getElementById('rtEditor');
+    var rtStateCmds = ['bold', 'italic', 'underline', 'strikeThrough', 'insertUnorderedList', 'insertOrderedList'];
+
+    function rtExec(cmd, val) {
+        rtEditor.focus();
+        document.execCommand(cmd, false, val || null);
+        rtSyncToolbar();
+        updateRichCount();
+    }
+    function rtSyncToolbar() {
+        Array.prototype.forEach.call(document.querySelectorAll('.rt-btn[data-cmd]'), function (b) {
+            var cmd = b.getAttribute('data-cmd');
+            if (rtStateCmds.indexOf(cmd) === -1) return;
+            var on = false;
+            try { on = document.queryCommandState(cmd); } catch (e) { on = false; }
+            b.classList.toggle('active', on);
+        });
+    }
+    function updateRichCount() {
+        var text = (rtEditor.innerText || rtEditor.textContent || '').replace(/\s+/g, '');
+        document.getElementById('rtCount').textContent = text.length;
+    }
+    Array.prototype.forEach.call(document.querySelectorAll('.rt-btn[data-cmd]'), function (btn) {
+        btn.addEventListener('mousedown', function (e) { e.preventDefault(); });
+        btn.addEventListener('click', function () {
+            var cmd = btn.getAttribute('data-cmd');
+            if (cmd === 'createLink') {
+                var url = window.prompt('请输入链接地址', 'https://');
+                if (url) rtExec('createLink', url);
+            } else if (cmd === 'insertImage') {
+                var img = window.prompt('请输入图片地址', 'https://');
+                if (img) rtExec('insertImage', img);
+            } else {
+                rtExec(cmd);
+            }
+        });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('.rt-btn[data-block]'), function (btn) {
+        btn.addEventListener('mousedown', function (e) { e.preventDefault(); });
+        btn.addEventListener('click', function () {
+            rtExec('formatBlock', '<' + btn.getAttribute('data-block') + '>');
+        });
+    });
+    rtEditor.addEventListener('input', updateRichCount);
+    rtEditor.addEventListener('keyup', rtSyncToolbar);
+    rtEditor.addEventListener('mouseup', rtSyncToolbar);
+    document.getElementById('cfgMask').addEventListener('click', function (e) {
+        if (e.target === this) closeConfig();
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && document.getElementById('cfgMask').classList.contains('show')) closeConfig();
+    });
 </script>
 
 <!-- ===== 右侧功能说明面板 ===== -->
@@ -477,6 +796,7 @@
             <h4>一、页面概述</h4>
             <ul>
                 <li>分销等级管理页（管理后台）用于配置平台分销员<strong>等级体系、升级门槛与佣金比例</strong>，支撑「分销员管理 / 分销员详情」中的等级展示与分佣结算。</li>
+                <li>页面同时承载全局<strong>「分销配置」</strong>入口（原位于「分销订单管理」页，现已迁移至此），统一维护分销推广开关、提现门槛与常见问题说明。</li>
             </ul>
             <h4>二、等级体系</h4>
             <ul>
@@ -499,6 +819,15 @@
                 <li>内置 5 个等级的<strong>编号固定不可调整</strong>（编辑时置灰），仅自定义新增等级可修改编号；</li>
                 <li>门槛数字填 0 表示不限制该条件，两项满足其一即升级；</li>
                 <li>保存后按等级编号自动排序；修改门槛新触发该等级的用户生效，已经达到该等级的用户保持不变。等级里面的内容变更对该等级所有用户生效</li>
+            </ul>
+            <h4>五、分销配置</h4>
+            <ul>
+                <li><strong>入口</strong>：页面右上角「⚙️ 分销配置」按钮，打开参数设置弹窗（原位于「分销订单管理」页，已迁移至本页）；</li>
+                <li><strong>启用分销推广</strong>：总开关，关闭后新订单不再产生分销佣金，历史数据保留；</li>
+                <li><strong>启用「我的主页 - 我的推广」按钮</strong>：控制分销员「我的主页」中「我的推广」入口的显示；关闭后该入口隐藏，无法进入推广合作协议与实名认证流程；</li>
+                <li><strong>最低提现金额</strong>：佣金累计未达该金额自动结转下期，达标后统一批量打款；</li>
+                <li><strong>常见问题说明（富文本）</strong>：支持小标题、正文、加粗 / 斜体 / 下划线 / 删除线、有序与无序列表、引用、链接、图片及撤销 / 重做，并实时统计字数；保存后内容同步展示在分销员端「常见问题说明」页面；</li>
+                <li><strong>保存</strong>：保存后提示「分销配置已保存」并关闭弹窗。</li>
             </ul>
         </div>
     </div>
