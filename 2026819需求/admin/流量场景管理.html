@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>流量场景管理 - 管理后台</title>
+    <link rel="stylesheet" href="asset/admin-sidebar.css">
+    <style>
+        :root {
+            --bg: #ffffff;
+            --accent: #0066cc;
+            --accent-hover: #0071e3;
+            --link: #0071e3;
+            --ink: #1d1d1f;
+            --ink-muted: #3f424b;
+            --ink-subtle: #86868b;
+            --border: #e0e0e0;
+            --card-bg: #ffffff;
+            --radius-card: 18px;
+            --radius-pill: 9999px;
+            --shadow-card: 0 0 0 1px rgba(0,0,0,0.06);
+            --font: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font);
+            background: #f5f5f7;
+            min-height: 100vh;
+            color: var(--ink);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .breadcrumb { padding: 16px 24px 0; font-size: 13px; color: var(--ink-subtle); }
+        .breadcrumb a { color: var(--ink-subtle); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--accent); }
+        .breadcrumb .current { color: var(--ink); font-weight: 500; }
+
+        .main { padding: 16px 24px 40px; }
+
+        .page-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        .page-header h2 { font-size: 20px; font-weight: 600; color: var(--ink); }
+        .page-header .header-right { display: flex; align-items: center; gap: 10px; }
+        .page-header .stat-badge {
+            font-size: 12px; color: var(--ink-subtle);
+            background: #f5f5f7; padding: 6px 16px; border-radius: var(--radius-pill);
+        }
+        .page-header .stat-badge strong { color: var(--ink); }
+        .btn-primary {
+            height: 36px; padding: 0 20px; border: none; border-radius: var(--radius-pill);
+            background: var(--accent); color: #fff; font-size: 13px; font-weight: 500;
+            cursor: pointer; font-family: inherit; transition: background 0.2s;
+        }
+        .btn-primary:hover { background: var(--accent-hover); }
+
+        .search-area {
+            background: #fff; border-radius: var(--radius-card);
+            padding: 20px 24px; margin-bottom: 16px; box-shadow: var(--shadow-card);
+        }
+        .search-row { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; }
+        .search-item { display: flex; flex-direction: column; gap: 4px; min-width: 160px; flex: 0 0 auto; }
+        .search-item label { font-size: 12px; color: var(--ink-subtle); font-weight: 500; }
+        .search-item input,
+        .search-item select {
+            height: 36px; padding: 0 12px; border: 1px solid var(--border);
+            border-radius: var(--radius-pill); font-size: 13px; color: var(--ink);
+            background: #fff; outline: none; font-family: inherit; transition: border-color 0.2s;
+        }
+        .search-item input:focus,
+        .search-item select:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,102,204,0.08); }
+        .search-actions { display: flex; gap: 10px; align-items: flex-end; padding-bottom: 1px; flex: 0 0 auto; }
+        .search-actions .btn {
+            height: 36px; padding: 0 20px; border-radius: var(--radius-pill);
+            font-size: 13px; cursor: pointer; border: none; transition: all 0.2s;
+            font-family: inherit; font-weight: 500;
+        }
+        .search-actions .btn-search { background: var(--accent); color: #fff; }
+        .search-actions .btn-search:hover { background: var(--accent-hover); }
+        .search-actions .btn-reset { background: #f5f5f7; color: var(--ink-subtle); border: 1px solid var(--border); }
+        .search-actions .btn-reset:hover { border-color: var(--accent); color: var(--accent); }
+
+        .table-wrap {
+            background: #fff; border-radius: var(--radius-card);
+            overflow: hidden; box-shadow: var(--shadow-card);
+        }
+        .table-scroll { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        thead th {
+            font-size: 12px; font-weight: 600; color: var(--ink-subtle);
+            text-align: left; padding: 14px 16px;
+            border-bottom: 1px solid var(--border); background: #fafafc; white-space: nowrap;
+        }
+        tbody td {
+            font-size: 13px; color: var(--ink); padding: 14px 16px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: #FAFBFF; }
+
+        .scene-code {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-family: 'SF Mono', Menlo, Consolas, monospace;
+            font-size: 12.5px; color: var(--accent); font-weight: 500;
+            background: #E8F0FE; padding: 3px 10px; border-radius: 6px;
+        }
+        .scene-code .lock-ic { font-size: 10px; opacity: 0.65; }
+        .cn-name { font-weight: 500; }
+
+        .tag {
+            display: inline-block; padding: 3px 12px; border-radius: 6px;
+            font-size: 11px; font-weight: 500;
+        }
+        .tag.enabled { background: #E8F5E9; color: #34c759; }
+        .tag.disabled { background: #f5f5f7; color: var(--ink-subtle); }
+
+        .action-btn {            padding: 5px 14px; border: none; border-radius: var(--radius-pill);
+            font-size: 12px; font-weight: 500; cursor: pointer;
+            transition: all 0.2s; font-family: inherit;
+        }
+        .action-btn.edit { background: #E8F0FE; color: var(--accent); }
+        .action-btn.edit:hover { background: var(--accent); color: #fff; }
+        .action-btn.toggle { background: #FFF3E0; color: #ff9500; }
+        .action-btn.toggle:hover { background: #ff9500; color: #fff; }
+        .action-btn.toggle.off { background: #E8F5E9; color: #34c759; }
+        .action-btn.toggle.off:hover { background: #34c759; color: #fff; }
+        .action-btn.delete { background: #FFF0F0; color: #D43828; }
+        .action-btn.delete:hover { background: #D43828; color: #fff; }
+        .action-btn.disabled { opacity: 0.4; cursor: default; background: #f5f5f7; color: var(--ink-subtle); }
+
+        .table-total {
+            padding: 12px 24px; font-size: 13px; color: var(--ink-subtle);
+            border-top: 1px solid #f0f0f0; display: flex; justify-content: space-between;
+        }
+        .table-total .tt-summary strong { color: var(--ink); }
+
+        .pagination {
+            display: flex; align-items: center; justify-content: center;
+            padding: 16px 24px; gap: 6px; border-top: 1px solid #f0f0f0;
+        }
+        .pagination .page-info { font-size: 13px; color: var(--ink-subtle); margin-right: 12px; }
+        .pagination .page-btn {
+            width: 32px; height: 32px; border-radius: var(--radius-pill);
+            border: 1px solid var(--border); background: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; color: var(--ink-subtle); cursor: pointer; transition: all 0.2s;
+        }
+        .pagination .page-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .pagination .page-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .pagination .page-btn.disabled { opacity: 0.4; cursor: default; }
+
+        .empty-row td {
+            text-align: center; padding: 48px 16px; color: var(--ink-subtle); font-size: 13px;
+        }
+
+        /* ===== 新建 / 编辑场景弹窗 ===== */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.4); z-index: 9999;
+            align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal {
+            background: #fff; width: 100%; max-width: 420px;
+            border-radius: var(--radius-card); padding: 28px 24px 24px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+        }
+        .modal .m-title {
+            font-size: 17px; font-weight: 600; color: var(--ink); margin-bottom: 6px;
+        }
+        .modal .m-tip {
+            font-size: 12px; color: #ff9500; background: #FFF8EE;
+            border-radius: 8px; padding: 8px 12px; margin-bottom: 16px; line-height: 1.6;
+        }
+        .modal .form-item { margin-bottom: 16px; }
+        .modal .form-item label {
+            display: block; font-size: 12px; color: var(--ink-subtle);
+            font-weight: 500; margin-bottom: 6px;
+        }
+        .modal .form-item .fi-head { display: flex; align-items: center; justify-content: space-between; }
+        .modal .form-item .fi-lock-tag {
+            font-size: 11px; color: var(--ink-subtle); background: #f5f5f7;
+            padding: 2px 10px; border-radius: 9999px;
+        }
+        .modal .form-item input {
+            width: 100%; height: 38px; padding: 0 14px;
+            border: 1px solid var(--border); border-radius: 10px;
+            font-size: 13px; color: var(--ink); outline: none;
+            font-family: inherit; transition: border-color 0.2s;
+        }
+        .modal .form-item input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,102,204,0.08); }
+        .modal .form-item input[readonly] {
+            background: #f5f5f7; color: var(--ink-subtle); cursor: not-allowed;
+            font-family: 'SF Mono', Menlo, Consolas, monospace;
+        }
+        .modal .form-item .fi-desc { font-size: 11.5px; color: var(--ink-subtle); margin-top: 5px; }
+        .modal .m-actions { display: flex; gap: 10px; margin-top: 6px; }
+        .modal .m-actions button {
+            flex: 1; height: 40px; border: none; border-radius: var(--radius-pill);
+            font-size: 14px; font-weight: 500; cursor: pointer;
+            font-family: inherit; transition: all 0.2s;
+        }
+        .modal .m-actions .m-cancel { background: #f5f5f7; color: var(--ink-subtle); }
+        .modal .m-actions .m-cancel:hover { background: #eee; }
+        .modal .m-actions .m-confirm { background: var(--accent); color: #fff; }
+        .modal .m-actions .m-confirm:hover { background: var(--accent-hover); }
+
+        @media (max-width: 768px) {
+            .breadcrumb { padding: 12px 16px 0; }
+            .main { padding: 12px 16px 24px; }
+            .search-row { flex-direction: column; gap: 10px; }
+            .search-item { min-width: 100%; }
+        }
+
+        /* ===== 右侧功能说明面板（后台风格三栏布局：左目录 | 中内容 | 右说明） ===== */
+        .func-panel {
+            position: fixed; top: 0; right: 0; bottom: 0;
+            width: 340px; z-index: 890;
+            background: #fff; border-left: 1px solid var(--border, #e3e6eb);
+            box-shadow: -1px 0 12px rgba(20, 30, 60, 0.04);
+            display: flex; flex-direction: column;
+        }
+        .func-panel .fp-inner { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+        .func-panel .fp-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px 14px 13px 18px; border-bottom: 1px solid #f0f1f4; flex-shrink: 0;
+        }
+        .func-panel .fp-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: var(--ink, #1d1d1f); }
+        .func-panel .fp-title::before {
+            content: ''; width: 8px; height: 8px; border-radius: 50%;
+            background: var(--accent, #0066cc); box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.12);
+        }
+        .func-panel .fp-fold-btn {
+            width: 28px; height: 28px; border: 1px solid var(--border, #e3e6eb); background: #fff;
+            border-radius: 50%; color: var(--ink-subtle, #86868b); font-size: 15px; line-height: 1;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .func-panel .fp-fold-btn:hover { border-color: var(--accent, #0066cc); color: var(--accent, #0066cc); }
+        .func-panel .fp-body {
+            flex: 1; overflow-y: auto; padding: 4px 18px 40px;
+            font-size: 13px; color: #555; line-height: 1.9;
+        }
+        .func-panel .fp-body::-webkit-scrollbar { width: 5px; }
+        .func-panel .fp-body::-webkit-scrollbar-thumb { background: #d8dce3; border-radius: 3px; }
+        .func-panel .fp-body h4 { font-size: 14px; font-weight: 600; color: var(--ink, #1d1d1f); margin: 18px 0 6px; }
+        .func-panel .fp-body h4:first-child { margin-top: 12px; }
+        .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
+        .func-panel .fp-body li { margin-bottom: 6px; }
+        .func-panel .fp-body strong { color: #333; }
+        .func-panel .fp-open {
+            display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+            border: none; background: transparent; cursor: pointer;
+            writing-mode: vertical-rl; text-orientation: upright;
+            font-size: 13px; font-weight: 600; letter-spacing: 6px; color: var(--ink-subtle, #86868b);
+            align-items: center; justify-content: center; font-family: inherit;
+            transition: all 0.2s;
+        }
+        .func-panel .fp-open:hover { color: var(--accent, #0066cc); background: #fafbfc; }
+
+        @media (min-width: 1024px) {
+            .main, .breadcrumb { margin-right: 340px; }
+            body.fp-collapsed .main,
+            body.fp-collapsed .breadcrumb { margin-right: 40px; }
+            body.fp-collapsed .func-panel { width: 40px; }
+            body.fp-collapsed .fp-inner { display: none; }
+            body.fp-collapsed .fp-open { display: flex; }
+        }
+        @media (max-width: 1023.98px) {
+            .func-panel { display: none; }
+            .main, .breadcrumb { margin-right: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="breadcrumb">
+        <a href="../index.html">首页</a>
+        <span class="sep"> &gt; </span>
+        <a href="#">流量管理</a>
+        <span class="sep"> &gt; </span>
+        <span class="current">流量场景管理</span>
+    </div>
+
+    <div class="main">
+        <div class="page-header">
+            <h2>流量场景管理</h2>
+            <div class="header-right">
+                <span class="stat-badge">场景总数：<strong id="sceneTotal">0</strong></span>
+                <button class="btn-primary" onclick="openCreate()">＋ 新建场景</button>
+            </div>
+        </div>
+
+        <div class="search-area">
+            <div class="search-row">
+                <div class="search-item">
+                    <label>关键词</label>
+                    <input type="text" id="searchKw" placeholder="场景名 / 中文名称">
+                </div>
+                <div class="search-actions">
+                    <button class="btn btn-search" onclick="doSearch()">搜索</button>
+                    <button class="btn btn-reset" onclick="resetSearch()">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-wrap">
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:16%">场景名（唯一标识）</th>
+                            <th style="width:18%">中文名称</th>
+                            <th style="width:18%">流量来源说明</th>
+                            <th style="width:14%">创建时间</th>
+                            <th style="width:16%">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+            <div class="table-total">
+                <span class="tt-summary">共 <strong id="totalNum">0</strong> 个场景</span>
+                <span>场景名创建后不可修改；中文名称可随时编辑</span>
+            </div>
+            <div class="pagination">
+                <span class="page-info" id="pageInfo">第 1 / 1 页</span>
+                <button class="page-btn disabled" onclick="turnPage(-1)">‹</button>
+                <button class="page-btn active">1</button>
+                <button class="page-btn disabled" onclick="turnPage(1)">›</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 新建场景弹窗 ===== -->
+    <div class="modal-overlay" id="createModal">
+        <div class="modal">
+            <div class="m-title">新建流量场景</div>
+            <div class="m-tip">⚠️ 场景名（唯一标识）创建后<strong>不可修改</strong>，请谨慎填写；中文名称创建后可随时编辑。</div>
+            <div class="form-item">
+                <div class="fi-head">
+                    <label>场景名（唯一标识）</label>
+                </div>
+                <input type="text" id="createCode" placeholder="仅字母 / 数字 / 下划线，如 mingtu" maxlength="30">
+                <div class="fi-desc">用于外部引流链路的埋点标识，创建后锁定不可修改</div>
+            </div>
+            <div class="form-item">
+                <label>中文名称</label>
+                <input type="text" id="createName" placeholder="如：明途" maxlength="20">
+                <div class="fi-desc">对外展示名称，创建后可修改</div>
+            </div>
+            <div class="m-actions">
+                <button class="m-cancel" onclick="closeCreate()">取消</button>
+                <button class="m-confirm" onclick="submitCreate()">创建</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 编辑场景弹窗（仅中文名称可改） ===== -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <div class="m-title">编辑场景</div>
+            <div class="form-item">
+                <div class="fi-head">
+                    <label>场景名（唯一标识）</label>
+                    <span class="fi-lock-tag">🔒 不可修改</span>
+                </div>
+                <input type="text" id="editCode" readonly>
+            </div>
+            <div class="form-item">
+                <label>中文名称</label>
+                <input type="text" id="editName" maxlength="20">
+            </div>
+            <div class="m-actions">
+                <button class="m-cancel" onclick="closeEdit()">取消</button>
+                <button class="m-confirm" onclick="submitEdit()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 右侧功能说明面板（后台风格三栏布局） ===== -->
+    <aside class="func-panel">
+        <div class="fp-inner">
+            <div class="fp-header">
+                <span class="fp-title">功能说明</span>
+                <button class="fp-fold-btn" onclick="toggleFuncPanel()" title="收起功能说明">›</button>
+            </div>
+            <div class="fp-body">
+                <h4>一、页面用途</h4>
+                <ul>
+                    <li>管理<strong>外部引流场景</strong>数据：为不同外部渠道（如「明途」）建立场景，用于标记各链路带来的流量。</li>
+                    <li>页面顶部实时统计<strong>场景总数</strong>。</li>
+                </ul>
+                <h4>二、场景字段规则</h4>
+                <ul>
+                    <li><strong>场景名（唯一标识）</strong>：如 <code>mingtu</code>，仅字母/数字/下划线；<strong>创建后不可修改</strong>，列表中以蓝色代码样式展示并带 🔒 标记；</li>
+                    <li><strong>中文名称</strong>：如「明途」，对外展示用，<strong>可随时修改</strong>；</li>
+                    <li>其余字段：流量来源说明、创建时间。</li>
+                </ul>
+                <h4>三、新建场景</h4>
+                <ul>
+                    <li>点击右上角「＋ 新建场景」打开弹窗；</li>
+                    <li>弹窗内有橙色提示条强调「场景名创建后不可修改」；</li>
+                    <li>场景名会做<strong>唯一性校验</strong>（与已有场景重复时拦截）与<strong>格式校验</strong>（仅字母/数字/下划线）；</li>
+                    <li>创建成功后自动追加到列表顶部。</li>
+                </ul>
+                <h4>四、列表与筛选</h4>
+                <ul>
+                    <li>顶部筛选区支持按<strong>关键词</strong>（场景名 / 中文名称模糊匹配）筛选；</li>
+                    <li>表格底部展示场景总数，并注明字段修改规则。</li>
+                </ul>
+                <h4>五、行操作</h4>
+                <ul>
+                    <li><strong>编辑</strong>：打开编辑弹窗，场景名只读置灰（带「🔒 不可修改」标签），仅可修改<strong>中文名称</strong>；</li>
+                    <li><strong>删除</strong>：二次确认后删除，删除后不可恢复。</li>
+                </ul>
+            </div>
+        </div>
+        <button class="fp-open" onclick="toggleFuncPanel()" title="展开功能说明">功能说明‹</button>
+    </aside>
+
+    <script>
+        /* ── 场景数据（原型演示数据） ── */
+        var scenes = [
+            { code: 'mingtu',   name: '明途',           src: '明途平台投放',  time: '2026-08-19 10:24' },
+            { code: 'douyin_live', name: '抖音直播',    src: '抖音直播间挂链', time: '2026-08-21 15:02' },
+            { code: 'xhs_note', name: '小红书笔记',     src: '小红书种草笔记', time: '2026-08-25 09:41' },
+            { code: 'wechat_mp', name: '公众号菜单',    src: '公众号菜单栏',   time: '2026-08-28 14:18' },
+            { code: 'partner_k12', name: 'K12合作机构', src: '渠道合作分成',   time: '2026-09-02 11:35' },
+            { code: 'offline_poster', name: '线下海报', src: '门店物料二维码', time: '2026-09-05 16:50' }
+        ];
+
+        var editingCode = null;
+
+        /* ── 渲染列表 ── */
+        function render() {
+            var kw = (document.getElementById('searchKw').value || '').trim().toLowerCase();
+
+            var list = scenes.filter(function (s) {
+                return !kw || s.code.toLowerCase().indexOf(kw) > -1 || s.name.toLowerCase().indexOf(kw) > -1;
+            });
+
+            var tbody = document.getElementById('tableBody');
+            if (!list.length) {
+                tbody.innerHTML = '<tr class="empty-row"><td colspan="5">暂无符合条件的场景</td></tr>';
+            } else {
+                tbody.innerHTML = list.map(function (s) {
+                    return '<tr>'
+                        + '<td><span class="scene-code"><span class="lock-ic">🔒</span>' + s.code + '</span></td>'
+                        + '<td class="cn-name">' + s.name + '</td>'
+                        + '<td>' + s.src + '</td>'
+                        + '<td>' + s.time + '</td>'
+                        + '<td>'
+                        + '<button class="action-btn edit" onclick="openEdit(\'' + s.code + '\')">编辑</button> '
+                        + '<button class="action-btn delete" onclick="delScene(\'' + s.code + '\')">删除</button>'
+                        + '</td>'
+                        + '</tr>';
+                }).join('');
+            }
+
+            document.getElementById('totalNum').textContent = list.length;
+            document.getElementById('sceneTotal').textContent = scenes.length;
+            document.getElementById('pageInfo').textContent = '第 1 / 1 页';
+        }
+
+        /* ── 筛选 ── */
+        function doSearch() { render(); }
+        function resetSearch() {
+            document.getElementById('searchKw').value = '';
+            render();
+        }
+        function turnPage() { /* 原型演示：单页 */ }
+
+        /* ── 新建场景 ── */
+        function openCreate() {
+            document.getElementById('createCode').value = '';
+            document.getElementById('createName').value = '';
+            document.getElementById('createModal').classList.add('show');
+            setTimeout(function () { document.getElementById('createCode').focus(); }, 60);
+        }
+        function closeCreate() {
+            document.getElementById('createModal').classList.remove('show');
+        }
+        function submitCreate() {
+            var code = document.getElementById('createCode').value.trim();
+            var name = document.getElementById('createName').value.trim();
+
+            if (!code) { alert('请输入场景名（唯一标识）'); return; }
+            if (!/^[A-Za-z0-9_]+$/.test(code)) { alert('场景名仅支持字母、数字、下划线'); return; }
+            if (scenes.some(function (s) { return s.code.toLowerCase() === code.toLowerCase(); })) {
+                alert('场景名「' + code + '」已存在，请更换'); return;
+            }
+            if (!name) { alert('请输入中文名称'); return; }
+
+            var now = new Date();
+            var pad = function (n) { return n < 10 ? '0' + n : '' + n; };
+            scenes.unshift({
+                code: code, name: name, src: '—', count: 0,
+                time: now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate())
+                    + ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes())
+            });
+            closeCreate();
+            render();
+        }
+
+        /* ── 编辑（仅中文名称） ── */
+        function openEdit(code) {
+            var s = scenes.filter(function (x) { return x.code === code; })[0];
+            if (!s) return;
+            editingCode = code;
+            document.getElementById('editCode').value = s.code; /* 只读：场景名不可修改 */
+            document.getElementById('editName').value = s.name;
+            document.getElementById('editModal').classList.add('show');
+            setTimeout(function () { document.getElementById('editName').focus(); }, 60);
+        }
+        function closeEdit() {
+            document.getElementById('editModal').classList.remove('show');
+            editingCode = null;
+        }
+        function submitEdit() {
+            if (!editingCode) return;
+            var name = document.getElementById('editName').value.trim();
+            if (!name) { alert('请输入中文名称'); return; }
+            scenes.forEach(function (s) {
+                if (s.code === editingCode) s.name = name; /* 仅中文名称可改 */
+            });
+            closeEdit();
+            render();
+        }
+
+        /* ── 删除 ── */
+        function delScene(code) {
+            var s = scenes.filter(function (x) { return x.code === code; })[0];
+            if (!s) return;
+            if (!confirm('确认删除场景「' + s.name + '（' + s.code + '）」？删除后不可恢复。')) return;
+            scenes = scenes.filter(function (x) { return x.code !== code; });
+            render();
+        }
+
+        /* ── 右侧功能说明面板：收起 / 展开 ── */
+        function toggleFuncPanel() {
+            document.body.classList.toggle('fp-collapsed');
+        }
+
+        render();
+    </script>
+    <script src="asset/admin-sidebar.js"></script>
+</body>
+</html>

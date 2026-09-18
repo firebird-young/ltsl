@@ -30,6 +30,14 @@
                 { name: '拼团订单管理', href: '拼团订单管理.html' },
                 { name: '用户订单管理', href: '用户订单管理.html' }
             ]
+        },
+        {
+            group: '流量管理',
+            items: [
+                { name: '流量场景管理', href: '流量场景管理.html' },
+                { name: '二维码管理', href: '二维码管理.html' },
+                { name: '流量记录', href: '流量记录.html' }
+            ]
         }
     ];
     /* ↑↑↑ MENU 配置到此为止 ↑↑↑ */
