@@ -61,6 +61,129 @@
         .stat-card.anon .sc-value { color: #ff9500; }
         .stat-card.conv .sc-value { color: var(--accent); }
 
+        /* 每日访问柱状图 */
+        .chart-card {
+            background: #fff; border-radius: var(--radius-card);
+            padding: 20px 24px; margin-bottom: 16px;
+            box-shadow: var(--shadow-card);
+        }
+        .chart-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 18px;
+        }
+        .chart-header h3 { margin: 0; font-size: 15px; font-weight: 600; color: var(--ink); }
+        .chart-legend { display: flex; align-items: center; gap: 18px; font-size: 12px; color: var(--ink-subtle); }
+        .chart-legend .dot {
+            display: inline-block; width: 10px; height: 10px; border-radius: 2px;
+            margin-right: 5px; vertical-align: -1px;
+        }
+        .chart-legend .dot.logged { background: #4A90E2; }
+        .chart-legend .dot.anon   { background: #D0D5DD; }
+        .chart-filter { display: flex; align-items: center; gap: 12px; }
+        .qt-group {
+            display: inline-flex; align-items: center;
+            background: #F5F5F7; border-radius: 6px; padding: 2px;
+        }
+        .qt {
+            padding: 5px 11px; font-size: 12px; color: var(--ink-subtle);
+            border-radius: 4px; cursor: pointer; transition: all 0.15s;
+            user-select: none;
+        }
+        .qt:hover { color: var(--ink); }
+        .qt.active { background: #fff; color: var(--ink); font-weight: 500; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+        .dt-range {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 12px; color: var(--ink-subtle);
+        }
+        .dt-range input {
+            width: 110px; height: 28px; padding: 0 8px;
+            border: 1px solid var(--border); border-radius: 4px;
+            font-size: 12px; color: var(--ink);
+            background: #fff; font-family: inherit; outline: none;
+            transition: border-color 0.15s;
+        }
+        .dt-range input:focus { border-color: var(--accent); }
+        .dt-range .sep { color: var(--ink-subtle); }
+        .chart-empty {
+            width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+            font-size: 13px; color: var(--ink-subtle);
+        }
+        .chart-body { display: flex; height: 340px; }
+        .chart-yaxis {
+            width: 40px; display: flex; flex-direction: column-reverse;
+            justify-content: space-between; padding: 2px 8px 22px 0;
+            font-size: 11px; color: var(--ink-subtle);
+            border-right: 1px solid #f0f0f0;
+        }
+        .chart-yaxis span { display: block; text-align: right; line-height: 1; }
+        .chart-bars {
+            flex: 1; display: flex; align-items: flex-end;
+            justify-content: space-around; padding: 0 12px;
+            gap: 6px; position: relative;
+        }
+        /* y 轴参考线 */
+        .chart-bars::before,
+        .chart-bars::after,
+        .chart-bars .grid-line {
+            content: ''; position: absolute; left: 12px; right: 12px; height: 1px;
+            background: #f5f5f7;
+        }
+        .chart-bars::before { top: 0; }
+        .chart-bars::after  { bottom: 22px; }
+        .bar-col {
+            flex: 1; max-width: 64px; min-width: 28px;
+            display: flex; flex-direction: column; align-items: center;
+            height: 100%; position: relative; z-index: 1;
+        }
+        .bar-col .bars-group {
+            flex: 1; width: 100%;
+            display: flex; flex-direction: column; align-items: center;
+            gap: 0; padding-bottom: 1px;
+            position: relative;
+        }
+        .bar-col .bar-num {
+            position: absolute; left: 50%;
+            transform: translateX(-50%);
+            padding: 2px 8px;
+            background: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            color: var(--ink);
+            font-size: 10px;
+            font-weight: 600;
+            line-height: 1.2;
+            font-family: 'SF Mono', Menlo, Consolas, monospace;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+        .bar-col .bars-stack {
+            flex: 1; display: flex; align-items: flex-end; justify-content: center; gap: 3px;
+            width: 100%; min-height: 0;
+        }
+        .bar-col .bar {
+            width: 12px; min-height: 2px;
+            border-radius: 3px 3px 0 0; cursor: pointer;
+            transition: opacity 0.15s;
+        }
+        .bar-col .bar.logged { background: #4A90E2; }
+        .bar-col .bar.anon   { background: #D0D5DD; }
+        .bar-col:hover .bar  { opacity: 0.8; }
+        .bar-col .bar-label { margin-top: 6px; font-size: 11px; color: var(--ink-subtle); white-space: nowrap; }
+        .bar-col .bar-tip {
+            position: absolute; bottom: calc(100% - 4px); left: 50%; transform: translateX(-50%);
+            background: var(--ink); color: #fff;
+            font-size: 11px; padding: 6px 10px; border-radius: 4px;
+            white-space: nowrap; opacity: 0; pointer-events: none;
+            transition: opacity 0.15s; z-index: 10; line-height: 1.5;
+        }
+        .bar-col:hover .bar-tip { opacity: 1; }
+        .bar-tip::after {
+            content: ''; position: absolute; top: 100%; left: 50%;
+            transform: translateX(-50%);
+            border: 4px solid transparent; border-top-color: var(--ink);
+        }
+
         .search-area {
             background: #fff; border-radius: var(--radius-card);
             padding: 20px 24px; margin-bottom: 16px; box-shadow: var(--shadow-card);
@@ -325,6 +448,31 @@
             </div>
         </div>
 
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3>每日访问趋势</h3>
+                <div class="chart-filter">
+                    <div class="qt-group" id="qtGroup">
+                        <span class="qt active" data-qt="7">近 7 天</span>
+                        <span class="qt" data-qt="14">近 14 天</span>
+                    </div>
+                    <div class="dt-range">
+                        <input type="text" id="chartFrom" placeholder="开始日期">
+                        <span class="sep">~</span>
+                        <input type="text" id="chartTo" placeholder="结束日期">
+                    </div>
+                </div>
+                <div class="chart-legend">
+                    <span><span class="dot logged"></span>已登录</span>
+                    <span><span class="dot anon"></span>未登录</span>
+                </div>
+            </div>
+            <div class="chart-body">
+                <div class="chart-yaxis" id="chartY"></div>
+                <div class="chart-bars" id="chartBars"></div>
+            </div>
+        </div>
+
         <div class="search-area">
             <div class="search-row">
                 <div class="search-item">
@@ -382,10 +530,10 @@
                                             <th style="width:14%">访问时间</th>
                                             <th style="width:12%">访问类型</th>
                                             <th style="width:14%">流量场景</th>
-                                            <th style="width:18%">用户（手机号）</th>
+                                            <th style="width:16%">用户（手机号）</th>
                                             <th style="width:12%">登录状态</th>
                                             <th style="width:18%">设备 / 客户端</th>
-                                            <th style="width:14%">落地页</th>
+                                            <th style="width:16%">落地页</th>
                                         </tr>
                                     </thead>
                     <tbody id="tableBody"></tbody>
@@ -422,7 +570,21 @@
                     <li><strong>未登录访问</strong>：用户未登录或未授权手机的匿名访问量；</li>
                     <li><strong>今日访问</strong>：当天（截至当前）的实时访问量。</li>
                 </ul>
-                <h4>三、字段说明</h4>
+                <h4>三、每日访问趋势</h4>
+                <ul>
+                    <li>展示按<strong>日期分组</strong>的访问量柱状图，每个柱子顶部显示当日<strong>访问总数</strong>。</li>
+                    <li>每个日期下两根并排小柱：<strong>蓝色 = 已登录</strong>、<strong>灰色 = 未登录</strong>，可直接对比每日登录占比。</li>
+                    <li>Y 轴刻度按当前范围内最大值向上取整自适应（保留 20% 顶部空间）。</li>
+                    <li>鼠标悬停柱子显示该日<strong>精确访问数</strong>（已登录 N · 未登录 N）。</li>
+                    <li><strong>日期段查询</strong>：
+                        <ul>
+                            <li>快捷选项：<strong>近 7 天 / 近 14 天</strong>（以 LOGS 中最新一天为基准倒推），进入页面默认展示近 7 天；点击切换立即刷新。</li>
+                            <li>自定义日期段：填写起止日期（<code>YYYY-MM-DD</code>），留空一端则取数据范围边界；任一端输入后图表立即刷新。</li>
+                            <li>点击快捷会自动清空起止输入；填写起止日期会自动取消所有快捷高亮，互斥生效。</li>
+                        </ul>
+                    </li>
+                </ul>
+                <h4>四、字段说明</h4>
                 <ul>
                     <li><strong>访问时间</strong>：扫码 / 链接打开小程序的时间；</li>
                     <li><strong>访问类型</strong>：<strong>二维码</strong>（扫码进入）或<strong>链接</strong>，以后可能还有其他方式；</li>
@@ -432,13 +594,13 @@
                     <li><strong>设备</strong>：操作系统 + 客户端版本（如 iOS 17.5 · 微信 8.0.45）；</li>
                     <li><strong>落地页</strong>：扫码进入的小程序页面（首页 / 课程详情等）。</li>
                 </ul>
-                <h4>四、筛选条件</h4>
+                <h4>五、筛选条件</h4>
                 <ul>
                     <li>支持按<strong>流量场景</strong>、<strong>登录状态</strong>、<strong>访问类型</strong>、<strong>日期范围</strong>联合筛选。</li>
                     <li><strong>手机号</strong>：<strong>精确匹配</strong>，需输入完整的 11 位手机号；<strong>仅匹配已登录记录</strong>，未登录访问无手机号字段。</li>
                     <li><strong>落地页关键词</strong>：支持模糊匹配<strong>落地页</strong>字段（首页 / 课程详情等），例如输入 <code>课程详情</code> 可筛出所有进入课程详情页的访问。</li>
                 </ul>
-                <h4>五、导出</h4>
+                <h4>六、导出</h4>
                 <ul>
                     <li>点击表格右上角<strong>「导出 CSV」</strong>按钮，按当前筛选条件导出全部记录。</li>
                     <li>导出字段：访问时间、访问类型、流量场景、手机号、昵称、登录状态、操作系统、客户端版本、落地页、二维码编号。</li>
@@ -469,26 +631,38 @@
 
         /* ── 流量记录（演示数据） ── */
         var LOGS = [
-            { time: '2026-09-18 14:32:05', scene: 'mingtu',         src: '二维码', qr: 'QR20260001', logged: true,  nick: '山间一隅',     phone: '13812342305', os: 'iOS',         ver: '17.5 · 微信 8.0.45',   page: '课程详情 (CP20250001)' },
-            { time: '2026-09-18 14:18:42', scene: 'douyin_live',    src: '二维码', qr: 'QR20260003', logged: true,  nick: '风清云淡',     phone: '18612348810', os: 'Android',     ver: '14 · 微信 8.0.45',     page: '课程详情 (CP20250003)' },
+            { time: '2026-09-18 14:32:05', scene: 'mingtu',         src: '二维码', qr: 'QR20260001', logged: true,  nick: '山间一隅',     phone: '13812342305', os: 'iOS',         ver: '17.5 · 微信 8.0.45',   page: '课程详情 · 盆景美学·指尖山水' },
+            { time: '2026-09-18 14:18:42', scene: 'douyin_live',    src: '二维码', qr: 'QR20260003', logged: true,  nick: '风清云淡',     phone: '18612348810', os: 'Android',     ver: '14 · 微信 8.0.45',     page: '课程详情 · 诗界无心·草堂寻心' },
             { time: '2026-09-18 13:55:20', scene: 'xhs_note',       src: '二维码', qr: 'QR20260007', logged: false, nick: '',             phone: '',          os: 'iOS',         ver: '17.4 · 微信 8.0.44',   page: '小程序首页' },
             { time: '2026-09-18 12:40:51', scene: 'offline_poster', src: '二维码', qr: 'QR20260004', logged: false, nick: '',             phone: '',          os: 'Android',     ver: '13 · 微信 8.0.45',     page: '小程序首页' },
             { time: '2026-09-18 11:22:08', scene: 'wechat_mp',      src: '二维码', qr: 'QR20260002', logged: true,  nick: '竹雨听风',     phone: '15912346028', os: 'HarmonyOS',   ver: '4.0 · 微信 8.0.45',    page: '小程序首页' },
-            { time: '2026-09-18 10:48:36', scene: 'partner_k12',    src: '二维码', qr: 'QR20260009', logged: true,  nick: '江南可游',     phone: '17712340192', os: 'iOS',         ver: '16.6 · 微信 8.0.43',   page: '课程详情 (CP20250005)' },
+            { time: '2026-09-18 10:48:36', scene: 'partner_k12',    src: '二维码', qr: 'QR20260009', logged: true,  nick: '江南可游',     phone: '17712340192', os: 'iOS',         ver: '16.6 · 微信 8.0.43',   page: '课程详情 · 搭建小茅屋' },
             { time: '2026-09-18 09:30:15', scene: 'mingtu',         src: '二维码', qr: 'QR20260001', logged: false, nick: '',             phone: '',          os: 'Android',     ver: '14 · 微信 8.0.45',     page: '小程序首页' },
-            { time: '2026-09-17 22:11:48', scene: 'xhs_note',       src: '二维码', qr: 'QR20260007', logged: true,  nick: '林下问童',     phone: '13512343340', os: 'iOS',         ver: '17.5 · 微信 8.0.45',   page: '课程详情 (CP20250009)' },
+            { time: '2026-09-17 22:11:48', scene: 'xhs_note',       src: '二维码', qr: 'QR20260007', logged: true,  nick: '林下问童',     phone: '13512343340', os: 'iOS',         ver: '17.5 · 微信 8.0.45',   page: '课程详情 · 自然探索营' },
             { time: '2026-09-17 19:55:02', scene: 'douyin_live',    src: '二维码', qr: 'QR20260008', logged: false, nick: '',             phone: '',          os: 'Android',     ver: '12 · 微信 8.0.44',     page: '小程序首页' },
             { time: '2026-09-17 18:08:33', scene: 'offline_poster', src: '二维码', qr: 'QR20260004', logged: true,  nick: '云深不知处',   phone: '18812347756', os: 'iOS',         ver: '17.4 · 微信 8.0.45',   page: '小程序首页' },
             { time: '2026-09-17 15:42:19', scene: 'wechat_mp',      src: '二维码', qr: 'QR20260002', logged: false, nick: '',             phone: '',          os: 'iOS',         ver: '17.5 · 微信 8.0.45',   page: '小程序首页' },
-            { time: '2026-09-17 14:20:07', scene: 'mingtu',         src: '二维码', qr: 'QR20260001', logged: true,  nick: '远山',         phone: '13912345524', os: 'Android',     ver: '14 · 微信 8.0.45',     page: '课程详情 (CP20250011)' },
-            { time: '2026-09-17 11:05:54', scene: 'partner_k12',    src: '二维码', qr: 'QR20260009', logged: true,  nick: '夏目漱石',     phone: '15212348817', os: 'HarmonyOS',   ver: '4.0 · 微信 8.0.44',    page: '课程详情 (CP20250007)' },
+            { time: '2026-09-17 14:20:07', scene: 'mingtu',         src: '二维码', qr: 'QR20260001', logged: true,  nick: '远山',         phone: '13912345524', os: 'Android',     ver: '14 · 微信 8.0.45',     page: '课程详情 · 户外生存技能' },
+            { time: '2026-09-17 11:05:54', scene: 'partner_k12',    src: '二维码', qr: 'QR20260009', logged: true,  nick: '夏目漱石',     phone: '15212348817', os: 'HarmonyOS',   ver: '4.0 · 微信 8.0.44',    page: '课程详情 · 唐代诗歌赏析' },
             { time: '2026-09-16 20:36:21', scene: 'xhs_note',       src: '二维码', qr: 'QR20260007', logged: false, nick: '',             phone: '',          os: 'iOS',         ver: '17.5 · 微信 8.0.45',   page: '小程序首页' },
-            { time: '2026-09-16 17:14:09', scene: 'douyin_live',    src: '二维码', qr: 'QR20260008', logged: true,  nick: '青衫客',       phone: '17612344408', os: 'Android',     ver: '14 · 微信 8.0.45',     page: '课程详情 (CP20250003)' },
+            { time: '2026-09-16 17:14:09', scene: 'douyin_live',    src: '二维码', qr: 'QR20260008', logged: true,  nick: '青衫客',       phone: '17612344408', os: 'Android',     ver: '14 · 微信 8.0.45',     page: '课程详情 · 诗界无心·草堂寻心' },
             { time: '2026-09-16 15:48:33', scene: 'offline_poster', src: '二维码', qr: 'QR20260004', logged: false, nick: '',             phone: '',          os: 'iOS',         ver: '16.5 · 微信 8.0.43',   page: '小程序首页' },
-            { time: '2026-09-15 16:22:40', scene: 'mingtu',         src: '二维码', qr: 'QR20260001', logged: true,  nick: '山中来信',     phone: '18012349962', os: 'Android',     ver: '13 · 微信 8.0.44',     page: '课程详情 (CP20250002)' },
+            { time: '2026-09-15 16:22:40', scene: 'mingtu',         src: '二维码', qr: 'QR20260001', logged: true,  nick: '山中来信',     phone: '18012349962', os: 'Android',     ver: '13 · 微信 8.0.44',     page: '课程详情 · 春假托管班' },
             { time: '2026-09-15 10:18:55', scene: 'wechat_mp',      src: '二维码', qr: 'QR20260002', logged: false, nick: '',             phone: '',          os: 'iOS',         ver: '17.5 · 微信 8.0.45',   page: '小程序首页' },
-            { time: '2026-09-14 19:05:12', scene: 'partner_k12',    src: '二维码', qr: 'QR20260009', logged: true,  nick: '听雪楼主',     phone: '13312347790', os: 'iOS',         ver: '17.4 · 微信 8.0.45',   page: '课程详情 (CP20250009)' },
-            { time: '2026-09-14 14:12:08', scene: 'xhs_note',       src: '二维码', qr: 'QR20260007', logged: false, nick: '',             phone: '',          os: 'Android',     ver: '14 · 微信 8.0.45',     page: '小程序首页' }
+            { time: '2026-09-14 19:05:12', scene: 'partner_k12',    src: '二维码', qr: 'QR20260009', logged: true,  nick: '听雪楼主',     phone: '13312347790', os: 'iOS',         ver: '17.4 · 微信 8.0.45',   page: '课程详情 · 国画水墨体验' },
+            { time: '2026-09-14 14:12:08', scene: 'xhs_note',       src: '二维码', qr: 'QR20260007', logged: false, nick: '',             phone: '',          os: 'Android',     ver: '14 · 微信 8.0.45',     page: '小程序首页' },
+            { time: '2026-09-13 16:38:22', scene: 'mingtu',         src: '二维码', qr: 'QR20260001', logged: true,  nick: '临江仙',       phone: '18912343322', os: 'Android',     ver: '14 · 微信 8.0.44',     page: '课程详情 · 快速搭建茅屋' },
+            { time: '2026-09-13 11:24:51', scene: 'douyin_live',    src: '二维码', qr: 'QR20260003', logged: false, nick: '',             phone: '',          os: 'iOS',         ver: '17.5 · 微信 8.0.45',   page: '小程序首页' },
+            { time: '2026-09-13 09:48:17', scene: 'wechat_mp',      src: '二维码', qr: 'QR20260002', logged: true,  nick: '青溪踏雪',     phone: '15512346690', os: 'iOS',         ver: '17.4 · 微信 8.0.45',   page: '课程详情 · 盆景制作入门' },
+            { time: '2026-09-12 18:55:03', scene: 'offline_poster', src: '二维码', qr: 'QR20260004', logged: true,  nick: '梅子黄时',     phone: '13612345508', os: 'HarmonyOS',   ver: '4.0 · 微信 8.0.43',    page: '小程序首页' },
+            { time: '2026-09-12 13:20:46', scene: 'mingtu',         src: '二维码', qr: 'QR20260001', logged: false, nick: '',             phone: '',          os: 'Android',     ver: '13 · 微信 8.0.45',     page: '小程序首页' },
+            { time: '2026-09-12 10:15:29', scene: 'partner_k12',    src: '二维码', qr: 'QR20260009', logged: true,  nick: '听松主人',     phone: '15812347721', os: 'iOS',         ver: '16.6 · 微信 8.0.43',   page: '课程详情 · 春假艺术工坊' },
+            { time: '2026-09-11 20:42:18', scene: 'xhs_note',       src: '二维码', qr: 'QR20260007', logged: false, nick: '',             phone: '',          os: 'Android',     ver: '14 · 微信 8.0.45',     page: '小程序首页' },
+            { time: '2026-09-11 15:36:04', scene: 'wechat_mp',      src: '二维码', qr: 'QR20260002', logged: true,  nick: '竹影清风',     phone: '17812341156', os: 'iOS',         ver: '17.5 · 微信 8.0.44',   page: '课程详情 · 诗界无心·草堂寻心' },
+            { time: '2026-09-10 17:18:52', scene: 'douyin_live',    src: '二维码', qr: 'QR20260003', logged: true,  nick: '长亭外',       phone: '13912348803', os: 'Android',     ver: '14 · 微信 8.0.45',     page: '课程详情 · 唐代诗歌赏析' },
+            { time: '2026-09-10 11:05:33', scene: 'mingtu',         src: '二维码', qr: 'QR20260001', logged: false, nick: '',             phone: '',          os: 'iOS',         ver: '17.4 · 微信 8.0.45',   page: '小程序首页' },
+            { time: '2026-09-09 19:24:11', scene: 'offline_poster', src: '二维码', qr: 'QR20260004', logged: true,  nick: '夜归人',       phone: '15012346631', os: 'HarmonyOS',   ver: '4.0 · 微信 8.0.44',    page: '课程详情 · 搭建小茅屋' },
+            { time: '2026-09-09 12:47:39', scene: 'wechat_mp',      src: '二维码', qr: 'QR20260002', logged: false, nick: '',             phone: '',          os: 'Android',     ver: '13 · 微信 8.0.45',     page: '小程序首页' }
         ];
 
         /* ── 场景下拉初始化 ── */
@@ -499,6 +673,113 @@
             });
             s.insertAdjacentHTML('beforeend', '<option value="none">未标识（无场景参数）</option>');
         })();
+
+        /* ── 每日柱状图 ── */
+        var chartRange = { mode: 'qt', qt: 7, from: '', to: '' };
+
+        function getDateRange(r) {
+            /* 提取 LOGS 中所有不重复日期 */
+            var seen = {}; var dates = [];
+            LOGS.forEach(function (l) {
+                var d = l.time.split(' ')[0];
+                if (!seen[d]) { seen[d] = true; dates.push(d); }
+            });
+            dates.sort();
+            var minD = dates[0], maxD = dates[dates.length - 1];
+
+            if (r.mode === 'custom') {
+                return {
+                    from: r.from || minD,
+                    to:   r.to   || maxD
+                };
+            }
+            if (r.qt === 'all') return { from: minD, to: maxD };
+            /* qt = N：以 LOGS 最新一天为基准，倒推 N-1 天 */
+            var n = parseInt(r.qt, 10);
+            var start = new Date(maxD);
+            start.setDate(start.getDate() - (n - 1));
+            return { from: start.toISOString().slice(0, 10), to: maxD };
+        }
+
+        function getDailyData() {
+            var range = getDateRange(chartRange);
+            var map = {};
+            LOGS.forEach(function (l) {
+                var d = l.time.split(' ')[0];
+                if (d < range.from || d > range.to) return;
+                if (!map[d]) map[d] = { date: d, logged: 0, anon: 0 };
+                if (l.logged) map[d].logged++; else map[d].anon++;
+            });
+            return Object.keys(map).sort().map(function (d) {
+                return { date: d, logged: map[d].logged, anon: map[d].anon, total: map[d].logged + map[d].anon };
+            });
+        }
+
+        function renderChart() {
+            var data = getDailyData();
+            /* y 轴 */
+            document.getElementById('chartY').innerHTML = '';
+            if (!data.length) {
+                document.getElementById('chartBars').innerHTML = '<div class="chart-empty">所选日期段内无访问记录</div>';
+                return;
+            }
+            var maxTotal = Math.max.apply(null, data.map(function (d) { return d.total; }));
+            var yMax = Math.max(4, Math.ceil(maxTotal * 1.2));
+            /* y 轴 5 刻度：0 / 25% / 50% / 75% / 100% */
+            var ticks = [];
+            for (var i = 4; i >= 0; i--) ticks.push(Math.round(yMax * i / 4));
+            document.getElementById('chartY').innerHTML = ticks.map(function (v) {
+                return '<span>' + v + '</span>';
+            }).join('');
+
+            /* 计算 bars-stack 实际高度 = chart-bars 高度 - label 高度
+               用于让 bar-num 绝对定位紧贴柱顶上方 4px */
+            var chartBarsEl = document.getElementById('chartBars');
+            var stackH = (chartBarsEl.clientHeight || 340) - 22;
+
+            document.getElementById('chartBars').innerHTML = data.map(function (d) {
+                var hL = (d.logged / yMax * 100);
+                var hA = (d.anon   / yMax * 100);
+                var maxBar = Math.max(hL, hA);
+                /* 柱顶距 bars-group 底 = maxBar/100 * stackH，bar-num 底边在其上方 10px */
+                var numBottom = maxBar / 100 * stackH + 10;
+                return '<div class="bar-col">'
+                    + '<div class="bar-tip">' + d.date + '<br>已登录 ' + d.logged + ' · 未登录 ' + d.anon + '</div>'
+                    + '<div class="bars-group">'
+                    + '<div class="bar-num" style="bottom:' + numBottom.toFixed(1) + 'px">' + d.total + '</div>'
+                    + '<div class="bars-stack">'
+                    + '<div class="bar logged" style="height:' + hL.toFixed(1) + '%"></div>'
+                    + '<div class="bar anon"   style="height:' + hA.toFixed(1) + '%"></div>'
+                    + '</div>'
+                    + '</div>'
+                    + '<div class="bar-label">' + d.date.slice(5) + '</div>'
+                    + '</div>';
+            }).join('');
+        }
+
+        /* ── 图表筛选交互 ── */
+        document.getElementById('qtGroup').addEventListener('click', function (e) {
+            var t = e.target.closest('.qt');
+            if (!t) return;
+            chartRange = { mode: 'qt', qt: t.getAttribute('data-qt'), from: '', to: '' };
+            document.getElementById('chartFrom').value = '';
+            document.getElementById('chartTo').value = '';
+            document.querySelectorAll('#qtGroup .qt').forEach(function (el) { el.classList.toggle('active', el === t); });
+            renderChart();
+        });
+
+        ['chartFrom', 'chartTo'].forEach(function (id) {
+            document.getElementById(id).addEventListener('change', function () {
+                chartRange.mode = 'custom';
+                chartRange.from = document.getElementById('chartFrom').value.trim();
+                chartRange.to   = document.getElementById('chartTo').value.trim();
+                /* 进入自定义模式：去掉所有快捷 active */
+                document.querySelectorAll('#qtGroup .qt').forEach(function (el) { el.classList.remove('active'); });
+                renderChart();
+            });
+        });
+
+        renderChart();
 
         /* ── 场景名查表 ── */
         function sceneName(code) {
