@@ -106,6 +106,7 @@
         }
         .tag.home { background: #E8F0FE; color: var(--accent); }
         .tag.course { background: #F3E8FF; color: #7c3aed; }
+        .tag.product { background: #FFE8D9; color: #C45A11; }
 
         .scene-chip {
             display: inline-block; padding: 3px 10px; border-radius: 6px;
@@ -341,6 +342,7 @@
                         <option value="all">全部</option>
                         <option value="home">首页二维码</option>
                         <option value="course">课程二维码</option>
+                        <option value="product">商品二维码</option>
                     </select>
                 </div>
                 <div class="search-item">
@@ -400,6 +402,11 @@
                     <div class="tc-name">课程二维码</div>
                     <div class="tc-desc">扫码进入课程详情</div>
                 </div>
+                <div class="type-card" id="cardProduct" onclick="pickType('product')">
+                    <div class="tc-icon">🛍️</div>
+                    <div class="tc-name">商品二维码</div>
+                    <div class="tc-desc">扫码进入商品详情</div>
+                </div>
             </div>
             <div class="m-actions">
                 <button class="m-cancel" onclick="closeTypeModal()">取消</button>
@@ -413,12 +420,36 @@
         <div class="modal">
             <div class="m-title" id="genTitle">生成首页二维码</div>
 
-            <div class="form-item" id="courseItem" style="display:none">
-                <label>课程名称 <span class="req">*</span></label>
-                <select id="genCourse">
-                    <option value="">请选择课程</option>
-                </select>
-                <div class="fi-desc">仅「上线 / 下线」状态的课程可选，草稿课程不提供二维码生成</div>
+            <div id="courseItems" style="display:none">
+                <div class="form-item">
+                    <label>课程分类 <span class="req">*</span></label>
+                    <select id="genCourseCategory">
+                        <option value="">请选择课程分类</option>
+                    </select>
+                </div>
+                <div class="form-item" style="margin-bottom:16px">
+                    <label>课程名称 <span class="req">*</span></label>
+                    <select id="genCourse" disabled>
+                        <option value="">请先选择分类</option>
+                    </select>
+                    <div class="fi-desc">课程按所选分类联动筛选；仅「上线 / 下线」状态课程可选，草稿不可选</div>
+                </div>
+            </div>
+
+            <div id="productItems" style="display:none">
+                <div class="form-item">
+                    <label>商品品类 <span class="req">*</span></label>
+                    <select id="genCategory">
+                        <option value="">请选择品类</option>
+                    </select>
+                </div>
+                <div class="form-item" style="margin-bottom:16px">
+                    <label>商品名称 <span class="req">*</span></label>
+                    <select id="genProduct" disabled>
+                        <option value="">请先选择品类</option>
+                    </select>
+                    <div class="fi-desc">商品按所选品类联动筛选；下架商品亦可生成（仅追溯演示）</div>
+                </div>
             </div>
 
             <div class="form-item">
@@ -468,19 +499,21 @@
                 <ul>
                     <li>点击右上角「＋ 生成二维码」，先在<strong>步骤 1</strong> 选择类型：</li>
                     <li><strong>首页二维码</strong>：扫码进入<strong>小程序首页</strong>，可附加<strong>流量场景</strong>（非必填）；</li>
-                    <li><strong>课程二维码</strong>：需先选择<strong>课程名称</strong>（仅<strong>上线 / 下线</strong>等非草稿状态课程可选，草稿不可选），再可附加流量场景（非必填）；</li>
+                    <li><strong>课程二维码</strong>：需先选择<strong>课程分类</strong>（<strong>文博研学 / 非遗文化 / 艺术臻品 / OPC 创业</strong>），<strong>课程名称</strong>下拉会按所选分类联动筛选（仅展示该分类下「上线 / 下线」状态课程，草稿不可选），再可附加流量场景（非必填）；</li>
+                    <li><strong>商品二维码</strong>：需先选择<strong>商品品类</strong>（日用品 / 工艺品 / 食品），<strong>商品名称</strong>下拉会按所选品类联动筛选（仅展示已上架商品，下架不可选），再可附加流量场景（非必填）；</li>
                     <li>流量场景来源为「<a href="流量场景管理.html">流量场景管理</a>」中维护的场景数据。</li>
                 </ul>
                 <h4>三、链接规则</h4>
                 <ul>
                     <li>首页二维码：<code>weapp://litai/pages/index/index?scene=场景名</code>；</li>
                     <li>课程二维码：<code>weapp://litai/pages/course/detail?courseId=课程ID&scene=场景名</code>；</li>
+                    <li>商品二维码：<code>weapp://litai/pages/goods/detail?productId=商品ID&scene=场景名</code>；</li>
                     <li>未附加流量场景时不携带 <code>scene</code> 参数。</li>
                 </ul>
                 <h4>四、生成记录列表</h4>
                 <ul>
                     <li>列表展示：二维码编号、类型、内容、附加流量场景、链接、生成时间；</li>
-                    <li>筛选：按<strong>类型</strong>（首页 / 课程）与<strong>关键词</strong>（课程名称 / 流量场景）过滤。</li>
+                    <li>筛选：按<strong>类型</strong>（首页 / 课程 / 商品）与<strong>关键词</strong>（课程名称 / 课程分类 / 商品名称 / 商品品类 / 流量场景）模糊过滤。</li>
                 </ul>
                 <h4>五、查看二维码</h4>
                 <ul>
@@ -505,25 +538,43 @@
             { code: 'offline_poster', name: '线下海报' }
         ];
         /* 课程（参考 课程管理_v2.html，仅非草稿状态可选） */
+        var COURSE_CATEGORIES = ['文博研学', '非遗文化', '艺术臻品', 'OPC创业'];
         var COURSES = [
-            { id: 'CP20250001', name: '盆景美学·指尖山水',  status: 'online'  },
-            { id: 'CP20250002', name: '春假托管班',          status: 'online'  },
-            { id: 'CP20250003', name: '诗界无心·草堂寻心',   status: 'online'  },
-            { id: 'CP20250004', name: '杜甫和李白的故事',    status: 'offline' },
-            { id: 'CP20250005', name: '搭建小茅屋',          status: 'online'  },
-            { id: 'CP20250007', name: '唐代诗歌赏析',        status: 'online'  },
-            { id: 'CP20250009', name: '自然探索营',          status: 'online'  },
-            { id: 'CP20250010', name: '春假艺术工坊',        status: 'offline' },
-            { id: 'CP20250011', name: '户外生存技能',        status: 'online'  }
+            { id: 'CP20250001', name: '盆景美学·指尖山水',  category: ['非遗文化'],              status: 'online'  },
+            { id: 'CP20250002', name: '春假托管班',          category: ['OPC创业'],               status: 'online'  },
+            { id: 'CP20250003', name: '诗界无心·草堂寻心',   category: ['文博研学'],              status: 'online'  },
+            { id: 'CP20250004', name: '杜甫和李白的故事',    category: ['文博研学'],              status: 'offline' },
+            { id: 'CP20250005', name: '搭建小茅屋',          category: ['非遗文化'],              status: 'online'  },
+            { id: 'CP20250007', name: '唐代诗歌赏析',        category: ['文博研学'],              status: 'online'  },
+            { id: 'CP20250009', name: '自然探索营',          category: ['文博研学', 'OPC创业'],     status: 'online'  },
+            { id: 'CP20250010', name: '春假艺术工坊',        category: ['艺术臻品'],              status: 'offline' },
+            { id: 'CP20250011', name: '户外生存技能',        category: ['OPC创业'],               status: 'online'  }
+        ];
+
+        /* 商品品类 + 商品（按品类两级联动；下架商品也可选） */
+        var CATEGORIES = ['日用品', '工艺品', '食品'];
+        var GOODS = [
+            { id: 'GD20260001', name: '思畅 富锶低氘矿泉水',         category: '日用品', status: 'online'  },
+            { id: 'GD20260002', name: '便携茶具套装',                 category: '日用品', status: 'online'  },
+            { id: 'GD20260003', name: '苏州绣美摆件刺绣装饰摆台',     category: '工艺品', status: 'online'  },
+            { id: 'GD20260004', name: '蜀绣团扇',                     category: '工艺品', status: 'online'  },
+            { id: 'GD20260005', name: '青城山漆器摆件',               category: '工艺品', status: 'offline' },
+            { id: 'GD20260006', name: '归藏源藏茶',                   category: '食品',   status: 'online'  },
+            { id: 'GD20260007', name: '藏地青稞米酥',                 category: '食品',   status: 'online'  },
+            { id: 'GD20260008', name: '离泰定制红茶',                 category: '食品',   status: 'offline' }
         ];
 
         /* ── 生成记录（原型演示数据） ── */
         var records = [
-            { no: 'QR20260001', type: 'course', courseId: 'CP20250001', courseName: '盆景美学·指尖山水', scene: 'mingtu',      time: '2026-09-10 10:12' },
-            { no: 'QR20260002', type: 'home',   courseId: '',           courseName: '',                scene: '',             time: '2026-09-11 15:40' },
-            { no: 'QR20260003', type: 'course', courseId: 'CP20250003', courseName: '诗界无心·草堂寻心', scene: 'xhs_note',    time: '2026-09-12 09:26' },
-            { no: 'QR20260004', type: 'home',   courseId: '',           courseName: '',                scene: 'offline_poster', time: '2026-09-13 17:05' },
-            { no: 'QR20260005', type: 'course', courseId: 'CP20250009', courseName: '自然探索营',        scene: '',             time: '2026-09-15 11:33' }
+            { no: 'QR20260001', type: 'course',  courseId: 'CP20250001', courseName: '盆景美学·指尖山水',     courseCategory: ['非遗文化'],                productId: '', productName: '', productCategory: '', scene: 'mingtu',         time: '2026-09-10 10:12' },
+            { no: 'QR20260002', type: 'home',    courseId: '',           courseName: '',                    courseCategory: [],                          productId: '', productName: '', productCategory: '', scene: '',               time: '2026-09-11 15:40' },
+            { no: 'QR20260003', type: 'course',  courseId: 'CP20250003', courseName: '诗界无心·草堂寻心',     courseCategory: ['文博研学'],                productId: '', productName: '', productCategory: '', scene: 'xhs_note',       time: '2026-09-12 09:26' },
+            { no: 'QR20260004', type: 'home',    courseId: '',           courseName: '',                    courseCategory: [],                          productId: '', productName: '', productCategory: '', scene: 'offline_poster', time: '2026-09-13 17:05' },
+            { no: 'QR20260005', type: 'course',  courseId: 'CP20250009', courseName: '自然探索营',            courseCategory: ['文博研学', 'OPC创业'],      productId: '', productName: '', productCategory: '', scene: '',               time: '2026-09-15 11:33' },
+            { no: 'QR20260006', type: 'product', courseId: '',           courseName: '',                    courseCategory: [],                          productId: 'GD20260001', productName: '思畅 富锶低氘矿泉水',         productCategory: '日用品', scene: 'wechat_mp',     time: '2026-09-16 14:08' },
+            { no: 'QR20260007', type: 'product', courseId: '',           courseName: '',                    courseCategory: [],                          productId: 'GD20260003', productName: '苏州绣美摆件刺绣装饰摆台',     productCategory: '工艺品', scene: '',               time: '2026-09-17 10:25' },
+            { no: 'QR20260008', type: 'product', courseId: '',           courseName: '',                    courseCategory: [],                          productId: 'GD20260006', productName: '归藏源藏茶',                   productCategory: '食品',   scene: 'douyin_live',   time: '2026-09-18 16:42' },
+            { no: 'QR20260009', type: 'product', courseId: '',           courseName: '',                    courseCategory: [],                          productId: 'GD20260008', productName: '离泰定制红茶',                 productCategory: '食品',   scene: '',               time: '2026-09-19 11:18' }
         ];
 
         var seq = 6;
@@ -532,10 +583,21 @@
 
         /* ── 链接生成 ── */
         function buildUrl(r) {
-            var base = (r.type === 'home')
-                ? 'weapp://litai/pages/index/index'
-                : 'weapp://litai/pages/course/detail?courseId=' + r.courseId;
+            var base;
+            if (r.type === 'home') {
+                base = 'weapp://litai/pages/index/index';
+            } else if (r.type === 'course') {
+                base = 'weapp://litai/pages/course/detail?courseId=' + r.courseId;
+            } else {
+                base = 'weapp://litai/pages/goods/detail?productId=' + r.productId;
+            }
             return r.scene ? base + (r.type === 'home' ? '?' : '&') + 'scene=' + r.scene : base;
+        }
+        function typeName(t) {
+            return t === 'home' ? '首页' : (t === 'course' ? '课程' : '商品');
+        }
+        function typeTagClass(t) {
+            return t === 'home' ? 'home' : (t === 'course' ? 'course' : 'product');
         }
         function sceneName(code) {
             var s = SCENES.filter(function (x) { return x.code === code; })[0];
@@ -551,8 +613,12 @@
                 var hitTp = tp === 'all' || r.type === tp;
                 var hitKw = !kw
                     || (r.courseName && r.courseName.toLowerCase().indexOf(kw) > -1)
+                    || (r.courseCategory && r.courseCategory.join(' ').toLowerCase().indexOf(kw) > -1)
+                    || (r.productName && r.productName.toLowerCase().indexOf(kw) > -1)
+                    || (r.productCategory && r.productCategory.toLowerCase().indexOf(kw) > -1)
                     || (r.scene && (r.scene.toLowerCase().indexOf(kw) > -1 || sceneName(r.scene).toLowerCase().indexOf(kw) > -1))
-                    || (r.type === 'home' && '首页'.indexOf(kw) > -1);
+                    || (r.type === 'home' && '首页'.indexOf(kw) > -1)
+                    || (r.type === 'product' && '商品'.indexOf(kw) > -1);
                 return hitTp && hitKw;
             });
 
@@ -561,10 +627,18 @@
                 tbody.innerHTML = '<tr class="empty-row"><td colspan="7">暂无符合条件的生成记录</td></tr>';
             } else {
                 tbody.innerHTML = list.map(function (r) {
+                    var content;
+                    if (r.type === 'home') {
+                        content = '小程序首页';
+                    } else if (r.type === 'course') {
+                        content = r.courseName;
+                    } else {
+                        content = r.productName;
+                    }
                     return '<tr>'
                         + '<td><span style="font-family:Menlo,Consolas,monospace;font-size:12.5px;color:var(--accent)">' + r.no + '</span></td>'
-                        + '<td><span class="tag ' + (r.type === 'home' ? 'home' : 'course') + '">' + (r.type === 'home' ? '首页' : '课程') + '</span></td>'
-                        + '<td>' + (r.type === 'home' ? '小程序首页' : r.courseName) + '</td>'
+                        + '<td><span class="tag ' + typeTagClass(r.type) + '">' + typeName(r.type) + '</span></td>'
+                        + '<td>' + content + '</td>'
                         + '<td>' + (r.scene ? '<span class="scene-chip">' + sceneName(r.scene) + '</span>' : '<span class="scene-none">—</span>') + '</td>'
                         + '<td><span class="qr-link">' + buildUrl(r) + '</span></td>'
                         + '<td>' + r.time + '</td>'
@@ -591,6 +665,7 @@
             genType = null;
             document.getElementById('cardHome').classList.remove('selected');
             document.getElementById('cardCourse').classList.remove('selected');
+            document.getElementById('cardProduct').classList.remove('selected');
             document.getElementById('typeModal').classList.add('show');
         }
         function closeTypeModal() {
@@ -600,25 +675,42 @@
             genType = t;
             document.getElementById('cardHome').classList.toggle('selected', t === 'home');
             document.getElementById('cardCourse').classList.toggle('selected', t === 'course');
+            document.getElementById('cardProduct').classList.toggle('selected', t === 'product');
         }
         function nextStep() {
             if (!genType) { alert('请先选择二维码类型'); return; }
             closeTypeModal();
 
-            /* 标题与课程选择区 */
+            /* 标题与表单区显隐 */
             document.getElementById('genTitle').textContent =
-                genType === 'home' ? '生成首页二维码' : '生成课程二维码';
-            document.getElementById('courseItem').style.display =
-                genType === 'course' ? '' : 'none';
+                genType === 'home' ? '生成首页二维码'
+                : (genType === 'course' ? '生成课程二维码' : '生成商品二维码');
+            document.getElementById('courseItems').style.display = genType === 'course' ? '' : 'none';
+            document.getElementById('productItems').style.display = genType === 'product' ? '' : 'none';
 
-            /* 课程下拉：仅非草稿（上线 / 下线）状态 */
+            /* 课程分类下拉 */
+            var ccSel = document.getElementById('genCourseCategory');
+            ccSel.innerHTML = '<option value="">请选择课程分类</option>'
+                + COURSE_CATEGORIES.map(function (c) { return '<option value="' + c + '">' + c + '</option>'; }).join('');
+            ccSel.value = '';
+
+            /* 课程下拉：默认禁用，待选择分类后联动 */
             var cSel = document.getElementById('genCourse');
-            cSel.innerHTML = '<option value="">请选择课程</option>'
-                + COURSES.map(function (c) {
-                    var st = c.status === 'online' ? '上线' : '下线';
-                    return '<option value="' + c.id + '">' + c.name + '（' + st + '）</option>';
-                }).join('');
+            cSel.innerHTML = '<option value="">请先选择分类</option>';
             cSel.value = '';
+            cSel.disabled = true;
+
+            /* 品类下拉 */
+            var catSel = document.getElementById('genCategory');
+            catSel.innerHTML = '<option value="">请选择品类</option>'
+                + CATEGORIES.map(function (c) { return '<option value="' + c + '">' + c + '</option>'; }).join('');
+            catSel.value = '';
+
+            /* 商品下拉：默认禁用，待选择品类后联动 */
+            var pSel = document.getElementById('genProduct');
+            pSel.innerHTML = '<option value="">请先选择品类</option>';
+            pSel.value = '';
+            pSel.disabled = true;
 
             /* 场景下拉 */
             var sSel = document.getElementById('genScene');
@@ -630,6 +722,47 @@
 
             document.getElementById('genModal').classList.add('show');
         }
+        /* 课程分类 → 课程 联动 */
+        document.getElementById('genCourseCategory').addEventListener('change', function () {
+            var cat = this.value;
+            var cSel = document.getElementById('genCourse');
+            if (!cat) {
+                cSel.innerHTML = '<option value="">请先选择分类</option>';
+                cSel.value = '';
+                cSel.disabled = true;
+                return;
+            }
+            /* 仅显示该分类下、非草稿的课程 */
+            var list = COURSES.filter(function (c) {
+                return c.category.indexOf(cat) > -1 && c.status !== 'draft';
+            });
+            cSel.disabled = false;
+            cSel.innerHTML = '<option value="">请选择课程</option>'
+                + list.map(function (c) {
+                    var st = c.status === 'online' ? '上线' : '下线';
+                    return '<option value="' + c.id + '">' + c.name + '（' + st + '）</option>';
+                }).join('');
+            cSel.value = '';
+        });
+        /* 品类 → 商品 联动（下架商品也可选） */
+        document.getElementById('genCategory').addEventListener('change', function () {
+            var cat = this.value;
+            var pSel = document.getElementById('genProduct');
+            if (!cat) {
+                pSel.innerHTML = '<option value="">请先选择品类</option>';
+                pSel.value = '';
+                pSel.disabled = true;
+                return;
+            }
+            var list = GOODS.filter(function (g) { return g.category === cat; });
+            pSel.disabled = false;
+            pSel.innerHTML = '<option value="">请选择商品</option>'
+                + list.map(function (g) {
+                    var st = g.status === 'online' ? '' : '（下架）';
+                    return '<option value="' + g.id + '">' + g.name + st + '</option>';
+                }).join('');
+            pSel.value = '';
+        });
         function closeGenModal() {
             document.getElementById('genModal').classList.remove('show');
         }
@@ -637,20 +770,33 @@
         /* ── 步骤2：提交生成（同步接口：直接入库并展示二维码结果） ── */
         function submitGen() {
             var scene = document.getElementById('genScene').value;
-            var courseId = '', courseName = '';
+            var courseId = '', courseName = '', courseCategory = [];
+            var productId = '', productName = '', productCategory = '';
 
             if (genType === 'course') {
+                var ccVal = document.getElementById('genCourseCategory').value;
                 courseId = document.getElementById('genCourse').value;
+                if (!ccVal) { alert('请选择课程分类'); return; }
                 if (!courseId) { alert('请选择课程名称'); return; }
                 var c = COURSES.filter(function (x) { return x.id === courseId; })[0];
                 courseName = c ? c.name : '';
+                courseCategory = c ? c.category : [];
+            } else if (genType === 'product') {
+                productCategory = document.getElementById('genCategory').value;
+                productId = document.getElementById('genProduct').value;
+                if (!productCategory) { alert('请选择商品品类'); return; }
+                if (!productId) { alert('请选择商品名称'); return; }
+                var g = GOODS.filter(function (x) { return x.id === productId; })[0];
+                productName = g ? g.name : '';
             }
 
             var now = new Date();
             var pad = function (n) { return n < 10 ? '0' + n : '' + n; };
             var rec = {
                 no: 'QR202600' + (seq < 10 ? '0' + seq : seq),
-                type: genType, courseId: courseId, courseName: courseName,
+                type: genType,
+                courseId: courseId, courseName: courseName, courseCategory: courseCategory,
+                productId: productId, productName: productName, productCategory: productCategory,
                 scene: scene,
                 time: now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate())
                     + ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes())
@@ -675,9 +821,9 @@
             document.getElementById('qrInfo').innerHTML =
                 '<div class="qi-row"><span class="qi-label">二维码编号</span><span class="qi-value">' + r.no + '</span></div>'
                 + '<div class="qi-row"><span class="qi-label">类型</span><span class="qi-value">'
-                + (r.type === 'home' ? '首页二维码' : '课程二维码') + '</span></div>'
+                + (r.type === 'home' ? '首页二维码' : (r.type === 'course' ? '课程二维码' : '商品二维码')) + '</span></div>'
                 + '<div class="qi-row"><span class="qi-label">内容</span><span class="qi-value">'
-                + (r.type === 'home' ? '小程序首页' : r.courseName + '（' + r.courseId + '）') + '</span></div>'
+                + contentLabel(r) + '</span></div>'
                 + '<div class="qi-row"><span class="qi-label">流量场景</span><span class="qi-value">'
                 + (r.scene ? sceneName(r.scene) : '未附加') + '</span></div>'
                 + '<div class="qi-row"><span class="qi-label">链接</span><span class="qi-value">' + buildUrl(r) + '</span></div>'
@@ -692,12 +838,23 @@
 
             document.getElementById('viewModal').classList.add('show');
         }
+        function contentLabel(r) {
+            if (r.type === 'home') return '小程序首页';
+            if (r.type === 'course') {
+                var cats = (r.courseCategory && r.courseCategory.length) ? ('[' + r.courseCategory.join(' · ') + '] ') : '';
+                return cats + r.courseName + '（' + r.courseId + '）';
+            }
+            return r.productCategory + ' · ' + r.productName + '（' + r.productId + '）';
+        }
 
         /* ── 删除生成记录 ── */
         function deleteRecord(no) {
             var r = records.filter(function (x) { return x.no === no; })[0];
             if (!r) return;
-            var label = r.type === 'home' ? '首页二维码' : ('课程二维码（' + r.courseName + '）');
+            var label;
+            if (r.type === 'home') label = '首页二维码';
+            else if (r.type === 'course') label = '课程二维码（' + r.courseName + '）';
+            else label = '商品二维码（' + r.productName + '）';
             if (!confirm('确定要删除 ' + no + ' 的' + label + '生成记录吗？删除后不可恢复。')) return;
             records = records.filter(function (x) { return x.no !== no; });
             render();
@@ -714,9 +871,9 @@
 
             document.getElementById('qrInfo').innerHTML =
                 '<div class="qi-row"><span class="qi-label">类型</span><span class="qi-value">'
-                + (r.type === 'home' ? '首页二维码' : '课程二维码') + '</span></div>'
+                + (r.type === 'home' ? '首页二维码' : (r.type === 'course' ? '课程二维码' : '商品二维码')) + '</span></div>'
                 + '<div class="qi-row"><span class="qi-label">内容</span><span class="qi-value">'
-                + (r.type === 'home' ? '小程序首页' : r.courseName + '（' + r.courseId + '）') + '</span></div>'
+                + contentLabel(r) + '</span></div>'
                 + '<div class="qi-row"><span class="qi-label">流量场景</span><span class="qi-value">'
                 + (r.scene ? sceneName(r.scene) : '未附加') + '</span></div>'
                 + '<div class="qi-row"><span class="qi-label">链接</span><span class="qi-value">' + buildUrl(r) + '</span></div>'
