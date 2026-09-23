@@ -259,31 +259,13 @@
         .func-panel .fp-body::-webkit-scrollbar-thumb { background: #d8dce3; border-radius: 3px; }
         .func-panel .fp-body h4 { font-size: 14px; font-weight: 600; color: #1d1d1f; margin: 18px 0 6px; }
         .func-panel .fp-img {
-            margin: 10px 0 6px; border: 1px solid #eceef2; border-radius: 10px;
+            display: block; margin: 10px 0 6px; border: 1px solid #eceef2; border-radius: 10px;
             overflow: hidden; box-shadow: 0 4px 14px rgba(20, 30, 60, 0.08);
-            cursor: zoom-in;
+            cursor: zoom-in; text-decoration: none;
         }
         .func-panel .fp-img img { display: block; width: 100%; height: auto; }
+        .func-panel .fp-img:hover { border-color: var(--accent); }
         .func-panel .fp-img-cap { font-size: 11px; color: #9aa0ac; text-align: center; margin: 4px 0 2px; }
-        .func-panel .fp-img-cap .zoom-hint { color: #6b8fc7; }
-        /* ── 原图查看浮层：点击后全屏直接铺开展示大图 ── */
-        .img-viewer {
-            position: fixed; inset: 0; z-index: 6000;
-            display: none; align-items: center; justify-content: center;
-            background: rgba(8, 10, 18, 0.94); padding: 0;
-        }
-        .img-viewer.show { display: flex; }
-        .img-viewer img {
-            display: block; width: 100%; height: 100%;
-            object-fit: contain; cursor: zoom-out;
-        }
-        .img-viewer .iv-close {
-            position: absolute; top: 16px; right: 18px; width: 38px; height: 38px;
-            border: 1px solid rgba(255, 255, 255, 0.45); border-radius: 50%;
-            background: rgba(255, 255, 255, 0.12); color: #fff; font-size: 20px;
-            line-height: 36px; text-align: center; cursor: pointer;
-        }
-        .img-viewer .iv-close:hover { background: rgba(255, 255, 255, 0.25); }
         .func-panel .fp-body h4:first-child { margin-top: 12px; }
         .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
         .func-panel .fp-body li { margin-bottom: 6px; }
@@ -463,13 +445,13 @@
                 <li>分销（推广）中心是推广员的推广管理的核心页面（手机端）。展示累计收益、余额、已结算佣金比例与收益明细；已结算金额由系统每月末自动批量打款至微信零钱（授权免确认模式）。</li>
                 <li><a href="https://pay.weixin.qq.com/doc/v3/merchant/4012711988" target="_blank">参考微信支付商家转账</a></li>
             </ul>
-            <div class="fp-img" title="点击查看原图" onclick="viewImg('../asset/分销.png')">
+            <a class="fp-img" href="../asset/分销.png" target="_blank" rel="noopener" title="在新窗口查看原图">
                 <img src="../asset/分销.png" alt="分销逻辑主业务流程">
-            </div>
-             <div class="fp-img" title="点击查看原图" onclick="viewImg('../asset/分销金额描述.png')">
+            </a>
+            <a class="fp-img" href="../asset/分销金额描述.png" target="_blank" rel="noopener" title="在新窗口查看原图">
                 <img src="../asset/分销金额描述.png" alt="分销金额描述">
-            </div>
-            <div class="fp-img-cap">图：分销逻辑主业务流程（点击图片可查看原图）</div>
+            </a>
+            <div class="fp-img-cap">图：分销逻辑主业务流程（点击图片将在新窗口打开原图）</div>
             <h4>二、收益概览</h4>
             <ul>
                 <li>关系：<strong>累计收益</strong> = 已提现总额 + 当前余额（已结算）+ 待结算</li>
@@ -503,24 +485,7 @@
     <button class="fp-open" onclick="toggleFuncPanel()" title="展开功能说明">功能说明‹</button>
 </aside>
 
-<!-- 原图查看浮层 -->
-<div class="img-viewer" id="imgViewer" onclick="closeImgViewer()">
-    <img id="ivImg" src="" alt="原图" onclick="event.stopPropagation()">
-    <span class="iv-close" onclick="closeImgViewer()">✕</span>
-</div>
-
 <script>
-    /* ── 原图查看：全屏直接铺开展示大图 ── */
-    function viewImg(src) {
-        document.getElementById('ivImg').src = src;
-        document.getElementById('imgViewer').classList.add('show');
-    }
-    function closeImgViewer() {
-        document.getElementById('imgViewer').classList.remove('show');
-    }
-    document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') closeImgViewer();
-    });
     function goLedger() { window.location.href = '分销记账.html'; }
     function goWithdraw() { window.location.href = '分销提现.html'; }
     /* ── 常见问题：新开页面展示后台配置的富文本说明 ── */
