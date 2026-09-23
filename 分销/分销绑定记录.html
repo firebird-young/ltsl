@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>分销绑定记录 - 管理后台</title>
+<link rel="stylesheet" href="asset/admin-sidebar.css">
+<style>
+:root{
+    --accent:#0066cc; --accent-hover:#0071e3;
+    --ink:#1d1d1f; --ink-muted:#3f424b; --ink-subtle:#86868b;
+    --border:#e0e0e0; --radius-card:18px; --radius-tag:6px; --radius-pill:9999px;
+    --shadow-card:0 0 0 1px rgba(0,0,0,.06);
+    --font:'SF Pro Text',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);background:#f5f5f7;min-height:100vh;color:var(--ink);-webkit-font-smoothing:antialiased}
+.breadcrumb{padding:16px 24px 0;font-size:13px;color:var(--ink-subtle)}
+.breadcrumb a{color:var(--ink-subtle);text-decoration:none}
+.breadcrumb a:hover{color:var(--accent)}
+.breadcrumb .current{color:var(--ink);font-weight:500}
+.main{padding:16px 24px 40px}
+
+/* 统计卡片 */
+.stat-group{margin-bottom:20px}
+.stat-group-title{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--ink-muted);margin:2px 2px 10px}
+.stat-group-title::before{content:"";width:3px;height:13px;border-radius:2px;background:var(--accent);flex-shrink:0}
+.stat-row{display:flex;flex-wrap:wrap;gap:16px}
+.stat-card{flex:1 1 calc(25% - 12px);min-width:0;background:#fff;border-radius:var(--radius-card);padding:18px 20px;box-shadow:var(--shadow-card)}
+.stat-card .sc-label{font-size:13px;color:var(--ink-subtle)}
+.stat-card .sc-value{font-size:23px;font-weight:700;margin-top:5px;letter-spacing:-.2px}
+.stat-card .sc-value.blue{color:var(--accent)} .stat-card .sc-value.green{color:#34c759}
+.stat-card .sc-value.orange{color:#ff9500} .stat-card .sc-value.red{color:#e5484d}
+.stat-card .sc-sub{font-size:11.5px;color:#a1a6b0;margin-top:4px}
+@media (max-width:1100px){.stat-card{flex-basis:calc(50% - 8px)}}
+
+/* 筛选面板 */
+.adv-filter{background:#fff;border-radius:var(--radius-card);box-shadow:var(--shadow-card);padding:16px 18px 14px;margin-bottom:16px}
+.af-title{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;margin-bottom:12px}
+.af-title::before{content:"";width:3px;height:13px;border-radius:2px;background:var(--accent);flex-shrink:0}
+.af-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px 14px}
+.af-field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.af-field>label{font-size:12px;color:var(--ink-subtle)}
+.af-field input[type=text],.af-field input[type=date]{width:100%;height:34px;border:1px solid var(--border);border-radius:8px;padding:0 10px;font-size:13px;outline:none;font-family:inherit;color:var(--ink);background:#fff}
+.af-field input:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(0,102,204,.08)}
+.af-date-range{display:flex;align-items:center;gap:6px}
+.af-date-range span{color:#c0c5cf;font-size:12px;flex-shrink:0}
+.af-chips{display:flex;flex-wrap:wrap;gap:8px;min-height:34px;align-items:center}
+.af-chip{position:relative}
+.af-chip input{position:absolute;opacity:0;pointer-events:none}
+.af-chip span{display:inline-block;padding:5px 12px;border-radius:var(--radius-pill);font-size:12px;border:1px solid var(--border);color:var(--ink-subtle);cursor:pointer;transition:all .18s;background:#fff}
+.af-chip span:hover{border-color:var(--accent);color:var(--accent)}
+.af-chip input:checked+span{background:rgba(0,102,204,.08);border-color:var(--accent);color:var(--accent);font-weight:600}
+.af-actions{display:flex;align-items:center;gap:10px;margin-top:14px}
+.af-actions .btn{height:34px;padding:0 20px;border:none;border-radius:var(--radius-pill);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .2s}
+.af-actions .btn.primary{background:var(--accent);color:#fff}
+.af-actions .btn.primary:hover{background:var(--accent-hover)}
+.af-actions .btn.ghost{background:#fff;border:1px solid var(--border);color:var(--ink-subtle)}
+.af-actions .btn.ghost:hover{border-color:var(--accent);color:var(--accent)}
+.af-right{margin-left:auto}
+@media (max-width:1200px){.af-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* 规则提示 */
+.rule-tip{display:flex;gap:8px;flex-wrap:wrap;background:linear-gradient(135deg,#eef5fe,#f7faff);border:1px solid #d9e6f8;border-radius:var(--radius-card);padding:11px 18px;margin-bottom:16px;font-size:12.5px;color:#3f556e;line-height:1.7}
+.rule-tip b{color:var(--accent);font-weight:600}
+
+/* 表格 */
+.table-wrap{background:#fff;border-radius:var(--radius-card);overflow-x:auto;box-shadow:var(--shadow-card)}
+table{width:100%;border-collapse:collapse;min-width:1560px}
+thead th{font-size:12px;font-weight:600;color:var(--ink-subtle);text-align:left;white-space:nowrap;padding:14px 16px;border-bottom:1px solid var(--border);background:#fafafc}
+tbody td{font-size:13px;padding:14px 16px;border-bottom:1px solid #f5f5f5;white-space:nowrap}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:#FAFBFF}
+.mono{font-family:Menlo,Consolas,monospace;font-size:12.5px;color:var(--ink-muted)}
+.prod-id{font-family:Menlo,Consolas,monospace;font-size:12.5px;color:var(--accent)}
+.num-strong,.money{font-weight:600}
+.money.blue{color:var(--accent)} .money.green{color:#34c759}
+.zero{color:#c7ccd4;font-weight:400}
+.tag{display:inline-block;padding:3px 12px;border-radius:var(--radius-tag);font-size:11px;font-weight:500}
+.tag.green{background:#E8F5E9;color:#34c759} .tag.orange{background:#FFF3E0;color:#ff9500}
+.tag.blue{background:#E8F0FE;color:var(--accent)} .tag.purple{background:#F1EBFF;color:#7b5cf0}
+.tag.red{background:#FFF0F0;color:#ff3b30} .tag.gray{background:#f5f5f7;color:var(--ink-subtle)}
+.action-btn{padding:5px 14px;border:none;border-radius:var(--radius-pill);font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;margin:0 3px}
+.action-btn.blue{background:#E8F0FE;color:var(--accent)}
+.action-btn.gray{background:#f5f5f7;color:var(--ink-subtle)}
+.pagination{display:flex;justify-content:center;gap:6px;margin-top:20px}
+.pagination .page-btn{width:34px;height:34px;border:1px solid var(--border);border-radius:var(--radius-pill);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-subtle);cursor:pointer;background:#fff;transition:all .2s}
+.pagination .page-btn:hover{border-color:var(--accent);color:var(--accent)}
+.pagination .page-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.pagination .page-btn.disabled{opacity:.4;cursor:default}
+
+/* 绑定明细弹窗 */
+.modal-mask{display:none;position:fixed;inset:0;z-index:950;background:rgba(20,26,38,.42);align-items:center;justify-content:center;padding:24px}
+.modal-mask.show{display:flex}
+.modal{width:760px;max-width:100%;max-height:86vh;background:#fff;border-radius:var(--radius-card);box-shadow:0 18px 50px rgba(15,23,42,.22);display:flex;flex-direction:column;overflow:hidden}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #f0f1f4;flex-shrink:0}
+.modal-head h3{font-size:15px;font-weight:700}
+.modal-close{width:28px;height:28px;border:1px solid var(--border);background:#fff;border-radius:50%;color:var(--ink-subtle);font-size:15px;line-height:1;cursor:pointer}
+.modal-close:hover{border-color:var(--accent);color:var(--accent)}
+.modal-body{padding:18px 20px 22px;overflow-y:auto}
+.bind-chain{display:flex;align-items:center;flex-wrap:wrap;gap:12px;background:#fafbfd;border:1px solid #eef0f4;border-radius:14px;padding:14px 16px;margin-bottom:16px}
+.chain-node .cn-role{font-size:11px;color:var(--ink-subtle)}
+.chain-node .cn-val{font-size:13px;font-weight:600;margin-top:2px}
+.chain-node .cn-sub{font-size:11px;color:#a1a6b0;margin-top:2px}
+.chain-arrow{color:#c0c5cf;font-size:15px}
+.kv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 16px;margin-bottom:18px}
+.kv-item .kv-lbl{font-size:12px;color:var(--ink-subtle)}
+.kv-item .kv-val{font-size:13px;font-weight:500;margin-top:3px}
+.modal-sub-title{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;margin-bottom:10px}
+.modal-sub-title::before{content:"";width:3px;height:13px;border-radius:2px;background:var(--accent)}
+.modal-table{border:1px solid #eef0f4;border-radius:12px;overflow:hidden}
+.modal-table table{min-width:0;width:100%}
+.modal-table thead th{background:#fafafc;padding:10px 12px}
+.modal-table tbody td{padding:10px 12px}
+
+/* 功能说明面板 */
+.func-panel{position:fixed;top:0;right:0;bottom:0;width:340px;z-index:890;background:#fff;border-left:1px solid #e3e6eb;box-shadow:-1px 0 12px rgba(20,30,60,.04);display:flex;flex-direction:column}
+.func-panel .fp-inner{display:flex;flex-direction:column;height:100%;min-width:0}
+.func-panel .fp-header{display:flex;align-items:center;justify-content:space-between;padding:15px 14px 13px 18px;border-bottom:1px solid #f0f1f4;flex-shrink:0}
+.func-panel .fp-title{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:700;color:#1d1d1f}
+.func-panel .fp-title::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px rgba(0,102,204,.12)}
+.func-panel .fp-fold-btn{width:28px;height:28px;border:1px solid var(--border);background:#fff;border-radius:50%;color:var(--ink-subtle);font-size:15px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.func-panel .fp-fold-btn:hover{border-color:var(--accent);color:var(--accent)}
+.func-panel .fp-body{flex:1;overflow-y:auto;padding:4px 18px 40px;font-size:13px;color:#555;line-height:1.9}
+.func-panel .fp-body::-webkit-scrollbar{width:5px}
+.func-panel .fp-body::-webkit-scrollbar-thumb{background:#d8dce3;border-radius:3px}
+.func-panel .fp-body h4{font-size:14px;font-weight:600;color:#1d1d1f;margin:18px 0 6px}
+.func-panel .fp-body h4:first-child{margin-top:12px}
+.func-panel .fp-body ul{padding-left:18px;margin:0 0 8px}
+.func-panel .fp-body li{margin-bottom:6px}
+.func-panel .fp-body strong{color:#333}
+.func-panel .fp-open{display:none;position:absolute;inset:0;border:none;background:transparent;cursor:pointer;writing-mode:vertical-rl;text-orientation:upright;font-size:13px;font-weight:600;letter-spacing:6px;color:var(--ink-subtle);align-items:center;justify-content:center;font-family:inherit}
+.func-panel .fp-open:hover{color:var(--accent);background:#fafbfc}
+@media (min-width:1024px){
+    .main,.breadcrumb{margin-right:340px}
+    body.fp-collapsed .main,body.fp-collapsed .breadcrumb{margin-right:40px}
+    body.fp-collapsed .func-panel{width:40px}
+    body.fp-collapsed .fp-inner{display:none}
+    body.fp-collapsed .fp-open{display:flex}
+}
+@media (max-width:1023.98px){
+    .func-panel{display:none}
+    .main,.breadcrumb{margin-right:0}
+}
+</style>
+</head>
+<body>
+<div class="breadcrumb">
+    <a href="分销.html">分销中心</a>
+    <span> / </span>
+    <span class="current">分销绑定记录</span>
+</div>
+
+<div class="main">
+
+    <!-- 统计卡片 -->
+    <div class="stat-group">
+        <div class="stat-group-title">绑定概览</div>
+        <div class="stat-row">
+            <div class="stat-card">
+                <div class="sc-label">绑定关系总数</div>
+                <div class="sc-value blue">1,286</div>
+                <div class="sc-sub">「用户 × 产品」维度的绑定条数</div>
+            </div>
+            <div class="stat-card">
+                <div class="sc-label">有效绑定</div>
+                <div class="sc-value green">842</div>
+                <div class="sc-sub">距过期时间仍有剩余天数</div>
+            </div>
+            <div class="stat-card">
+                <div class="sc-label">已过期绑定</div>
+                <div class="sc-value red">444</div>
+                <div class="sc-sub">首触满 30 天，不再分佣</div>
+            </div>
+            <div class="stat-card">
+                <div class="sc-label">累计已下单总金额</div>
+                <div class="sc-value">¥386,420.00</div>
+                <div class="sc-sub">绑定期内产生的订单金额合计</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 业务规则提示 -->
+    <div class="rule-tip">
+        <b>绑定规则：</b>下单人点击分销链接即建立「分销员 — 下单人 — 产品」绑定关系，有效期 30 天（过期时间 = 首触时间 + 30 天）；有效期内该下单人购买此产品的每一笔订单均计入该分销员分佣，多次下单多次分佣。
+    </div>
+
+    <!-- 筛选面板 -->
+    <div class="adv-filter">
+        <div class="af-title">筛选条件</div>
+        <div class="af-grid">
+            <div class="af-field">
+                <label>用户账号（下单人手机号）</label>
+                <input type="text" id="bUser" placeholder="输入下单人手机号" oninput="filterBindings()">
+            </div>
+            <div class="af-field">
+                <label>分销员账号（手机号）</label>
+                <input type="text" id="bDistAcct" placeholder="输入分销员手机号" oninput="filterBindings()">
+            </div>
+            <div class="af-field">
+                <label>分销员姓名</label>
+                <input type="text" id="bDistName" placeholder="输入分销员姓名" oninput="filterBindings()">
+            </div>
+            <div class="af-field">
+                <label>产品ID / 产品名称</label>
+                <input type="text" id="bProduct" placeholder="输入产品ID或名称" oninput="filterBindings()">
+            </div>
+            <div class="af-field">
+                <label>分销类型（可多选）</label>
+                <div class="af-chips" id="bTypeChips">
+                    <label class="af-chip"><input type="checkbox" name="bType" value="all" checked onchange="syncChips('bTypeChips',this)"><span>全部类型</span></label>
+                    <label class="af-chip"><input type="checkbox" name="bType" value="course" checked onchange="syncChips('bTypeChips',this)"><span>课程</span></label>
+                    <label class="af-chip"><input type="checkbox" name="bType" value="product" checked onchange="syncChips('bTypeChips',this)"><span>商品</span></label>
+                </div>
+            </div>
+            <div class="af-field">
+                <label>绑定状态（可多选）</label>
+                <div class="af-chips" id="bStatusChips">
+                    <label class="af-chip"><input type="checkbox" name="bStatus" value="all" checked onchange="syncChips('bStatusChips',this)"><span>全部状态</span></label>
+                    <label class="af-chip"><input type="checkbox" name="bStatus" value="valid" checked onchange="syncChips('bStatusChips',this)"><span>有效</span></label>
+                    <label class="af-chip"><input type="checkbox" name="bStatus" value="expiring" checked onchange="syncChips('bStatusChips',this)"><span>即将过期</span></label>
+                    <label class="af-chip"><input type="checkbox" name="bStatus" value="expired" checked onchange="syncChips('bStatusChips',this)"><span>已过期</span></label>
+                </div>
+            </div>
+            <div class="af-field">
+                <label>首触时间（区间）</label>
+                <div class="af-date-range">
+                    <input type="date" id="bStart" onchange="filterBindings()">
+                    <span>至</span>
+                    <input type="date" id="bEnd" onchange="filterBindings()">
+                </div>
+            </div>
+            <div class="af-field">
+                <label>过期时间（区间）</label>
+                <div class="af-date-range">
+                    <input type="date" id="bExpStart" onchange="filterBindings()">
+                    <span>至</span>
+                    <input type="date" id="bExpEnd" onchange="filterBindings()">
+                </div>
+            </div>
+        </div>
+        <div class="af-actions">
+            <button class="btn primary" onclick="filterBindings()">查询</button>
+            <button class="btn ghost" onclick="resetFilter()">重置</button>
+            <div class="af-right">
+                <button class="btn primary" onclick="alert('已导出当前筛选结果')">导出</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>用户账号</th>
+                    <th>分销类型</th>
+                    <th>产品ID</th>
+                    <th>产品名称</th>
+                    <th>分销员账号</th>
+                    <th>分销员姓名</th>
+                    <th>首触时间</th>
+                    <th>过期时间</th>
+                    <th>绑定状态</th>
+                    <th>已下单订单数量</th>
+                    <th>已下单订单总金额</th>
+                    <th>已结算订单数量</th>
+                    <th>已结算订单总金额</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="bindTableBody"></tbody>
+        </table>
+    </div>
+    <div class="pagination" id="bindPagination"></div>
+
+</div>
+
+<!-- 绑定明细弹窗 -->
+<div class="modal-mask" id="detailMask" onclick="if(event.target===this)closeDetail()">
+    <div class="modal">
+        <div class="modal-head">
+            <h3>绑定关系明细</h3>
+            <button class="modal-close" onclick="closeDetail()">✕</button>
+        </div>
+        <div class="modal-body" id="detailBody"></div>
+    </div>
+</div>
+<script>
+/* ===== 模拟数据：一条记录 = 一条「分销员-下单人-产品」绑定关系 ===== */
+var bindData = [
+    { user:'13900001111', type:'course',  pid:'C2026001', pname:'盆景美学·指尖山水',        distAcct:'13812345678', distName:'王小明', first:'2026-09-18 10:22', orders:3, orderAmt:1120.00, settled:2, settledAmt:746.66 },
+    { user:'13900002222', type:'course',  pid:'C2026002', pname:'诗界无心·草堂寻心',        distAcct:'13812345678', distName:'王小明', first:'2026-09-20 14:05', orders:1, orderAmt:200.00,  settled:1, settledAmt:200.00 },
+    { user:'15811113333', type:'product', pid:'P2026018', pname:'思畅 富锶低氘矿泉水',        distAcct:'18698765432', distName:'李大力', first:'2026-09-22 09:10', orders:2, orderAmt:596.00,  settled:0, settledAmt:0 },
+    { user:'13722224444', type:'course',  pid:'C2026003', pname:'搭建小茅屋',              distAcct:'18698765432', distName:'李大力', first:'2026-08-10 16:30', orders:4, orderAmt:1200.00, settled:4, settledAmt:1200.00 },
+    { user:'13533335555', type:'course',  pid:'C2026005', pname:'我为杜甫建茅屋',            distAcct:'13655667788', distName:'张小红', first:'2026-07-28 08:45', orders:2, orderAmt:1173.34, settled:2, settledAmt:1173.34 },
+    { user:'15944446666', type:'product', pid:'P2026022', pname:'杜甫草堂文创茶具套装',        distAcct:'15099887766', distName:'赵思远', first:'2026-09-21 19:02', orders:1, orderAmt:268.00,  settled:0, settledAmt:0 },
+    { user:'13655557777', type:'course',  pid:'C2026001', pname:'盆景美学·指尖山水',        distAcct:'17712340987', distName:'刘佳',   first:'2026-09-19 11:38', orders:2, orderAmt:746.66,  settled:1, settledAmt:373.33 },
+    { user:'13166668888', type:'product', pid:'P2026031', pname:'非遗蜀绣书签礼盒',          distAcct:'18856781234', distName:'陈伟',   first:'2026-09-23 08:05', orders:1, orderAmt:128.00,  settled:0, settledAmt:0 },
+    { user:'13277779999', type:'course',  pid:'C2026007', pname:'自然探索营·亲子研学',        distAcct:'18856781234', distName:'陈伟',   first:'2026-08-27 15:20', orders:3, orderAmt:894.00,  settled:1, settledAmt:298.00 },
+    { user:'15588880000', type:'product', pid:'P2026009', pname:'草堂篆刻体验套装',          distAcct:'13655667788', distName:'张小红', first:'2026-09-10 10:00', orders:5, orderAmt:1640.00, settled:3, settledAmt:984.00 },
+    { user:'18699991111', type:'course',  pid:'C2026002', pname:'诗界无心·草堂寻心',        distAcct:'18912349876', distName:'周雨萱', first:'2026-08-05 13:15', orders:1, orderAmt:200.00,  settled:1, settledAmt:200.00 },
+    { user:'13355552222', type:'product', pid:'P2026040', pname:'蜀锦纹样丝巾',            distAcct:'18912349876', distName:'周雨萱', first:'2026-09-17 20:40', orders:2, orderAmt:456.00,  settled:1, settledAmt:228.00 },
+    { user:'13411112222', type:'course',  pid:'C2026006', pname:'唐诗拓印手作课',          distAcct:'15099887766', distName:'赵思远', first:'2026-09-23 09:30', orders:0, orderAmt:0,       settled:0, settledAmt:0 }
+];
+
+var BIND_DAYS = 30;          // 绑定有效期：30 天
+var EXPIRING_DAYS = 3;       // 剩余 ≤3 天视为「即将过期」
+var bindPage = 1, bindPageSize = 8;
+
+/* ===== 工具函数 ===== */
+function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+function fmtDT(d) {
+    return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()) + ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+}
+/* 过期时间 = 首触时间 + 30 天 */
+function expireOf(first) {
+    var d = new Date(first.replace(/-/g, '/'));
+    d.setDate(d.getDate() + BIND_DAYS);
+    return d;
+}
+/* 绑定状态：按剩余天数判定 */
+function bindStatus(r) {
+    var left = Math.ceil((expireOf(r.first) - new Date()) / 86400000);
+    if (left < 0) return 'expired';
+    if (left <= EXPIRING_DAYS) return 'expiring';
+    return 'valid';
+}
+function typeTag(t) {
+    return t === 'course' ? '<span class="tag blue">课程</span>' : '<span class="tag purple">商品</span>';
+}
+function statusTag(s) {
+    var map = { valid: ['green', '有效'], expiring: ['orange', '即将过期'], expired: ['gray', '已过期'] };
+    var m = map[s] || ['gray', s];
+    return '<span class="tag ' + m[0] + '">' + m[1] + '</span>';
+}
+function money(v) {
+    return v ? '¥' + Number(v).toFixed(2) : '<span class="zero">¥0.00</span>';
+}
+
+/* ===== 多选 chip 联动（全部 / 具体项） ===== */
+function syncChips(groupId, cb) {
+    var boxes = document.querySelectorAll('#' + groupId + ' input');
+    var all = document.querySelector('#' + groupId + ' input[value="all"]');
+    if (cb.value === 'all' && cb.checked) {
+        Array.prototype.forEach.call(boxes, function (c) { c.checked = true; });
+    } else if (cb.value !== 'all') {
+        var specific = Array.prototype.filter.call(boxes, function (c) { return c.value !== 'all'; });
+        all.checked = specific.every(function (c) { return c.checked; });
+    }
+    filterBindings();
+}
+function chipSelection(groupId, fallback) {
+    var checked = Array.prototype.filter.call(
+        document.querySelectorAll('#' + groupId + ' input:checked'),
+        function (c) { return c.value !== 'all'; }).map(function (c) { return c.value; });
+    return checked.length ? checked : fallback;
+}
+
+/* ===== 筛选 ===== */
+function filterBindings() { bindPage = 1; renderBindings(); }
+function resetFilter() {
+    ['bUser', 'bDistAcct', 'bDistName', 'bProduct', 'bStart', 'bEnd', 'bExpStart', 'bExpEnd'].forEach(function (id) {
+        document.getElementById(id).value = '';
+    });
+    document.querySelectorAll('#bTypeChips input, #bStatusChips input').forEach(function (cb) { cb.checked = true; });
+    filterBindings();
+}
+function inRange(dateStr, start, end) {
+    if (!start && !end) return true;
+    var d = (dateStr || '').slice(0, 10);
+    if (!d) return false;
+    if (start && d < start) return false;
+    if (end && d > end) return false;
+    return true;
+}
+
+/* ===== 渲染列表 ===== */
+function renderBindings() {
+    var val = function (id) { return document.getElementById(id).value.trim().toLowerCase(); };
+    var userKw = val('bUser'), distAcctKw = val('bDistAcct'), distNameKw = val('bDistName'), prodKw = val('bProduct');
+    var start = document.getElementById('bStart').value, end = document.getElementById('bEnd').value;
+    var expStart = document.getElementById('bExpStart').value, expEnd = document.getElementById('bExpEnd').value;
+    var types = chipSelection('bTypeChips', ['course', 'product']);
+    var statuses = chipSelection('bStatusChips', ['valid', 'expiring', 'expired']);
+
+    var filtered = bindData.filter(function (r) {
+        if (userKw && r.user.toLowerCase().indexOf(userKw) === -1) return false;
+        if (distAcctKw && r.distAcct.toLowerCase().indexOf(distAcctKw) === -1) return false;
+        if (distNameKw && r.distName.toLowerCase().indexOf(distNameKw) === -1) return false;
+        if (prodKw && (r.pid + r.pname).toLowerCase().indexOf(prodKw) === -1) return false;
+        if (types.indexOf(r.type) === -1) return false;
+        if (statuses.indexOf(bindStatus(r)) === -1) return false;
+        if (!inRange(r.first, start, end)) return false;
+        if (!inRange(fmtDT(expireOf(r.first)), expStart, expEnd)) return false;
+        return true;
+    });
+
+    var totalPages = Math.ceil(filtered.length / bindPageSize) || 1;
+    var cur = Math.min(bindPage, totalPages);
+    var pageData = filtered.slice((cur - 1) * bindPageSize, cur * bindPageSize);
+    var html = '';
+    pageData.forEach(function (r) {
+        html += '<tr>'
+              + '<td class="mono">' + r.user + '</td>'
+              + '<td>' + typeTag(r.type) + '</td>'
+              + '<td class="prod-id">' + r.pid + '</td>'
+              + '<td>' + r.pname + '</td>'
+              + '<td class="mono">' + r.distAcct + '</td>'
+              + '<td>' + r.distName + '</td>'
+              + '<td class="mono" style="color:var(--ink-subtle)">' + r.first + '</td>'
+              + '<td class="mono" style="color:var(--ink-subtle)">' + fmtDT(expireOf(r.first)) + '</td>'
+              + '<td>' + statusTag(bindStatus(r)) + '</td>'
+              + '<td class="num-strong' + (r.orders ? '' : ' zero') + '">' + r.orders + ' 单</td>'
+              + '<td class="money' + (r.orderAmt ? '' : ' zero') + '">' + (r.orderAmt ? '¥' + r.orderAmt.toFixed(2) : '¥0.00') + '</td>'
+              + '<td class="num-strong' + (r.settled ? '' : ' zero') + '">' + r.settled + ' 单</td>'
+              + '<td class="money green' + (r.settledAmt ? '' : ' zero') + '">' + (r.settledAmt ? '¥' + r.settledAmt.toFixed(2) : '¥0.00') + '</td>'
+              + '<td><button class="action-btn blue" onclick="openDetail(\'' + r.pid + '\',\'' + r.user + '\')">查看订单</button></td>'
+              + '</tr>';
+    });
+    if (!html) html = '<tr><td colspan="14" style="text-align:center;color:var(--ink-subtle);padding:40px;">暂无符合条件的绑定记录</td></tr>';
+    document.getElementById('bindTableBody').innerHTML = html;
+    bindPage = cur;
+    renderPagination(totalPages);
+}
+
+function renderPagination(total) {
+    var html = bindPage > 1
+        ? '<div class="page-btn" onclick="goBindPage(' + (bindPage - 1) + ')">‹</div>'
+        : '<div class="page-btn disabled">‹</div>';
+    for (var i = 1; i <= total; i++) {
+        html += '<div class="page-btn' + (i === bindPage ? ' active' : '') + '" onclick="goBindPage(' + i + ')">' + i + '</div>';
+    }
+    html += bindPage < total
+        ? '<div class="page-btn" onclick="goBindPage(' + (bindPage + 1) + ')">›</div>'
+        : '<div class="page-btn disabled">›</div>';
+    document.getElementById('bindPagination').innerHTML = html;
+}
+function goBindPage(p) { bindPage = p; renderBindings(); }
+
+/* ===== 明细弹窗：绑定链路 + 该绑定下产生的订单 ===== */
+function openDetail(pid, user) {
+    var r = bindData.filter(function (x) { return x.pid === pid && x.user === user; })[0];
+    if (!r) return;
+    var st = bindStatus(r);
+    var stText = { valid: '有效', expiring: '即将过期', expired: '已过期' }[st];
+    var exp = fmtDT(expireOf(r.first));
+    var left = Math.ceil((expireOf(r.first) - new Date()) / 86400000);
+
+    var html = '<div class="bind-chain">'
+        + '<div class="chain-node"><div class="cn-role">分销员</div><div class="cn-val">' + r.distName + '</div><div class="cn-sub">' + r.distAcct + '</div></div>'
+        + '<span class="chain-arrow">→</span>'
+        + '<div class="chain-node"><div class="cn-role">下单人（用户账号）</div><div class="cn-val">' + r.user + '</div><div class="cn-sub">首触 ' + r.first + '</div></div>'
+        + '<span class="chain-arrow">→</span>'
+        + '<div class="chain-node"><div class="cn-role">产品（' + (r.type === 'course' ? '课程' : '商品') + '）</div><div class="cn-val">' + r.pname + '</div><div class="cn-sub">' + r.pid + '</div></div>'
+        + '</div>';
+
+    html += '<div class="kv-grid">'
+        + '<div class="kv-item"><div class="kv-lbl">首触时间</div><div class="kv-val">' + r.first + '</div></div>'
+        + '<div class="kv-item"><div class="kv-lbl">过期时间（首触 + 30 天）</div><div class="kv-val">' + exp + '</div></div>'
+        + '<div class="kv-item"><div class="kv-lbl">绑定状态</div><div class="kv-val">' + statusTag(st) + (left >= 0 ? ' <span style="color:var(--ink-subtle);font-size:12px;">剩 ' + left + ' 天</span>' : '') + '</div></div>'
+        + '<div class="kv-item"><div class="kv-lbl">已下单订单数量</div><div class="kv-val">' + r.orders + ' 单</div></div>'
+        + '<div class="kv-item"><div class="kv-lbl">已下单订单总金额</div><div class="kv-val">¥' + r.orderAmt.toFixed(2) + '</div></div>'
+        + '<div class="kv-item"><div class="kv-lbl">已结算订单数量 / 总金额</div><div class="kv-val">' + r.settled + ' 单 / ¥' + r.settledAmt.toFixed(2) + '</div></div>'
+        + '</div>';
+
+    html += '<div class="modal-sub-title">绑定期内订单明细</div><div class="modal-table"><table><thead><tr>'
+        + '<th>订单编号</th><th>订单金额</th><th>下单时间</th><th>佣金</th><th>状态</th></tr></thead><tbody>';
+    if (!r.orders) {
+        html += '<tr><td colspan="5" style="text-align:center;color:var(--ink-subtle);padding:26px;">该绑定关系尚未产生订单</td></tr>';
+    } else {
+        for (var i = 0; i < r.orders; i++) {
+            var amt = i === r.orders - 1 ? r.orderAmt - Math.floor(r.orderAmt / r.orders * 100) / 100 * (r.orders - 1) : Math.floor(r.orderAmt / r.orders * 100) / 100;
+            var t = new Date(r.first.replace(/-/g, '/'));
+            t.setDate(t.getDate() + i * 2);
+            var done = i < r.settled;
+            html += '<tr>'
+                + '<td class="mono" style="font-size:12px;color:var(--ink-subtle)">YX2026' + pad2(t.getMonth() + 1) + pad2(t.getDate()) + pad2(i + 1) + '00' + r.pid.slice(-2) + '</td>'
+                + '<td class="money">¥' + amt.toFixed(2) + '</td>'
+                + '<td class="mono" style="font-size:12px;color:var(--ink-subtle)">' + fmtDT(t) + '</td>'
+                + '<td style="color:var(--accent);font-weight:600">¥' + (amt * 0.15).toFixed(2) + '</td>'
+                + '<td>' + (done ? '<span class="tag green">已结算</span>' : '<span class="tag orange">待结算</span>') + '</td>'
+                + '</tr>';
+        }
+    }
+    html += '</tbody></table></div>';
+
+    document.getElementById('detailBody').innerHTML = html;
+    document.getElementById('detailMask').classList.add('show');
+}
+function closeDetail() { document.getElementById('detailMask').classList.remove('show'); }
+
+/* ===== 初始化 ===== */
+renderBindings();
+</script>
+
+<!-- ===== 右侧功能说明面板 ===== -->
+<aside class="func-panel">
+    <div class="fp-inner">
+        <div class="fp-header">
+            <span class="fp-title">功能说明</span>
+            <button class="fp-fold-btn" onclick="toggleFuncPanel()" title="收起功能说明">›</button>
+        </div>
+        <div class="fp-body">
+            <h4>一、业务规则</h4>
+            <ul>
+                <li><strong>绑定建立</strong>：下单人点击分销员分享的链接后，即建立「分销员 — 下单人 — 产品」绑定关系；一个下单人对同一产品只保留一条当前有效绑定；</li>
+                <li><strong>有效期</strong>：绑定自首触时刻起 <strong>30 天</strong>内有效，过期时间 = 首触时间 + 30 天，到期自动失效、不再分佣；</li>
+                <li><strong>多次分佣</strong>：有效期内该下单人购买此产品的每一笔订单都计入该分销员佣金，多次下单多次分佣；</li>
+                <li><strong>过期后再点击链接</strong>：重新建立一条新的绑定关系，以新的首触时间重新计算 30 天。</li>
+            </ul>
+            <h4>二、统计概览</h4>
+            <ul>
+                <li><strong>绑定关系总数</strong>：按「用户 × 产品」维度统计的绑定条数（含已过期）；</li>
+                <li><strong>有效绑定</strong>：距过期时间仍有剩余天数的绑定；</li>
+                <li><strong>已过期绑定</strong>：首触已满 30 天的绑定；</li>
+                <li><strong>累计已下单总金额</strong>：所有绑定期内产生订单的金额合计。</li>
+            </ul>
+            <h4>三、绑定记录列表</h4>
+            <ul>
+                <li><strong>用户账号</strong>：下单人手机号，即被绑定的一方；</li>
+                <li><strong>分销类型 / 产品ID / 产品名称</strong>：绑定指向的产品，类型为课程或商品，产品ID 为系统内唯一编号；</li>
+                <li><strong>分销员账号 / 姓名</strong>：获得该绑定分佣的分销员；</li>
+                <li><strong>首触时间</strong>：下单人首次点击该分销链接（建立绑定）的时间；</li>
+                <li><strong>过期时间</strong>：首触时间 + 30 天，到期即失效；</li>
+                <li><strong>绑定状态</strong>：有效 / 即将过期（剩余 ≤3 天）/ 已过期，由剩余天数自动判定；</li>
+                <li><strong>已下单订单数量 / 总金额</strong>：绑定期内该下单人对此产品已下单的订单笔数与金额合计；</li>
+                <li><strong>已结算订单数量 / 总金额</strong>：其中已完成佣金结算的部分，剩余为待结算；</li>
+                <li><strong>查看订单</strong>：打开明细弹窗，展示绑定链路与绑定期内的订单明细。</li>
+            </ul>
+            <h4>四、筛选与导出</h4>
+            <ul>
+                <li><strong>筛选条件</strong>：支持按下单人手机号、分销员手机号 / 姓名、产品ID 或名称、分销类型（多选）、绑定状态（多选）、首触时间区间、过期时间区间组合筛选，各条件相互叠加；</li>
+                <li><strong>重置</strong>：一键清空全部筛选条件并恢复全量数据；</li>
+                <li><strong>导出</strong>：按当前筛选结果导出绑定记录明细，用于分佣对账与纠纷核查。</li>
+            </ul>
+        </div>
+    </div>
+    <button class="fp-open" onclick="toggleFuncPanel()" title="展开功能说明">功能说明‹</button>
+</aside>
+
+<script>
+function toggleFuncPanel() {
+    document.body.classList.toggle('fp-collapsed');
+}
+</script>
+<script src="asset/admin-sidebar.js"></script>
+</body>
+</html>

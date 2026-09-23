@@ -32,6 +32,7 @@
             group: '管理端',
             items: [
                 { name: '分销订单管理', href: '分销订单管理.html' },
+                { name: '分销绑定记录', href: '分销绑定记录.html' },
                 { name: '分销提现管理', href: '分销提现管理.html' },
                 { name: '分销员管理',   href: '分销员管理.html' },
                 { name: '分销员详情',   href: '分销员详情.html' },
