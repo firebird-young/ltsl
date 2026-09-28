@@ -249,6 +249,7 @@
         }
         .cfg-input-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,102,204,0.1); }
         .cfg-input-box .cfg-prefix { font-size: 13px; color: var(--ink-subtle); }
+        .cfg-input-box .cfg-suffix { font-size: 13px; color: var(--ink-subtle); flex-shrink: 0; }
         .cfg-input-box input {
             width: 100%; min-width: 0; border: none; outline: none;
             font-family: inherit; font-size: 15px; font-weight: 600; color: var(--ink); background: transparent;
@@ -517,6 +518,16 @@
             </div>
             <div class="cfg-item">
                 <div class="cfg-info">
+                    <div class="cfg-name">首触保护期</div>
+                    <div class="cfg-desc">下单人首次点击分销链接即与该分销员建立绑定关系，保护期内产生的订单均计入该分销员分佣；过期后可被其他分销员重新绑定</div>
+                </div>
+                <div class="cfg-control cfg-input-box">
+                    <input type="number" id="cfgProtectDays" min="1" step="1" value="30">
+                    <span class="cfg-suffix">天</span>
+                </div>
+            </div>
+            <div class="cfg-item">
+                <div class="cfg-info">
                     <div class="cfg-name">最低提现金额</div>
                     <div class="cfg-desc">佣金累计未达该金额时自动结转至下期，达标后统一发起打款</div>
                 </div>
@@ -714,6 +725,11 @@
         document.getElementById('cfgMask').classList.remove('show');
     }
     function saveConfig() {
+        var protectDays = parseFloat(document.getElementById('cfgProtectDays').value);
+        if (isNaN(protectDays) || protectDays < 1 || protectDays % 1 !== 0) {
+            showConfigToast('首触保护期需填写大于 0 的整数天');
+            return;
+        }
         var minAmount = parseFloat(document.getElementById('cfgMinAmount').value);
         if (isNaN(minAmount) || minAmount < 0) {
             showConfigToast('最低提现金额不能小于 0');
@@ -825,6 +841,7 @@
                 <li><strong>入口</strong>：页面右上角「⚙️ 分销配置」按钮，打开参数设置弹窗（原位于「分销订单管理」页，已迁移至本页）；</li>
                 <li><strong>启用分销推广</strong>：总开关，关闭后新订单不再产生分销佣金，历史数据保留；</li>
                 <li><strong>启用「我的主页 - 我的推广」按钮</strong>：控制分销员「我的主页」中「我的推广」入口的显示；关闭后该入口隐藏，无法进入推广合作协议与实名认证流程；</li>
+                <li><strong>首触保护期</strong>：数字填写，默认 <strong>30 天</strong>；下单人首次点击分销链接即与该分销员建立绑定关系，保护期内该下单人产生的订单均计入该分销员分佣，多次下单多次分佣；保护期结束后绑定失效，可被其他分销员重新绑定；</li>
                 <li><strong>最低提现金额</strong>：佣金累计未达该金额自动结转下期，达标后统一批量打款；</li>
                 <li><strong>常见问题说明（富文本）</strong>：支持小标题、正文、加粗 / 斜体 / 下划线 / 删除线、有序与无序列表、引用、链接、图片及撤销 / 重做，并实时统计字数；保存后内容同步展示在分销员端「常见问题说明」页面；</li>
                 <li><strong>保存</strong>：保存后提示「分销配置已保存」并关闭弹窗。</li>
