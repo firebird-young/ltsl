@@ -210,6 +210,29 @@
         .wd-group .wdg-header .wdg-summary { font-size: 12px; color: var(--ink-subtle); }
         .wd-group .wdg-header .wdg-summary strong { color: var(--ink); }
         .wd-group .wdg-header .wdg-summary .red { color: #ff3b30; }
+        .wd-group .wdg-header .wdg-summary .orange { color: #ff9500; }
+        .wd-pending-hint { font-size: 12px; color: var(--ink-subtle); }
+        .wdg-head-right { display: flex; align-items: center; gap: 14px; }
+        .btn-batch {
+            display: inline-flex; align-items: center; gap: 5px;
+            height: 30px; padding: 0 14px; border-radius: var(--radius-pill);
+            border: 1px solid #cfe0fb; background: #E8F0FE; color: var(--accent);
+            font-size: 12px; font-weight: 500; cursor: pointer;
+            font-family: inherit; transition: all 0.2s; white-space: nowrap;
+        }
+        .btn-batch:hover { background: #dbe8ff; border-color: #b3cdf7; }
+        .btn-batch:active { opacity: 0.8; }
+        .btn-batch .batch-num {
+            display: inline-block; min-width: 16px; padding: 0 5px; height: 16px; line-height: 16px;
+            border-radius: 8px; background: var(--accent); color: #fff; font-size: 11px; text-align: center;
+        }
+        .btn-batch.disabled,
+        .btn-batch:disabled {
+            background: #f5f5f7; border-color: var(--border); color: #c0c4cc;
+            cursor: not-allowed;
+        }
+        .btn-batch.disabled .batch-num,
+        .btn-batch:disabled .batch-num { background: #d6d9de; color: #fff; }
         .wd-group .wdg-item { display: flex; align-items: center; padding: 14px 20px; border-bottom: 1px solid #f5f5f5; }
         .wd-group .wdg-item:last-child { border-bottom: none; }
         .wd-group .wdg-item .wdg-info { flex: 2; min-width: 0; }
@@ -329,6 +352,10 @@
         <div class="stat-group-title">提现概览</div>
         <div class="stat-row">
             <div class="stat-card">
+                <div class="sc-label">待提现总金额</div>
+                <div class="sc-value orange" id="statPendingAmount">¥0.00</div>
+            </div>
+            <div class="stat-card">
                 <div class="sc-label">已提现佣金总额</div>
                 <div class="sc-value green">¥37,240.30</div>
             </div>
@@ -375,6 +402,7 @@
                     <label>状态（多选）</label>
                     <div class="af-chips" id="wStatusChips">
                         <label class="af-chip"><input type="checkbox" name="wStatus" value="all" checked onchange="syncStatusChipsWD(this)"><span>全部状态</span></label>
+                        <label class="af-chip"><input type="checkbox" name="wStatus" value="pending" checked onchange="syncStatusChipsWD(this)"><span>待提现</span></label>
                         <label class="af-chip"><input type="checkbox" name="wStatus" value="success" checked onchange="syncStatusChipsWD(this)"><span>提现成功</span></label>
                         <label class="af-chip"><input type="checkbox" name="wStatus" value="failed" checked onchange="syncStatusChipsWD(this)"><span>提现失败</span></label>
                     </div>
@@ -396,6 +424,8 @@
 <script>
     /* ===== 模拟数据 ===== */
     var withdrawData = [
+        { month: '2026年6月', name: '孙雅婷', phone: '13566778899', idcard: '330110199405183326', amount: 2180.00, account: '微信零钱', time: '', status: 'pending' },
+        { month: '2026年6月', name: '周启明', phone: '13901234567', idcard: '330110198706241179', amount: 960.00, account: '微信零钱', time: '', status: 'pending' },
         { month: '2026年6月', name: '王小明', phone: '13812345678', idcard: '330110199003124512', amount: 1560.00, account: '微信零钱', time: '2026-06-01 09:23:45', status: 'success' },
         { month: '2026年5月', name: '李大力', phone: '18698765432', idcard: '330110198812052316', amount: 2300.00, account: '微信零钱', time: '2026-05-31 14:55:33', status: 'success' },
         { month: '2026年5月', name: '张小红', phone: '13655667788', idcard: '330110199507220021', amount: 880.00, account: '微信零钱', time: '2026-05-31 16:08:12', status: 'success' },
@@ -406,13 +436,13 @@
         { month: '2026年4月', name: '李大力', phone: '18698765432', idcard: '330110198812052316', amount: 1400.00, account: '微信零钱', time: '2026-04-30 15:36:48', status: 'success' },
         { month: '2026年4月', name: '刘佳', phone: '17712340987', idcard: '330110199811301122', amount: 800.00, account: '微信零钱', time: '', status: 'failed', failReason: '身份证实名核验未通过，打款被微信支付拒绝，请确认实名信息后重试' },
     ];
-    var statusLabels = { success: '提现成功', failed: '提现失败' };
+    var statusLabels = { pending: '待提现', success: '提现成功', failed: '提现失败' };
 
     var withdrawPage = 1, withdrawPageSize = 6;
 
     /* ===== 状态标签 ===== */
     function wdStatusTag(status, reason) {
-        var map = { success: ['green', '提现成功'], failed: ['red', '提现失败'] };
+        var map = { pending: ['orange', '待提现'], success: ['green', '提现成功'], failed: ['red', '提现失败'] };
         var m = map[status] || ['gray', status];
         if (status === 'failed' && reason) {
             return '<span class="tag ' + m[0] + ' wd-fail">' + m[1] + '<span class="wd-fail-tip">' + reason + '</span></span>';
@@ -500,7 +530,7 @@
         var statuses = Array.prototype.filter.call(
             document.querySelectorAll('#wStatusChips input:checked'),
             function (c) { return c.value !== 'all'; }).map(function (c) { return c.value; });
-        if (!statuses.length) statuses = ['success', 'failed'];
+        if (!statuses.length) statuses = ['pending', 'success', 'failed'];
         return withdrawData.filter(function (w) {
             var mk = monthKey(w.month);
             if (mStart && mk < mStart) return false;
@@ -515,6 +545,16 @@
     function renderWithdraws() {
         var filtered = getFilteredWithdraws();
 
+        /* 顶部统计：待提现总金额（全量数据口径，不受筛选影响） */
+        var pendingTotal = withdrawData.filter(function (w) { return w.status === 'pending'; })
+            .reduce(function (s, w) { return s + w.amount; }, 0);
+        var pendingEl = document.getElementById('statPendingAmount');
+        if (pendingEl) {
+            pendingEl.textContent = '¥' + pendingTotal.toLocaleString('en-US', {
+                minimumFractionDigits: 2, maximumFractionDigits: 2
+            });
+        }
+
         var groups = {};
         filtered.forEach(function(w) {
             if (!groups[w.month]) groups[w.month] = [];
@@ -528,16 +568,42 @@
             var total = items.reduce(function(s, w) { return s + w.amount; }, 0);
             var successCount = items.filter(function(w) { return w.status === 'success'; }).length;
             var failCount = items.filter(function(w) { return w.status === 'failed'; }).length;
+            var pendingItems = items.filter(function(w) { return w.status === 'pending'; });
+            var pendingCount = pendingItems.length;
+            var pendingAmount = pendingItems.reduce(function(s, w) { return s + w.amount; }, 0);
+
+            /* 组内排序：待提现 → 提现失败 → 提现成功 */
+            var statusOrder = { pending: 0, failed: 1, success: 2 };
+            items.sort(function (a, b) {
+                return (statusOrder[a.status] || 0) - (statusOrder[b.status] || 0);
+            });
 
             var summaryParts = [];
             summaryParts.push('总额 <strong>¥' + total.toFixed(2) + '</strong>');
+            if (pendingCount) {
+                summaryParts.push('待提现 <strong class="orange">' + pendingCount + '</strong> 笔 ¥' + pendingAmount.toFixed(2));
+            }
             if (successCount) summaryParts.push('成功 <strong>' + successCount + '</strong> 笔');
             if (failCount) summaryParts.push('失败 <strong class="red">' + failCount + '</strong> 笔');
+
+            /* 当前分组（当前筛选结果）内可打款记录（待提现 + 提现失败）在原始数据中的索引 */
+            var payableIdx = [];
+            items.forEach(function (w) {
+                if (w.status === 'pending' || w.status === 'failed') payableIdx.push(withdrawData.indexOf(w));
+            });
+            var payableCount = pendingCount + failCount;
 
             html += '<div class="wd-group">'
                  + '<div class="wdg-header">'
                  + '<span class="wdg-month">' + month + '</span>'
+                 + '<div class="wdg-head-right">'
                  + '<span class="wdg-summary">' + summaryParts.join(' · ') + '</span>'
+                 + '<button type="button" class="btn-batch' + (payableCount ? '' : ' disabled') + '"'
+                 + (payableCount
+                        ? ' onclick="batchPayMonth([' + payableIdx.join(',') + '])" title="对该月待提现与失败记录批量发起打款"'
+                        : ' disabled title="该月暂无可打款记录"')
+                 + '>▶ 批量打款 <span class="batch-num">' + payableCount + '</span></button>'
+                 + '</div>'
                  + '</div>';
 
             items.forEach(function(w) {
@@ -553,7 +619,11 @@
                      + '<div>' + (w.time || '<span style="color:#ccc;">-</span>') + '</div>'
                      + '</div>'
                      + '<div class="wdg-status">' + wdStatusTag(w.status, w.failReason) + '</div>'
-                     + '<div class="wdg-action">' + (w.status === 'failed' ? '<button class="btn-retry" onclick="retryWithdraw(' + withdrawData.indexOf(w) + ')">↻ 重新打款</button>' : '') + '</div>'
+                     + '<div class="wdg-action">'
+                     + (w.status === 'failed'
+                            ? '<button class="btn-retry" onclick="retryWithdraw(' + withdrawData.indexOf(w) + ')">↻ 重新打款</button>'
+                            : (w.status === 'pending' ? '<span class="wd-pending-hint">次月 1 号批量打款</span>' : ''))
+                     + '</div>'
                      + '</div>';
             });
 
@@ -565,17 +635,56 @@
         document.getElementById('withdrawPagination').innerHTML = '';
     }
 
+    function nowStr() {
+        var d = new Date();
+        var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+        return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate())
+            + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+    }
+
     function retryWithdraw(idx) {
         if (confirm('确认重新打款给该分销员？')) {
-            var d = new Date();
-            var pad = function (n) { return (n < 10 ? '0' : '') + n; };
             withdrawData[idx].status = 'success';
-            withdrawData[idx].time = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate())
-                + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+            withdrawData[idx].time = nowStr();
             withdrawData[idx].failReason = '';
             renderWithdraws();
             showToast('已重新发起打款，打款成功');
         }
+    }
+
+    /* ===== 某月批量打款（待提现 + 提现失败） ===== */
+    function batchPayMonth(idxList) {
+        var targets = (idxList || []).filter(function (i) {
+            return withdrawData[i] && (withdrawData[i].status === 'pending' || withdrawData[i].status === 'failed');
+        });
+        if (!targets.length) {
+            showToast('该月暂无可打款记录');
+            return;
+        }
+
+        var pendingN = 0, pendingAmt = 0, failN = 0, failAmt = 0;
+        targets.forEach(function (i) {
+            var w = withdrawData[i];
+            if (w.status === 'pending') { pendingN++; pendingAmt += w.amount; }
+            else { failN++; failAmt += w.amount; }
+        });
+        var total = pendingAmt + failAmt;
+        var month = withdrawData[targets[0]].month;
+        var detail = [];
+        if (pendingN) detail.push('待提现 ' + pendingN + ' 笔（¥' + pendingAmt.toFixed(2) + '）');
+        if (failN) detail.push('失败重发 ' + failN + ' 笔（¥' + failAmt.toFixed(2) + '）');
+
+        if (!confirm('确认对 ' + month + ' 的 ' + targets.length + ' 笔记录批量打款？\n'
+            + detail.join('，') + '\n合计金额 ¥' + total.toFixed(2) + '，打款结果将逐笔回写。')) { return; }
+
+        var time = nowStr();
+        targets.forEach(function (i) {
+            withdrawData[i].status = 'success';
+            withdrawData[i].time = time;
+            withdrawData[i].failReason = '';
+        });
+        renderWithdraws();
+        showToast('已批量打款 ' + targets.length + ' 笔，合计 ¥' + total.toFixed(2));
     }
 
     /* ===== 导出 Excel (.xls) — 表格样式 + 列宽设置 + 数字右对齐 ===== */
@@ -697,20 +806,32 @@
         </div>
         <div class="fp-body">
             <h4>一、提现概览</h4>
-            <p style="margin:2px 0 4px;">顶部「提现概览」两张统计卡（提现数据口径）：</p>
+            <p style="margin:2px 0 4px;">顶部「提现概览」三张统计卡（提现数据口径）：</p>
             <ul>
+                <li><strong>待提现总金额</strong>：全部「待提现」记录的金额合计，即财务需充值至微信商户号营销账户、将于次月 1 号批量打款的金额，随批量打款实时减少；</li>
                 <li><strong>已提现佣金总额</strong>：分销员累计已成功打款到账的佣金金额，示例 <i>¥37,240.30</i>；</li>
                 <li><strong>提现失败待重发金额</strong>：因实名不一致、风控拦截等原因打款失败、需重新发起打款的金额合计，示例 <i>¥4,500.00</i>。</li>
             </ul>
             <h4>二、提现记录</h4>
-            <p style="margin:2px 0 4px;">业务规则：佣金累计达到「最低提现金额」后自动发起提现，因此每条记录均已有明确打款结果，只有「提现成功 / 提现失败」两种状态；未发起提现的佣金仍留存于分销员余额中</p>
+            <p style="margin:2px 0 4px;">业务规则：佣金累计达到「最低提现金额」的用户，由系统在每月月底计算生成提现记录，次月 1 号统一批量打款；因此记录存在「<strong>待提现</strong> / <strong>提现成功</strong> / <strong>提现失败</strong>」三种状态；余额未达标的佣金不生成记录，仍留存于分销员余额中</p>
             <ul>
-                <li><strong>按月分组</strong>：按月份展示提现记录，头部汇总当月总额及成功 / 失败笔数；</li>
-                <li><strong>独立筛选</strong>：支持按分销员姓名、分销员账号、月份区间与状态（可多选）组合筛选；月份为一个合并输入框，点击调用日期控件选择起始 / 结束月，只填单侧则按单月筛选，倒序自动纠正；</li>
+                <li><strong>状态说明</strong>：<span class="tag orange" style="font-size:11px;">待提现</span> 系统已计算生成、款项尚未打至分销员；<span class="tag green" style="font-size:11px;">提现成功</span> 已打款至微信零钱；<span class="tag red" style="font-size:11px;">提现失败</span> 打款被拒，需重发；</li>
+                <li><strong>按月分组</strong>：按月份展示提现记录，头部左侧为月份，右侧汇总当月总额、待提现金额及成功 / 失败笔数，并提供「批量打款」按钮；组内按「待提现 → 提现失败 → 提现成功」排序；</li>
+                <li><strong>待提现记录</strong>：操作列不提供单条打款按钮，仅提示「次月 1 号批量打款」，打款时间显示为「-」；如需提前打款，使用分组头部的「批量打款」；</li>
+                <li><strong>批量打款</strong>：每个月份分组头部右侧提供该按钮，蓝色徽标显示该月分组内可打款笔数（<strong>待提现 + 提现失败</strong>）；点击后二次确认，弹窗按「待提现 N 笔（金额）/ 失败重发 N 笔（金额）」分项列出并给出合计金额，确认即对该月待提现与失败记录一次性批量打款，结果逐笔回写为「提现成功」并记录打款时间、清除失败原因；分组内无可打款记录时按钮置灰不可点击；</li>
+                <li><strong>独立筛选</strong>：支持按分销员姓名、分销员账号、月份区间与状态（可多选，含待提现）组合筛选；月份为一个合并输入框，点击调用日期控件选择起始 / 结束月，只填单侧则按单月筛选，倒序自动纠正；</li>
                 <li><strong>身份信息</strong>：列表展示分销员姓名、手机号及身份证号，供打款实名核验与税务申报使用；</li>
                 <li><strong>失败原因</strong>：鼠标悬停「提现失败」标签可查看具体失败原因；</li>
                 <li><strong>重新打款</strong>：仅「提现失败」的记录显示，点击二次确认后重新发起打款，打款成功即更新为「提现成功」并记录打款时间；</li>
-                <li><strong>导出</strong>：将当前筛选条件下的全部提现记录导出为 Excel</li>
+                <li><strong>导出</strong>：将当前筛选条件下的全部提现记录导出为 Excel（状态列区分待提现 / 成功 / 失败）</li>
+            </ul>
+            <h4>三、月度结算与打款流程</h4>
+            <ul>
+                <li><strong>① 每月月底（如 28 号）系统计算</strong>：系统统计各分销员当月可提现佣金，筛选出累计金额达到「最低提现金额」的用户，按用户生成当月提现记录，状态统一为「<strong>待提现</strong>」；此时尚未发生实际打款，记录即为本月的待打款清单；</li>
+                <li><strong>② 财务备款</strong>：财务在本页按月份查看「待提现」清单，核对笔数与合计金额无误后，将对应款项从对公账户转入<strong>微信商户号营销账户</strong>（营销资金 / 代付备付金），确保账户余额充足；</li>
+                <li><strong>③ 次月 1 号系统批量打款</strong>：系统于次月 1 号按上月「待提现」记录逐笔批量打款至分销员微信零钱，打款成功的记录状态更新为「提现成功」并写入打款时间；</li>
+                <li><strong>④ 打款失败处理</strong>：打款被拒（如实名不一致、风控拦截）的记录转为「提现失败」并记录失败原因，可点击分组头部「批量打款」（与待提现记录一并提交）或单条「重新打款」重试；</li>
+                <li><strong>示例</strong>：6 月 28 日计算生成 6 月待提现记录 → 财务充值至微信商户号营销账户 → 7 月 1 日系统批量打款 → 记录转为「提现成功」；</li>
             </ul>
         </div>
     </div>

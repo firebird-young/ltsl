@@ -206,7 +206,7 @@ tbody tr:hover{background:#FAFBFF}
                 <input type="text" id="bProduct" placeholder="输入产品ID或名称" oninput="filterBindings()">
             </div>
             <div class="af-field">
-                <label>分销类型（可多选）</label>
+                <label>分销产品类型（可多选）</label>
                 <div class="af-chips" id="bTypeChips">
                     <label class="af-chip"><input type="checkbox" name="bType" value="all" checked onchange="syncChips('bTypeChips',this)"><span>全部类型</span></label>
                     <label class="af-chip"><input type="checkbox" name="bType" value="course" checked onchange="syncChips('bTypeChips',this)"><span>课程</span></label>
@@ -253,7 +253,7 @@ tbody tr:hover{background:#FAFBFF}
             <thead>
                 <tr>
                     <th>用户账号</th>
-                    <th>分销类型</th>
+                    <th>分销产品类型</th>
                     <th>产品ID</th>
                     <th>产品名称</th>
                     <th>分销员账号</th>
@@ -518,7 +518,7 @@ renderBindings();
             <h4>三、绑定记录列表</h4>
             <ul>
                 <li><strong>用户账号</strong>：下单人手机号，即被绑定的一方；</li>
-                <li><strong>分销类型 / 产品ID / 产品名称</strong>：绑定指向的产品，类型为课程或商品，产品ID 为系统内唯一编号；</li>
+                <li><strong>分销产品类型 / 产品ID / 产品名称</strong>：绑定指向的产品，类型为课程或商品，产品ID 为系统内唯一编号；</li>
                 <li><strong>分销员账号 / 姓名</strong>：获得该绑定分佣的分销员；</li>
                 <li><strong>首触时间</strong>：下单人首次点击该分销链接（建立绑定）的时间；</li>
                 <li><strong>过期时间</strong>：首触时间 + 30 天，到期即失效；</li>

@@ -157,7 +157,7 @@
         .table-wrap {
             background: #fff; border-radius: var(--radius-card); overflow-x: auto; box-shadow: var(--shadow-card);
         }
-        table { width: 100%; border-collapse: collapse; min-width: 1140px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1240px; }
         thead th {
             font-size: 12px; font-weight: 600; color: var(--ink-subtle); text-align: left;
             padding: 14px 16px; border-bottom: 1px solid var(--border); background: #fafafc;
@@ -174,6 +174,7 @@
         .tag.green { background: #E8F5E9; color: #34c759; }
         .tag.orange { background: #FFF3E0; color: #ff9500; }
         .tag.blue { background: #E8F0FE; color: var(--accent); }
+        .tag.purple { background: #F1EBFF; color: #7b5cf0; }
         .tag.red { background: #FFF0F0; color: #ff3b30; }
         .tag.gray { background: #f5f5f7; color: var(--ink-subtle); }
 
@@ -305,6 +306,14 @@
                     <input type="text" id="oName" placeholder="输入订单名称" oninput="filterOrders()">
                 </div>
                 <div class="af-field">
+                    <label>分销产品类型（可多选）</label>
+                    <div class="af-chips" id="oTypeChips">
+                        <label class="af-chip"><input type="checkbox" name="oType" value="all" checked onchange="syncTypeChips(this)"><span>全部类型</span></label>
+                        <label class="af-chip"><input type="checkbox" name="oType" value="course" checked onchange="syncTypeChips(this)"><span>课程</span></label>
+                        <label class="af-chip"><input type="checkbox" name="oType" value="product" checked onchange="syncTypeChips(this)"><span>商品</span></label>
+                    </div>
+                </div>
+                <div class="af-field">
                     <label>分销员账号</label>
                     <input type="text" id="oDistAcct" placeholder="输入分销员手机号" oninput="filterOrders()">
                 </div>
@@ -369,6 +378,7 @@
                     <tr>
                         <th>订单编号</th>
                         <th>订单名称</th>
+                        <th>分销产品类型</th>
                         <th>订单金额</th>
                         <th>分销员</th>
                         <th>分销员账号</th>
@@ -392,14 +402,17 @@
 <script>
     /* ===== 模拟数据 ===== */
     var orderData = [
-        { id: 'YX20260602001', name: '盆景美学·指尖山水', amount: 373.33, phone: '13812345678', distributor: '王小明', buyerPhone: '13900001111', rate: '15%', commission: 56.00, time: '2026-06-02 10:30', settleTime: '2026-06-02 23:00', status: 'done' },
-        { id: 'YX20260601002', name: '诗界无心·草堂寻心', amount: 200.00, phone: '13812345678', distributor: '王小明', buyerPhone: '13900002222', rate: '15%', commission: 30.00, time: '2026-06-01 14:20', settleTime: '2026-06-01 23:00', status: 'done' },
-        { id: 'YX20260530003', name: '搭建小茅屋', amount: 150.00, phone: '18698765432', distributor: '李大力', buyerPhone: '15811113333', rate: '15%', commission: 22.50, time: '2026-05-30 09:15', settleTime: null, status: 'pending' },
-        { id: 'YX20260522004', name: '自然探索营', amount: 298.00, phone: '18698765432', distributor: '李大力', buyerPhone: '13722224444', rate: '15%', commission: 44.70, time: '2026-05-22 08:30', settleTime: '2026-05-22 23:00', status: 'done' },
-        { id: 'YX20260520005', name: '我为杜甫建茅屋', amount: 586.67, phone: '13655667788', distributor: '张小红', buyerPhone: '13533335555', rate: '15%', commission: 88.00, time: '2026-05-20 16:00', settleTime: '2026-05-20 23:00', status: 'done' },
-        { id: 'YX20260518006', name: '盆景美学·指尖山水', amount: 373.33, phone: '15099887766', distributor: '赵思远', buyerPhone: '15944446666', rate: '15%', commission: 56.00, time: '2026-05-18 11:20', settleTime: null, status: 'refund' },
-        { id: 'YX20260515007', name: '诗界无心·草堂寻心', amount: 200.00, phone: '17712340987', distributor: '刘佳', buyerPhone: '13655557777', rate: '15%', commission: 30.00, time: '2026-05-15 09:00', settleTime: '2026-05-15 23:00', status: 'done' },
-        { id: 'YX20260512008', name: '搭建小茅屋', amount: 150.00, phone: '18856781234', distributor: '陈伟', buyerPhone: '13166668888', rate: '15%', commission: 22.50, time: '2026-05-12 14:30', settleTime: null, status: 'pending' },
+        { id: 'YX20260605009', name: '思畅 富锶低氘矿泉水', type: 'product', amount: 298.00, phone: '18698765432', distributor: '李大力', buyerPhone: '15811113333', rate: '12%', commission: 35.76, time: '2026-06-05 15:40', settleTime: null, status: 'pending' },
+        { id: 'YX20260604010', name: '杜甫草堂文创茶具套装', type: 'product', amount: 268.00, phone: '15099887766', distributor: '赵思远', buyerPhone: '15944446666', rate: '12%', commission: 32.16, time: '2026-06-04 09:20', settleTime: '2026-06-04 23:00', status: 'done' },
+        { id: 'YX20260602001', name: '盆景美学·指尖山水', type: 'course', amount: 373.33, phone: '13812345678', distributor: '王小明', buyerPhone: '13900001111', rate: '15%', commission: 56.00, time: '2026-06-02 10:30', settleTime: '2026-06-02 23:00', status: 'done' },
+        { id: 'YX20260601002', name: '诗界无心·草堂寻心', type: 'course', amount: 200.00, phone: '13812345678', distributor: '王小明', buyerPhone: '13900002222', rate: '15%', commission: 30.00, time: '2026-06-01 14:20', settleTime: '2026-06-01 23:00', status: 'done' },
+        { id: 'YX20260530003', name: '搭建小茅屋', type: 'course', amount: 150.00, phone: '18698765432', distributor: '李大力', buyerPhone: '15811113333', rate: '15%', commission: 22.50, time: '2026-05-30 09:15', settleTime: null, status: 'pending' },
+        { id: 'YX20260528011', name: '非遗蜀绣书签礼盒', type: 'product', amount: 128.00, phone: '13655667788', distributor: '张小红', buyerPhone: '13533335555', rate: '12%', commission: 15.36, time: '2026-05-28 20:10', settleTime: '2026-05-28 23:00', status: 'done' },
+        { id: 'YX20260522004', name: '自然探索营', type: 'course', amount: 298.00, phone: '18698765432', distributor: '李大力', buyerPhone: '13722224444', rate: '15%', commission: 44.70, time: '2026-05-22 08:30', settleTime: '2026-05-22 23:00', status: 'done' },
+        { id: 'YX20260520005', name: '我为杜甫建茅屋', type: 'course', amount: 586.67, phone: '13655667788', distributor: '张小红', buyerPhone: '13533335555', rate: '15%', commission: 88.00, time: '2026-05-20 16:00', settleTime: '2026-05-20 23:00', status: 'done' },
+        { id: 'YX20260518006', name: '盆景美学·指尖山水', type: 'course', amount: 373.33, phone: '15099887766', distributor: '赵思远', buyerPhone: '15944446666', rate: '15%', commission: 56.00, time: '2026-05-18 11:20', settleTime: null, status: 'refund' },
+        { id: 'YX20260515007', name: '诗界无心·草堂寻心', type: 'course', amount: 200.00, phone: '17712340987', distributor: '刘佳', buyerPhone: '13655557777', rate: '15%', commission: 30.00, time: '2026-05-15 09:00', settleTime: '2026-05-15 23:00', status: 'done' },
+        { id: 'YX20260512008', name: '搭建小茅屋', type: 'course', amount: 150.00, phone: '18856781234', distributor: '陈伟', buyerPhone: '13166668888', rate: '15%', commission: 22.50, time: '2026-05-12 14:30', settleTime: null, status: 'pending' },
     ];
 
     var orderPage = 1, orderPageSize = 6;
@@ -409,6 +422,10 @@
         var map = { done: ['green', '已结算'], pending: ['orange', '待结算'], refund: ['red', '已作废'] };
         var m = map[status] || ['gray', status];
         return '<span class="tag ' + m[0] + '">' + m[1] + '</span>';
+    }
+    /* ===== 分销产品类型标签：课程 / 商品 ===== */
+    function typeTag(t) {
+        return t === 'course' ? '<span class="tag blue">课程</span>' : '<span class="tag purple">商品</span>';
     }
     /* ===== 分销订单：独立多条件筛选 ===== */
     function filterOrders() {
@@ -421,7 +438,28 @@
             document.getElementById(id).value = '';
         });
         document.querySelectorAll('#oStatusChips input').forEach(function (cb) { cb.checked = true; });
+        document.querySelectorAll('#oTypeChips input').forEach(function (cb) { cb.checked = true; });
         filterOrders();
+    }
+    /* 分销产品类型多选联动（全部类型 / 课程 / 商品） */
+    function syncTypeChips(cb) {
+        var box = document.getElementById('oTypeChips');
+        var all = box.querySelector('input[value="all"]');
+        if (cb.value === 'all' && cb.checked) {
+            box.querySelectorAll('input').forEach(function (c) { c.checked = true; });
+        } else if (cb.value !== 'all') {
+            var specific = Array.prototype.filter.call(
+                box.querySelectorAll('input'),
+                function (c) { return c.value !== 'all'; });
+            all.checked = specific.every(function (c) { return c.checked; });
+        }
+        filterOrders();
+    }
+    function getTypeSelection() {
+        var checked = Array.prototype.filter.call(
+            document.querySelectorAll('#oTypeChips input:checked'),
+            function (c) { return c.value !== 'all'; }).map(function (c) { return c.value; });
+        return checked.length ? checked : ['course', 'product'];
     }
     function syncStatusChips(cb) {
         var all = document.querySelector('#oStatusChips input[value="all"]');
@@ -453,6 +491,7 @@
         var settleStart = document.getElementById('oSettleStart').value;
         var settleEnd = document.getElementById('oSettleEnd').value;
         var statuses = getStatusSelection();
+        var types = getTypeSelection();
         var inRange = function (dateStr, start, end) {
             if (!start && !end) return true;
             var d = (dateStr || '').slice(0, 10);
@@ -470,6 +509,7 @@
             if (!inRange(o.time, orderStart, orderEnd)) return false;
             if (!inRange(o.settleTime, settleStart, settleEnd)) return false;
             if (statuses.indexOf(o.status) === -1) return false;
+            if (types.indexOf(o.type) === -1) return false;
             return true;
         });
 
@@ -503,6 +543,7 @@
         pageData.forEach(function(o) {
             html += '<tr><td style="font-size:12px;color:var(--ink-subtle);">' + o.id + '</td>'
                  + '<td>' + o.name + '</td>'
+                 + '<td>' + typeTag(o.type) + '</td>'
                  + '<td>¥' + o.amount.toFixed(2) + '</td>'
                  + '<td><a href="分销员详情.html?name=' + encodeURIComponent(o.distributor) + '&phone=' + o.phone + '" style="color:var(--accent);text-decoration:none;font-weight:500;">' + o.distributor + '</a></td>'
                  + '<td style="font-family:monospace;">' + o.phone + '</td>'
@@ -513,7 +554,7 @@
                  + '<td style="font-size:12px;color:var(--ink-subtle);">' + (o.settleTime || '-') + '</td>'
                  + '<td>' + statusTag(o.status) + '</td></tr>';
         });
-        if (!html) html = '<tr><td colspan="11" style="text-align:center;color:var(--ink-subtle);padding:40px;">暂无数据</td></tr>';
+        if (!html) html = '<tr><td colspan="12" style="text-align:center;color:var(--ink-subtle);padding:40px;">暂无数据</td></tr>';
         document.getElementById('orderTableBody').innerHTML = html;
         renderPagination('orderPagination', totalPages, orderPage, goOrderPage);
     }
@@ -552,7 +593,8 @@
             </ul>
             <h4>二、分销订单</h4>
             <ul>
-                <li><strong>独立筛选</strong>：支持按订单编号、订单名称、分销员账号 / 姓名、下单人账号、下单 / 结算时间区间、状态（可多选）组合筛选，各条件相互叠加；</li>
+                <li><strong>独立筛选</strong>：支持按订单编号、订单名称、分销产品类型（可多选）、分销员账号 / 姓名、下单人账号、下单 / 结算时间区间、状态（可多选）组合筛选，各条件相互叠加；</li>
+                <li><strong>分销产品类型</strong>：新增该筛选条件与列表列，区分「<span class="tag blue" style="font-size:11px;">课程</span>」与「<span class="tag purple" style="font-size:11px;">商品</span>」两类分销产品；筛选支持全部类型 / 课程 / 商品多选联动（勾选「全部类型」即全选，取消任一子项后「全部类型」自动取消），与绑定记录页的分销类型口径一致；</li>
                 <li><strong>佣金统计总额</strong>：选择下单或结算时间区间后，表格上方自动汇总该区间内筛选订单数与订单金额、佣金总额及已结算 / 待结算 / 已作废佣金；</li>
                 <li><strong>状态含义</strong>：已结算 / 待结算 / 已作废，已作废订单佣金不计入结算；</li>
                 <li><strong>结算规则</strong>：订单成交后进入「待结算」，已核销/已过期且7天无退款的订单结算并发放佣金「已结算」；</li>
