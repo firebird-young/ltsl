@@ -270,8 +270,25 @@
         .cfg-switch input:checked + i { background: var(--accent); }
         .cfg-switch input:checked + i::before { transform: translateX(20px); }
 
-        /* ===== 常见问题说明：富文本编辑区 ===== */
-        .cfg-rich { padding: 16px 0 6px; border-top: 1px solid #f5f5f7; margin-top: 4px; }
+        /* ===== 富文本内容项（分销协议 / 常见问题说明）===== */
+        .cfg-doc-ctrl { gap: 10px; }
+        .doc-btn {
+            height: 34px; padding: 0 16px; border-radius: var(--radius-pill);
+            border: 1px solid var(--border); background: #fff; color: var(--ink);
+            font-family: inherit; font-size: 12.5px; font-weight: 500; cursor: pointer;
+            white-space: nowrap; transition: all 0.2s;
+        }
+        .doc-btn:hover { border-color: var(--accent); color: var(--accent); background: #f7faff; }
+        .doc-btn:active { opacity: 0.8; }
+
+        /* 富文本编辑弹窗 */
+        .rt-mask { z-index: 1300; }
+        .rt-dialog { width: 780px; }
+        .rt-dialog .rt-body { padding: 18px 24px 6px; overflow-y: auto; flex: 1; min-height: 0; }
+        .rt-dialog .rt-wrap { margin-top: 0; }
+        .rt-dialog .rt-editor { min-height: 300px; max-height: none; }
+        .rt-dialog .rt-foot { padding: 8px 2px 12px; }
+
         .rt-wrap {
             margin-top: 10px; border: 1px solid var(--border); border-radius: 12px;
             overflow: hidden; background: #fff; transition: border-color 0.2s, box-shadow 0.2s;
@@ -487,7 +504,7 @@
         <div class="dlg-head">
             <div>
                 <div class="dlg-title">⚙️ 分销配置</div>
-                <div class="dlg-sub">配置分销推广规则、提现门槛与常见问题说明，保存后立即生效</div>
+                <div class="dlg-sub">配置分销推广规则、提现门槛、分销协议与常见问题说明，保存后立即生效</div>
             </div>
             <button class="dlg-close" onclick="closeConfig()" aria-label="关闭">✕</button>
         </div>
@@ -537,53 +554,75 @@
                 </div>
             </div>
 
-            <!-- ===== 常见问题说明：富文本编辑区 ===== -->
-            <div class="cfg-rich">
-                <div class="cfg-name">📖 常见问题说明</div>
-                <div class="cfg-desc">编辑分销员端「常见问题说明」页面的内容，保存后同步展示在小程序端</div>
-                <div class="rt-wrap">
-                    <div class="rt-toolbar">
-                        <button type="button" class="rt-btn" data-cmd="bold" title="加粗"><b>B</b></button>
-                        <button type="button" class="rt-btn" data-cmd="italic" title="斜体"><i>I</i></button>
-                        <button type="button" class="rt-btn" data-cmd="underline" title="下划线"><u>U</u></button>
-                        <button type="button" class="rt-btn" data-cmd="strikeThrough" title="删除线"><s>S</s></button>
-                        <span class="rt-sep"></span>
-                        <button type="button" class="rt-btn" data-block="h4" title="小标题">H</button>
-                        <button type="button" class="rt-btn" data-block="p" title="正文">正文</button>
-                        <span class="rt-sep"></span>
-                        <button type="button" class="rt-btn" data-cmd="insertUnorderedList" title="无序列表">•≡</button>
-                        <button type="button" class="rt-btn" data-cmd="insertOrderedList" title="有序列表">1.</button>
-                        <button type="button" class="rt-btn" data-block="blockquote" title="引用">❝</button>
-                        <span class="rt-sep"></span>
-                        <button type="button" class="rt-btn" data-cmd="createLink" title="插入链接">🔗</button>
-                        <button type="button" class="rt-btn" data-cmd="insertImage" title="插入图片">🖼</button>
-                        <span class="rt-sep"></span>
-                        <button type="button" class="rt-btn" data-cmd="removeFormat" title="清除格式">✕</button>
-                        <button type="button" class="rt-btn" data-cmd="undo" title="撤销">↶</button>
-                        <button type="button" class="rt-btn" data-cmd="redo" title="重做">↷</button>
-                    </div>
-                    <div class="rt-editor" id="rtEditor" contenteditable="true" data-ph="输入常见问题说明内容，可设置标题、列表、链接与图片…">
-                        <h4>一、佣金什么时候结算？</h4>
-                        <p>订单成交后佣金进入「待结算」，已核销 / 已过期且 7 天内未退款的订单，将在 T+1 结算为「已结算」。</p>
-                        <h4>二、什么时候可以提现？</h4>
-                        <ul>
-                            <li>佣金累计达到平台设置的最低提现金额后，可发起提现申请；</li>
-                            <li>未达最低金额的部分自动结转至下一期，达标后统一批量打款。</li>
-                        </ul>
-                        <h4>三、订单退款后佣金如何处理？</h4>
-                        <p>订单发生退款时，对应佣金计为「已作废」，不计入结算与提现。</p>
-                        <blockquote>如仍有疑问，可联系平台运营获取帮助。</blockquote>
-                    </div>
-                    <div class="rt-foot">
-                        <span>已输入 <b id="rtCount">0</b> 字</span>
-                        <span>支持标题、加粗 / 列表 / 链接 / 图片，保存后即时同步</span>
-                    </div>
+            <!-- ===== 富文本内容项：分销协议 / 常见问题说明（按钮点击弹出编辑器）===== -->
+            <div class="cfg-item">
+                <div class="cfg-info">
+                    <div class="cfg-name">📄 分销协议</div>
+                    <div class="cfg-desc">分销员申请推广资格时需同意的协议正文，保存后展示在「我的推广 - 推广合作协议」页面</div>
+                </div>
+                <div class="cfg-control cfg-doc-ctrl">
+                    <button type="button" class="doc-btn" onclick="openDocEditor('agreement')">✎ 编辑内容</button>
+                </div>
+            </div>
+            <div class="cfg-item">
+                <div class="cfg-info">
+                    <div class="cfg-name">📖 常见问题说明</div>
+                    <div class="cfg-desc">分销员端「常见问题说明」页面的内容，保存后同步展示在小程序端</div>
+                </div>
+                <div class="cfg-control cfg-doc-ctrl">
+                    <button type="button" class="doc-btn" onclick="openDocEditor('faq')">✎ 编辑内容</button>
                 </div>
             </div>
         </div>
         <div class="dlg-foot">
             <button class="btn-dlg ghost" onclick="closeConfig()">取消</button>
             <button class="btn-dlg primary" onclick="saveConfig()">保存配置</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== 富文本内容编辑弹窗（分销协议 / 常见问题说明）===== -->
+<div class="modal-mask rt-mask" id="rtMask">
+    <div class="cfg-dialog rt-dialog" role="dialog" aria-label="内容编辑">
+        <div class="dlg-head">
+            <div>
+                <div class="dlg-title" id="rtDocTitle">内容编辑</div>
+                <div class="dlg-sub" id="rtDocSub"></div>
+            </div>
+            <button class="dlg-close" onclick="closeDocEditor()" aria-label="关闭">✕</button>
+        </div>
+        <div class="rt-body">
+            <div class="rt-wrap">
+                <div class="rt-toolbar">
+                    <button type="button" class="rt-btn" data-cmd="bold" title="加粗"><b>B</b></button>
+                    <button type="button" class="rt-btn" data-cmd="italic" title="斜体"><i>I</i></button>
+                    <button type="button" class="rt-btn" data-cmd="underline" title="下划线"><u>U</u></button>
+                    <button type="button" class="rt-btn" data-cmd="strikeThrough" title="删除线"><s>S</s></button>
+                    <span class="rt-sep"></span>
+                    <button type="button" class="rt-btn" data-block="h4" title="小标题">H</button>
+                    <button type="button" class="rt-btn" data-block="p" title="正文">正文</button>
+                    <span class="rt-sep"></span>
+                    <button type="button" class="rt-btn" data-cmd="insertUnorderedList" title="无序列表">•≡</button>
+                    <button type="button" class="rt-btn" data-cmd="insertOrderedList" title="有序列表">1.</button>
+                    <button type="button" class="rt-btn" data-block="blockquote" title="引用">❝</button>
+                    <span class="rt-sep"></span>
+                    <button type="button" class="rt-btn" data-cmd="createLink" title="插入链接">🔗</button>
+                    <button type="button" class="rt-btn" data-cmd="insertImage" title="插入图片">🖼</button>
+                    <span class="rt-sep"></span>
+                    <button type="button" class="rt-btn" data-cmd="removeFormat" title="清除格式">✕</button>
+                    <button type="button" class="rt-btn" data-cmd="undo" title="撤销">↶</button>
+                    <button type="button" class="rt-btn" data-cmd="redo" title="重做">↷</button>
+                </div>
+                <div class="rt-editor" id="rtEditor" contenteditable="true" data-ph="请输入内容，可设置标题、列表、链接与图片…"></div>
+                <div class="rt-foot">
+                    <span>已输入 <b id="rtCount">0</b> 字</span>
+                    <span>支持标题、加粗 / 列表 / 链接 / 图片</span>
+                </div>
+            </div>
+        </div>
+        <div class="dlg-foot">
+            <button class="btn-dlg ghost" onclick="closeDocEditor()">取消</button>
+            <button class="btn-dlg primary" onclick="saveDocEditor()">保存内容</button>
         </div>
     </div>
 </div>
@@ -719,10 +758,11 @@
     /* ===== 分销配置弹窗 ===== */
     function openConfig() {
         document.getElementById('cfgMask').classList.add('show');
-        updateRichCount();
+        resetDocDraft();
     }
     function closeConfig() {
         document.getElementById('cfgMask').classList.remove('show');
+        resetDocDraft();
     }
     function saveConfig() {
         var protectDays = parseFloat(document.getElementById('cfgProtectDays').value);
@@ -735,6 +775,8 @@
             showConfigToast('最低提现金额不能小于 0');
             return;
         }
+        docContents.agreement = docDraft.agreement;
+        docContents.faq = docDraft.faq;
         closeConfig();
         showConfigToast('分销配置已保存');
     }
@@ -746,9 +788,81 @@
         showConfigToast._timer = setTimeout(function () { t.classList.remove('show'); }, 1800);
     }
 
-    /* ===== 常见问题说明：富文本编辑区 ===== */
+    /* ===== 富文本内容：分销协议 / 常见问题说明 ===== */
     var rtEditor = document.getElementById('rtEditor');
+    var rtMask = document.getElementById('rtMask');
     var rtStateCmds = ['bold', 'italic', 'underline', 'strikeThrough', 'insertUnorderedList', 'insertOrderedList'];
+
+    /* 两份富文本内容，保存配置时一并提交 */
+    var docContents = {
+        agreement: '<h4>一、协议主体与生效</h4>'
+            + '<p>本协议由平台运营方（以下简称「平台」）与申请成为分销员的用户（以下简称「推广者」）共同签订，推广者提交申请并经平台审核通过后生效。</p>'
+            + '<h4>二、推广方式与佣金</h4>'
+            + '<ul>'
+            + '<li>推广者通过平台分配的专属链接、二维码进行推广，他人通过该渠道下单成交后，按推广者当前等级比例计提佣金；</li>'
+            + '<li>佣金在订单核销 / 过期且 7 天内未退款后结算，累计达到最低提现金额后于次月 1 号统一批量打款。</li>'
+            + '</ul>'
+            + '<h4>三、行为规范</h4>'
+            + '<p>推广者不得进行虚假交易、刷单、恶意退货、虚假宣传等行为，不得以平台名义对外承诺；一经核实，平台有权扣除对应佣金并终止其分销资格。</p>'
+            + '<h4>四、协议变更</h4>'
+            + '<p>平台可根据业务需要调整本协议内容，调整后通过小程序端公告或站内信通知，推广者继续推广视为接受变更。</p>'
+            + '<blockquote>推广前请仔细阅读本协议全部条款，如有疑问可联系平台运营咨询。</blockquote>',
+        faq: '<h4>一、佣金什么时候结算？</h4>'
+            + '<p>订单成交后佣金进入「待结算」，已核销 / 已过期且 7 天内未退款的订单，将在 T+1 结算为「已结算」。</p>'
+            + '<h4>二、什么时候可以提现？</h4>'
+            + '<ul>'
+            + '<li>佣金累计达到平台设置的最低提现金额后，可发起提现申请；</li>'
+            + '<li>未达最低金额的部分自动结转至下一期，达标后统一批量打款。</li>'
+            + '</ul>'
+            + '<h4>三、订单退款后佣金如何处理？</h4>'
+            + '<p>订单发生退款时，对应佣金计为「已作废」，不计入结算与提现。</p>'
+            + '<blockquote>如仍有疑问，可联系平台运营获取帮助。</blockquote>'
+    };
+
+    var docConf = {
+        agreement: {
+            name: '分销协议',
+            sub: '分销员申请推广资格时需同意的协议正文，保存后展示在「我的推广 - 推广合作协议」页面',
+            ph: '请输入分销协议内容，可设置标题、列表、链接与图片…'
+        },
+        faq: {
+            name: '常见问题说明',
+            sub: '分销员端「常见问题说明」页面内容，保存后同步展示在小程序端',
+            ph: '请输入常见问题说明内容，可设置标题、列表、链接与图片…'
+        }
+    };
+    var rtDocKey = null;
+    /* 编辑草稿：编辑弹窗保存后先写入草稿，点击「保存配置」才真正提交 */
+    var docDraft = { agreement: docContents.agreement, faq: docContents.faq };
+    function resetDocDraft() {
+        docDraft.agreement = docContents.agreement;
+        docDraft.faq = docContents.faq;
+    }
+
+    function openDocEditor(key) {
+        var c = docConf[key];
+        if (!c) return;
+        rtDocKey = key;
+        document.getElementById('rtDocTitle').textContent = c.name;
+        document.getElementById('rtDocSub').textContent = c.sub;
+        rtEditor.setAttribute('data-ph', c.ph);
+        rtEditor.innerHTML = docDraft[key] || '';
+        rtMask.classList.add('show');
+        updateRichCount();
+        rtSyncToolbar();
+        setTimeout(function () { rtEditor.focus(); }, 80);
+    }
+    function closeDocEditor() {
+        rtMask.classList.remove('show');
+        rtDocKey = null;
+    }
+    function saveDocEditor() {
+        if (!rtDocKey) return;
+        var key = rtDocKey;
+        docDraft[key] = rtEditor.innerHTML;
+        closeDocEditor();
+        showConfigToast('「' + docConf[key].name + '」内容已更新，点击「保存配置」后生效');
+    }
 
     function rtExec(cmd, val) {
         rtEditor.focus();
@@ -793,11 +907,16 @@
     rtEditor.addEventListener('input', updateRichCount);
     rtEditor.addEventListener('keyup', rtSyncToolbar);
     rtEditor.addEventListener('mouseup', rtSyncToolbar);
+    rtMask.addEventListener('click', function (e) {
+        if (e.target === this) closeDocEditor();
+    });
     document.getElementById('cfgMask').addEventListener('click', function (e) {
         if (e.target === this) closeConfig();
     });
     document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && document.getElementById('cfgMask').classList.contains('show')) closeConfig();
+        if (e.key !== 'Escape') return;
+        if (rtMask.classList.contains('show')) { closeDocEditor(); return; }
+        if (document.getElementById('cfgMask').classList.contains('show')) closeConfig();
     });
 </script>
 
@@ -812,7 +931,7 @@
             <h4>一、页面概述</h4>
             <ul>
                 <li>分销等级管理页（管理后台）用于配置平台分销员<strong>等级体系、升级门槛与佣金比例</strong>，支撑「分销员管理 / 分销员详情」中的等级展示与分佣结算。</li>
-                <li>页面同时承载全局<strong>「分销配置」</strong>入口（原位于「分销订单管理」页，现已迁移至此），统一维护分销推广开关、提现门槛与常见问题说明。</li>
+                <li>页面同时承载全局<strong>「分销配置」</strong>入口（原位于「分销订单管理」页，现已迁移至此），统一维护分销推广开关、提现门槛、分销协议与常见问题说明。</li>
             </ul>
             <h4>二、等级体系</h4>
             <ul>
@@ -843,7 +962,9 @@
                 <li><strong>启用「我的主页 - 我的推广」按钮</strong>：控制分销员「我的主页」中「我的推广」入口的显示；关闭后该入口隐藏，无法进入推广合作协议与实名认证流程；</li>
                 <li><strong>首触保护期</strong>：数字填写，默认 <strong>30 天</strong>；下单人首次点击分销链接，即与该分销员和该课程建立绑定关系，保护期内该下单人在该课程下产生的订单均计入该分销员分佣，多次下单多次分佣；保护期结束后绑定失效，可被其他分销员重新绑定；</li>
                 <li><strong>最低提现金额</strong>：佣金累计未达该金额自动结转下期，达标后统一批量打款；</li>
-                <li><strong>常见问题说明（富文本）</strong>：支持小标题、正文、加粗 / 斜体 / 下划线 / 删除线、有序与无序列表、引用、链接、图片及撤销 / 重做，并实时统计字数；保存后内容同步展示在分销员端「常见问题说明」页面；</li>
+                <li><strong>分销协议（富文本）</strong>：位于常见问题说明之前，右侧仅保留「✎ 编辑内容」按钮；点击后弹出富文本编辑器弹窗，编辑分销员申请推广资格时需同意的协议正文，保存后展示在「我的推广 - 推广合作协议」页面；</li>
+                <li><strong>常见问题说明（富文本）</strong>：同样改为点击「✎ 编辑内容」按钮弹出富文本编辑器，编辑分销员端「常见问题说明」页面内容，保存后同步展示在小程序端；</li>
+                <li><strong>富文本编辑器</strong>：支持小标题、正文、加粗 / 斜体 / 下划线 / 删除线、有序与无序列表、引用、链接、图片及撤销 / 重做，底部实时统计字数；点「保存内容」回填内容并提示「点击保存配置后生效」，点「取消」或按 Esc / 点击遮罩则放弃本次编辑；</li>
                 <li><strong>保存</strong>：保存后提示「分销配置已保存」并关闭弹窗。</li>
             </ul>
         </div>
