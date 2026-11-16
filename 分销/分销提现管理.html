@@ -53,7 +53,7 @@
         }
         .stat-row { display: flex; flex-wrap: wrap; gap: 16px; }
         .stat-card {
-            flex: 1 1 calc(33.333% - 11px); min-width: 240px;
+            flex: 1 1 calc(25% - 12px); min-width: 200px;
             background: #fff; border-radius: var(--radius-card); padding: 18px 20px;
             box-shadow: var(--shadow-card);
         }
@@ -63,7 +63,7 @@
         .stat-card .sc-value.green { color: #34c759; }
         .stat-card .sc-value.orange { color: #ff9500; }
         .stat-card .sc-value.red { color: #e5484d; }
-        @media (max-width: 1100px) {
+        @media (max-width: 1280px) {
             .stat-card { flex-basis: calc(50% - 8px); }
         }
 
@@ -207,7 +207,7 @@
         .wd-group { background: #fff; border-radius: var(--radius-card); margin-bottom: 16px; box-shadow: var(--shadow-card); overflow: hidden; }
         .wd-group .wdg-header { padding: 14px 20px; background: #fafafc; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
         .wd-group .wdg-header .wdg-month { font-size: 14px; font-weight: 600; color: var(--ink); }
-        .wd-group .wdg-header .wdg-summary { font-size: 12px; color: var(--ink-subtle); }
+        .wd-group .wdg-header .wdg-summary { font-size: 12px; color: var(--ink-subtle); text-align: right; line-height: 1.7; }
         .wd-group .wdg-header .wdg-summary strong { color: var(--ink); }
         .wd-group .wdg-header .wdg-summary .red { color: #ff3b30; }
         .wd-group .wdg-header .wdg-summary .orange { color: #ff9500; }
@@ -244,8 +244,15 @@
         .wd-group .wdg-item .wdg-info .wdg-idcard i {
             font-style: normal; font-family: monospace; color: var(--ink); letter-spacing: 0.3px;
         }
-        .wd-group .wdg-item .wdg-amount { flex: 1; font-size: 16px; font-weight: 700; color: var(--ink); text-align: center; }
-        .wd-group .wdg-item .wdg-meta { flex: 1.5; font-size: 12px; color: var(--ink-subtle); text-align: center; }
+        .wd-group .wdg-item .wdg-amount { flex: 1.5; text-align: center; line-height: 1.45; }
+        .wd-group .wdg-item .wdg-amount .amt-total { font-size: 16px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+        .wd-group .wdg-item .wdg-amount .amt-sub {
+            font-size: 11px; color: var(--ink-subtle); white-space: nowrap;
+            font-variant-numeric: tabular-nums;
+        }
+        .wd-group .wdg-item .wdg-amount .amt-sub .tax { color: #ff9500; }
+        .wd-group .wdg-item .wdg-amount .amt-sub b { color: #34c759; font-weight: 600; }
+        .wd-group .wdg-item .wdg-meta { flex: 1.3; font-size: 12px; color: var(--ink-subtle); text-align: center; }
         .wd-group .wdg-item .wdg-meta .wdg-acct { margin-bottom: 2px; }
         .wd-group .wdg-item .wdg-status { flex: 0.8; text-align: center; }
         .wd-group .wdg-item .wdg-action { flex: 1; text-align: center; }
@@ -304,6 +311,50 @@
         .func-panel .fp-body ul { padding-left: 18px; margin: 0 0 8px; }
         .func-panel .fp-body li { margin-bottom: 6px; }
         .func-panel .fp-body strong { color: #333; }
+        .func-panel .fp-img {
+            display: block; margin: 10px 0 6px; border: 1px solid #eceef2; border-radius: 10px;
+            overflow: hidden; box-shadow: 0 4px 14px rgba(20, 30, 60, 0.08);
+            cursor: zoom-in; text-decoration: none; max-height: 380px; position: relative;
+        }
+        .func-panel .fp-img img {
+            display: block; width: 100%; height: auto; max-height: 380px;
+            object-fit: cover; object-position: top center;
+        }
+        .func-panel .fp-img::after {
+            content: "点击查看原图"; position: absolute; left: 0; right: 0; bottom: 0;
+            padding: 18px 0 7px; text-align: center; font-size: 11px; color: #fff;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.55));
+            opacity: 0; transition: opacity 0.2s;
+        }
+        .func-panel .fp-img:hover { border-color: var(--accent); }
+        .func-panel .fp-img:hover::after { opacity: 1; }
+        .func-panel .fp-img-cap { font-size: 11px; color: #9aa0ac; text-align: center; margin: 4px 0 2px; }
+
+        /* 图片放大查看：默认适应宽度，点击图片可切换 1:1 原图 */
+        .img-lightbox {
+            position: fixed; inset: 0; z-index: 2000; background: rgba(0, 0, 0, 0.86);
+            display: none; overflow: auto; padding: 28px 28px 52px; cursor: zoom-out;
+        }
+        .img-lightbox.show { display: block; }
+        .img-lightbox img {
+            display: block; margin: 0 auto; width: auto; height: auto; max-width: 100%;
+            border-radius: 8px; background: #fff; box-shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
+            cursor: zoom-in;
+        }
+        .img-lightbox img.actual { max-width: none; cursor: zoom-out; }
+        .img-lightbox .lb-close {
+            position: fixed; top: 20px; right: 24px; z-index: 2; width: 36px; height: 36px;
+            border-radius: 50%; background: rgba(255, 255, 255, 0.16); color: #fff;
+            font-size: 16px; line-height: 1; display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+        }
+        .img-lightbox .lb-close:hover { background: rgba(255, 255, 255, 0.3); }
+        .img-lightbox .lb-hint {
+            position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 2;
+            padding: 6px 14px; border-radius: 999px; background: rgba(0, 0, 0, 0.5);
+            color: rgba(255, 255, 255, 0.82); font-size: 12px; white-space: nowrap;
+            pointer-events: none;
+        }
         .func-panel .fp-open {
             display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0;
             border: none; background: transparent; cursor: pointer;
@@ -356,12 +407,16 @@
                 <div class="sc-value orange" id="statPendingAmount">¥0.00</div>
             </div>
             <div class="stat-card">
-                <div class="sc-label">已提现佣金总额</div>
-                <div class="sc-value green">¥37,240.30</div>
+                <div class="sc-label">已提现总金额</div>
+                <div class="sc-value green" id="statWithdrawnAmount">¥0.00</div>
+            </div>
+            <div class="stat-card">
+                <div class="sc-label" title="已打款成功记录按代扣规则计算的税额合计">代扣税总金额</div>
+                <div class="sc-value blue" id="statTaxAmount">¥0.00</div>
             </div>
             <div class="stat-card">
                 <div class="sc-label">提现失败待重发金额</div>
-                <div class="sc-value red">¥4,500.00</div>
+                <div class="sc-value red" id="statFailedAmount">¥0.00</div>
             </div>
         </div>
     </div>
@@ -421,6 +476,13 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- 图片放大查看 -->
+<div class="img-lightbox" id="imgLightbox" onclick="closeImgLightbox()">
+    <img src="" alt="分销提现流程图" id="imgLightboxPic" onclick="toggleImgOriginal(event)" title="点击切换 1:1 原图 / 适应宽度">
+    <span class="lb-close" onclick="closeImgLightbox()">✕</span>
+    <div class="lb-hint" id="imgLightboxHint">点击图片切换 1:1 原图 · 点击空白处或按 Esc 关闭</div>
+</div>
+
 <script>
     /* ===== 模拟数据 ===== */
     var withdrawData = [
@@ -437,6 +499,16 @@
         { month: '2026年4月', name: '刘佳', phone: '17712340987', idcard: '330110199811301122', amount: 800.00, account: '微信零钱', time: '', status: 'failed', failReason: '身份证实名核验未通过，打款被微信支付拒绝，请确认实名信息后重试' },
     ];
     var statusLabels = { pending: '待提现', success: '提现成功', failed: '提现失败' };
+
+    /* ===== 代扣税规则：单笔 800 元以内免税，超出 800 元的部分按 20% 代扣 ===== */
+    var TAX_FREE_LIMIT = 800;
+    var TAX_RATE = 0.2;
+    function round2(n) { return Math.round(n * 100) / 100; }
+    function taxOf(amount) {
+        var taxable = Math.max(0, amount - TAX_FREE_LIMIT);
+        return round2(taxable * TAX_RATE);
+    }
+    function netOf(amount) { return round2(amount - taxOf(amount)); }
 
     var withdrawPage = 1, withdrawPageSize = 6;
 
@@ -545,15 +617,30 @@
     function renderWithdraws() {
         var filtered = getFilteredWithdraws();
 
-        /* 顶部统计：待提现总金额（全量数据口径，不受筛选影响） */
+        /* 顶部统计：全量数据口径，不受筛选影响 */
         var pendingTotal = withdrawData.filter(function (w) { return w.status === 'pending'; })
             .reduce(function (s, w) { return s + w.amount; }, 0);
-        var pendingEl = document.getElementById('statPendingAmount');
-        if (pendingEl) {
-            pendingEl.textContent = '¥' + pendingTotal.toLocaleString('en-US', {
+        var successItems = withdrawData.filter(function (w) { return w.status === 'success'; });
+        var withdrawnTotal = successItems.reduce(function (s, w) { return s + w.amount; }, 0);
+        var withdrawnTaxTotal = successItems.reduce(function (s, w) { return s + taxOf(w.amount); }, 0);
+        var failedTotal = withdrawData.filter(function (w) { return w.status === 'failed'; })
+            .reduce(function (s, w) { return s + w.amount; }, 0);
+
+        function fmtMoney(n) {
+            return '¥' + Number(n).toLocaleString('en-US', {
                 minimumFractionDigits: 2, maximumFractionDigits: 2
             });
         }
+        var statMap = {
+            statPendingAmount: pendingTotal,
+            statWithdrawnAmount: withdrawnTotal,
+            statTaxAmount: round2(withdrawnTaxTotal),
+            statFailedAmount: failedTotal
+        };
+        Object.keys(statMap).forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) el.textContent = fmtMoney(statMap[id]);
+        });
 
         var groups = {};
         filtered.forEach(function(w) {
@@ -580,6 +667,8 @@
 
             var summaryParts = [];
             summaryParts.push('总额 <strong>¥' + total.toFixed(2) + '</strong>');
+            var taxTotal = items.reduce(function (s, w) { return s + taxOf(w.amount); }, 0);
+            summaryParts.push('代扣税 <strong class="orange">¥' + round2(taxTotal).toFixed(2) + '</strong> · 实际到账 <strong>¥' + round2(total - taxTotal).toFixed(2) + '</strong>');
             if (pendingCount) {
                 summaryParts.push('待提现 <strong class="orange">' + pendingCount + '</strong> 笔 ¥' + pendingAmount.toFixed(2));
             }
@@ -613,7 +702,11 @@
                      + '<div class="wdg-phone">' + w.phone + '</div>'
                      + '<div class="wdg-idcard">身份证 <i>' + w.idcard + '</i></div>'
                      + '</div>'
-                     + '<div class="wdg-amount">¥' + w.amount.toFixed(2) + '</div>'
+                     + '<div class="wdg-amount">'
+                     + '<div class="amt-total">¥' + w.amount.toFixed(2) + '</div>'
+                     + '<div class="amt-sub">代扣税 <span class="tax">-¥' + taxOf(w.amount).toFixed(2) + '</span></div>'
+                     + '<div class="amt-sub">到账 <b>¥' + netOf(w.amount).toFixed(2) + '</b></div>'
+                     + '</div>'
                      + '<div class="wdg-meta">'
                      + '<div class="wdg-acct">' + w.account + '</div>'
                      + '<div>' + (w.time || '<span style="color:#ccc;">-</span>') + '</div>'
@@ -669,13 +762,16 @@
             else { failN++; failAmt += w.amount; }
         });
         var total = pendingAmt + failAmt;
+        var taxTotal = targets.reduce(function (s, i) { return s + taxOf(withdrawData[i].amount); }, 0);
         var month = withdrawData[targets[0]].month;
         var detail = [];
         if (pendingN) detail.push('待提现 ' + pendingN + ' 笔（¥' + pendingAmt.toFixed(2) + '）');
         if (failN) detail.push('失败重发 ' + failN + ' 笔（¥' + failAmt.toFixed(2) + '）');
 
         if (!confirm('确认对 ' + month + ' 的 ' + targets.length + ' 笔记录批量打款？\n'
-            + detail.join('，') + '\n合计金额 ¥' + total.toFixed(2) + '，打款结果将逐笔回写。')) { return; }
+            + detail.join('，') + '\n合计金额 ¥' + total.toFixed(2)
+            + '（代扣税 ¥' + round2(taxTotal).toFixed(2) + '，实际到账 ¥' + round2(total - taxTotal).toFixed(2) + '）'
+            + '，打款结果将逐笔回写。')) { return; }
 
         var time = nowStr();
         targets.forEach(function (i) {
@@ -684,7 +780,8 @@
             withdrawData[i].failReason = '';
         });
         renderWithdraws();
-        showToast('已批量打款 ' + targets.length + ' 笔，合计 ¥' + total.toFixed(2));
+        showToast('已批量打款 ' + targets.length + ' 笔，合计 ¥' + total.toFixed(2)
+            + '（代扣税 ¥' + round2(taxTotal).toFixed(2) + '，实际到账 ¥' + round2(total - taxTotal).toFixed(2) + '）');
     }
 
     /* ===== 导出 Excel (.xls) — 表格样式 + 列宽设置 + 数字右对齐 ===== */
@@ -700,10 +797,10 @@
                 .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         }
 
-        var headers = ['月份', '分销员姓名', '手机号', '身份证号', '提现金额', '到账方式', '打款时间', '状态', '失败原因'];
-        /* 手机号、提现金额加宽，确保默认列宽下不被截断 */
-        var widths  = [96, 100, 130, 180, 120, 100, 160, 90, 260];
-        var aligns  = ['left', 'left', 'left', 'left', 'right', 'left', 'left', 'left', 'left'];
+        var headers = ['月份', '分销员姓名', '手机号', '身份证号', '提现总金额', '代扣税金额', '实际到账金额', '到账方式', '打款时间', '状态', '失败原因'];
+        /* 手机号、金额列加宽，确保默认列宽下不被截断 */
+        var widths  = [96, 100, 130, 180, 120, 110, 120, 100, 160, 90, 260];
+        var aligns  = ['left', 'left', 'left', 'left', 'right', 'right', 'right', 'left', 'left', 'left', 'left'];
 
         /* Excel 文本标记：单元格内容以单引号开头会被强制视为文本，且前缀单引号默认隐藏 */
         var textMark = String.fromCharCode(39);
@@ -719,6 +816,8 @@
                 w.phone,
                 w.idcard,
                 fmtAmount(w.amount),
+                fmtAmount(taxOf(w.amount)),
+                fmtAmount(netOf(w.amount)),
                 w.account,
                 w.time || '-',
                 statusLabels[w.status] || w.status,
@@ -726,7 +825,7 @@
             ];
             return '<tr>' + cells.map(function (c, i) {
                 var align = ' align="' + aligns[i] + '"';
-                var cls = i === 4 ? ' class="num"' : '';
+                var cls = (i >= 4 && i <= 6) ? ' class="num"' : '';
                 /* 手机号、身份证号：前置单引号 + mso-number-format:'\\@' 双保险，避免长数字变成 3.3011E+17 */
                 if (i === 2 || i === 3) {
                     return '<td' + cls + ' style="width:' + widths[i] + 'px; mso-number-format:\\\@ ;"' + align + '>' + textMark + esc(c) + '</td>';
@@ -736,6 +835,7 @@
         }).join('');
 
         var totalAmount = rows.reduce(function (s, w) { return s + w.amount; }, 0);
+        var totalTax = rows.reduce(function (s, w) { return s + taxOf(w.amount); }, 0);
         var exportTime = new Date().toLocaleString('zh-CN', { hour12: false });
 
         var html = ''
@@ -753,7 +853,8 @@
             + '.sumrow td { background: #f5f6f8; font-weight: 600; color: #1d1d1f; }'
             + '</style></head><body>'
             + '<div class="title">提现记录</div>'
-            + '<div class="meta">导出时间：' + esc(exportTime) + ' · 共 ' + rows.length + ' 条 · 合计金额 ¥' + fmtAmount(totalAmount) + '</div>'
+            + '<div class="meta">导出时间：' + esc(exportTime) + ' · 共 ' + rows.length + ' 条 · 提现总金额 ¥' + fmtAmount(totalAmount)
+            + ' · 代扣税合计 ¥' + fmtAmount(totalTax) + ' · 实际到账合计 ¥' + fmtAmount(round2(totalAmount - totalTax)) + '</div>'
             + '<table><thead>' + headRow + '</thead><tbody>' + bodyRows + '</tbody></table>'
             + '</body></html>';
 
@@ -806,11 +907,13 @@
         </div>
         <div class="fp-body">
             <h4>一、提现概览</h4>
-            <p style="margin:2px 0 4px;">顶部「提现概览」三张统计卡（提现数据口径）：</p>
+            <p style="margin:2px 0 4px;">顶部「提现概览」四张统计卡（全量提现数据口径，不受筛选条件影响，随打款结果实时刷新）：</p>
             <ul>
-                <li><strong>待提现总金额</strong>：全部「待提现」记录的金额合计，即财务需充值至微信商户号营销账户、将于次月 1 号批量打款的金额，随批量打款实时减少；</li>
-                <li><strong>已提现佣金总额</strong>：分销员累计已成功打款到账的佣金金额，示例 <i>¥37,240.30</i>；</li>
-                <li><strong>提现失败待重发金额</strong>：因实名不一致、风控拦截等原因打款失败、需重新发起打款的金额合计，示例 <i>¥4,500.00</i>。</li>
+                <li><strong>待提现总金额</strong>：全部「待提现」记录的提现总金额合计，即财务需充值至微信商户号营销账户、将于次月 1 号批量打款的金额，随批量打款实时减少；</li>
+                <li><strong>已提现总金额</strong>：全部分销员已成功打款记录（状态为「提现成功」）的提现总金额合计，即累计已提现（含代扣税）的佣金总额；</li>
+                <li><strong>代扣税总金额</strong>：上述已成功打款记录按代扣税规则<strong>实际代扣的税额合计</strong>，即「已提现总金额」中由平台代扣代缴的部分；与「已提现总金额」之差为实际打款到账金额；</li>
+                <li><strong>提现失败待重发金额</strong>：因实名不一致、风控拦截等原因打款失败、需重新发起打款的提现总金额合计，示例 <i>¥4,500.00</i>；</li>
+                <li><strong>数值联动</strong>：批量打款 / 单条重新打款成功后，记录状态转为「提现成功」，对应金额由「待提现」「待重发」转入「已提现总金额」，并同步累加「代扣税总金额」。</li>
             </ul>
             <h4>二、提现记录</h4>
             <p style="margin:2px 0 4px;">业务规则：佣金累计达到「最低提现金额」的用户，由系统在每月月底计算生成提现记录，次月 1 号统一批量打款；因此记录存在「<strong>待提现</strong> / <strong>提现成功</strong> / <strong>提现失败</strong>」三种状态；余额未达标的佣金不生成记录，仍留存于分销员余额中</p>
@@ -820,12 +923,21 @@
                 <li><strong>待提现记录</strong>：操作列不提供单条打款按钮，仅提示「次月 1 号批量打款」，打款时间显示为「-」；如需提前打款，使用分组头部的「批量打款」；</li>
                 <li><strong>批量打款</strong>：每个月份分组头部右侧提供该按钮，蓝色徽标显示该月分组内可打款笔数（<strong>待提现 + 提现失败</strong>）；点击后二次确认，弹窗按「待提现 N 笔（金额）/ 失败重发 N 笔（金额）」分项列出并给出合计金额，确认即对该月待提现与失败记录一次性批量打款，结果逐笔回写为「提现成功」并记录打款时间、清除失败原因；分组内无可打款记录时按钮置灰不可点击；</li>
                 <li><strong>独立筛选</strong>：支持按分销员姓名、分销员账号、月份区间与状态（可多选，含待提现）组合筛选；月份为一个合并输入框，点击调用日期控件选择起始 / 结束月，只填单侧则按单月筛选，倒序自动纠正；</li>
+                <li><strong>金额构成</strong>：每条记录的金额拆分为三项——<strong>提现总金额</strong>（当月可提现佣金总额，列表主数值）、<strong>代扣税金额</strong>（按代扣税规则计算）、<strong>实际到账金额</strong>（提现总金额 − 代扣税金额），后两者相加等于提现总金额；分组头部汇总同口径展示「总额 / 代扣税 / 实际到账」；</li>
                 <li><strong>身份信息</strong>：列表展示分销员姓名、手机号及身份证号，供打款实名核验与税务申报使用；</li>
                 <li><strong>失败原因</strong>：鼠标悬停「提现失败」标签可查看具体失败原因；</li>
                 <li><strong>重新打款</strong>：仅「提现失败」的记录显示，点击二次确认后重新发起打款，打款成功即更新为「提现成功」并记录打款时间；</li>
-                <li><strong>导出</strong>：将当前筛选条件下的全部提现记录导出为 Excel（状态列区分待提现 / 成功 / 失败）</li>
+                <li><strong>导出</strong>：将当前筛选条件下的全部提现记录导出为 Excel（含提现总金额 / 代扣税金额 / 实际到账金额三列，状态列区分待提现 / 成功 / 失败，并在表头标注三项合计）</li>
             </ul>
-            <h4>三、月度结算与打款流程</h4>
+            <h4>三、代扣税规则</h4>
+            <ul>
+                <li><strong>免税额度</strong>：单笔提现总金额 <strong>≤ ¥800</strong> 时免个人所得税，代扣税金额为 <strong>¥0.00</strong>，实际到账金额等于提现总金额；</li>
+                <li><strong>超额计征</strong>：单笔提现总金额 <strong>超过 ¥800</strong> 时，仅对超出部分按 <strong>20%</strong> 代扣，公式为：<br><strong>代扣税金额 =（提现总金额 − 800）× 20%</strong>；<br><strong>实际到账金额 = 提现总金额 − 代扣税金额</strong>；</li>
+                <li><strong>示例</strong>：提现总金额 ¥2,180.00 → 代扣税（2180−800）×20% = <i>¥276.00</i>，实际到账 <i>¥1,904.00</i>；提现总金额 ¥800.00 → 代扣税 <i>¥0.00</i>，实际到账 <i>¥800.00</i>；提现总金额 ¥500.00 → 代扣税 <i>¥0.00</i>，实际到账 <i>¥500.00</i>；</li>
+                <li><strong>打款口径</strong>：系统按<strong>实际到账金额</strong>打款至分销员微信零钱，代扣税款由平台代扣代缴；批量打款确认弹窗会同时给出「合计金额 / 代扣税合计 / 实际到账合计」；</li>
+                <li><strong>税务申报</strong>：以列表展示的身份证实名信息作为代扣代缴申报依据，导出明细可直接用于财务核对。</li>
+            </ul>
+            <h4>四、月度结算与打款流程</h4>
             <ul>
                 <li><strong>① 每月月底（如 28 号）系统计算</strong>：系统统计各分销员当月可提现佣金，筛选出累计金额达到「最低提现金额」的用户，按用户生成当月提现记录，状态统一为「<strong>待提现</strong>」；此时尚未发生实际打款，记录即为本月的待打款清单；</li>
                 <li><strong>② 财务备款</strong>：财务在本页按月份查看「待提现」清单，核对笔数与合计金额无误后，将对应款项从对公账户转入<strong>微信商户号营销账户</strong>（营销资金 / 代付备付金），确保账户余额充足；</li>
@@ -833,6 +945,11 @@
                 <li><strong>④ 打款失败处理</strong>：打款被拒（如实名不一致、风控拦截）的记录转为「提现失败」并记录失败原因，可点击分组头部「批量打款」（与待提现记录一并提交）或单条「重新打款」重试；</li>
                 <li><strong>示例</strong>：6 月 28 日计算生成 6 月待提现记录 → 财务充值至微信商户号营销账户 → 7 月 1 日系统批量打款 → 记录转为「提现成功」；</li>
             </ul>
+            <h4>五、分销提现流程</h4>
+            <a class="fp-img" href="../asset/分销提现流程图.png" onclick="openImgLightbox(this.href); return false;" title="点击查看原图">
+                <img src="../asset/分销提现流程图.png" alt="分销提现流程图">
+            </a>
+            <div class="fp-img-cap">图：分销提现流程图（点击图片全屏查看，再点图片可切换 1:1 原图）</div>
         </div>
     </div>
     <button class="fp-open" onclick="toggleFuncPanel()" title="展开功能说明">功能说明‹</button>
@@ -843,6 +960,41 @@
     function toggleFuncPanel() {
         document.body.classList.toggle('fp-collapsed');
     }
+    /* ── 流程图点击放大 ── */
+    function openImgLightbox(src) {
+        var box = document.getElementById('imgLightbox');
+        var pic = document.getElementById('imgLightboxPic');
+        pic.classList.remove('actual');
+        pic.src = src;
+        box.scrollTop = 0;
+        box.scrollLeft = 0;
+        box.classList.add('show');
+        document.getElementById('imgLightboxHint').textContent = '点击图片切换 1:1 原图 · 点击空白处或按 Esc 关闭';
+        document.body.style.overflow = 'hidden';
+    }
+    function closeImgLightbox() {
+        var box = document.getElementById('imgLightbox');
+        var pic = document.getElementById('imgLightboxPic');
+        box.classList.remove('show');
+        pic.classList.remove('actual');
+        pic.src = '';
+        document.body.style.overflow = '';
+    }
+    /* 点击图片：在「适应宽度」与「1:1 原图」之间切换，可上下/左右滚动查看细节 */
+    function toggleImgOriginal(e) {
+        if (e) e.stopPropagation();
+        var pic = document.getElementById('imgLightboxPic');
+        var hint = document.getElementById('imgLightboxHint');
+        pic.classList.toggle('actual');
+        if (pic.classList.contains('actual')) {
+            hint.textContent = '当前为 1:1 原图（可上下滚动）· 点击图片返回适应宽度';
+        } else {
+            hint.textContent = '点击图片切换 1:1 原图 · 点击空白处或按 Esc 关闭';
+        }
+    }
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && document.getElementById('imgLightbox').classList.contains('show')) closeImgLightbox();
+    });
 </script>
 <script src="asset/admin-sidebar.js"></script>
 </body>

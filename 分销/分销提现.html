@@ -417,7 +417,7 @@
                         <div class="auth-icon active" id="authIcon">✅</div>
                         <div class="auth-title">微信提现账户 <span class="auth-tag active" id="authTag">已绑定</span></div>
                     </div>
-                    <div class="auth-hint">绑定微信账号后，系统每月末自动将可提现余额批量打款到微信零钱</div>
+                    <div class="auth-hint">绑定微信账号后，系统每月末结算当月可提现佣金，次月初自动打款到微信零钱</div>
                     <button class="auth-btn secondary" id="authBtn" onclick="handleAuthAction()">解绑账号</button>
                 </div>
 
@@ -436,10 +436,10 @@
                     <div class="pc-grid" id="nextPayGrid">
                         <div class="pc-cell">
                             <div class="pc-label">下次预计打款日期</div>
-                            <div class="pc-value highlight">2026年6月30日</div>
+                            <div class="pc-value highlight">2026年7月1日</div>
                         </div>
                         <div class="pc-cell">
-                            <div class="pc-label">下次预计打款金额</div>
+                            <div class="pc-label">下次预计打款金额（税前）</div>
                             <div class="pc-value highlight" id="payoutAmount">¥1,560.00</div>
                         </div>
                         <div class="pc-cell">
@@ -451,13 +451,13 @@
                             <div class="pc-value green">自动打款</div>
                         </div>
                     </div>
-                    <div class="pc-note" id="nextPayNote">每月末最后一天，将自动为您打款账户全部已结算余额。<br><span style="color:#b45309;">温馨提示：</span><span style="color:#666;">佣金将依法预扣个人所得税，您微信实际收到的为扣税后金额，税款由平台代为申报。</span></div>
+                    <div class="pc-note" id="nextPayNote">每月末进行结算，次月初自动打款至您的微信零钱。<br><span style="color:#b45309;">温馨提示：</span><span style="color:#666;">佣金将依法预扣个人所得税，您微信实际收到的为扣税后金额，税款由平台代为申报。</span></div>
                 </div>
 
                 <!-- 打款记录 -->
                 <div class="card" style="margin-bottom:16px;" id="recordSection">
                     <div class="record-header">
-                        <span class="rh-title">📄 打款记录</span>
+                        <span class="rh-title">📄 提现记录</span>
                         <span class="rh-more" onclick="goLedger()">查看更多 ›</span>
                     </div>
                     <div id="recordList">
@@ -465,7 +465,7 @@
                             <div class="ri-icon">💰</div>
                             <div class="ri-info">
                                 <div class="ri-name">2026年5月批量打款</div>
-                                <div class="ri-time">2026-05-31 23:59</div>
+                                <div class="ri-time">2026-06-01 10:00</div>
                             </div>
                             <div class="ri-amount">+¥2,300.00</div>
                             <div class="ri-status">已到账</div>
@@ -474,7 +474,7 @@
                             <div class="ri-icon">💰</div>
                             <div class="ri-info">
                                 <div class="ri-name">2026年4月批量打款</div>
-                                <div class="ri-time">2026-04-30 23:59</div>
+                                <div class="ri-time">2026-05-01 10:00</div>
                             </div>
                             <div class="ri-amount">+¥1,640.00</div>
                             <div class="ri-status">已到账</div>
@@ -483,7 +483,7 @@
                             <div class="ri-icon">💰</div>
                             <div class="ri-info">
                                 <div class="ri-name">2026年3月批量打款</div>
-                                <div class="ri-time">2026-03-31 23:59</div>
+                                <div class="ri-time">2026-04-01 10:00</div>
                             </div>
                             <div class="ri-amount">+¥1,400.00</div>
                             <div class="ri-status">已到账</div>
@@ -523,7 +523,7 @@
         <div class="fp-body">
             <h4>一、页面概述</h4>
             <ul>
-                <li>提现账户管理页面（手机端）用于管理微信账号绑定及系统自动打款。绑定后每月末自动将可提现余额批量打款至用户微信零钱（免确认授权模式）。这里的打款日期以及报税信息等需要跟财务确定方案</li>
+                <li>提现账户管理页面（手机端）用于管理微信账号绑定及系统自动打款。绑定后系统每月末结算当月可提现佣金，次月初自动批量打款至用户微信零钱（免确认授权模式）。这里的打款日期以及报税信息等需要跟财务确定方案</li>
             </ul>
             <h4>二、账号绑定</h4>
             <ul>
@@ -533,12 +533,12 @@
             </ul>
             <h4>三、自动打款</h4>
             <ul>
-                <li>每月末自动批量打款，金额 =「当前余额（已结算）」全部金额；</li>
+                <li>每月末进行结算，次月初自动批量打款，金额 =「当前余额（已结算）」全部金额；</li>
                 <li>对接微信支付「商家转账」接口（佣金报酬场景），已绑定用户无需每次确认收款。</li>
                 <li><strong>余额未达最低提现金额</strong>：当可提现余额低于平台设定的最小提现金额时，「下次打款信息」隐藏日期、金额、账户、模式等信息，仅居中展示当前余额，并在下方提示「未达到最小提现金额，暂时不能提现」。</li>
                 <li>手机框右侧的「切换到余额不足状态」按钮为原型演示用，用于预览上述两种状态的切换效果。</li>
             </ul>
-            <h4>四、打款记录</h4>
+            <h4>四、提现记录</h4>
             <ul>
                 <li>展示历次自动打款（月份、金额、到账状态）；「查看更多」进入「分销记账」查看完整流水。</li>
             </ul>
@@ -643,7 +643,7 @@
             body.innerHTML = '<div class="wx-center">' +
                 '<div class="wx-ok-ic">✓</div>' +
                 '<div class="wx-success-title">开通成功</div>' +
-                '<div class="wx-ok-desc">微信账号已绑定成功，每月末系统将自动把可提现余额打款至您的微信零钱</div>' +
+                '<div class="wx-ok-desc">微信账号已绑定成功，系统每月末结算当月可提现佣金，次月初自动打款至您的微信零钱</div>' +
                 '<button class="wx-agree" style="width:220px;" onclick="wxFinish()">完成</button>' +
                 '</div>';
             return;
@@ -657,7 +657,7 @@
             '<div class="wx-request-title">在「离泰数链」通过微信支付收款</div>' +
             '<div class="wx-table">' +
                 '<div class="wx-row"><span class="r-label">转账类型</span><span class="r-value">活动奖励</span></div>' +
-                '<div class="wx-row"><span class="r-label">转账说明</span><span class="r-value">同意后每月末系统将自动把可提现佣金转账至您选定的微信零钱</span></div>' +
+                '<div class="wx-row"><span class="r-label">转账说明</span><span class="r-value">同意后系统每月末结算佣金，次月初自动转账至您选定的微信零钱</span></div>' +
                 '<div class="wx-row"><span class="r-label">收款方式</span><span class="r-value">零钱</span></div>' +
             '</div>';
         foot.innerHTML = '<button class="wx-agree" onclick="wxAllow()">同意</button>' +
