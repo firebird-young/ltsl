@@ -504,7 +504,7 @@
         <div class="dlg-head">
             <div>
                 <div class="dlg-title">⚙️ 分销配置</div>
-                <div class="dlg-sub">配置分销推广规则、提现门槛、分销协议与常见问题说明，保存后立即生效</div>
+                <div class="dlg-sub">配置分销推广规则、提现门槛与单笔转账上限、分销协议与常见问题说明，保存后立即生效</div>
             </div>
             <button class="dlg-close" onclick="closeConfig()" aria-label="关闭">✕</button>
         </div>
@@ -551,6 +551,16 @@
                 <div class="cfg-control cfg-input-box">
                     <span class="cfg-prefix">¥</span>
                     <input type="number" id="cfgMinAmount" min="0" step="0.01" value="50">
+                </div>
+            </div>
+            <div class="cfg-item">
+                <div class="cfg-info">
+                    <div class="cfg-name">单笔最大金额</div>
+                    <div class="cfg-desc">系统打款时单笔转账的上限，由运营配置；<strong style="color:#e5484d;font-weight:600;">不能大于微信商户号「商家转账」配置的单笔限额（当前 ¥200）</strong>。低于提现金额的记录将按此上限自动拆分为多笔转账</div>
+                </div>
+                <div class="cfg-control cfg-input-box">
+                    <span class="cfg-prefix">¥</span>
+                    <input type="number" id="cfgMaxPerTx" min="0.01" step="0.01" value="200">
                 </div>
             </div>
 
@@ -764,6 +774,9 @@
         document.getElementById('cfgMask').classList.remove('show');
         resetDocDraft();
     }
+    /* 微信支付商户号后台「商家转账」配置的单笔限额（此处仅作前端提示与校验） */
+    var WX_TRANSFER_LIMIT = 200;
+
     function saveConfig() {
         var protectDays = parseFloat(document.getElementById('cfgProtectDays').value);
         if (isNaN(protectDays) || protectDays < 1 || protectDays % 1 !== 0) {
@@ -773,6 +786,15 @@
         var minAmount = parseFloat(document.getElementById('cfgMinAmount').value);
         if (isNaN(minAmount) || minAmount < 0) {
             showConfigToast('最低提现金额不能小于 0');
+            return;
+        }
+        var maxPerTx = parseFloat(document.getElementById('cfgMaxPerTx').value);
+        if (isNaN(maxPerTx) || maxPerTx <= 0) {
+            showConfigToast('单笔最大金额需填写大于 0 的金额');
+            return;
+        }
+        if (maxPerTx > WX_TRANSFER_LIMIT) {
+            showConfigToast('单笔最大金额不能大于微信商户号配置的 ¥' + WX_TRANSFER_LIMIT + '.00');
             return;
         }
         docContents.agreement = docDraft.agreement;
@@ -931,7 +953,7 @@
             <h4>一、页面概述</h4>
             <ul>
                 <li>分销等级管理页（管理后台）用于配置平台分销员<strong>等级体系、升级门槛与佣金比例</strong>，支撑「分销员管理 / 分销员详情」中的等级展示与分佣结算。</li>
-                <li>页面同时承载全局<strong>「分销配置」</strong>入口（原位于「分销订单管理」页，现已迁移至此），统一维护分销推广开关、提现门槛、分销协议与常见问题说明。</li>
+                <li>页面同时承载全局<strong>「分销配置」</strong>入口（原位于「分销订单管理」页，现已迁移至此），统一维护分销推广开关、提现门槛与单笔转账上限、分销协议与常见问题说明。</li>
             </ul>
             <h4>二、等级体系</h4>
             <ul>
@@ -962,6 +984,7 @@
                 <li><strong>启用「我的主页 - 我的推广」按钮</strong>：控制分销员「我的主页」中「我的推广」入口的显示；关闭后该入口隐藏，无法进入推广合作协议与实名认证流程；</li>
                 <li><strong>首触保护期</strong>：数字填写，默认 <strong>30 天</strong>；下单人首次点击分销链接，即与该分销员和该课程建立绑定关系，保护期内该下单人在该课程下产生的订单均计入该分销员分佣，多次下单多次分佣；保护期结束后绑定失效，可被其他分销员重新绑定；</li>
                 <li><strong>最低提现金额</strong>：佣金累计未达该金额自动结转下期，达标后统一批量打款；</li>
+                <li><strong>单笔最大金额</strong>：系统向分销员微信零钱打款时<strong>单笔转账的上限</strong>，由<strong>运营</strong>在此配置（默认 ¥200.00）；<strong>该值不能大于微信支付商户号后台「商家转账」中配置的单笔限额</strong>（当前商户号限额为 ¥200.00），填写的金额超过商户号限额时保存不通过并提示「单笔最大金额不能大于微信商户号配置的 ¥200.00」；提现总金额超过该上限的记录，由系统按此金额为上限<strong>自动拆分为多笔转账</strong>逐笔发起（拆分与「部分提现」规则见「分销提现管理」页）；</li>
                 <li><strong>分销协议（富文本）</strong>：位于常见问题说明之前，右侧仅保留「✎ 编辑内容」按钮；点击后弹出富文本编辑器弹窗，编辑分销员申请推广资格时需同意的协议正文，保存后展示在「我的推广 - 推广合作协议」页面；</li>
                 <li><strong>常见问题说明（富文本）</strong>：同样改为点击「✎ 编辑内容」按钮弹出富文本编辑器，编辑分销员端「常见问题说明」页面内容，保存后同步展示在小程序端；</li>
                 <li><strong>富文本编辑器</strong>：支持小标题、正文、加粗 / 斜体 / 下划线 / 删除线、有序与无序列表、引用、链接、图片及撤销 / 重做，底部实时统计字数；点「保存内容」回填内容并提示「点击保存配置后生效」，点「取消」或按 Esc / 点击遮罩则放弃本次编辑；</li>
