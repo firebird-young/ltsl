@@ -215,7 +215,6 @@
         .wd-group .wdg-header .wdg-summary .green { color: #34c759; }
         .wd-group .wdg-header .wdg-summary .blue { color: var(--accent); }
         .wd-pending-hint { font-size: 12px; color: var(--ink-subtle); }
-        .wd-pending-hint.manual { color: #e5484d; font-weight: 600; cursor: help; }
         .wdg-head-right { display: flex; align-items: center; gap: 14px; }
         .btn-batch {
             display: inline-flex; align-items: center; gap: 5px;
@@ -256,10 +255,6 @@
         }
         .wd-group .wdg-item .wdg-amount .amt-sub .tax { color: #ff9500; }
         .wd-group .wdg-item .wdg-amount .amt-sub b { color: #34c759; font-weight: 600; }
-        /* 税前佣金超 2 万：税制不同，先记账标红、暂不计税与打款 */
-        .wd-group .wdg-item .wdg-amount .amt-total.manual { color: #e5484d; }
-        .wd-group .wdg-item .wdg-amount .amt-sub .tax.manual { color: #e5484d; font-weight: 600; cursor: help; }
-        .wd-group .wdg-item .wdg-amount .amt-sub b.manual { color: #e5484d; font-weight: 600; }
 
         /* 转账拆分三列：已转账金额 / 已转账笔数 / 剩余转账金额（按系统配置的单笔最大金额拆分） */
         .wd-group .wdg-item .wdg-transfer { flex: 1.9; display: flex; align-items: center; padding: 0 4px; }
@@ -537,26 +532,34 @@
     function transferRemainCount(w) { return Math.max(0, transferTotalCount(w) - transferPaidCount(w)); }
 
     /* ===== 代扣税规则（劳务报酬预扣预缴口径）=====
-       ① 佣金（税前）≤ ¥20,000：
-          - 佣金 < ¥4,000：应纳税所得额 = 佣金 − 800（≤ 0 时不计税）
-          - 佣金 ≥ ¥4,000：应纳税所得额 = 佣金 × (1 − 20%)
-          - 代扣税率 20%
-       ② 佣金（税前）> ¥20,000：税率计算方式不同，系统先记账、金额标红，暂不计税、暂不打款，待人工核定后处理 ===== */
+       ① 先算应纳税所得额：
+          - 佣金（税前）< ¥4,000：应纳税所得额 = 佣金 − 800（≤ 0 时不计税）
+          - 佣金（税前）≥ ¥4,000：应纳税所得额 = 佣金 × (1 − 20%)
+       ② 再按应纳税所得额分档定税率：
+          - ≤ ¥20,000：20%
+          - ¥20,000 ~ ¥50,000：30%
+          - > ¥50,000：40%
+       ③ 代扣税 = 应纳税所得额 × 对应税率；实际到账 = 佣金 − 代扣税 ===== */
     var TAX_FREE_LIMIT = 800;       /* 费用扣除额 */
     var TAX_4000_LINE = 4000;       /* 4,000 元分界：以下减 800，以上按 20% 扣除费用 */
-    var TAX_MANUAL_LINE = 20000;    /* 2 万元分界：超过则人工核定 */
-    var TAX_RATE = 0.2;
+    var TAX_MID_LINE = 20000;       /* 应纳税所得额 2 万元分界 */
+    var TAX_HIGH_LINE = 50000;      /* 应纳税所得额 5 万元分界 */
+    var TAX_RATE_LOW = 0.2, TAX_RATE_MID = 0.3, TAX_RATE_HIGH = 0.4;
     function round2(n) { return Math.round(n * 100) / 100; }
-    /* 是否需要人工核定（税前佣金超过 2 万） */
-    function taxNeedManual(amount) { return amount > TAX_MANUAL_LINE; }
     /* 应纳税所得额 */
     function taxableOf(amount) {
         var taxable = amount < TAX_4000_LINE ? (amount - TAX_FREE_LIMIT) : round2(amount * (1 - 0.2));
         return Math.max(0, round2(taxable));
     }
+    /* 按应纳税所得额分档取税率 */
+    function taxRateOf(taxable) {
+        if (taxable > TAX_HIGH_LINE) return TAX_RATE_HIGH;
+        if (taxable > TAX_MID_LINE) return TAX_RATE_MID;
+        return TAX_RATE_LOW;
+    }
     function taxOf(amount) {
-        if (taxNeedManual(amount)) return 0;   /* 超 2 万：暂不计税 */
-        return round2(taxableOf(amount) * TAX_RATE);
+        var taxable = taxableOf(amount);
+        return round2(taxable * taxRateOf(taxable));
     }
     function netOf(amount) { return round2(amount - taxOf(amount)); }
 
@@ -739,10 +742,7 @@
             summaryParts.push('已转 <strong class="green">¥' + round2(paidSum).toFixed(2) + '</strong> · 剩余 <strong class="orange">¥' + round2(remainSum).toFixed(2) + '</strong>'
                 + '（转账 <strong>' + transferredCount + '/' + transferCount + '</strong> 笔）');
             var taxTotal = items.reduce(function (s, w) { return s + taxOf(w.amount); }, 0);
-            var manualItems = items.filter(function (w) { return taxNeedManual(w.amount); });
-            var manualSum = manualItems.reduce(function (s, w) { return s + w.amount; }, 0);
-            summaryParts.push('代扣税 <strong class="orange">¥' + round2(taxTotal).toFixed(2) + '</strong> · 实际到账 <strong>¥' + round2(total - taxTotal - manualSum).toFixed(2) + '</strong>'
-                + (manualSum > 0 ? ' · 待人工核定 <strong class="red">¥' + round2(manualSum).toFixed(2) + '</strong>' : ''));
+            summaryParts.push('代扣税 <strong class="orange">¥' + round2(taxTotal).toFixed(2) + '</strong> · 实际到账 <strong>¥' + round2(total - taxTotal).toFixed(2) + '</strong>');
             var statusBits = [];
             if (pendingCount) statusBits.push('待提现 <strong class="orange">' + pendingCount + '</strong> 笔');
             if (partialCount) statusBits.push('部分提现 <strong class="blue">' + partialCount + '</strong> 笔');
@@ -750,11 +750,9 @@
             if (failCount) statusBits.push('失败 <strong class="red">' + failCount + '</strong> 笔');
             if (statusBits.length) summaryParts.push(statusBits.join(' · '));
 
-            /* 当前分组（当前筛选结果）内可打款记录（待提现 + 部分提现 + 提现失败）在原始数据中的索引
-               税前佣金超过 ¥20,000 的记录需人工核定，暂不参与打款 */
+            /* 当前分组（当前筛选结果）内可打款记录（待提现 + 部分提现 + 提现失败）在原始数据中的索引 */
             var payableIdx = [];
             items.forEach(function (w) {
-                if (taxNeedManual(w.amount)) return;
                 if (w.status === 'pending' || w.status === 'partial' || w.status === 'failed') payableIdx.push(withdrawData.indexOf(w));
             });
             var payableCount = payableIdx.length;
@@ -780,12 +778,9 @@
                      + '<div class="wdg-idcard">身份证 <i>' + w.idcard + '</i></div>'
                      + '</div>'
                      + '<div class="wdg-amount">'
-                     + '<div class="amt-total' + (taxNeedManual(w.amount) ? ' manual' : '') + '">¥' + w.amount.toFixed(2) + '</div>'
-                     + (taxNeedManual(w.amount)
-                            ? '<div class="amt-sub"><span class="tax manual" title="税前佣金超过 ¥20,000，税率计算方式不同：系统先记账、暂不计税且暂不打款，待财务人工核定后处理">超 2 万 · 待人工核定</span></div>'
-                                + '<div class="amt-sub">到账 <b class="manual">待核定</b></div>'
-                            : '<div class="amt-sub">代扣税 <span class="tax">-¥' + taxOf(w.amount).toFixed(2) + '</span></div>'
-                                + '<div class="amt-sub">到账 <b>¥' + netOf(w.amount).toFixed(2) + '</b></div>')
+                     + '<div class="amt-total">¥' + w.amount.toFixed(2) + '</div>'
+                     + '<div class="amt-sub">代扣税 <span class="tax" title="应纳税所得额 ¥' + taxableOf(w.amount).toFixed(2) + '，适用税率 ' + (taxRateOf(taxableOf(w.amount)) * 100) + '%">-¥' + taxOf(w.amount).toFixed(2) + '</span></div>'
+                     + '<div class="amt-sub">到账 <b>¥' + netOf(w.amount).toFixed(2) + '</b></div>'
                      + '</div>'
                      + '<div class="wdg-transfer">'
                      + '<div class="wdt-col"><span class="wdt-k">已转账金额</span><span class="wdt-v paid">¥' + paidOf(w).toFixed(2) + '</span></div>'
@@ -805,9 +800,7 @@
                                     : '重新发起打款')
                                 + '">↻ 重新打款</button>'
                             : (w.status === 'pending'
-                                ? (taxNeedManual(w.amount)
-                                    ? '<span class="wd-pending-hint manual" title="税前佣金超过 ¥20,000，税率计算方式不同：系统先记账、暂不计税且暂不打款，待财务人工核定后处理">超 2 万 · 待人工核定</span>'
-                                    : '<span class="wd-pending-hint">次月 1 号批量打款</span>')
+                                ? '<span class="wd-pending-hint">次月 1 号批量打款</span>'
                                 : ''))
                      + '</div>'
                      + '</div>';
@@ -831,10 +824,6 @@
     function retryWithdraw(idx) {
         var w = withdrawData[idx];
         if (!w) return;
-        if (taxNeedManual(w.amount)) {
-            showToast('该记录税前佣金超过 ¥20,000，税制不同，需人工核定后处理，暂不打款');
-            return;
-        }
         var isPartial = w.status === 'partial';
         var rest = remainOf(w);
         var restCount = transferRemainCount(w);
@@ -859,11 +848,8 @@
         var targets = (idxList || []).filter(function (i) {
             return withdrawData[i] && ['pending', 'partial', 'failed'].indexOf(withdrawData[i].status) > -1;
         });
-        /* 税前佣金超 ¥20,000 的记录税制不同，先记账、暂不计税与打款，需人工核定 */
-        var manualN = targets.filter(function (i) { return taxNeedManual(withdrawData[i].amount); }).length;
-        targets = targets.filter(function (i) { return !taxNeedManual(withdrawData[i].amount); });
         if (!targets.length) {
-            showToast('所选记录税前佣金均超过 ¥20,000，需人工核定后处理，暂不打款');
+            showToast('该月暂无可打款记录');
             return;
         }
 
@@ -895,8 +881,7 @@
         if (!confirm('确认对 ' + month + ' 的 ' + targets.length + ' 笔记录批量打款？\n'
             + detail.join('，') + '\n合计金额 ¥' + total.toFixed(2)
             + '（代扣税 ¥' + round2(taxTotal).toFixed(2) + '，实际到账 ¥' + round2(total - taxTotal).toFixed(2) + '）\n'
-            + '系统配置的单笔最大金额 ¥' + TRANSFER_LIMIT + '，本次将拆分为 ' + transferN + ' 笔转账，打款结果逐笔回写。'
-            + (manualN ? '\n另有 ' + manualN + ' 笔税前佣金超 ¥20,000 的记录暂不计税、不打款，待人工核定后处理。' : ''))) { return; }
+            + '系统配置的单笔最大金额 ¥' + TRANSFER_LIMIT + '，本次将拆分为 ' + transferN + ' 笔转账，打款结果逐笔回写。')) { return; }
 
         var time = nowStr();
         targets.forEach(function (i) {
@@ -942,8 +927,8 @@
                 w.phone,
                 w.idcard,
                 fmtAmount(w.amount),
-                taxNeedManual(w.amount) ? '待人工核定' : fmtAmount(taxOf(w.amount)),
-                taxNeedManual(w.amount) ? '待人工核定' : fmtAmount(netOf(w.amount)),
+                fmtAmount(taxOf(w.amount)),
+                fmtAmount(netOf(w.amount)),
                 fmtAmount(paidOf(w)),
                 fmtAmount(remainOf(w)),
                 w.account,
@@ -965,10 +950,6 @@
         var totalAmount = rows.reduce(function (s, w) { return s + w.amount; }, 0);
         var totalTax = rows.reduce(function (s, w) { return s + taxOf(w.amount); }, 0);
         var totalPaid = rows.reduce(function (s, w) { return s + paidOf(w); }, 0);
-        /* 税前佣金超 ¥20,000 的记录：暂不计税，单独标注待人工核定 */
-        var manualRows = rows.filter(function (w) { return taxNeedManual(w.amount); });
-        var manualCount = manualRows.length;
-        var manualSum = manualRows.reduce(function (s, w) { return s + w.amount; }, 0);
         var exportTime = new Date().toLocaleString('zh-CN', { hour12: false });
 
         var html = ''
@@ -988,8 +969,7 @@
             + '<div class="title">提现记录</div>'
             + '<div class="meta">导出时间：' + esc(exportTime) + ' · 共 ' + rows.length + ' 条 · 提现总金额 ¥' + fmtAmount(totalAmount)
             + ' · 已转账合计 ¥' + fmtAmount(totalPaid) + ' · 剩余转账合计 ¥' + fmtAmount(round2(totalAmount - totalPaid))
-            + ' · 代扣税合计 ¥' + fmtAmount(totalTax) + ' · 实际到账合计 ¥' + fmtAmount(round2(totalAmount - totalTax - manualSum)) + '</div>'
-            + (manualSum > 0 ? '<div class="meta" style="color:#e5484d;">注：' + manualCount + ' 条记录税前佣金超过 ¥20,000，税率计算方式不同，系统先记账、暂不计税与打款，合计 ¥' + fmtAmount(manualSum) + '（待人工核定）</div>' : '')
+            + ' · 代扣税合计 ¥' + fmtAmount(totalTax) + ' · 实际到账合计 ¥' + fmtAmount(round2(totalAmount - totalTax)) + '</div>'
             + '<table><thead>' + headRow + '</thead><tbody>' + bodyRows + '</tbody></table>'
             + '</body></html>';
 
@@ -1068,12 +1048,12 @@
                 <li><strong>部分提现</strong>：多笔中部分被拒（风控、日限额）时为「部分提现」；示例 ¥2,180 按 ¥200 需转 11 笔，成功 7 笔（¥1,400）→ 已转 7/11 笔、剩余 ¥780.00（4 笔），续打后转成功；</li>
                 <li>拆分为打款执行层面的技术拆分，代扣税仍按整笔提现总金额计算，不影响税额与到账金额。</li>
             </ul>
-            <h4>四、代扣税规则（税率 20%）</h4>
+            <h4>四、代扣税规则（两步计算）</h4>
             <ul>
-                <li><strong>税前佣金 &lt; ¥4,000</strong>：应纳税所得额 = 佣金 − 800（≤ ¥800 时为 0）；<strong>¥4,000 ~ ¥20,000</strong>：应纳税所得额 = 佣金 × 80%；</li>
-                <li><strong>代扣税 = 应纳税所得额 × 20%</strong>，<strong>实际到账 = 佣金 − 代扣税</strong>；示例：¥2,180 → 税 <i>¥276.00</i>；¥800 → <i>¥0.00</i>；¥6,000 → 税 <i>¥960.00</i>；</li>
-                <li><strong>税前佣金 &gt; ¥20,000</strong>：税率计算方式不同，系统<strong>先记账</strong>——金额与状态<strong style="color:#e5484d;">标红</strong>标注「超 2 万 · 待人工核定」，<strong>暂不计税、暂不打款</strong>（批量打款与重新打款均拦截），导出对应列标注待核定，待财务人工核定后处理；</li>
-                <li>系统按实际到账金额打款，税款由平台代扣代缴；确认弹窗同步给出合计金额 / 代扣税 / 实际到账。</li>
+                <li><strong>第一步 · 算应纳税所得额</strong>：佣金（税前）<strong>&lt; ¥4,000</strong> → 应纳税所得额 = 佣金 − 800（≤ ¥800 时为 0）；佣金 <strong>≥ ¥4,000</strong> → 应纳税所得额 = 佣金 × (1 − 20%)；</li>
+                <li><strong>第二步 · 按应纳税所得额分档定税率</strong>：<strong>≤ ¥20,000 扣 20%</strong>；<strong>¥20,000 ~ ¥50,000 扣 30%</strong>；<strong>&gt; ¥50,000 扣 40%</strong>；</li>
+                <li><strong>代扣税 = 应纳税所得额 × 对应税率</strong>，<strong>实际到账 = 佣金 − 代扣税</strong>；示例：¥6,000 → 所得额 4,800 → 20% → 税 <i>¥960.00</i>；佣金 ¥37,500 → 所得额 30,000 → 30% → 税 <i>¥9,000.00</i>；佣金 ¥80,000 → 所得额 64,000 → 40% → 税 <i>¥25,600.00</i>；</li>
+                <li>全部记录统一按此规则自动计税，不再有特殊标记或人工干预；系统按实际到账金额打款，税款由平台代扣代缴，确认弹窗同步给出合计金额 / 代扣税 / 实际到账。</li>
             </ul>
             <h4>五、月度结算流程</h4>
             <ul>
