@@ -450,17 +450,6 @@
         <div class="m-tip">等级佣金比例与权益将即时同步到符合该等级的分销员；修改门槛后系统会于次日重新核算成员归属。</div>
         <div class="form-grid">
             <div class="form-item">
-                <label>等级徽记<em class="req">*</em></label>
-                <select id="fColor">
-                    <option value="#B87333">铜色 · Lv.1 风格</option>
-                    <option value="#8A93A0">银色 · Lv.2 风格</option>
-                    <option value="#E6A23C">金色 · Lv.3 风格</option>
-                    <option value="#2BB3A3">铂金 · Lv.4 风格</option>
-                    <option value="#722ED1">钻石 · Lv.5 风格</option>
-                    <option value="#0066cc">品牌蓝（自定义）</option>
-                </select>
-            </div>
-            <div class="form-item">
                 <label>等级名称<em class="req">*</em></label>
                 <input type="text" id="fName" placeholder="如：金牌分销员" maxlength="20">
             </div>
@@ -649,6 +638,8 @@
     ];
 
     var editingIndex = -1;
+    /* 徽记配色改由系统按等级编号自动匹配，编辑弹窗不再提供该项 */
+    var editingColor = '#B87333';
 
     function fmt(n) { return n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
     function fmtNum(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
@@ -710,7 +701,7 @@
         fLv.value = d.lv;
         fLv.disabled = isSys;
         document.getElementById('fLvHint').style.display = isSys ? 'block' : 'none';
-        document.getElementById('fColor').value = d.color;
+        editingColor = d.color || '#B87333';
         document.getElementById('fComm').value = d.comm;
         document.getElementById('fOrders').value = d.orders;
         document.getElementById('fAmount').value = d.amount;
@@ -730,7 +721,7 @@
         var rec = {
             lv: Math.max(1, lv),
             name: name,
-            color: document.getElementById('fColor').value,
+            color: editingColor,
             comm: parseFloat(document.getElementById('fComm').value) || 0,
             orders: Math.max(0, parseInt(document.getElementById('fOrders').value, 10) || 0),
             amount: Math.max(0, parseInt(document.getElementById('fAmount').value, 10) || 0),
@@ -961,20 +952,21 @@
             </ul>
             <h4>三、等级列表</h4>
             <ul>
-                <li><strong>等级</strong>：徽记 + 名称，系统内置等级带「系统默认」标识不可删除；</li>
+                <li><strong>等级名称</strong>：显示等级名称与编号，系统内置等级带「系统默认」标识不可删除；</li>
+                <li><strong>排序</strong>：列表按<strong>等级编号从小到大升序排列</strong>（编号越小越靠前），编号即排序依据；</li>
                 <li><strong>升级门槛</strong>：展示两条件，满足其一即可；</li>
                 <li><strong>佣金比例</strong>：该等级成员每笔推广订单计提的佣金比例；</li>
                 <li><strong>等级权益</strong>：结算优先、专属顾问、活动返现等差异化权益描述；</li>
                 <li><strong>当前人数</strong>：该等级现有分销员数，点击跳转「分销员管理」查看成员；</li>
                 <li><strong>状态</strong>：开关一键<strong>启用 / 停用</strong>等级，停用后新成员不再自动获得该等级；</li>
-                <li><strong>操作</strong>：<strong>编辑</strong>等级配置；系统默认等级<strong>删除按钮置灰</strong>，仅自定义等级可删除。</li>
+                <li><strong>操作</strong>：<strong>编辑</strong>等级配置；系统默认等级<strong>删除按钮置灰</strong>，仅自定义等级可删除。如果该等级有人达到，就不能删除，可以编辑。</li>
             </ul>
             <h4>四、新增 / 编辑等级</h4>
             <ul>
-                <li>点「＋ 新增等级」弹出表单：可配置<strong>徽记配色、等级名称、等级编号、佣金比例、双项升级门槛、权益说明</strong>及启用状态；</li>
+                <li>点「＋ 新增等级」弹出表单：可配置<strong>等级名称、等级编号、佣金比例、双项升级门槛、权益说明</strong>及启用状态；</li>
                 <li>内置 5 个等级的<strong>编号固定不可调整</strong>（编辑时置灰），仅自定义新增等级可修改编号；</li>
                 <li>门槛数字填 0 表示不限制该条件，两项满足其一即升级；</li>
-                <li>保存后按等级编号自动排序；修改门槛新触发该等级的用户生效，已经达到该等级的用户保持不变。等级里面的内容变更对该等级所有用户生效</li>
+                <li>等级编号决定排序：保存后列表按编号从小到大升序重新排列；修改门槛新触发该等级的用户生效，已经达到该等级的用户保持不变。等级里面的内容变更对该等级所有用户生效</li>
             </ul>
             <h4>五、分销配置</h4>
             <ul>
