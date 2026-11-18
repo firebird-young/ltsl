@@ -456,7 +456,7 @@ function openDetail(pid, user) {
 
     html += '<div class="kv-grid">'
         + '<div class="kv-item"><div class="kv-lbl">首触时间</div><div class="kv-val">' + r.first + '</div></div>'
-        + '<div class="kv-item"><div class="kv-lbl">过期时间（首触 + 30 天）</div><div class="kv-val">' + exp + '</div></div>'
+        + '<div class="kv-item"><div class="kv-lbl">过期时间（首触 + 首触保护期）</div><div class="kv-val">' + exp + '</div></div>'
         + '<div class="kv-item"><div class="kv-lbl">绑定状态</div><div class="kv-val">' + statusTag(st) + (left >= 0 ? ' <span style="color:var(--ink-subtle);font-size:12px;">剩 ' + left + ' 天</span>' : '') + '</div></div>'
         + '<div class="kv-item"><div class="kv-lbl">已下单订单数量</div><div class="kv-val">' + r.orders + ' 单</div></div>'
         + '<div class="kv-item"><div class="kv-lbl">已下单订单总金额</div><div class="kv-val">¥' + r.orderAmt.toFixed(2) + '</div></div>'
@@ -504,7 +504,7 @@ renderBindings();
             <h4>一、业务规则</h4>
             <ul>
                 <li><strong>绑定建立</strong>：下单人点击分销员分享的链接后，即建立「分销员 — 下单人 — 产品」绑定关系；一个下单人对同一产品只保留一条当前有效绑定；</li>
-                <li><strong>有效期</strong>：绑定自首触时刻起 <strong>30 天</strong>内有效，过期时间 = 首触时间 + 30 天，到期自动失效、不再分佣；</li>
+                <li><strong>有效期</strong>：绑定自首触时刻起 <strong>30 天</strong>内有效，过期时间 = 首触时间 + 30 天（根据业务实际配置的首触保护期），到期自动失效、不再分佣；</li>
                 <li><strong>多次分佣</strong>：有效期内该下单人购买此产品的每一笔订单都计入该分销员佣金，多次下单多次分佣；</li>
                 <li><strong>过期后再点击链接</strong>：重新建立一条新的绑定关系，以新的首触时间重新计算 30 天。</li>
             </ul>
@@ -512,7 +512,7 @@ renderBindings();
             <ul>
                 <li><strong>绑定关系总数</strong>：按「用户 × 产品」维度统计的绑定条数（含已过期）；</li>
                 <li><strong>有效绑定</strong>：距过期时间仍有剩余天数的绑定；</li>
-                <li><strong>已过期绑定</strong>：首触已满 30 天的绑定；</li>
+                <li><strong>已过期绑定</strong>：首触已满有效期的绑定；</li>
                 <li><strong>累计已下单总金额</strong>：所有绑定期内产生订单的金额合计。</li>
             </ul>
             <h4>三、绑定记录列表</h4>
@@ -521,7 +521,7 @@ renderBindings();
                 <li><strong>分销产品类型 / 产品ID / 产品名称</strong>：绑定指向的产品，类型为课程或商品，产品ID 为系统内唯一编号；</li>
                 <li><strong>分销员账号 / 姓名</strong>：获得该绑定分佣的分销员；</li>
                 <li><strong>首触时间</strong>：下单人首次点击该分销链接（建立绑定）的时间；</li>
-                <li><strong>过期时间</strong>：首触时间 + 30 天，到期即失效；</li>
+                <li><strong>过期时间</strong>：首触时间 + 有效期，到期即失效；</li>
                 <li><strong>绑定状态</strong>：有效 / 即将过期（剩余 ≤3 天）/ 已过期，由剩余天数自动判定；</li>
                 <li><strong>已下单订单数量 / 总金额</strong>：绑定期内该下单人对此产品已下单的订单笔数与金额合计；</li>
                 <li><strong>已结算订单数量 / 总金额</strong>：其中已完成佣金结算的部分，剩余为待结算；</li>
